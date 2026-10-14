@@ -35,6 +35,8 @@ Do not create an OC for ordinary private helper boundaries merely because values
 
 ## Durable artifact
 
+Use the consuming repository's OKF relationship vocabulary and heading rules when publishing the document. The example `## Derived from` heading is illustrative; relationship type and path are repository-owned.
+
 ```markdown
 # OC-NNN — <descriptive title>
 
@@ -61,6 +63,6 @@ Do not create an OC for ordinary private helper boundaries merely because values
 **Verification semantics:**
 <what must be observed across the real participants to prove/falsify the contract>
 
-**Derived from:**
+## Derived from
 - <closest accepted semantic authority>
 ```
