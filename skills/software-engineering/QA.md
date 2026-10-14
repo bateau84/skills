@@ -1,6 +1,6 @@
 # Software Engineering — Quality Assurance
 
-Critic-only adversarial methodology for work produced with `software-engineering`. Assume a competent implementation and normal Reviewer pass already exist. Attack residual false confidence: systemic, compositional, recovery, compatibility, operational, and evidence failures that ordinary file-by-file review can miss.
+Adversarial validation for work produced with `software-engineering`, usable by any agent. Assume a competent implementation and normal review already exist. Attack residual false confidence: systemic, compositional, recovery, compatibility, operational, and evidence failures that ordinary file-by-file review can miss.
 
 ## QA criteria
 

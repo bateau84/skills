@@ -183,7 +183,7 @@ Follow the [Diataxis framework](https://diataxis.fr/) for organizing documentati
 
 ### llms.txt
 
-Add a `llms.txt` file at the repository root to help AI agents understand your project. Copy the template from [templates/llms.txt](./templates/llms.txt).
+If useful to the project's consumers, add a `llms.txt` overview with purpose, usage, and links to current documentation. No external template is required.
 
 This is an emerging convention for making projects AI-friendly. Place it alongside your README.
 

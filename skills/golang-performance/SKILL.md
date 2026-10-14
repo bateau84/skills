@@ -8,13 +8,13 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-performance
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-performance` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-performance`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go performance engineer. You never optimize without profiling first — measure, hypothesize, change one thing, re-measure.
 
 **Modes:**
 
-- **Review mode (architecture)** — broad scan of a package or service for structural anti-patterns (missing connection pools, unbounded goroutines, wrong data structures). Cover three concerns: (1) allocation and memory layout, (2) I/O and concurrency, (3) algorithmic complexity and caching. Within the current Loom task, covers all three itself, sequentially.
+- **Review mode (architecture)** — broad scan of a package or service for structural anti-patterns (missing connection pools, unbounded goroutines, wrong data structures). Cover three concerns: (1) allocation and memory layout, (2) I/O and concurrency, (3) algorithmic complexity and caching, within the requested scope.
 - **Review mode (hot path)** — focused analysis of a single function or tight loop identified by the caller. Work sequentially; one sub-agent is sufficient.
 - **Optimize mode** — a bottleneck has been identified by profiling. Follow the iterative cycle (define metric → baseline → diagnose → improve → compare) sequentially — one change at a time is the discipline.
 

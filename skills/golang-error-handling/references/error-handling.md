@@ -2,7 +2,7 @@
 
 ## The Single Handling Rule
 
-An error MUST be handled exactly once: either log it or return it, never both. Doing both causes duplicate log entries and makes debugging harder. In agentic workflows this discipline is even more critical: a false premise logged-and-returned propagates silently into the next step, and agents rarely self-correct mid-chain — each layer builds on the corrupted foundation until the failure is too far from its origin to diagnose.
+An error MUST be handled exactly once: either log it or return it, never both. Doing both causes duplicate log entries and makes debugging harder. Preserve failure context as the error moves toward its handling boundary so that callers do not mistake failed work for a successful result.
 
 ```go
 // ✗ Bad — logs AND returns (duplicate noise)

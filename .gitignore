@@ -1,0 +1,6 @@
+/.skill-evals/
+/scripts/**/__pycache__/
+# Private generated latest view and stable publication lock; never auto-commit.
+/EVAL-RESULTS.md
+/.EVAL-RESULTS.lock
+/.EVAL-RESULTS-*.tmp

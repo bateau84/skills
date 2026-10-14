@@ -8,15 +8,15 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-lint
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-lint` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-lint`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go code quality engineer. You treat linting as a first-class part of the development workflow — not a post-hoc cleanup step.
 
 **Modes:**
 
 - **Setup mode** — configuring `.golangci.yml`, choosing linters, enabling CI: follow the configuration and workflow sections sequentially.
-- **Coding mode** — writing new Go code: run `golangci-lint run --fix` on the modified files only as part of the inner compile loop (see `golang-common-practice`). Delegation follows `current Loom role directive and control-plane state` — only `general` dispatches sub-agents.
-- **Interpret/fix mode** — reading lint output, suppressing warnings, fixing issues on existing code: start from "Interpreting Output" and "Suppressing Lint Warnings". For large-scale legacy cleanup, delegation follows `current Loom role directive and control-plane state` — only `general` dispatches sub-agents.
+- **Coding mode** — writing new Go code: run the configured lint checks as part of the verification loop (see `golang-common-practice`). Use automatic fixes only when permitted, inspect the resulting diff, and avoid unrelated changes.
+- **Interpret/fix mode** — reading lint output, suppressing warnings, fixing issues on existing code: start from "Interpreting Output" and "Suppressing Lint Warnings". Keep legacy cleanup scoped to the requested work.
 
 **Dependencies:**
 
@@ -28,7 +28,7 @@ metadata:
 
 `golangci-lint` is the standard Go linting tool. It aggregates 100+ linters into a single binary, runs them in parallel, and provides a unified configuration format. Run it frequently during development and always in CI.
 
-Every Go project MUST have a `.golangci.yml` — it is the **source of truth** for which linters are enabled and how they are configured. See the [recommended configuration](./assets/.golangci.yml) for a production-ready setup with 48 linters enabled.
+When a project uses golangci-lint, its configured `.golangci.yml` (or another supported configuration path) is the source of truth for enabled linters. Follow the repository's actual configuration and installed major version; see the [configuration documentation](https://golangci-lint.run/docs/configuration/).
 
 ## Quick Reference
 
@@ -54,7 +54,7 @@ golangci-lint run --verbose ./...
 
 ## Configuration
 
-The [recommended .golangci.yml](./assets/.golangci.yml) provides a production-ready setup with 33 linters. For configuration details, linter categories, and per-linter descriptions, see the **[linter reference](./references/linter-reference.md)** — which linters check for what (correctness, style, complexity, performance, security), descriptions of all 33+ linters, and when each one is useful.
+Select linters according to the project's risks and existing policy rather than assuming a universal preset. See the **[linter reference](./references/linter-reference.md)** for categories, descriptions, and applicability; confirm supported names and settings against the installed version.
 
 ## Suppressing Lint Warnings
 
@@ -128,13 +128,13 @@ The linter name in parentheses tells you which linter flagged it. Use this to:
 
 ## Parallelizing Legacy Codebase Cleanup
 
-When adopting linting on a legacy codebase, fix the independent linter categories below. Within the current Loom task, works through them sequentially:
+When adopting linting on a legacy codebase, address the applicable categories below. One practitioner can cover them sequentially. Parallel contributors are optional; categories can touch the same files, so coordinate mutation ownership rather than assuming isolation or host locks.
 
-- Sub-agent 1: Run `golangci-lint run --fix ./...` for auto-fixable issues
-- Sub-agent 2: Fix security linter findings (bodyclose, sqlclosecheck, gosec)
-- Sub-agent 3: Fix error handling issues (errcheck, nilerr, wrapcheck)
-- Sub-agent 4: Fix style and formatting (gofumpt, goimports, revive)
-- Sub-agent 5: Fix code quality (gocritic, unused, ineffassign)
+- Automatic fixes: Run configured automatic fixes only within the authorized cleanup scope and inspect the diff
+- Security: Fix security linter findings (bodyclose, sqlclosecheck, gosec)
+- Error handling: Fix errcheck, nilerr, and wrapcheck findings
+- Style and formatting: Fix gofumpt, goimports, and revive findings
+- Code quality: Fix gocritic, unused, and ineffassign findings
 
 ## Cross-References
 

@@ -1,13 +1,13 @@
 ---
 name: tui-design
-description: Design, build, refactor, or review terminal interfaces—full-screen TUIs, interactive prompts, and command-line tools. Dual-audience: Designer loads this skill for human-centered TUI design reasoning (terminal constraints, keyboard interaction philosophy, focus model design, key binding design, color strategy, accessibility); Worker loads it for implementation (Bubble Tea, Ratatui, Textual, Ink, framework lifecycle, testing). Use for terminal-app layout and UX, CLI behavior, ncurses-style tools, dashboards, REPLs, fzf-like pickers, and libraries such as Bubble Tea, Ratatui, Textual, or Ink, including requests that name a known TUI such as lazygit, k9s, btop, helix, or yazi instead of saying "TUI." Do not use for browser or web UI, native GUI, editor or font configuration, or backend and shell work that has no terminal interface.
+description: "Design, build, refactor, or review terminal interfaces: full-screen TUIs, interactive prompts, and command-line tools. Covers terminal constraints, keyboard interaction, focus, key bindings, color, accessibility, and framework implementation with Bubble Tea, Ratatui, Textual, or Ink. Use for terminal-app layout and UX, CLI behavior, ncurses-style tools, dashboards, REPLs, fzf-like pickers, and requests naming lazygit, k9s, btop, helix, or yazi. Not for browser/web UI, native GUI, editor/font configuration, or backend and shell work with no terminal interface."
 metadata:
   version: "1.0.0"
 ---
 
 ## Human-Centered TUI Design Reasoning
 
-*This section is the design-reasoning layer for Designer. It addresses the what and why of TUI design decisions — terminal-specific constraints, keyboard interaction philosophy, focus model design, and known design failures. This is NOT adapted from web or GUI conventions — the terminal is a fundamentally different medium that requires its own design vocabulary. If you are a Worker implementing a TUI, skip to [TUI & CLI Design](#tui--cli-design) below.*
+*This section addresses the what and why of TUI design: terminal-specific constraints, keyboard interaction, focus models, and known design failures. The terminal requires its own design vocabulary. For implementation guidance, see [TUI & CLI Design](#tui--cli-design) below. Any agent may use either section as needed.*
 
 ---
 

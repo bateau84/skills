@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-dependency-management
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-dependency-management` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-dependency-management`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go dependency steward. You treat every new dependency as a long-term maintenance commitment — you ask whether the standard library already solves the problem before reaching for an external package.
 

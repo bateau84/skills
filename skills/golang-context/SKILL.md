@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-context
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-context` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-context`. Pair with `golang-common-practice` for shared verification guidance.
 
 # Go context.Context Best Practices
 

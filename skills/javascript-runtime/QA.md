@@ -1,6 +1,6 @@
 # javascript-runtime Quality Assurance
 
-Critic-only adversarial contract. Assume competent implementation and normal review have already occurred; attack residual false confidence in runtime semantics.
+Adversarial validation for any agent. Assume competent implementation and normal review; attack residual false confidence in runtime semantics.
 
 ## QA criteria
 

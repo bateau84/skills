@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-continuous-integration
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-continuous-integration` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-continuous-integration`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go DevOps engineer. You treat CI as a quality gate — every pipeline decision is weighed against build speed, signal reliability, and security posture.
 
@@ -49,7 +49,7 @@ The versions in the examples below are reference versions that may be outdated. 
 
 ## Testing
 
-`.github/workflows/test.yml` — see [test.yml](./assets/test.yml)
+`.github/workflows/test.yml` — use `github-workflow` for workflow structure and the Go checks below for job steps.
 
 Adapt the Go version matrix to match `go.mod`:
 
@@ -71,13 +71,13 @@ Test flags:
 
 ### Coverage Configuration
 
-CI SHOULD enforce code coverage thresholds. Configure thresholds in `codecov.yml` at the repo root — see [codecov.yml](./assets/codecov.yml)
+Use coverage thresholds when they support the project's quality policy. If Codecov is used, configure `codecov.yml` according to its [configuration documentation](https://docs.codecov.com/docs/codecov-yaml).
 
 ---
 
 ## Integration Tests
 
-`.github/workflows/integration.yml` — see [integration.yml](./assets/integration.yml)
+`.github/workflows/integration.yml` — define real service dependencies and isolation using `github-workflow` and `golang-testing`.
 
 Use `-count=1` to disable test caching — cached results can hide flaky service interactions.
 
@@ -85,7 +85,7 @@ Use `-count=1` to disable test caching — cached results can hide flaky service
 
 ## Linting
 
-`golangci-lint` MUST be run in CI on every PR. `.github/workflows/lint.yml` — see [lint.yml](./assets/lint.yml)
+When golangci-lint is the configured linter, run it in CI using the repository's version and configuration. Use `github-workflow` and `golang-lint` for job and linter guidance.
 
 ### golangci-lint Configuration
 
@@ -95,13 +95,13 @@ Create `.golangci.yml` at the root of the project. See the `golang-lint` skill f
 
 ## Security & SAST
 
-`.github/workflows/security.yml` — see [security.yml](./assets/security.yml)
+`.github/workflows/security.yml` — use `github-workflow` and `golang-security` for applicable security checks.
 
 CI MUST run `govulncheck`. It only reports vulnerabilities in code paths your project actually calls — unlike generic CVE scanners. CodeQL results appear in the repository's Security tab. Bearer is good at detecting sensitive data flow issues.
 
 ### CodeQL Configuration
 
-Create `.github/codeql/codeql-config.yml` to use the extended security query suite — see [codeql-config.yml](./assets/codeql-config.yml)
+If CodeQL is used, configure its query suite according to the project's threat surface and [CodeQL documentation](https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning).
 
 Available query suites:
 
@@ -111,7 +111,7 @@ Available query suites:
 
 ### Container Image Scanning
 
-If the project produces Docker images, Trivy container scanning is included in the Docker workflow — see [docker.yml](./assets/docker.yml)
+If the project produces Docker images and uses Trivy, include container scanning in the Docker workflow; verify the project's actual configuration rather than assuming a bundled workflow exists.
 
 ---
 
@@ -119,13 +119,13 @@ If the project produces Docker images, Trivy container scanning is included in t
 
 ### Dependabot
 
-`.github/dependabot.yml` — see [dependabot.yml](./assets/dependabot.yml)
+`.github/dependabot.yml` — follow the [Dependabot configuration documentation](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file).
 
 Minor/patch updates are grouped into a single PR. Major updates get individual PRs since they may have breaking changes.
 
 #### Auto-Merge for Dependabot
 
-`.github/workflows/dependabot-auto-merge.yml` — see [dependabot-auto-merge.yml](./assets/dependabot-auto-merge.yml)
+If automated dependency merging is part of repository policy, require the configured checks and respect workflow trust boundaries; use `github-workflow` for implementation guidance.
 
 > **Security warning:** This workflow requires `contents: write` and `pull-requests: write` — these are elevated permissions that allow merging PRs and modifying repository content. The `if: github.actor == 'dependabot[bot]'` guard restricts execution to Dependabot only. Do not remove this guard. Note that `github.actor` checks are not fully spoof-proof — **branch protection rules are the real safety net**. Ensure branch protection is configured (see [Repository Security Settings](#repository-security-settings)) with required status checks and required approvals so that auto-merge only succeeds after all checks pass, regardless of who triggered the workflow.
 
@@ -133,7 +133,7 @@ Minor/patch updates are grouped into a single PR. Major updates get individual P
 
 Renovate is a more mature and configurable alternative to Dependabot. It supports automerge natively, grouping, scheduling, regex managers, and monorepo-aware updates. If Dependabot feels too limited, Renovate is the go-to choice.
 
-Install the [Renovate GitHub App](https://github.com/apps/renovate), then create `renovate.json` at the repo root — see [renovate.json](./assets/renovate.json)
+If choosing Renovate, install the [Renovate GitHub App](https://github.com/apps/renovate) or the project's supported deployment and configure it using the [Renovate configuration reference](https://docs.renovatebot.com/configuration-options/).
 
 Key advantages over Dependabot:
 
@@ -151,7 +151,7 @@ GoReleaser automates binary builds, checksums, and GitHub Releases. The configur
 
 ### Release Workflow
 
-`.github/workflows/release.yml` — see [release.yml](./assets/release.yml)
+`.github/workflows/release.yml` — use `github-workflow` for triggers, permissions, artifacts, and release jobs.
 
 > **Security warning:** This workflow requires `contents: write` to create GitHub Releases. It is restricted to tag pushes (`tags: ["v*"]`) so it cannot be triggered by pull requests or branch pushes. Only users with push access to the repository can create tags.
 
@@ -159,13 +159,13 @@ GoReleaser automates binary builds, checksums, and GitHub Releases. The configur
 
 Programs need cross-compiled binaries, archives, and optionally Docker images.
 
-`.goreleaser.yml` — see [goreleaser-cli.yml](./assets/goreleaser-cli.yml)
+`.goreleaser.yml` — configure CLI builds and archives with the [GoReleaser documentation](https://goreleaser.com/customization/).
 
 ### GoReleaser for Libraries
 
 Libraries don't produce binaries — they only need a GitHub Release with a changelog. Use a minimal config that skips the build.
 
-`.goreleaser.yml` — see [goreleaser-lib.yml](./assets/goreleaser-lib.yml)
+For libraries, use the project's tag and release-note workflow; configure GoReleaser only for the release artifacts actually needed.
 
 For libraries, you may not even need GoReleaser — a simple GitHub Release created via the UI or `gh release create` is often sufficient.
 
@@ -173,13 +173,13 @@ For libraries, you may not even need GoReleaser — a simple GitHub Release crea
 
 When a repository contains multiple commands (e.g., `cmd/api/`, `cmd/worker/`).
 
-`.goreleaser.yml` — see [goreleaser-monorepo.yml](./assets/goreleaser-monorepo.yml)
+For monorepos, configure module-specific release boundaries and tag conventions according to the repository and installed release tooling.
 
 ### Docker Build & Push
 
 For projects that produce Docker images. This workflow builds multi-platform images, generates SBOM and provenance attestations, pushes to both GitHub Container Registry (GHCR) and Docker Hub, and includes Trivy container scanning.
 
-`.github/workflows/docker.yml` — see [docker.yml](./assets/docker.yml)
+`.github/workflows/docker.yml` — use `github-workflow` for container build/publish permissions and job structure.
 
 > **Security warning:** Permissions are scoped per job: the `container-scan` job only gets `contents: read` + `security-events: write`, while the `docker` job gets `packages: write` (to push to GHCR) and `attestations: write` + `id-token: write` (for provenance/SBOM signing). This ensures the scan job cannot push images even if compromised. The `push` flag is set to `false` on pull requests so untrusted code cannot publish images. The `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` secrets must be configured in the repository secrets settings — never hardcode credentials.
 
@@ -203,15 +203,15 @@ Repository security settings (branch protection, workflow permissions, secrets, 
 
 ## AI-Driven Code Review
 
-Add AI agents as PR reviewers alongside traditional static analysis. When loaded with this skill plugin, the agent applies the relevant Go skills per review area — catching architectural drift, logic bugs, missing error context, and concurrency hazards that linters cannot detect.
+AI-assisted PR review can supplement traditional static analysis when the project chooses it. Provide task-relevant Go guidance by ordinary file reads or a supported loader; no skill plugin is assumed. Assess findings against the code and tests rather than treating AI review as guaranteed detection or a substitute for required independent review.
 
-> **Cost note:** AI review agents run concurrently per PR. For cost control, remove jobs you don't need or raise the PR trigger filter to specific branches only.
+> **Cost note:** If the integration runs multiple review jobs per PR, limit jobs and triggers to the project's needs and observe actual cost.
 
 ### Claude Code
 
-`.github/workflows/ai-review.yml` — see [claude-code-review.yml](./assets/claude-code-review.yml)
+If the project uses an AI review integration, configure its documented action and permissions in the repository's workflow. No AI review service is required by this skill.
 
-The workflow runs parallel jobs, each scoped to a set of review areas and priority level:
+A project may group review areas as below. These are optional work categories, not required agents or parallel jobs:
 
 | Job | Areas | Priority |
 | --- | --- | --- |
@@ -226,7 +226,7 @@ The Claude Code GitHub App integration is configured via the `/install-github-ap
 
 ### GitHub Copilot
 
-Copy skills into your repo, then append [copilot-review-instructions.md](./assets/copilot-review-instructions.md) to `.github/copilot-instructions.md`:
+If Copilot review is used, provide concise project-specific review instructions in its supported configuration. The following is an optional example; no copied template is required:
 
 ```bash
 npx skills add https://github.com/samber/cc-skills-golang --agent github-copilot --skill '*' -y --copy
@@ -247,7 +247,7 @@ ln -s .agents .copilot
 | Not pinning action versions | GitHub Actions MUST use pinned major versions (e.g. `@vN`, not `@master`) |
 | No `permissions` block | Follow least-privilege per job |
 | Ignoring govulncheck findings | Fix or suppress with justification |
-| No AI review in CI | Add Claude Code or Copilot review — catches logic, security, and architectural issues that static analysis misses |
+| Treating AI review as guaranteed coverage | Keep it optional, validate findings, and retain the project's required checks and review |
 
 ## Related Skills
 

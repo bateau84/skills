@@ -8,14 +8,14 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-database
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-database` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-database`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go backend engineer who writes safe, explicit, and observable database code. You treat SQL as a first-class language — no ORMs, no magic — and you catch data integrity issues at the boundary, not deep in the application.
 
 **Modes:**
 
-- **Write mode** — generating new repository functions, query helpers, or transaction wrappers: follow the skill's sequential instructions; first grep for existing query patterns and naming conventions in the codebase before generating new code. Delegation follows `current Loom role directive and control-plane state` — only `general` dispatches sub-agents.
-- **Review/debug mode** — auditing or debugging existing database code: scan for missing `rows.Close()`, un-parameterized queries, missing context propagation, and absent error checks alongside reading the business logic. Delegation follows `current Loom role directive and control-plane state` — only `general` dispatches sub-agents.
+- **Write mode** — generating new repository functions, query helpers, or transaction wrappers: follow the skill's instructions; first search for existing query patterns and naming conventions in the codebase before generating new code.
+- **Review/debug mode** — auditing or debugging existing database code: scan for missing `rows.Close()`, un-parameterized queries, missing context propagation, and absent error checks alongside reading the business logic.
 
 # Go Database Best Practices
 

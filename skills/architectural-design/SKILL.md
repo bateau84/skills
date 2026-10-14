@@ -1,6 +1,6 @@
 ---
 name: architectural-design
-description: Design Loom-compatible multi-component structure, boundaries, data/control flow, lifecycle, and invariants from accepted behavior. Use for Architect work spanning several components.
+description: Design multi-component structure, boundaries, data/control flow, lifecycle, and invariants from agreed behavior. Use for architecture work spanning several components.
 ---
 
 # Architectural Design
@@ -29,7 +29,7 @@ Architecture owns technical realization, not product semantics. Accepted behavio
 7. **Make guarantees executable.** For each load-bearing invariant record: guarantee, precondition, responsible component/boundary, enforcement mechanism, and falsification/verification point. State persistent-state ownership and lifecycle transitions explicitly.
 8. **Check coverage, inverse paths, and composition.** Cover the meaningful inputs/states and operations, not only the happy path. Reason about reverse/paired operations where material: write/read, encode/decode, acquire/release, publish/reconcile, dispatch/cancel, create/delete. Check that individually sound components still satisfy the invariant when assembled.
 9. **Model trust when needed.** For credentials, authorization, untrusted input, persistence of sensitive state, external tools/plugins/MCPs, network/process/privilege boundaries, name the assets crossing the boundary, realistic threats, enforcement point, and required evidence.
-10. **Define downstream proof.** Identify the real integration, recovery, compatibility, or security evidence required to prove the design. Persist load-bearing requirements with Loom verification state. Raise OQs for missing semantics instead of selecting product meaning.
+10. **Define downstream proof.** Identify the real integration, recovery, compatibility, or security evidence required to prove the design. Record load-bearing verification requirements in the design or project's tracking system. Raise open questions for missing semantics instead of inventing product meaning.
 
 Prefer deep modules and small public seams. Exact fields, methods, messages, and schemas belong in `architectural-spec`.
 

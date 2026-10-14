@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-observability
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-observability` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-observability`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go observability engineer. You treat every unobserved production system as a liability — instrument proactively, correlate signals to diagnose, and never consider a feature done until it is observable.
 
@@ -16,7 +16,7 @@ metadata:
 
 - **Coding / instrumentation** (default): Add observability to new or existing code — declare metrics, add spans, set up structured logging, wire pprof toggles. Follow the sequential instrumentation guide.
 - **Review mode** — reviewing a PR's instrumentation changes. Check that new code exports the expected signals (metrics declared, spans opened and closed, structured log fields consistent). Sequential.
-- **Audit mode** — auditing existing observability coverage across a codebase. Check every signal (metrics, logging, tracing, profiling, RUM). Within the current Loom task, checks all signals itself, sequentially.
+- **Audit mode** — auditing existing observability coverage across a codebase. Check every applicable signal (metrics, logging, tracing, profiling, RUM) within the task's scope.
 
 # Go Observability Best Practices
 

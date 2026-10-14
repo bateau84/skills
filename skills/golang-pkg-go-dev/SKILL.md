@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-pkg-go-dev
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-pkg-go-dev` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-pkg-go-dev`. Pair with `golang-common-practice` for shared verification guidance. The documented CLI/MCP integration is optional; package documentation can also be read directly on pkg.go.dev.
 
 # golang-pkg-go-dev
 
@@ -102,7 +102,7 @@ Full `-o md` output for every command: [sample-output.md](references/sample-outp
 - `--filter` narrows list results server-side with a Go boolean expression — see [Filter syntax](#filter-syntax).
 - `--goos`/`--goarch` set the documentation/symbols build context (e.g. `linux`/`amd64`).
 - Prefer `symbol doc`/`symbol examples` over the package-wide `package doc`/`package examples` when you only need one symbol — far fewer tokens.
-- **Parallelize independent lookups** — every command is a self-contained, read-only HTTP query, so calls never depend on each other. When a task needs docs, examples, versions, or vulns for **several** symbols, packages, or modules, issue all the calls at once (multiple `godig` invocations in a single turn) rather than one after another — wall-clock drops from sum-of-latencies to slowest-single-call. For a large fan-out (documenting many symbols, comparing many candidate libraries, auditing CVEs across a dependency set), delegation follows `current Loom role directive and control-plane state` — only `general` dispatches sub-agents; otherwise run the `godig` calls yourself, batched in one turn, and keep the raw LARGE output out of the main context.
+- **Batch independent lookups when supported** — read-only documentation queries for separate symbols or packages can run concurrently. Respect rate limits and available tool support; summarize relevant results rather than flooding context. Queries that use an earlier result must remain ordered. No subagent facility is required.
 - Listing commands auto-paginate (return all results); use `--limit` to cap.
 
 ### Filter syntax

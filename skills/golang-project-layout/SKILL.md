@@ -59,28 +59,28 @@ See [directory layout examples](references/directory-layouts.md) for universal, 
 
 ## Organising Internal Code: Vertical Slices vs. Horizontal Layers
 
-**Default for human teams:** separate directories by layer — `internal/handler/`, `internal/service/`, `internal/model/`. This is what the reference layouts show.
+**Horizontal layers:** separate directories by layer — `internal/handler/`, `internal/service/`, `internal/model/`. This is what the reference layouts show.
 
-**For agent-maintained projects:** organise by feature (vertical slice), not by layer, unless deployment boundaries require otherwise.
+**Vertical slices:** consider organising by feature when changes repeatedly cross layers. Preserve meaningful package and deployment boundaries, and follow the project's existing conventions unless restructuring is in scope.
 
 ```
-# Horizontal — layer-based, default convention
+# Horizontal — layer-based
 internal/{handler,service,model}/
 
-# Vertical — feature-based, prefer when agent-maintained
+# Vertical — feature-based
 internal/{order,payment,user}/   # each dir: handler + service + types in 1–3 files
 ```
 
-A vertical layout keeps a feature's complete implementation in 1–3 files. A horizontal layout requires reading 3–5 directories for the same feature change — a key predictor of agent task failure (ESEM 2026 — wide, flat directory structures (`repo_top_level_dir_count`) predict agent failure; `patch_num_hunks` is the strongest individual predictor [partially unverified — third report]).
+A vertical layout can keep related feature behavior close together and reduce cross-directory navigation for humans and agents. Horizontal layers can be useful when shared responsibilities form stable boundaries. Judge locality against representative changes in this project; file or directory counts alone do not establish an agent-failure risk or prove one layout superior.
 
-**File consolidation:** 15 files × 30 lines is worse for agent navigability than 3 files × 150 lines — more files means more tool calls per task. But cap individual files at ~500 lines of business logic (provisional — OQ1 unresolved). A 2 000-line file triggers "Lost in the Middle" attention failures. The safe range: consolidated but bounded. Applies to `internal/` packages; generated files and test files are exempt.
+**File consolidation:** Keep related behavior discoverable without excessive fragmentation. Large files can also obscure boundaries; roughly 500 lines of business logic can prompt a cohesion review, but it is a heuristic, not a universal ceiling. Follow existing package conventions and treat generated/test files according to their purpose.
 
 ## Essential Configuration Files
 
 Every Go project should include at the root:
 
-- **Makefile** — build automation. See [Makefile template](assets/Makefile)
-- **.gitignore** — git ignore patterns. See [.gitignore template](assets/.gitignore)
+- **Makefile** — optional build automation; mirror the project's actual build, test, and lint commands.
+- **.gitignore** — ignore generated binaries, coverage output, and local secrets according to repository conventions; retain intentional source artifacts.
 - **.golangci.yml** — linter config. See the `golang-lint` skill for the recommended configuration
 
 For application configuration with Cobra + Viper, see [config reference](references/config.md).
@@ -101,7 +101,7 @@ When starting a new Go project:
 - [ ] **Ask the developer** their preferred DI approach — see `golang-dependency-injection` skill
 - [ ] Decide project type (CLI, library, service, monorepo)
 - [ ] Right-size the structure to the project scope
-- [ ] For agent-maintained projects: prefer vertical-slice organisation inside `internal/`
+- [ ] Consider vertical slices where they improve locality for representative changes
 - [ ] Choose module name (matches repo URL, lowercase, hyphens)
 - [ ] Run `go mod init github.com/user/project-name`
 - [ ] Create `cmd/{name}/main.go` for entry point

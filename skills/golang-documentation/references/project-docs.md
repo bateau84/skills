@@ -4,7 +4,7 @@
 
 ## README.md
 
-A LICENSE file MUST exist in every project. A README is the front page of your project. Make it simple, clear, and scannable. A copy-paste template with empty sections is available at [templates/README.md](./templates/README.md).
+A distributed project's license should be explicit and appropriate to its intended use. A README is the front page: make it simple, clear, and scannable using the sections below and repository conventions.
 
 ### Section Order
 
@@ -27,7 +27,7 @@ The template includes commented-out sections for applications (binary download t
 
 The goal: a new contributor should be able to clone the repo, make a change, and run the tests **in under 10 minutes**. If your project takes longer, add tooling to fix that.
 
-Copy the template from [templates/CONTRIBUTING.md](./templates/CONTRIBUTING.md).
+Use the sections below as a starting point, adapting the repository's contribution workflow.
 
 ### The 10-Minute Rule
 
@@ -45,7 +45,7 @@ If setup takes more than 10 minutes, add these improvements:
 
 ## Changelog
 
-CHANGELOG MUST be updated for every release. Track notable changes for each release. Use [Keep a Changelog](https://keepachangelog.com/) format. Copy the template from [templates/CHANGELOG.md](./templates/CHANGELOG.md).
+Keep the project's release notes current. Track notable changes using [Keep a Changelog](https://keepachangelog.com/) or the existing release-note convention.
 
 ### Format
 

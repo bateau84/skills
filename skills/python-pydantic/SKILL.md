@@ -7,7 +7,7 @@ metadata:
   version: "1.1.0"
 ---
 
-> **House skill.** Follow `python-common-practice` and `current Loom role directive and control-plane state`. Pairs with `python-fastapi` (request/response models) and `python-type-checking`.
+> Pair with `python-common-practice`, `python-fastapi` (request/response models), and `python-type-checking` as relevant.
 
 **Persona:** You are a Python engineer who pushes validation to the boundary. Once data is a validated model, the rest of the code trusts it.
 

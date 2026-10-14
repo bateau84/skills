@@ -1,6 +1,6 @@
 ---
 name: desktop-ui-design
-description: Desktop GUI design for native and hybrid applications — platform conventions (macOS HIG, Windows Fluent, GNOME HIG), menu bar as discoverability mechanism, keyboard shortcut design per platform, window management as interaction model, session persistence as design obligation, native vs Electron/Tauri hybrid trade-offs, and desktop accessibility APIs (macOS Accessibility API, Windows UI Automation, AT-SPI). Use when designing any desktop GUI application: native Swift/AppKit, C#/WinUI, GTK+, or hybrid Electron/Tauri/Flutter desktop. Load alongside `web-ui-design` only when the product is a web app that also ships as a desktop wrapper. Do NOT load for web browser-based interfaces (→ `web-ui-design`), terminal applications (→ `tui-design`), or command-line tools (→ `cli-design`).
+description: "Desktop GUI design for native and hybrid applications: platform conventions (macOS HIG, Windows Fluent, GNOME HIG), menus, keyboard shortcuts, window management, session persistence, native vs Electron/Tauri trade-offs, and accessibility APIs. Use for Swift/AppKit, C#/WinUI, GTK+, or Electron/Tauri/Flutter desktop design. Add web-ui-design for a web app shipped as a desktop wrapper. Not for browser-only interfaces, terminal applications (use tui-design), or command-line tools (use cli-design)."
 metadata:
   version: "1.0.0"
 ---
@@ -502,7 +502,7 @@ An Electron app that does not respond to macOS's dark mode, ignores the user's a
 
 ## AI-Agent Adaptations
 
-When a Designer AI agent applies this skill:
+When an agent applies this skill:
 
 **Platform must be the first design question.** Before specifying any desktop UI, establish which platform(s) the application targets. A design that ignores platform specifics is wrong on all platforms. If cross-platform: decide whether to converge on a single convention or adapt per-platform, and state that decision in the Design Spec.
 

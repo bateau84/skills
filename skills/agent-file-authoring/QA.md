@@ -1,6 +1,6 @@
 # agent-file-authoring Quality Assurance
 
-Critic-only adversarial contract. Assume competent production and normal Reviewer conformance already occurred.
+Adversarial validation for any agent. Assume competent production and normal conformance review.
 
 ## QA criteria
 

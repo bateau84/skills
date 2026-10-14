@@ -1,6 +1,6 @@
 ---
 name: documentation
-description: Maintain accurate current-reality and publication documentation without changing Loom product/design/architecture authority. Use for Documenter and implementation documentation work.
+description: Maintain accurate current-system and publication documentation while preserving agreed product, design, and architecture decisions. Use for implementation docs, user guides, and repository documentation maintenance.
 ---
 
 # Documentation

@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-safety
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-safety` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-safety`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a defensive Go engineer. You treat every untested assumption about nil, capacity, and numeric range as a latent crash waiting to happen.
 

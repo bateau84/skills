@@ -1,11 +1,11 @@
 ---
 name: behavioral-spec
-description: Derive a bounded, implementation-independent obligation layer from accepted anchors through goal refinement, coverage lenses, obstacle analysis, authority tracking, and counterexample checks; select and reconcile BR/QS/OC artifacts without expanding product scope.
+description: Derive bounded, implementation-independent requirements from agreed product intent through goal refinement, coverage lenses, obstacle analysis, provenance tracking, and counterexample checks. Use to select and reconcile behavioral requirements, quality scenarios, and shared contracts without expanding scope.
 ---
 
 # Behavioral Specification
 
-Use this skill for material Specifier work. It owns the common reasoning shared by Behavioral Requirements, Quality Scenarios, and Obligation Contracts.
+Use this skill for substantive behavioral specification. It provides common reasoning for behavioral requirements, quality scenarios, and shared semantic contracts.
 
 **Expand the consequences of the anchor, not the scope of the product.** Use lightweight goal refinement and obstacle analysis to produce the smallest coherent set of observable obligations. Thoroughness means covering material meaning, not maximizing artifact count or claiming to exhaust every imaginable case.
 
@@ -13,7 +13,7 @@ Use this skill for material Specifier work. It owns the common reasoning shared 
 
 Own **what must be observably or semantically true**, not structural realization. Do not choose components, schemas, protocols, storage, libraries, deployment topology, or implementation mechanisms unless accepted external/product authority itself fixes them.
 
-Specifier may resolve ordinary semantic detail inside delegated product authority. It may not silently create a new capability, scope, material guarantee, risk acceptance, or user-reserved preference. This method adds no roles, approval stages, or mandatory modeling notation.
+An agent writing specifications may resolve ordinary semantic detail within the agreed task. It may not silently create a new capability, scope, material guarantee, risk acceptance, or user-reserved preference. This method adds no roles, approval stages, or mandatory modeling notation. An "anchor" here means the project's agreed product intent or brief, not a required artifact system.
 
 ## Common method
 
@@ -37,7 +37,7 @@ For each candidate normative claim distinguish:
 
 - **sourced** — explicitly fixed by accepted authority;
 - **derived** — a necessary consequence of it;
-- **specified** — an ordinary semantic choice Specifier is delegated to settle inside the accepted envelope;
+- **specified** — an ordinary semantic choice the specification author may settle inside the agreed scope;
 - **open** — materially changes capability, scope, risk, guarantee, or reserved preference and needs owning authority.
 
 These are reasoning states, not mandatory document fields. A reasonable choice is not necessarily a logical consequence. Settle routine detail within delegated authority and explain the choice; do not escalate every ambiguity or disguise a preference as necessity.
@@ -48,7 +48,7 @@ For each commitment ask: **what must be true for this to hold?** Follow conseque
 
 - Separate conditions that must **all** hold from **alternative ways** to satisfy a condition. Do not turn one convenient alternative into a derived obligation.
 - Explain each consequential derivation: **without this obligation, which accepted commitment could fail, and how?** A source link alone does not demonstrate necessity.
-- Keep the source-to-obligation relationship visible enough to check coverage and revisit affected obligations when authority changes. Reuse the bundle index and artifact relationships; do not create a second normative ledger.
+- Keep the source-to-obligation relationship visible enough to check coverage and revisit affected obligations when authority changes. Reuse existing navigation and artifact relationships where available; do not create a second normative ledger.
 - Identify who must perform or preserve each observable obligation, and which other parties rely on it, without selecting implementation components.
 
 ### 3. Sweep applicable behavior
@@ -85,11 +85,11 @@ Expose assumptions about the environment, other actors, and dependencies. Establ
 
 ### 5. Reconcile without importing downstream authority
 
-First derive the clean obligation meaning from accepted semantic authority. Then compare it with Designer artifacts, architecture, tests, code, and implementation evidence. Downstream material may expose a gap, conflict, missing case, or feasibility concern; it does not silently become upstream product truth. Feed newly discovered cases back through the same authority and derivation checks.
+First derive obligation meaning from agreed product intent. Then compare it with design, architecture, tests, code, and implementation evidence. Downstream material may expose a gap, conflict, missing case, or feasibility concern; it does not silently become upstream product truth. Feed newly discovered cases back through the same provenance and derivation checks.
 
-User Stories and human-centered Scenarios may constrain observable experience inside Designer authority. The BR/QS/OC layer and Designer layer must agree before Architecture depends on them; disagreements are gaps to resolve, not permission for either role to silently overwrite the other.
+User stories and human-centered scenarios may constrain observable experience. Requirements, quality scenarios, shared contracts, and design must agree before architecture depends on them; disagreements are gaps to resolve rather than permission to silently overwrite another agreed decision.
 
-Check architecture leakage: could materially different architectures satisfy an obligation while preserving the same meaning? If not, verify that the structural constraint is itself authoritative; otherwise rewrite the obligation or route the structural choice to Architect.
+Check architecture leakage: could materially different architectures satisfy an obligation while preserving the same meaning? If not, verify that the structural constraint is itself agreed; otherwise rewrite the obligation or address the structural choice in architecture work.
 
 ### 6. Write the smallest falsifiable contract
 
@@ -123,17 +123,17 @@ A handoff is ready only for the scope whose accepted meaning is sufficiently set
 - Every normative obligation has a legitimate basis and a real falsification criterion. Relevant lenses, obstacles, invariants, progress conditions, and interactions have been considered at a depth proportionate to their consequences.
 - No known in-scope counterexample or unresolved conflict defeats the claimed coverage. Assumptions and remaining uncertainty are visible, not presented as proof of exhaustive completeness.
 
-Continue and hand off independent, unaffected specification while an authority question is open. Do not declare the dependent portion or whole assignment complete just because its gap has been recorded. Summarize the ready scope, consequential choices, coverage limits, and blockers using the existing bundle index and handoff surface, not a new required artifact. A fresh counterexample or changed anchor reopens affected coverage, not the entire process by default.
+Continue and hand off independent, unaffected specification while an authority question is open. Do not declare the dependent portion or whole assignment complete just because its gap has been recorded. Summarize the ready scope, consequential choices, coverage limits, and blockers using the project's existing notes or handoff surface, not a new required artifact. A fresh counterexample or changed anchor reopens affected coverage, not the entire process by default.
 
 ## Worked example
 
-Illustration only, not new Loom product authority: **two sessions may execute a shared workflow, but must never execute the same logical task concurrently.**
+Illustration only, not a requirement for every project: **two sessions may execute a shared workflow, but must never execute the same logical task concurrently.**
 
 A per-session non-overlap rule misses the cross-session promise. Denying every start meets non-overlap but defeats the execution capability. A shared SQLite database is one possible realization, not a necessary consequence. Lost contact does not prove execution stopped or authorize an automatic retry; applicable failure assumptions and any recovery promise need their own basis. The useful contract identifies task identity, the scope of non-overlap, and conditions for useful execution without silently choosing a storage or coordination mechanism.
 
 ## Durable bundle
 
-Use one anchor-rooted bundle:
+Keep related obligations and their source relationships discoverable using the project's conventions. If a new file-based bundle is useful, this is one possible layout, not a required namespace:
 
 ```text
 docs/requirements/<anchor-slug>/
@@ -146,8 +146,8 @@ docs/requirements/<anchor-slug>/
     oc-NNN-<descriptive-slug>.md
 ```
 
-Use independent BR/QS/OC numbering. The bundle index is navigation and relationship context, not a replacement for the artifacts.
+In this layout, use separate BR/QS/OC numbering. The bundle index is navigation and relationship context, not a replacement for the artifacts. Other identifiers and layouts are valid when relationships remain clear.
 
-Existing flat BR/OC bundles remain valid until an intentional migration updates them and their references; do not move legacy artifacts merely to satisfy the new-work layout.
+Existing flat BR/OC bundles remain valid until an intentional migration updates them and their references; do not move artifacts merely to match this example.
 
 Load the artifact-specific skill before authoring each artifact type.

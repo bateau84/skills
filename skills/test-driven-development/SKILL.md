@@ -1,13 +1,13 @@
 ---
 name: test-driven-development
-description: "Test-Driven Development workflow for any language — use tests to drive behavior and design through a tight red-green-refactor loop. Use when implementing a feature test-first, choosing the next example, turning a bug into a regression test, evolving an API from tests, deciding when to Fake It or Triangulate, or judging whether TDD evidence really proves the claimed behavior. Covers the Test List, Red-Green-Refactor, Obvious Implementation / Fake It / Triangulation, design feedback, refactoring discipline, boundary tests, test doubles, and Loom's honest-green house rule. Pair with the language testing skill for mechanics."
+description: "Test-Driven Development workflow for any language — use tests to drive behavior and design through a tight red-green-refactor loop. Use when implementing a feature test-first, choosing the next example, turning a bug into a regression test, evolving an API from tests, deciding when to Fake It or Triangulate, or judging whether TDD evidence really proves the claimed behavior. Covers the Test List, Red-Green-Refactor, Obvious Implementation / Fake It / Triangulation, design feedback, refactoring discipline, boundary tests, test doubles, and honest-green test integrity. Pair with the language testing skill for mechanics."
 license: MIT
 metadata:
   author: Bateau
   version: "1.1.0"
 ---
 
-> **House skill.** This is Loom's language-agnostic TDD methodology. It combines the normal TDD method with explicit Loom house choices about test integrity and test doubles. Language mechanics live in skills such as `golang-testing` and `python-testing`. Loom authority, routing, evidence, and escalation still come from the active role directive and control-plane state.
+> Language-agnostic TDD methodology with explicit guidance about test integrity and test doubles. Language mechanics live in skills such as `golang-testing` and `python-testing`. Follow the project's testing conventions and the host's execution permissions.
 
 **Persona:** You let tests drive the next behavior and expose design pressure. You do not write new production behavior until a failing test demands it, and you do not trust a green bar until you know why it is green.
 
@@ -109,7 +109,7 @@ Pay attention to friction:
 
 Do not automatically "fix" test friction with more mocks or helpers. First ask whether the production design is creating the friction.
 
-A useful Loom heuristic: if a focused test requires understanding roughly five or more implementation files, inspect the design boundary before normalizing that complexity.
+A useful heuristic: if a focused test requires understanding roughly five or more implementation files, inspect the design boundary before normalizing that complexity.
 
 ## Behavior, examples, and invariants
 
@@ -126,7 +126,7 @@ Round-trip tests are valuable for pairs such as encode/decode, add/remove, or se
 
 But a round trip can pass when **both sides are wrong in the same way**. When the representation or behavior has independent meaning, also use known-answer tests for each side.
 
-## Honest green — Loom house rule
+## Honest green — test integrity
 
 A passing test counts only when **real input at the level under test travels through the real behavior path being claimed**.
 
@@ -140,20 +140,20 @@ A test is faking success when it:
 - asserts mainly on values the test itself planted rather than values produced by the behavior;
 - replaces the missing implementation with equivalent logic inside the fake or fixture.
 
-If a meaningful test cannot pass without bypassing the behavior, surface the implementation, design, or scope gap through Loom rather than massaging the test green.
+If a meaningful test cannot pass without bypassing the behavior, fix the implementation within scope or report the design/scope gap with evidence rather than massaging the test green.
 
 The fingerprint to watch for is: *"the test passes because I supplied the thing the system was supposed to create."*
 
-## Test doubles — Loom's default style
+## Test doubles — choosing boundaries
 
-TDD itself does not require one mocking school. Loom defaults to a **classical/sociable style** because it usually gives agents stronger evidence about real collaboration:
+TDD itself does not require one mocking school. Prefer a **classical/sociable style** when real local collaboration is part of the claim:
 
 - mock or stub true system boundaries such as network APIs, clocks, nondeterministic services, or expensive external systems;
 - prefer real collaborators or behaviorally faithful in-memory fakes inside the owned codebase;
 - avoid mocking the immediate collaborator when that collaboration is the behavior under proof;
 - never put production-equivalent decision logic into a fake, because production and fake can then be wrong identically.
 
-A more interaction-heavy/mockist style can still be TDD, but it is not Loom's default. If the accepted architecture or test boundary requires interaction assertions, keep them focused on observable protocol obligations rather than incidental call choreography.
+A more interaction-heavy/mockist style can also be TDD. If the agreed architecture or test boundary requires interaction assertions, keep them focused on observable protocol obligations rather than incidental call choreography.
 
 A fixture is **input to** the behavior: sample payloads, files, database starting state, or protocol messages. It is not a substitute for output the behavior itself must create.
 
@@ -211,7 +211,7 @@ Never advance to the next behavior on a red bar or an unexplained green bar.
 
 ## Cross-references
 
-- active Loom role directive and control-plane state — authority, Test Integrity, execution policy, and evidence obligations;
+- The project's testing conventions and host instructions — scope, execution policy, and evidence expectations;
 - `golang-testing`, `python-testing`, `typescript-testing`, or another language testing skill — framework and language mechanics;
 - the applicable language `*-common-practice` skill — compile/check/lint inner-loop mechanics.
 

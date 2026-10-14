@@ -1,6 +1,6 @@
 ---
 name: architectural-spec
-description: Define exact implementation-facing APIs, schemas, protocols, configuration shapes, messages, and interfaces after Loom architecture decisions are settled.
+description: Define exact implementation-facing APIs, schemas, protocols, configuration shapes, messages, and interfaces after the relevant architecture decisions are settled.
 ---
 
 # Architectural Specification
@@ -26,7 +26,7 @@ A specification realizes architecture; it does not create new architecture or pr
    Do not invent rollout policy that parent architecture/product authority has not settled; surface the missing authority when exact emission/admission behavior is not derivable.
 7. **Define security surface when applicable.** State trust boundary, authority/data crossing it, validation/authorization point, secret visibility/logging rules, replay controls, and failure behavior.
 8. **Run the two-implementer test.** Two competent implementers reading only this specification should produce interoperable components. If materially incompatible implementations could both satisfy the text, tighten the contract.
-9. **Define conformance evidence.** Name the smallest set of tests/proofs covering load-bearing invariants, transitions, edge cases, failures, compatibility, and real composition. When interoperability between independently implemented sides is load-bearing, include at least one composition check that exercises those real sides together rather than proving only schema syntax or one-sided behavior. Persist load-bearing downstream verification through Loom when needed.
+9. **Define conformance evidence.** Name the smallest set of tests/proofs covering load-bearing invariants, transitions, edge cases, failures, compatibility, and real composition. When interoperability between independently implemented sides is load-bearing, include at least one composition check that exercises those real sides together rather than proving only schema syntax or one-sided behavior. Record downstream verification requirements in the specification or project's tracking system.
 
 Separate normative contract from examples. Prefer the smallest exact interface that removes material ambiguity.
 

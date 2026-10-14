@@ -6,19 +6,19 @@
     {
       "id": "Report-01",
       "name": "ephemeral-review-report-without-authority-elevation",
-      "trap": "Write the report straight into durable docs, omit OKF validation/profile fields, or describe persistence as making the verdict more authoritative.",
-      "prompt": "You are a Reviewer with a useful failed review that needs a file artifact for later workflow retrieval. The producer is reviewer. Explain the correct report lifecycle and provide the report-path/profile requirements. The report is operational evidence, not durable product documentation.",
+      "trap": "Treat a temporary report as durable product documentation, require a framework-specific schema or indexing tool, or describe persistence as making the verdict more authoritative.",
+      "prompt": "You have a useful failed review that needs a temporary file for later retrieval. Explain the report lifecycle and the content/path checks needed. The report is operational evidence, not durable product documentation, and no indexing service is installed.",
       "expectations": [
-        "Keeps the report under ephemeral-reports/reviewer rather than docs or another role namespace.",
-        "Requires the Loom OKF report profile with type report reviewer, non-empty title and description, and a non-empty string tags array.",
-        "Requires OKF validation before relying on discovery or handing the report off as a discoverable artifact.",
+        "Chooses a non-colliding temporary location according to host or repository conventions.",
+        "Records title, purpose, scope, author/context, findings, evidence, uncertainty, and outstanding work without requiring a framework-specific profile.",
+        "Checks file existence, readability, and evidence links before handoff; indexed discovery is not claimed without an available index.",
         "Keeps the review verdict/evidence/uncertainty unchanged by persistence and does not elevate report authority.",
-        "Treats durable promotion as a separate General-owned retention decision rather than the default specialist action."
+        "Treats durable retention as a separate lasting-value decision without requiring a named agent role."
       ],
       "negative_expectations": [
         "Must not put the report directly in docs/reports or authority-bearing documentation.",
-        "Must not describe OKF validity or persistence as semantic approval.",
-        "Must not have Reviewer or another specialist call the General-only promotion operation."
+        "Must not describe schema validity or persistence as semantic approval.",
+        "Must not require private tools or a coordinator role for report creation or retention."
       ]
     }
   ]

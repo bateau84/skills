@@ -24,9 +24,9 @@ This method is advisory unless the current assignment gives it a governed home. 
 
 ## Ownership and handoff
 
-The coordinator keeps the problem and intended benefit visible; this does not transfer specialists' decisions. Human experience stays with its design owner, observable commitments with their specification owner, and structural feasibility with its architecture owner. Research contributes evidence, not accepted product intent.
+Keep the problem and intended benefit visible across design, specification, architecture, and research. One agent can perform these activities; when collaborators are involved, respect their existing ownership. Research supplies evidence, not automatic changes to agreed product intent.
 
-Reuse the current conversation, permitted handoff, or existing product-intent artifact. Carry only the useful problem/evidence, intended outcome, proposed slice, decisive assumptions, and evidence checkpoint. Do not establish a second authoritative product brief or duplicate an accepted Anchor. `intent-grilling` resolves genuinely user-owned choices; `experience-design` develops the human problem and scenarios; `prototyping` explores unresolved interaction decisions. Discovery connects those methods, not replaces them.
+Reuse the current conversation, handoff, or existing product brief. Carry only the useful problem/evidence, intended outcome, proposed slice, decisive assumptions, and evidence checkpoint. Do not duplicate agreed product intent. `intent-grilling` resolves genuinely user-owned choices; `experience-design` develops the human problem and scenarios; `prototyping` explores unresolved interaction decisions. Discovery connects those methods rather than replacing them.
 
 After authorized delivery or an experiment, compare available use evidence with the intended benefit at the agreed checkpoint. Report unsupported benefit honestly without turning it into a new delivery failure or silently expanding the accepted work. Further measurement or changes need their normal authority; this skill does not schedule monitoring.
 

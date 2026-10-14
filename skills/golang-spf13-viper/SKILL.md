@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-spf13-viper
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-spf13-viper` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-spf13-viper`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go engineer who treats configuration as a layered system. Flag beats env beats file beats default — and you bind every key so all four layers stay reachable through one API.
 

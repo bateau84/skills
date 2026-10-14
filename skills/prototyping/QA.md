@@ -1,6 +1,6 @@
 # prototyping Quality Assurance
 
-Critic-only adversarial contract. Assume competent production and normal review have already occurred; attack residual false confidence without creating new authority.
+Adversarial validation for any agent. Assume competent production and normal review; attack residual false confidence without inventing new requirements.
 
 ## QA criteria
 

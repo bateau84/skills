@@ -1,4 +1,4 @@
-# loom-learning Reviewer Assessment
+# Learning Assessment
 
 ## Review criteria
 
@@ -7,4 +7,4 @@
 - Unconfirmed theories are not promoted to established lessons.
 - New heuristics begin at an evidence-appropriate confidence level.
 - Recall is advisory and current authority/evidence wins conflicts.
-- Contradicted learning is ignored for the current decision by any role; canonical episode retirement/demotion is performed only by authorized Reviewer/Critic and heuristic confidence reflects remaining independent support.
+- Contradicted learning is disregarded for the current decision; source-record correction preserves provenance and follows project editing conventions. Heuristic confidence reflects remaining independent support.

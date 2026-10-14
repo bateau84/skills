@@ -1,6 +1,6 @@
 # behavioral-spec Quality Assurance
 
-Critic-only cross-artifact contract. Assume competent production and Reviewer conformance; attack residual semantic false confidence without creating new authority.
+Cross-artifact adversarial validation for any agent. Assume competent production and conformance review; attack residual semantic false confidence without inventing new requirements.
 
 ## QA criteria
 

@@ -678,6 +678,6 @@ The five formats here are not a workaround for not having Figma access — they 
 - Flaherty, K. (2022). "Evaluate Interface Learnability with Cognitive Walkthroughs." Nielsen Norman Group. [nngroup.com/articles/cognitive-walkthroughs/] — the four cognitive walkthrough questions; learnability evaluation method.
 - Gothelf, J. & Seiden, J. (2021). *Lean UX* (3rd ed.). — decision prototyping concept; minimum viable prototype principle. [partially verified]
 - Carroll, J.M. (1995). *Scenario-Based Design*. — scenarios as design hypotheses evaluable through structured analysis. [partially verified]
-- Architecture §2.12, §4: "prototyping scope and OQ-4 resolution" — five formats for AI agent context; interactive prototypes out of scope.
+- This skill focuses on five text-based prototype formats that can be produced with ordinary agent tools. Interactive prototypes may supplement them when the task and available tools support it.
 
 ---

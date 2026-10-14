@@ -1,6 +1,6 @@
 # typescript-type-safety Quality Assurance
 
-Critic-only adversarial contract. Assume competent production and normal review have already occurred; attack residual false confidence that can survive an apparently clean strict typecheck.
+Adversarial validation for any agent. Assume competent production and normal review; attack residual false confidence that can survive an apparently clean strict typecheck.
 
 ## QA criteria
 

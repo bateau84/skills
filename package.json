@@ -1,0 +1,10 @@
+{
+  "name": "portable-agent-skills",
+  "private": true,
+  "scripts": {
+    "eval:live": "python3 -I -B scripts/run_evals.py",
+    "eval:list": "python3 -I -B scripts/run_evals.py --list",
+    "eval:validate": "python3 -I -B scripts/run_evals.py --validate",
+    "eval:harness-test": "python3 -I -B scripts/run_evals.py --harness-test"
+  }
+}

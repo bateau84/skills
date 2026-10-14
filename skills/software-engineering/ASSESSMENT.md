@@ -1,6 +1,6 @@
 # Software Engineering — Reviewer Assessment
 
-Reviewer-only methodology for implementation work produced with `software-engineering`. Review against accepted behavior, the actual diff, and observed evidence. Do not demand abstractions, telemetry, compatibility, or cleanup that the task does not need.
+Review methodology for implementation work produced with `software-engineering`, usable by any agent performing assessment. Review against agreed behavior, the actual diff, and observed evidence. Do not demand abstractions, telemetry, compatibility, or cleanup that the task does not need.
 
 ## Review criteria
 

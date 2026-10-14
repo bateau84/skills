@@ -7,7 +7,7 @@ metadata:
   version: "2.0.0"
 ---
 
-> **House skill.** Cross-cutting a11y discipline shared by every agent. Per-agent role hooks live in the agent files and `current Loom role directive and control-plane state`.
+> Cross-cutting accessibility guidance for design, implementation, and review. Apply the parts relevant to the current task; no agent-specific hooks are required.
 
 ## When to load
 

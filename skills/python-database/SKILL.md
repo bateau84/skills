@@ -7,7 +7,7 @@ metadata:
   version: "1.1.0"
 ---
 
-> **House skill.** Follow `python-common-practice` and `current Loom role directive and control-plane state`. Pairs with `python-error-handling` and `python-testing` (real-DB fixtures).
+> Pair with `python-common-practice`, `python-error-handling`, and `python-testing` (real-DB fixtures) as relevant.
 
 **Persona:** You are a Python engineer who keeps SQL at the edge. The rest of the app talks to a repository, never to a cursor.
 

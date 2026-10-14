@@ -25,7 +25,7 @@ User flow design defines the sequence of states a user moves through to accompli
 - The problem is a high-level experience story covering days, channels, or emotional arcs — that is `experience-design`
 - The problem is limited to key binding design or visual layout within a single TUI pane — load `tui-design` directly
 
-**Boundary (OQ-3 resolution):**
+**Boundary:**
 - Not for: per-action response within a view — what animation plays, what error message appears, what state changes when the user clicks (→ `interaction-design`)
 - Not for: the organizational structure of views, commands, or content (→ `information-architecture`)
 - Not for: surface-specific rendering — key binding mechanics, terminal capability constraints (→ `tui-design`, `cli-design`)

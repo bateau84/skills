@@ -1,6 +1,6 @@
 # Portable Skill Authoring Principles
 
-These principles are the reusable authoring knowledge that survived independent research and production use in `mats-opencode-setup`, separated from that repository's old AOS workflow mechanics. Loom's control plane and central eval harness remain authoritative for runtime state, permissions, approval, evidence, and evaluation execution.
+These principles preserve reusable guidance from the `mats-opencode-setup` authoring work identified under Source lineage, separated from repository-specific workflow mechanics. That lineage is not itself evidence of effectiveness in a new host. Host instructions and project conventions govern permissions and execution; no runtime or evaluation harness is assumed.
 
 ## Discovery is part of skill behavior
 
@@ -111,9 +111,16 @@ The goal is not ceremony. It is to avoid turning plausible advice, one-off taste
 - Examples are inputs to learning/understanding, not hand-built substitutes for the expected output.
 - Ground consequential version/API/tool claims; if verification is unavailable, narrow or mark the claim rather than projecting certainty.
 - Avoid unsupported statistics, marketing language, and incident stories that do not generalize into a reusable mechanism.
+- For empirical claims, retain a traceable source and the relevant task, model/tool, sample, and measurement context when available. A contextual result is not a universal rule. If applicability cannot be established, remove unsupported precision and retain only a defensible qualitative mechanism or explicitly provisional heuristic.
 - Preserve meaningful license/source attribution when material is adapted.
 - Do not expose private helper scripts as public workflows merely because the implementation contains them.
 - When curating an older skill, preserve the principle and its rationale while deliberately dropping obsolete control-plane mechanics.
+
+## Audit semantic portability
+
+Read the normal procedure and its load-bearing references as a practitioner in a host with ordinary file/tool access, no private orchestration services, and no separate reviewer. Can they carry out the work and its necessary checks without an optional companion, loader, fixed agent hierarchy, locks, snapshots, or mandatory artifact namespace? State actual task-specific tool dependencies rather than removing useful integration guidance. Example paths and formats should not silently become required infrastructure.
+
+Searches can locate candidates, but keyword absence does not prove portability. Trace meaningful instructions through linked references, duplicated advice, examples, and evaluation expectations. Check near misses: a documented external service required for its integration is legitimate; a private service assumed for ordinary skill use is not. Using assessment and QA perspectives for self-review is useful, but does not make the evidence independent. Record the inspected surface and remaining limits rather than claiming comprehensive semantic independence from pattern checks.
 
 ## Evaluate behavior, not wording
 
@@ -128,7 +135,7 @@ Where the claimed output is a file, tool action, or runtime effect, prefer inspe
 
 Use real incidents and recurring work as scenario sources when possible. Synthetic cases remain useful for stable regression coverage and rare safety boundaries, but a skill should not be optimized merely to recognize its benchmark.
 
-Loom's central eval harness owns execution, isolation, judging, ablation, evidence identity, retries, cost controls, and transport details. Do not recreate those mechanisms inside a skill.
+Use available evaluation tools, or exercise scenarios manually with recorded observations. Keep execution, isolation, judging, cost controls, and transport details separate from reusable methodology. Do not require a particular harness to load or use a skill.
 
 ## Preserve learning when migrating or compressing
 

@@ -215,7 +215,7 @@ The human need, not the interface solution. Named user in specific context, goal
 Constraints that all downstream design must honor. Each principle is problem-specific, falsifiable, and actionable.
 
 **What experience design does NOT produce:**
-- Wireframes or mockups (→ surface skills, Hallmark, prototyping)
+- Wireframes or mockups (use relevant surface guidance and `prototyping`).
 - Navigation taxonomy or information hierarchy (→ `information-architecture`)
 - Step-by-step task flows (→ `user-flow-design`)
 - Per-action response specifications (→ `interaction-design`)

@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-design-patterns
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-design-patterns` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-design-patterns`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go architect who values simplicity and explicitness. You apply patterns only when they solve a real problem — not to demonstrate sophistication — and you push back on premature abstraction.
 
@@ -235,13 +235,13 @@ Retry logic MUST check `ctx.Err()` between attempts and use exponential/linear b
 
 Ask the developer which architecture they prefer: clean architecture, hexagonal, DDD, or flat layout. Don't impose complex architecture on a small project.
 
-**Architecture style and Agent Navigability:** Clean architecture, hexagonal, and DDD all use horizontal layering — features scattered across 4–8 files. This is correct for human teams reasoning layer-by-layer. **Prefer vertical slices over horizontal layers when the codebase is agent-maintained** — one feature, one contiguous region. The references below are still valid; apply the qualification when choosing among them. Keep individual files under ~500 lines of business logic (provisional — OQ1 unresolved) to avoid Lost-in-the-Middle failures.
+**Architecture style and navigability:** Consider vertical slices when they keep related feature behavior easier to discover, but preserve useful boundaries and existing repository conventions. Agent involvement alone does not justify changing architecture. Review cohesion as files grow; roughly 500 lines is a heuristic, not a universal limit. The references below describe alternatives and their trade-offs.
 
 Core principles regardless of architecture:
 
 - **Keep domain pure** — no framework dependencies in the domain layer
 - **Fail fast** — validate at boundaries, trust internal code
-- **Make illegal states unrepresentable** — prefer type-level enforcement over documentation, especially in agent-maintained code where a type that structurally prevents incorrect usage eliminates a dominant class of silent failures.
+- **Make illegal states unrepresentable** — prefer type-level enforcement where it can prevent incorrect usage; document and validate the constraints that types cannot express. This helps human and agent callers without assuming a measured distribution of failures.
 - **Respect 12-factor app** principles
 
 ## Detailed Guides
@@ -255,8 +255,8 @@ Core principles regardless of architecture:
 
 ## Code Philosophy
 
-- **Locality before DRY** — "avoid repetitive code" is right until it scatters behavior across files. Prefer locality of behavior at the function level over a shared abstraction that requires tracing across modules. Heuristic (provisional — OQ2 unresolved): ≤3 copies → locality wins; ≥10 copies → extract (DRY wins); 3–10 copies → prefer locality if the copies are likely to change together.
-- **Ceremony-to-logic ratio** — minimise structural boilerplate relative to business logic. Go's ~2:1 ratio is agent-friendly; frameworks with 6+ files per feature are not. Choose patterns that keep this ratio low.
+- **Locality and DRY** — weigh discoverability against duplication. Extract when copies represent the same rule and should change together; preserve separate code when similar shapes have different responsibilities. Copy count alone does not establish the right abstraction.
+- **Ceremony-to-logic ratio** — avoid structural boilerplate that adds navigation without hiding useful complexity. Judge the pattern against representative project changes; a language-wide ratio or file-count threshold does not establish agent usability.
 - **Minimize dependencies** — a little recode > a big dependency
 - **Design for testability** — accept interfaces, inject dependencies, keep functions pure. Caveat: extract an interface only when there are 2+ implementations or a genuine testability requirement; a single-implementation interface is a zero-information token that increases ceremony without adding navigational value (→ see `golang-structs-interfaces` for the full rule).
 

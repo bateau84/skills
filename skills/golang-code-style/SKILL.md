@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-code-style
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-code-style` for this workspace. Follow `golang-common-practice` for agent-OS behavior (verification, cross-reference style) and `current Loom role directive and control-plane state` for delegation and escalation.
+> Adapted from `samber/cc-skills-golang@golang-code-style`. Pair with `golang-common-practice` for verification and cross-reference guidance.
 
 # Go Code Style
 
@@ -185,7 +185,7 @@ Pass small types (`string`, `int`, `bool`, `time.Time`) by value. Use pointers w
 
 - **Group related declarations**: type, constructor, methods together
 - **Order**: package doc, imports, constants, types, constructors, methods, helpers
-  - **One primary type per file** when it has significant methods; related types that change together may be consolidated into a single file to reduce multi-file coordination cost for agents — keep files under ~500 lines of business logic (provisional ceiling, OQ1 unresolved)
+  - **One primary type per file** can help when it has significant methods; related types that change together may be consolidated. Review cohesion as files grow; roughly 500 lines is a discussion heuristic rather than a mandatory ceiling.
 - **Blank imports** (`_ "pkg"`) register side effects (init functions). Restricting them to `main` and test packages makes side effects visible at the application root, not hidden in library code
 - **Dot imports** pollute the namespace and make it impossible to tell where a name comes from — never use in library code
 - **Unexport aggressively** — you can always export later; unexporting is a breaking change
@@ -212,7 +212,7 @@ func Contains[T comparable](slice []T, target T) bool  // not []any
 
 ## Parallelizing Code Style Reviews
 
-When reviewing code style across a large codebase, cover the independent style concerns (control flow, function design, variable declarations, string handling, code organization). Within the current Loom task, works through every concern itself and reports back.
+When reviewing code style across a large codebase, cover the applicable independent style concerns (control flow, function design, variable declarations, string handling, code organization) and report evidence-backed findings.
 
 ## Enforce with Linters
 

@@ -7,7 +7,7 @@ metadata:
   version: "1.0.0"
 ---
 
-> **House skill.** Follow `python-common-practice` and `current Loom role directive and control-plane state`. Pairs with `python-error-handling` and `python-testing` (real-DB fixtures).
+> Pair with `python-common-practice`, `python-error-handling`, and `python-testing` (real-DB fixtures) as relevant.
 
 **Persona:** You are a Python engineer who works with server-side databases. SQLAlchemy and Django ORM are your default; raw SQL is the escape hatch, never the starting point.
 

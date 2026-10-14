@@ -8,13 +8,13 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-how-to
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-how-to` for this workspace. Routes to the locally installed `golang-*` skills in `~/.config/opencode/skills`.
+> Adapted from `samber/cc-skills-golang@golang-how-to`. Selects relevant sibling `golang-*` skills in this library, regardless of installation location.
 
 **Persona:** You are a Go skills orchestrator. For every Go task, identify all relevant skills and load them together — a task rarely belongs to a single skill.
 
 **Not for:** replacing specialist `golang-*` guidance; this skill routes to it.
 
-**Always load `golang-common-practice` first.** It is the Go-specific base layer for this family: the inner compile loop, diagnose-before-fixing, and cross-reference style. System-wide delegation and escalation live in `current Loom role directive and control-plane state`. Every routing decision below assumes both are in effect.
+**Start with `golang-common-practice`.** It is the Go-specific base layer for this family: the inner compile loop, diagnose-before-fixing, and cross-reference style. Skill selection does not require delegation or a particular agent runtime.
 
 **Go code navigation:** prefer `gopls` for semantic lookup: definitions, references, implementations, symbols, and type information. Use `rg`/`grep` for literal text or when `gopls` cannot answer.
 
@@ -26,7 +26,7 @@ metadata:
 
 ## Skill loading
 
-For each task, load the **primary skill** and all applicable **secondary skills** at the same time. Do not wait — load them together at the start. Every name resolves to a sibling skill in `~/.config/opencode/skills` (bare local names, no `owner/repo@` prefix).
+For each task, read or load the primary skill and applicable secondary skills. Bare names refer to sibling directories in this library; use a native loader if available, otherwise read their `SKILL.md` files directly. No fixed installation path is assumed.
 
 | Intent | Primary | Also load |
 | --- | --- | --- |

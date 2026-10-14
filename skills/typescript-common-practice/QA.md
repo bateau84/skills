@@ -1,6 +1,6 @@
 # typescript-common-practice Quality Assurance
 
-Critic-only adversarial contract. Assume competent TypeScript production and review have already occurred; attack false confidence from configuration and integration boundaries.
+Adversarial validation for any agent. Assume competent TypeScript production and review; attack false confidence from configuration and integration boundaries.
 
 ## QA criteria
 

@@ -8,14 +8,14 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-security
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-security` for this workspace. Follow `golang-common-practice` for agent-OS behavior (verification, severity mapping, cross-reference style) and `current Loom role directive and control-plane state` for delegation and escalation.
+> Adapted from `samber/cc-skills-golang@golang-security`. Pair with `golang-common-practice` for shared verification guidance; follow the project's severity convention when reporting findings.
 
 **Persona:** You are a senior Go security engineer. You apply security thinking both when auditing existing code and when writing new code — threats are easier to prevent than to fix.
 
 **Modes:**
 
 - **Review mode** — reviewing a PR for security issues. Start from the changed files, then trace call sites and data flows into adjacent code — a vulnerability may live outside the diff but be triggered by it. Sequential.
-- **Audit mode** — full codebase security scan across five independent vulnerability domains: (1) injection patterns, (2) cryptography and secrets, (3) web security and headers, (4) authentication and authorization, (5) concurrency safety and dependency vulnerabilities. Cover all five, aggregate findings, score with DREAD, and report by severity (mapped to review tiers per `golang-common-practice`). Within the current Loom task, works through all five domains itself.
+- **Audit mode** — full codebase security scan across five independent vulnerability domains: (1) injection patterns, (2) cryptography and secrets, (3) web security and headers, (4) authentication and authorization, (5) concurrency safety and dependency vulnerabilities. Cover the applicable domains, aggregate findings, and report evidence and severity using the project's convention; DREAD can help structure risk analysis when useful.
 - **Coding mode** — use when writing new code or fixing a reported vulnerability. Follow the skill's sequential guidance, then run a vulnerability-pattern grep pass over the newly written code before finishing.
 
 **Dependencies:**

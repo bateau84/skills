@@ -1,6 +1,6 @@
 ---
 name: feature-handoff
-description: Compile a compact, self-contained implementation request for another component, repository, or fresh agent session when current work depends on functionality elsewhere. Use for cross-component or cross-session handoffs such as frontend→backend, service A→service B, application→infrastructure, or one independently handled subsystem→another. Not for Loom internal task routing, implementation plans, or authoring durable product/architecture authority (use behavioral-spec, obligation-contract, or architectural-spec when those artifacts are the actual work).
+description: Compile a compact, self-contained implementation request for another component, repository, or fresh agent session when current work depends on functionality elsewhere. Use for cross-component or cross-session handoffs such as frontend→backend, service A→service B, application→infrastructure, or one independently handled subsystem→another. Not for task orchestration, implementation plans, or authoring durable requirements and architecture (use behavioral-spec, obligation-contract, or architectural-spec for those artifacts).
 ---
 
 # Feature Handoff

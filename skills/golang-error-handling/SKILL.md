@@ -8,15 +8,15 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-error-handling
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-error-handling` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-error-handling`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go reliability engineer. You treat every error as an event that must either be handled or propagated with context — silent failures and duplicate logs are equally unacceptable.
 
 **Modes:**
 
-- **Coding mode** — writing new error handling code. Follow the best practices sequentially; optionally launch a background sub-agent to grep for violations in adjacent code (swallowed errors, log-and-return pairs) without blocking the main implementation.
+- **Coding mode** — writing new error handling code. Follow the best practices sequentially; inspect relevant adjacent code for swallowed errors and log-and-return pairs. An authorized read-only collaborator may help when available, but delegation is not required.
 - **Review mode** — reviewing a PR's error handling changes. Focus on the diff: check for swallowed errors, missing wrapping context, log-and-return pairs, and panic misuse. Sequential.
-- **Audit mode** — auditing existing error handling across a codebase. Cover every independent category (creation, wrapping, single-handling rule, panic/recover, structured logging). Within the current Loom task, covers all categories itself, sequentially.
+- **Audit mode** — auditing existing error handling across a codebase. Cover every applicable independent category (creation, wrapping, single-handling rule, panic/recover, structured logging).
 
 # Go Error Handling Best Practices
 
@@ -50,13 +50,13 @@ This skill guides the creation of robust, idiomatic error handling in Go applica
 
 ## Parallelizing Error Handling Audits
 
-When auditing error handling across a large codebase, cover each independent error category. Within the current Loom task, works through them sequentially:
+When auditing error handling across a large codebase, cover each applicable category below. One practitioner can do this sequentially. If parallel collaborators are available and authorized, divide read-only inspection and reconcile findings; coordinate any overlapping repairs explicitly rather than assuming host locks or isolated files.
 
-- Sub-agent 1: Error creation — validate `errors.New`/`fmt.Errorf` usage, low-cardinality messages, custom types
-- Sub-agent 2: Error wrapping — audit `%w` vs `%v`, verify `errors.Is`/`errors.As` patterns
-- Sub-agent 3: Single handling rule — find log-and-return violations, swallowed errors, discarded errors (`_`)
-- Sub-agent 4: Panic/recover — audit `panic` usage, verify recovery at goroutine boundaries
-- Sub-agent 5: Structured logging — verify `slog` usage at error sites, check for PII in error messages
+- Error creation — validate `errors.New`/`fmt.Errorf` usage, low-cardinality messages, custom types
+- Error wrapping — audit `%w` vs `%v`, verify `errors.Is`/`errors.As` patterns
+- Single handling rule — find log-and-return violations, swallowed errors, discarded errors (`_`)
+- Panic/recover — audit `panic` usage, verify recovery at goroutine boundaries
+- Structured logging — verify `slog` usage at error sites, check for PII in error messages
 
 ## Cross-References
 

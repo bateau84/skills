@@ -1,6 +1,6 @@
 ---
 name: architectural-decision
-description: Make one bounded technical realization choice with alternatives, drivers, consequences, and verification. Use for Architect decisions inside accepted Loom authority.
+description: Make one bounded technical realization choice with alternatives, drivers, consequences, and verification. Use for architecture decisions grounded in agreed requirements and constraints.
 ---
 
 # Architectural Decision
@@ -29,7 +29,7 @@ Accepted behavior and architecture are constraints, not variables to rewrite. Ro
 5. **Choose the least complex complete option.** State why it wins and why each serious rejected option loses. The decision should be strong enough that downstream implementation does not need to reopen the same question.
 6. **Record the price.** State positive, negative, and neutral consequences where material, including migration, operations, security, maintenance, lock-in, and reversibility.
 7. **Define falsification.** Name concrete confirmation evidence and the condition that would force reconsideration: benchmark, integration proof, compatibility test, runtime observation, security proof, changed premise, or similar.
-8. Persist any load-bearing downstream verification through Loom when needed.
+8. Record load-bearing downstream verification requirements in the decision or project's tracking system.
 
 ## Durable decision shape
 

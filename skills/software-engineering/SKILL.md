@@ -1,6 +1,6 @@
 ---
 name: software-engineering
-description: "MANDATORY baseline engineering discipline whenever a task authors or edits program-bearing source. Load before coding even for a one-line fix. Applies to application and library code, services, CLIs, APIs, scripts, tests, build logic, generators, migration code, infrastructure-as-code, code-bearing configuration, features, bug fixes, refactors, algorithms, and code deletion. Not for docs-only, research-only, design-only, commit-only, PR-only, or technical operations that do not change program-bearing source. This is the baseline; additionally load language/framework/domain skills."
+description: "Baseline engineering discipline for changing software. Use when authoring or editing application and library code, services, CLIs, APIs, scripts, tests, build logic, generators, migration code, infrastructure-as-code, or code-bearing configuration, including one-line fixes, refactors, algorithms, and code deletion. Not for docs-only, research-only, design-only, commit-only, PR-only, or technical operations that do not change program-bearing source. Combine with task-relevant language/framework/domain guidance."
 license: MIT
 metadata:
   author: Bateau
@@ -97,4 +97,4 @@ Before returning implementation work, ask:
 7. Is the resulting diff focused and understandable?
 8. If committing or opening a PR is in scope, were the dedicated Git/PR skills loaded?
 
-If any answer exposes a real implementation gap, fix it or surface it through the active Loom authority path. Do not manufacture completion.
+If any answer exposes a real implementation gap, fix it within scope or report the blocker with evidence to the user or responsible collaborator. Do not manufacture completion.

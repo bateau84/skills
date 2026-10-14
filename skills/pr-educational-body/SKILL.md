@@ -1,6 +1,6 @@
 ---
 name: pr-educational-body
-description: Create GitHub PRs with human-readable, educational PR bodies that explain WHY the work was done. Use when about to open or update a PR, when a PR body is missing or auto-generated from commit titles, or when a reviewer needs context beyond the diff. Not for commit messages (→ See `git-commit-discipline`), merge conflict resolution (→ See `git-conflicts`), code review (→ See `reviewer`), or CI/CD configuration.
+description: Create GitHub PRs with human-readable, educational PR bodies that explain WHY the work was done. Use when opening or updating a PR, replacing an empty or auto-generated body, or giving reviewers context beyond the diff. Not for commit messages (use git-commit-discipline), merge conflicts (use git-conflicts), code review, or CI/CD configuration.
 license: MIT
 metadata:
   author: Bateau
@@ -9,7 +9,7 @@ metadata:
 
 # PR Educational Body
 
-This skill teaches agents to produce GitHub PRs with educational, human-readable PR bodies. Not for commit messages (→ See `git-commit-discipline`), code review (→ See `reviewer`), or merge conflicts (→ See `git-conflicts`).
+This skill teaches agents to produce GitHub PRs with educational, human-readable PR bodies. Use `git-commit-discipline` for commits and `git-conflicts` for merge conflicts; use relevant assessment companions for code review.
 
 > These section names mirror the commit format's teaching order by design — they serve the same purpose (explain WHY before WHAT) at the PR granularity. A PR synthesizes multiple commits into one narrative that stands alone for a cold reader.
 
@@ -72,11 +72,11 @@ Introduce repository-specific terminology **after** explaining the underlying co
 
 Prefer:
 
-> Requirements become durable obligations carried into downstream agent work. The repository represents those relationships through its OKF profile.
+> Requirements are linked to the implementation and tests that satisfy them, so reviewers can trace each promise to its evidence.
 
 Over:
 
-> Adds OKF `satisfies`, `implements`, and `derived-from` relationships.
+> Adds `satisfies`, `implements`, and `derived-from` relationship metadata.
 
 For structural changes, a small diagram is often more educational than prose:
 

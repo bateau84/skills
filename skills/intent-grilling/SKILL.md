@@ -1,13 +1,13 @@
 ---
 name: intent-grilling
-description: Turn fuzzy product intent into an actionable Loom Anchor through one-question-at-a-time adversarial interviewing.
+description: Turn fuzzy product intent into an actionable product brief through one-question-at-a-time adversarial interviewing. Use when shaping an idea or pressure-testing scope and success criteria before execution.
 ---
 
 # Intent Grilling
 
 Use this skill when the user expresses a fuzzy product idea, asks to shape an idea, or wants to pressure-test product intent before autonomous execution.
 
-The goal is shared understanding sufficient for an Anchor, not exhaustive product design.
+The goal is shared understanding sufficient for a product brief, not exhaustive product design.
 
 ## Interview loop
 
@@ -23,7 +23,7 @@ The goal is shared understanding sufficient for an Anchor, not exhaustive produc
 5. Record the exact resolution before moving to the next branch.
 6. Challenge contradictions, weak assumptions, hidden scope expansion, and premature implementation constraints.
 7. Follow dependencies between decisions branch-by-branch. Do not dump a checklist of questions.
-8. Stop interviewing when the Anchor can state all of these clearly:
+8. Stop interviewing when the brief can state all of these clearly:
    - Goal;
    - observable success / Acceptance Criteria;
    - v1 scope;
@@ -40,7 +40,7 @@ Do not ask the user:
 - which programming language to use;
 - which database/library/framework to use;
 - how to structure internal components;
-- technical questions Loom can reasonably research later.
+- technical questions the agent can reasonably research later, unless the user has an explicit preference or constraint.
 
 Do ask when the answer is genuinely user-owned, for example:
 - which outcome matters more when goals conflict;
@@ -57,15 +57,13 @@ For each question, propose the answer you currently recommend based on known int
 
 The recommendation is not authority. The user's answer controls product intent.
 
-## Anchor handoff
+## Product brief handoff
 
 When the interview is ready:
 
-1. call `loom_intent_prepare`;
-2. write a draft Anchor under `docs/anchors/<product>/anchor.md`;
-3. show the complete draft to the user;
-4. ask for acceptance or a specific correction;
-5. only after explicit acceptance, mark the Anchor `accepted` and call `loom_intent_accept`;
-6. immediately continue with normal Loom execution using `loom_start` and `loom_route`.
+1. Summarize the resolved goal, success criteria, scope, exclusions, constraints, and remaining uncertainty.
+2. Use the project's existing brief format and location if a durable artifact is needed; otherwise present the brief inline.
+3. Show the complete brief to the user and resolve material corrections. Do not assume acceptance of a new product direction.
+4. Record the agreed decisions and continue with the requested work using available tools and local workflow conventions.
 
-Do not ask "should I continue?" after Anchor acceptance.
+Do not add a routine "should I continue?" checkpoint once the user has agreed to the brief and requested execution.

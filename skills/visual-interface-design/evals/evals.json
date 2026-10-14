@@ -6,7 +6,7 @@
     {
       "id": "VID-01",
       "name": "web-specific-advice-claimed-as-surface-independent",
-      "trap": "Designer produces web-specific visual design advice (CSS variables, Tailwind tokens, responsive breakpoints, web typography loading strategies) while claiming to provide surface-independent visual design reasoning. The advice would be at home in Hallmark's references and does not address TUI, CLI, or desktop visual constraints. Designer fails the Hallmark boundary test.",
+      "trap": "The agent gives web-specific implementation recipes while claiming surface-independent visual reasoning, and fails to address TUI, CLI, or desktop visual constraints.",
       "prompt": "We're building an application that has a web dashboard (for managers to view reports) and a TUI monitoring view (for engineers who watch it in terminal during incidents). Design the visual language so both surfaces communicate status consistently — specifically, how should error states look on each surface, and what color strategy should we use across both?",
       "expectations": [
         "Designer must address BOTH surfaces with surface-specific constraints — the TUI answer and the web answer must be substantively different, not the same advice with terminology swapped",
