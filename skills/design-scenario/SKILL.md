@@ -23,6 +23,8 @@ A Design Scenario is **human-centered**. It is distinct from a system Quality Sc
 
 ## Durable artifact
 
+Use the consuming repository's OKF relationship vocabulary and heading rules when publishing the document. The example `## Derived from` heading is illustrative; relationship type and path are repository-owned.
+
 Use the consuming repository's document path and naming rules. A numbered scenario may use `sc-NNN-<descriptive-slug>.md`; no Anchor-rooted layout is required by this skill.
 
 ```markdown
@@ -43,6 +45,6 @@ Use the consuming repository's document path and naming rules. A numbered scenar
 **Observable outcome:**
 <what success/recovery/failure looks like to the person>
 
-**Derived from:**
+## Derived from
 - <US and/or closest accepted human-facing authority>
 ```
