@@ -7,7 +7,7 @@ description: Capture a concrete human-centered end-to-end Scenario that exercise
 
 Use when design needs a concrete situation against which journeys, interaction states, recovery, and later Product Acceptance can be evaluated.
 
-A Design Scenario is **human-centered**. It is distinct from Specifier's Quality Scenario: SC describes a person's situation and journey; QS describes a measurable system quality under a stimulus/environment.
+A Design Scenario is **human-centered**. It is distinct from a system Quality Scenario: SC describes a person's situation and journey; QS describes a measurable system quality under a stimulus/environment.
 
 ## Method
 
@@ -23,7 +23,7 @@ A Design Scenario is **human-centered**. It is distinct from Specifier's Quality
 
 ## Durable artifact
 
-`Use the consuming repository's document path and naming rules. A numbered scenario may use `sc-NNN-<descriptive-slug>.md`; no Anchor-rooted layout is required by this skill.
+Use the consuming repository's document path and naming rules. A numbered scenario may use `sc-NNN-<descriptive-slug>.md`; no Anchor-rooted layout is required by this skill.
 
 ```markdown
 # SC-NNN — <descriptive title>
