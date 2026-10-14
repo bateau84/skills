@@ -33,7 +33,7 @@ Use when one observable or reviewable system behavior must be normative and fals
 **Verification semantics:**
 <what must be observed to prove or disprove the behavior>
 
-**Derived from:**
+## Derived from
 - <closest accepted semantic authority>
 ```
 
