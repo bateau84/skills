@@ -23,12 +23,7 @@ A User Story is design authority about human intent. It is not a Behavioral Requ
 
 ## Durable artifact
 
-New durable stories live under:
-
-```text
-docs/design/<anchor-slug>/user-stories/
-  us-NNN-<descriptive-slug>.md
-```
+Store the story in the location and naming convention established by the consuming repository. For example, repositories using numbered stories may choose `us-NNN-<descriptive-slug>.md`; this skill does not impose an Anchor-rooted path.
 
 ```markdown
 # US-NNN — <descriptive title>
