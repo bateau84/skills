@@ -23,10 +23,7 @@ A Design Scenario is **human-centered**. It is distinct from Specifier's Quality
 
 ## Durable artifact
 
-```text
-docs/design/<anchor-slug>/scenarios/
-  sc-NNN-<descriptive-slug>.md
-```
+`Use the consuming repository's document path and naming rules. A numbered scenario may use `sc-NNN-<descriptive-slug>.md`; no Anchor-rooted layout is required by this skill.
 
 ```markdown
 # SC-NNN — <descriptive title>
