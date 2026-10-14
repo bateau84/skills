@@ -1,15 +1,17 @@
-# work-decomposition Quality Assurance
+# Work Decomposition Quality Assurance
 
-Critic-only adversarial contract. Assume competent production and Reviewer conformance have already occurred; attack residual false confidence without creating new authority.
+Adversarially challenge apparently workable independent tasks. No particular planning harness or review role is assumed.
 
 ## QA criteria
 
-- Look for a seam that belongs to nobody because every task assumes another task will integrate it.
-- Look for duplicate or divergent implementations caused by parallel tasks owning adjacent concepts.
-- Attack the plan under one failed/late task: does downstream work become invalid or merely blocked?
-- Search for tasks that are locally verifiable but whose composition cannot prove the product path.
-- Ask whether decomposition optimized scheduling convenience at the expense of module integrity or coherent rollback.
+- Find a shared contract each task interprets differently while still meeting its local acceptance tests.
+- Find an integration seam or documentation update that every task assumes belongs to another.
+- Challenge a late or failed task: which downstream assumptions become false rather than merely delayed?
+- Search for locally passing tasks whose assembled product still violates the accepted user outcome.
+- Try conflicting concurrent writes or incompatible branch histories where coordination is left implicit.
+- Check whether scheduling convenience undermines module coherence, recovery, or rollback.
+- Probe whether first-principles or other unapproved authority was injected into task descriptions.
 
 ## QA depth
 
-Increase QA depth where a shared wrong assumption could survive both competent production and normal review.
+Increase scrutiny where independent implementation can multiply a common misunderstanding.
