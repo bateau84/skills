@@ -31,6 +31,8 @@ A Quality Scenario is a specialized behavioral obligation, not a vague non-funct
 
 ## Durable artifact
 
+Use the consuming repository's OKF relationship vocabulary and heading rules when publishing the document. The example `## Derived from` heading is illustrative; relationship type and path are repository-owned.
+
 ```markdown
 # QS-NNN — <descriptive title>
 
@@ -44,6 +46,6 @@ A Quality Scenario is a specialized behavioral obligation, not a vague non-funct
 **Verification semantics:**
 <how to establish the condition and determine whether the response/measure holds>
 
-**Derived from:**
+## Derived from
 - <BR(s) and/or closest accepted semantic authority>
 ```
