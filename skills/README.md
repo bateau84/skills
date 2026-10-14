@@ -2,6 +2,8 @@
 
 This repository provides **methodology**, independent of any agent harness, control plane, agent role or execution workflow. The consuming repository defines its own authority, file layout, permissions, and task orchestration.
 
+**Migration note:** This library was seeded from Loom and MATS. Some older skills still carry role names, product-specific paths or control-plane assumptions. They are legacy material to audit and migrate, not a license to impose those assumptions on new consumers. The skills touched by this change use repository-owned paths and coordination.
+
 ## Skill components
 
 | File | Purpose | Required? |
