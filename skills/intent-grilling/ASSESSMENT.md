@@ -1,15 +1,17 @@
-# intent-grilling Reviewer Assessment
+# Intent Grilling Assessment
 
-Reviewer-only domain contract. It does not create Loom authority, product meaning, or proof.
+Review focused intent elicitation against the user request and available project evidence. No control-plane role or gate is implied.
 
 ## Review criteria
 
-- Questions are limited to genuinely user-owned unresolved intent; repository/research-answerable branches are resolved with evidence.
-- One unresolved user question is active at a time and includes a useful recommendation/rationale.
-- Goal, observable success, scope, exclusions, and material user-owned decisions are clear before Anchor preparation.
-- Technical implementation choices are not pushed to the user.
-- Acceptance captures the user's actual confirmation and starts execution without an extra routine checkpoint.
+- Only consequential user-owned ambiguities are asked; source-answerable questions are resolved with evidence.
+- The conversation progresses one useful question at a time where questions are necessary, with a balanced recommendation and trade-off when useful.
+- The goal, observable success, scope, exclusions and material reserved choices are clear enough for the recipient to draft or update accepted intent.
+- Implementation choices are not delegated to the user merely because several technical options exist.
+- Recorded decisions preserve the user's actual strength of commitment rather than treating silence or ambiguity as acceptance.
+- The handoff is independently understandable without the questioning session.
+- Clear requests are not delayed by an unnecessary interview or another arbitrary checkpoint.
 
 ## Review depth
 
-Scale review depth with consequence, uncertainty, boundary count, and blast radius.
+Scale scrutiny with downstream ambiguity, consequence and reliance by independent agents.
