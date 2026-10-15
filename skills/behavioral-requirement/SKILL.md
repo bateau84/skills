@@ -33,8 +33,8 @@ Use when one observable or reviewable system behavior must be normative and fals
 **Verification semantics:**
 <what must be observed to prove or disprove the behavior>
 
-**Derived from:**
+## Derived from
 - <closest accepted semantic authority>
 ```
 
-Keep dependencies/relationships in the bundle index or repository relationship mechanism unless they are needed to understand the requirement itself.
+Represent necessary provenance and cross-document dependencies using the repository's authoritative relationship convention (such as OKF-compatible headings and links). Do not duplicate unnecessary ancestor links or treat an index as semantic authority.

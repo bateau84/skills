@@ -48,10 +48,10 @@ Use only sections that apply; keep them proportional.
 ## Open questions
 ```
 
-Durable US/SC artifacts live under `user-stories/` and `scenarios/`. The cohesive Experience Design may remain a descriptive file under `docs/design/<anchor-slug>/` following repository convention.
+Keep durable stories, scenarios and experience design discoverable in the repository's documented structure. Do not prescribe an Anchor-rooted layout; use the consuming repository's policy and applicable OKF authoring rules.
 
 ## Boundary
 
-Do not choose backend protocols, persistence, service/component topology, schema, or other architecture merely because the design needs a capability. State the capability/experience dependency and route structural realization to Architect.
+Do not choose backend protocols, persistence, service/component topology, schema, or other architecture merely because the design needs a capability. State the capability/experience dependency and leave structural realization to the relevant architecture owner.
 
-Do not duplicate complete BR/QS/OC semantics. Reconcile with Specifier where human-visible meaning overlaps.
+Do not duplicate complete BR/QS/OC semantics. Reconcile with the owning requirements documents where human-visible meaning overlaps.

@@ -1,71 +1,30 @@
 ---
 name: intent-grilling
-description: Turn fuzzy product intent into an actionable Loom Anchor through one-question-at-a-time adversarial interviewing.
+description: Clarify materially ambiguous user product intent through focused, evidence-aware questions. Use before portable Anchor authoring when user-owned scope or success is unclear; not for routine technical decisions or mandatory interviews.
 ---
 
 # Intent Grilling
 
-Use this skill when the user expresses a fuzzy product idea, asks to shape an idea, or wants to pressure-test product intent before autonomous execution.
+Use when an idea or request has unresolved **user-owned** outcomes, trade-offs, or scope that would materially affect independent implementation. Do not interview by default when the intent is already clear.
 
-The goal is shared understanding sufficient for an Anchor, not exhaustive product design.
+The goal is enough understanding for `anchor-authoring`, not an exhaustive product specification.
 
-## Interview loop
+## Method
 
-1. Identify the highest-impact unresolved branch of product intent.
-2. Before asking the user, determine whether the repository, current docs, prior accepted authority, or bounded research can answer it.
-   - If yes, resolve it autonomously and record the evidence.
-   - If no, ask the user.
-3. Ask exactly **one** user question at a time.
-4. Every user question includes:
-   - the question;
-   - your recommended answer;
-   - one short reason for that recommendation.
-5. Record the exact resolution before moving to the next branch.
-6. Challenge contradictions, weak assumptions, hidden scope expansion, and premature implementation constraints.
-7. Follow dependencies between decisions branch-by-branch. Do not dump a checklist of questions.
-8. Stop interviewing when the Anchor can state all of these clearly:
-   - Goal;
-   - observable success / Acceptance Criteria;
-   - v1 scope;
-   - explicit Not This boundaries;
-   - user-owned decisions/authority;
-   - important product context;
-   - no unresolved user-owned branch that would materially change those sections.
+1. Identify the highest-impact unresolved question about product intent, outcome, accepted risk, or scope.
+2. Check existing documentation, code evidence, and permitted research before asking: do not ask the user to repeat what is already known.
+3. Ask one consequential question at a time. When useful, recommend an answer and state one short reason and a meaningful alternative. Keep the question neutral.
+4. Record the user's actual resolution separately from agent proposals and objective observations. Ambiguous replies are not approval of a stronger guarantee.
+5. Challenge contradictions, weak assumptions, unintended scope expansion, and premature architecture.
+6. Follow semantic dependencies as needed, but stop once the goal, observable success, scope, exclusions and reserved decisions are sufficiently clear.
+7. Pass the resolved intent and any material open questions to `anchor-authoring` or the repository's existing accepted-intent document. The receiving agent must not need this conversation to recover the agreed meaning.
 
-## Question discipline
+## Questions to avoid
 
-Prefer questions about **what outcome the user wants**, not how to implement it.
+Do not offload ordinary expert decisions (language, database, library, packages, task breakdown) to the user. Ask only when such a decision itself expresses an actual user preference or material risk trade-off.
 
-Do not ask the user:
-- which programming language to use;
-- which database/library/framework to use;
-- how to structure internal components;
-- technical questions Loom can reasonably research later.
+## Boundary
 
-Do ask when the answer is genuinely user-owned, for example:
-- which outcome matters more when goals conflict;
-- what should or should not be in v1;
-- subjective workflow/product preferences;
-- whether a material guarantee may be weakened;
-- whether a material risk is acceptable.
+This skill does not publish, accept, or authorize an Anchor, require any control-plane tool, dictate its path, or start execution. The consuming repository and `anchor-authoring` determine how the durable result is recorded and how genuine acceptance is evidenced.
 
-## Recommendations
-
-Do not make the user invent every answer from scratch.
-
-For each question, propose the answer you currently recommend based on known intent and explain the trade-off briefly.
-
-The recommendation is not authority. The user's answer controls product intent.
-
-## Anchor handoff
-
-When the interview is ready:
-
-1. call `loom_intent_prepare`;
-2. write a draft Anchor under `docs/anchors/<product>/anchor.md`;
-3. show the complete draft to the user;
-4. ask for acceptance or a specific correction;
-5. only after explicit acceptance, mark the Anchor `accepted` and call `loom_intent_accept`;
-6. immediately continue with normal Loom execution using `loom_start` and `loom_route`.
-
-Do not ask "should I continue?" after Anchor acceptance.
+Do not create `first-principles.md` during intent elicitation. Broad first principles may only emerge later from accumulated project evidence.

@@ -1,68 +1,46 @@
-# Loom skills
+# Portable agent skills
 
-Skills are optional methodology loaded by the authorized role. They never override Loom authority or control-plane state.
+This repository provides **methodology**, independent of any agent harness, control plane, agent role or execution workflow. The consuming repository defines its own authority, file layout, permissions, and task orchestration.
 
-## Three-layer context model
+**Migration note:** This library was seeded from Loom and MATS. Some older skills still carry role names, product-specific paths or control-plane assumptions. They are legacy material to audit and migrate, not a license to impose those assumptions on new consumers. The skills touched by this change use repository-owned paths and coordination.
 
-A Loom skill directory can expose three deliberately different contexts:
+## Skill components
 
-| File | Consumer | Purpose |
+| File | Purpose | Required? |
 | --- | --- | --- |
-| `SKILL.md` | Producer / practitioner | **How do I do this work well?** Required for every skill. |
-| `ASSESSMENT.md` | Reviewer | **Did the work satisfy accepted inputs and domain obligations?** Optional. |
-| `QA.md` | Critic | **How could this still be wrong after competent production and review?** Optional. |
+| `SKILL.md` | How to perform the specialized work | Yes |
+| `ASSESSMENT.md` | Independent, normal review of the result against accepted inputs | No |
+| `QA.md` | Independent adversarial checks for residual false confidence | No |
 
-The split is about epistemic independence, not severity. `QA.md` is not "ASSESSMENT but stricter."
+Assessment and QA are distinct perspectives, not mandatory ceremonies or requirements for dedicated agent roles. Consumers may assign them to any capable independent agent.
 
-OpenCode discovers only `SKILL.md`. When a role loads a skill, the native skill tool also returns the skill base directory and a sampled companion-file list. Reviewer may then read `ASSESSMENT.md` if present; Critic may read `QA.md` if present.
+## Selection and authority
 
-Because the native skill tool injects `SKILL.md` while resolving that directory, Reviewer/Critic may also see practitioner guidance. That text is background only: Reviewer-specific criteria live in `ASSESSMENT.md`, Critic-specific adversarial methodology lives in `QA.md`.
+- Load the **smallest relevant skill set** for the task; use additional skills only when their distinct concerns matter.
+- Skills do not create product requirements, accept decisions for the user, grant tool permissions, or dictate workflow gates.
+- Prefer current repository authority and observed implementation over unsupported assumptions in examples or older instructions.
+- Leave repository-specific paths, IDs, document types, graph vocabulary, and mandatory updates to the consuming repository's `AGENTS.md` or equivalent policy.
+- Knowledge format, indexing, logging, graph mechanics, and their structural validation belong to the portable `okf-authoring` skill maintained in [nrkno/okf-mcp](https://github.com/nrkno/okf-mcp). Domain-specific skills decide substantive content.
 
-## Core role methodology
+## Documentation authoring
 
-| Loom role | Core skills |
+The documentation skills are independently selectable:
+
+| Concern | Skill |
 | --- | --- |
-| Designer | user-story and design-scenario when useful; design-specification; design-validation for realized experience; surface/design skills as needed |
-| Specifier | behavioral-spec; behavioral-requirement, quality-scenario, and obligation-contract as needed |
-| Architect | architectural-design; architectural-decision; architectural-spec |
-| Planner | risk-driven-planning; work-decomposition |
-| Acceptance | product-acceptance |
-| Documenter | documentation |
-| Reviewer | relevant skill `ASSESSMENT.md` files; design-review for design artifacts |
-| Worker | task-relevant engineering/domain `SKILL.md` only |
-| Diagnostic | narrow troubleshooting/domain `SKILL.md` matching the observed failure |
-| Critic | small set of load-bearing/risky skill `QA.md` files |
+| Preserve agreed user intent in a durable Anchor | `anchor-authoring` |
+| Explore ambiguous user-owned product intent | `intent-grilling` |
+| User Story and human-facing Scenario | `user-story`, `design-scenario` |
+| Human-experience specification | `design-specification` |
+| Functional requirement | `behavioral-requirement` |
+| Shared semantic guarantees | `obligation-contract` |
+| Measurable quality condition | `quality-scenario` |
+| Architectural design, decision, specification | `architectural-design`, `architectural-decision`, `architectural-spec` |
+| Current implementation and publication documentation | `documentation` |
+| Task decomposition and cross-session handoff | `work-decomposition`, `feature-handoff` |
 
-## Product-development methods
+For material parallel work, first establish shared **outcomes and contracts**, then give agents bounded responsibility and verification expectations. A downstream handoff must make sense without the original conversation. The number of document types and review steps scales with real ambiguity and risk, not a fixed pipeline.
 
-These are optional methods within existing roles, not a new workflow or additional gates.
+**First principles are not an Anchor deliverable.** They may be synthesized later from repeated, evidenced product and engineering decisions, when they become apparent and useful.
 
-| Method | Primary use and ownership |
-| --- | --- |
-| `product-discovery` | General keeps the problem, smallest useful outcome, evidence, and benefit assumptions visible; Designer and Research contribute within their existing domains. |
-| `solution-synthesis` | General coordinates constructive reconciliation; Designer, Specifier, and Architect retain their own decisions and authoritative artifacts. |
-| `product-lifecycle` | Architect leads applicable setup, operation, recovery, and upgrade coverage; Specifier/Designer own observable and human-facing meaning. Planner carries accepted work; Acceptance owns real scenario proof. |
-
-Use `risk-driven-planning` during discovery and solution development as well as decomposition when a decisive assumption could invalidate dependent work. A bounded authorized experiment may carry uncertain value; an accepted Anchor is permission/meaning, not proof of benefit.
-
-Reuse existing conversations, permitted handoffs, owner artifacts, Plan, and verification surfaces. Do not add a master product document, require every specialist on every change, or turn possible lifecycle concerns into accepted scope. Reviewer/Critic use the new skills' distinct companions only when relevant to their assigned review or attack.
-
-The focused cases in `evals/product-development.json` cover these decisions; see `evals/product-development.md` for scope and commands.
-
-## Loading discipline
-
-Load the smallest useful set. A Go database task might use `golang-common-practice`, `golang-database`, and `golang-testing`; it should not load every Go skill.
-
-Reviewer loads only assessment companions relevant to the reviewed surface. Critic loads QA companions only for load-bearing or materially risky domains, normally a small set rather than every skill touched by the workflow.
-
-Absence of `ASSESSMENT.md` or `QA.md` is intentional and valid. Do not invent generic companion files for symmetry.
-
-For Python tasks, use `python-how-to` / `python-common-practice` to select the relevant Python family.
-
-For TypeScript tasks, use `typescript-common-practice` as the language baseline and add `typescript-type-safety`, `typescript-async`, or `typescript-testing` only when that concern is material. Load `javascript-runtime` when JavaScript execution semantics are load-bearing, and `browser-runtime` for direct Web API work. Existing design, accessibility, observability, performance, and UI skills remain the owners of those cross-cutting concerns.
-
-For human-facing work, combine cross-surface skills (`information-architecture`, `interaction-design`, `user-flow-design`, `visual-interface-design`) only when that dimension is actually in scope, plus the relevant surface skill.
-
-Use `feature-handoff` when work in one component or session discovers functionality that another independently handled component, repository, or fresh session must provide. The skill produces a standalone copy/paste request rather than transferring conversation history.
-
-See `PORTING.md` for provenance and deferred source skills.
+Other language, framework, design, testing, and operational skills in this repository remain optional domain methods. See [PORTING.md](PORTING.md) for historical import decisions; it is not a present-day control-plane contract.

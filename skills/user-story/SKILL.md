@@ -23,12 +23,9 @@ A User Story is design authority about human intent. It is not a Behavioral Requ
 
 ## Durable artifact
 
-New durable stories live under:
+Use the consuming repository's OKF relationship vocabulary and heading rules when publishing the document. The example `## Derived from` heading is illustrative; relationship type and path are repository-owned.
 
-```text
-docs/design/<anchor-slug>/user-stories/
-  us-NNN-<descriptive-slug>.md
-```
+Store the story in the location and naming convention established by the consuming repository. For example, repositories using numbered stories may choose `us-NNN-<descriptive-slug>.md`; this skill does not impose an Anchor-rooted path.
 
 ```markdown
 # US-NNN — <descriptive title>
@@ -45,7 +42,7 @@ docs/design/<anchor-slug>/user-stories/
 **Observable success:**
 <what the person can observe/know when the goal is achieved>
 
-**Derived from:**
+## Derived from
 - <closest accepted product/user authority>
 ```
 
