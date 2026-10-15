@@ -1,71 +1,59 @@
 ---
 name: design-implementation
-description: "Implementing UI from a Design Spec — eight-state discipline, responsive non-negotiables, motion with purpose, component cookbook loading, copy rules, and token-locked output. Use when building or modifying UI components or pages from a Design Spec."
+description: Implement accessible, state-complete UI from a design specification. Use when building or modifying components or pages from agreed interaction, responsive, visual, and content requirements.
 license: MIT
 metadata:
   author: Bateau
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
-**Persona:** You are a UI implementation engineer. You implement pixel-accurate, accessible, state-complete UI from Design Specs. You never improvise tokens, never skip states, and never ship motion without a reason.
+# Design Implementation
 
-## When to load
+Translate the agreed design into working UI using the project's components, tokens, and framework conventions. No external design cookbook or theme plugin is required.
 
-Load this skill when a task involves implementing UI — components or full pages — from a Design Spec. The spec is the contract; this skill teaches how to honor it.
+## Establish the contract
 
-## Eight-state discipline
+Read the relevant design and existing implementation patterns. Identify user goals, interactions, states, responsive behavior, accessibility, copy, and capability dependencies. Resolve material ambiguity before inventing user-visible behavior. Use `design-specification` for an incomplete handoff and `accessibility` for implementation mechanics.
 
-Every interactive element ships all eight states. An element missing any state is unfinished.
+## State completeness
 
-| State | Required treatment |
-|---|---|
-| **Default** | Base styling |
-| **Hover** | Subtle shift — colour, 1px translate, or border (only `@media (hover: hover)`) |
-| **Focus** | Visible ring via `:focus-visible`, 2–3px, ≥ 3:1 contrast |
-| **Active** | Pressed-in: darker, `translate(0 1px)` |
-| **Disabled** | `opacity: 0.5`, `cursor: not-allowed`, `aria-disabled` |
-| **Loading** | Inline spinner or progress, label stays readable |
-| **Error** | Red border, error icon, message, `aria-invalid` |
-| **Success** | Green check, confirmation, auto-dismiss |
+Consider each reachable state; implement the ones meaningful to the component rather than forcing every element into a fixed quota:
 
-→ Full specs: [`interaction-and-states.md`](skills/hallmark/references/interaction-and-states.md)
+| State | Treatment |
+| --- | --- |
+| Default | Clear purpose, label, and affordance |
+| Hover | Additional feedback only where hover is available |
+| Focus | Visible keyboard focus and sensible focus order |
+| Active | Truthful pressed/selected feedback |
+| Disabled | Explain unavailability when needed; native semantics or correctly enforced ARIA behavior |
+| Loading | Prevent accidental duplicates, expose progress, and retain a readable label |
+| Error | Identify the problem and recovery action; associate field errors with their inputs |
+| Success | Confirm hidden effects where needed; avoid redundant or prematurely dismissed feedback |
+| Empty/interrupted/stale | Explain what happened, what remains, and how to continue |
 
-## Responsive — five non-negotiables
+Do not rely on color alone. Use native controls where possible. Preserve user input and focus appropriately through async transitions.
 
-1. **Mobile-first.** Base styles for smallest viewport. `min-width` media queries scale up. Never `max-width` as primary direction.
-2. **No horizontal scroll.** Root carries `overflow-x: clip` on both `html` and `body` — never `hidden`.
-3. **No wrapping clickable text.** Buttons, nav links, and CTAs are single-line at every viewport.
-4. **Content-driven breakpoints in rem.** Break where content breaks, not where devices sit.
-5. **Viewport units.** Use `dvh`/`svh` for heights interacting with mobile chrome. Never `width: 100vw`.
-6. **Safe areas.** Respect `env(safe-area-inset-*)` for iOS notch / Android nav bars.
+## Responsive behavior
 
-→ Full specs: [`responsive.md`](skills/hallmark/references/responsive.md)
+- Test at narrow widths, zoom, long content, and alternate input modes.
+- Use content-driven breakpoints and flexible sizing rather than fixed device assumptions.
+- Avoid accidental horizontal overflow; fix its cause instead of globally clipping meaningful content or focus indicators.
+- Allow labels and controls to wrap when needed for localization or zoom.
+- Use dynamic/small viewport units and safe-area insets when the surface requires them.
+- Verify layout changes preserve task completion and reading/focus order.
 
-## Microinteractions — four principles
+Use `web-ui-design` or the relevant surface skill for deeper guidance.
 
-1. **Motion has intent or motion is cut.** Every animation clarifies, guides, or confirms. If you cannot name what it communicates, it is decoration.
-2. **Silent success.** A visible result does not need a "Done!" toast. Reserve toasts for failures and hidden-effect actions.
-3. **Optimism with rollback.** Update UI immediately, request in background, animate rollback + Undo on failure.
-4. **Keyboard first, hover second.** Every hover affordance has a focus equivalent.
+## Motion and asynchronous feedback
 
-→ Timing/easing canon, recipes, and named tells: [`microinteractions.md`](skills/hallmark/references/microinteractions.md)
+Motion should clarify, guide, or confirm, and respect reduced-motion preferences. Every hover affordance needs a keyboard equivalent. Use optimistic updates only when failure can be detected and state truthfully restored; define pending, rollback, retry, and cancellation behavior. Destructive or irreversible actions may need confirmed completion rather than optimism.
 
-## Component cookbook loading
+## Components, tokens, and copy
 
-Do not load the whole cookbook. Read the archetype index in [`component-cookbook.md`](skills/hallmark/references/component-cookbook.md), pick the archetypes the Design Spec names, then load only those individual component files from `skills/hallmark/references/components/`. A typical build needs 5–7 files: 1 hero + 1 section head + 1–2 features + 1 CTA + 1 footer + 1 nav. Verify mobile collapse per the cookbook's per-archetype table.
+Reuse existing components and documented design tokens. If a component catalog is present, load only relevant examples. Add or adjust tokens through project conventions; do not assume append-only themes or mandatory source-file stamps.
 
-## Copy rules
+Use specific action labels and self-contained link text. Errors should state what happened and what the user can do without blaming them. Never fabricate product capabilities or metrics; use agreed content or explicit placeholders.
 
-- **Specific verbs.** "Save changes" beats "Submit". "Create account" beats "OK".
-- **Labels describe.** "Email address" beats "Email". Link text stands alone.
-- **Error structure.** What broke → why → what to do. One sentence if possible. Never apologetic for user input.
-- **Banned phrases.** "Click here", "Oops!", "Something went wrong", startup clichés (Unleash, Supercharge, Empower, Seamless).
-- **No fabricated metrics.** If the user did not supply a number, do not invent one. Use a placeholder (`—` + label) or pick a different layout.
+## Verify the implemented experience
 
-→ Full rules and voice samples: [`copy.md`](skills/hallmark/references/copy.md)
-
-## Output contract
-
-- **Tokens only.** Every colour and font-family references a named token from the Design Spec's theme block. No inline hex, OKLCH, or font strings.
-- **Append-only.** Add new tokens and components. Do not modify existing tokens or theme blocks.
-- **Stamp.** Every file gets a macrostructure comment: `/* · macrostructure: <name> · archetypes: <list> · knobs: <values> · */`.
+Exercise the real interaction path, keyboard navigation, focus transitions, error/recovery states, and relevant responsive conditions. Use available browser, terminal, or desktop tools; record actual observations and unverified limits. Compare the result with the design, not just a screenshot. Use `design-validation` for a fuller experience check.

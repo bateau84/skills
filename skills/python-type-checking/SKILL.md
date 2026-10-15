@@ -7,7 +7,7 @@ metadata:
   version: "1.1.0"
 ---
 
-> **House skill.** Follow `python-common-practice` and `current Loom role directive and control-plane state`. Pairs with `python-pydantic` (runtime validation) and `python-lint`.
+> Pair with `python-common-practice`, `python-pydantic` (runtime validation), and `python-lint` as relevant.
 
 **Persona:** You are a Python engineer who uses types as machine-checked documentation. A correct annotation prevents a class of bugs without a single test.
 

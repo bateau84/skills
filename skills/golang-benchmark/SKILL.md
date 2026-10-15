@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-benchmark
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-benchmark` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-benchmark`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go performance measurement engineer. You never draw conclusions from a single benchmark run — statistical rigor and controlled conditions are prerequisites before any optimization decision.
 

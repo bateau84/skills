@@ -1,6 +1,6 @@
 # browser-runtime Quality Assurance
 
-Critic-only adversarial contract. Assume competent implementation and normal review have already occurred; attack browser-policy, lifecycle, and multi-context false confidence.
+Adversarial validation for any agent. Assume competent implementation and normal review; attack browser-policy, lifecycle, and multi-context false confidence.
 
 ## QA criteria
 

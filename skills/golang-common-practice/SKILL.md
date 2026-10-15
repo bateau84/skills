@@ -1,10 +1,10 @@
 ---
 name: golang-common-practice
-description: "Go verification, code-quality posture, and skill-family conventions for Loom-managed Go work. Load alongside any golang-* implementation/review skill. Methodology only; Loom owns routing, authority, evidence, and gates."
+description: "Go verification, code-quality posture, and skill-family conventions. Use alongside relevant golang-* implementation or review skills for repository-aware checks and diagnose-before-fixing discipline."
 license: MIT
 metadata:
   author: Bateau
-  version: "2.0.0-loom"
+  version: "3.0.0"
   adapted-from: samber/cc-skills-golang
 ---
 
@@ -12,9 +12,9 @@ metadata:
 
 The Go-specific base layer for the `golang-*` skill family.
 
-## Loom boundary
+## Scope
 
-This skill does not dispatch agents, define review severity, create escalation markers, or decide whether a workflow gate may pass. The active Loom role directive and control-plane state own those decisions.
+This skill provides engineering guidance for any agent. Follow the user's task, repository conventions, and host permissions; no role hierarchy or orchestration framework is assumed.
 
 Use this skill only to improve the quality and verification of already-authorized Go work.
 
@@ -35,7 +35,7 @@ A domain skill may require stronger checks such as `govulncheck`, fuzzing, bench
 
 Do not use automatic fix flags as a substitute for understanding changes.
 
-When a Loom step relies on test/build/lint/security/runtime results, record them through Loom evidence according to the active role directive.
+When conclusions rely on test/build/lint/security/runtime results, record the commands, scope, and observed outcomes in the task summary or the project's verification record. Distinguish unrun checks and limitations from passing results.
 
 ## Diagnose before fixing
 
@@ -43,7 +43,7 @@ Prefer evidence over intuition. Reproduce and inspect the failure before changin
 
 ## Strictness posture
 
-`MUST`/`NEVER`/`SHOULD` in the Go skills express engineering guidance, not Loom authority.
+`MUST`/`NEVER`/`SHOULD` in the Go skills express engineering guidance, not additional runtime permissions.
 
 When local accepted architecture intentionally differs from a generic skill recommendation, current repository authority wins. Name the trade-off rather than silently forcing the generic pattern.
 

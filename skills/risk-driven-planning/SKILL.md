@@ -5,7 +5,7 @@ description: Front-load decisive uncertainty during product discovery, solution 
 
 # Risk-Driven Planning
 
-Do not elaborate a product direction, design, architecture, or task graph on an unverified fact that could materially invalidate that commitment. Apply this before decomposition when the risk already exists; keep Planner's existing planning use.
+Do not elaborate a product direction, design, architecture, or task graph on an unverified fact that could materially invalidate that commitment. Apply this during discovery, solution development, or planning whenever that risk exists.
 
 ## Classify uncertainty
 

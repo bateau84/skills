@@ -1,17 +1,17 @@
 ---
 name: python-how-to
-description: "Python skills orchestrator for selecting the smallest relevant python-* methodology set during authorized Loom work. Always pairs technical Python work with python-common-practice; does not mutate project policy or control Loom routing."
+description: "Select the smallest relevant python-* skill set for Python implementation, review, debugging, or configuration. Pair technical Python work with python-common-practice for shared verification guidance."
 license: MIT
 metadata:
   author: Bateau
   version: "1.1.0"
 ---
 
-> **House skill.** Routes to the locally installed `python-*` skills in `~/.config/opencode/skills`.
+> Selects relevant sibling `python-*` skills in this library, regardless of installation location.
 
 **Persona:** You are a Python skills orchestrator. For every Python task, identify all relevant skills and load them together — a task rarely belongs to a single skill.
 
-**Always load `python-common-practice` first.** It is the Python-specific base layer for this family: the inner check loop (ruff, pytest, type checker), diagnose-before-fixing, and cross-reference style. System-wide delegation and escalation live in `current Loom role directive and control-plane state`. Every routing decision below assumes both are in effect.
+**Start with `python-common-practice`.** It is the Python-specific base layer for this family: the inner check loop (ruff, pytest, type checker), diagnose-before-fixing, and cross-reference style. Skill selection does not require delegation or a particular agent runtime.
 
 **Modes:**
 
@@ -20,7 +20,7 @@ metadata:
 
 ## Skill loading
 
-For each task, load the **primary skill** and all applicable **secondary skills** at the same time. Do not wait — load them together at the start. Every name resolves to a sibling skill in `~/.config/opencode/skills` (bare local names, no `owner/repo@` prefix).
+For each task, read or load the primary skill and applicable secondary skills. Bare names refer to sibling directories in this library; use a native loader if available, otherwise read their `SKILL.md` files directly. No fixed installation path is assumed.
 
 | Intent | Primary | Also load |
 | --- | --- | --- |
@@ -51,7 +51,7 @@ For each task, load the **primary skill** and all applicable **secondary skills*
 | QA & Observability | `python-testing` `python-observability` |
 | Project Setup | `python-common-practice` |
 
-`python-design-patterns` is a pre-existing skill in this workspace; the rest are house `python-*` skills.
+All listed names refer to sibling skills in this library.
 
 ## Competing clusters — boundary lines
 

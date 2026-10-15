@@ -53,11 +53,11 @@ Detailed pattern documentation lives in `references/details.md`. Read that file 
 
 1. **Keep it simple** - Choose the simplest solution that works
 2. **Single responsibility** - Each unit has one reason to change
-3. **Separate concerns** - Distinct responsibilities with clear boundaries. Prefer feature-vertical over horizontal layers when agent-maintained (OQ6: deviation risks training-distribution hallucination — qualify, don't reverse).
+3. **Separate concerns** - Distinct responsibilities with clear boundaries. Consider feature-local organization when it improves discoverability, while preserving the repository's framework conventions and dependency boundaries.
 4. **Compose, don't inherit** - Combine objects for flexibility
 5. **Rule of three** - Wait before abstracting
 6. **Keep functions small** - 20-50 lines signals complexity; the real limit is one task per function.
-7. **Ceremony-to-logic ratio** - Minimise boilerplate relative to business logic. High ratios predict agent navigation cost; keep files under ~500 lines of business logic (provisional, OQ1).
+7. **Ceremony-to-logic ratio** - Minimise boilerplate relative to business logic. Review cohesion as files grow; roughly 500 lines can prompt review, but it is not a universal ceiling.
 8. **Test each concern in isolation** - Test components independently using their injected boundaries
 9. **Inject dependencies** - Constructor injection for testability
 10. **Delete before abstracting** - Remove dead code, then consider patterns
@@ -78,9 +78,9 @@ Keep composition shallow (2-3 levels). Consider a Protocol-based approach or fun
 Duplication that diverges in dangerous ways should be abstracted sooner. The rule of three is a heuristic, not a law. If the copies are already diverging incorrectly, extract immediately and add a test that exercises the shared behavior.
 
 **A service layer is importing from the API layer, breaking the dependency direction.**
-This is a layering violation. The service layer must not import from handlers. Introduce a shared types/models layer that both can import from, keeping the dependency arrow pointing downward (API → Service → Repository). For agent-maintained codebases, consider a feature-vertical slice instead: co-locate a feature's route, schema, and logic in one file or feature directory, reducing agent traversal cost (OQ6: deviates from framework convention — qualify, don't reverse).
+This is a layering violation. Avoid a service dependency on handlers; use shared domain types when both need the same model. Feature-local organization can improve discoverability, but preserve the project's dependency direction and framework conventions rather than changing layout solely because an agent maintains it.
 
 ## Related Skills
 
-- [python-testing-patterns](../python-testing-patterns/SKILL.md) — Test each concern in isolation using the dependency injection structure established here
-- [python-project-setup](../python-project-setup/SKILL.md) — Set up project structure and tooling that enforces layer boundaries from the start
+- [python-testing](../python-testing/SKILL.md) — Test each concern using the dependency injection structure established here.
+- [python-common-practice](../python-common-practice/SKILL.md) — Use repository-aware tooling and verification conventions.

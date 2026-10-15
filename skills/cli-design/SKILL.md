@@ -1,6 +1,6 @@
 ---
 name: cli-design
-description: CLI as a first-class human interface — command grammar, composability, exit semantics, stdin/stdout/stderr contracts, discoverability, help text design, and error message design. Use when designing any command-line interface: developer tools, build systems, deployment tools, data processing pipelines, or system administration tools. Also load when reviewing an existing CLI for design quality. Not for TUI interactive applications with persistent sessions (→ `tui-design`), general interaction patterns (→ `interaction-design`), or implementing CLI code in a specific language (→ `golang-cli` or equivalent).
+description: "CLI as a first-class human interface: command grammar, composability, exit semantics, stdin/stdout/stderr contracts, discoverability, help, and errors. Use when designing or reviewing developer tools, build/deployment tools, data pipelines, or system administration CLIs. Not for persistent TUIs (use tui-design), general interaction patterns (use interaction-design), or language-specific CLI implementation (use golang-cli or equivalent)."
 metadata:
   version: "1.0.0"
 ---

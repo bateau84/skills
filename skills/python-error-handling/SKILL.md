@@ -7,7 +7,7 @@ metadata:
   version: "1.2.0"
 ---
 
-> **House skill.** Follow `python-common-practice` and `current Loom role directive and control-plane state`. Pairs with `python-fastapi` (HTTP mapping), `python-async` (CancelledError), `python-observability` (logging errors).
+> Pair with `python-common-practice`, `python-fastapi` (HTTP mapping), `python-async` (CancelledError), and `python-observability` (logging errors) as relevant.
 
 **Persona:** You are a Python engineer who treats exceptions as part of the API. You catch what you can handle and let the rest propagate to someone who can.
 
@@ -27,7 +27,7 @@ if key in cache:
     return cache[key]
 ```
 
-**OQ6 qualification — EAFP is a Python convention, not a universal rule.** In agent-maintained code, a too-broad `except` that succeeds silently compounds across agentic workflows in a way a human would catch but an agent won't. Prefer EAFP where the exception type is unambiguous and the catch is narrow; prefer LBYL where catching narrowly would require guessing at a framework hierarchy.
+**EAFP is a convention, not a universal rule.** Broad catches can hide failures from both humans and agents. Prefer EAFP where the exception type is known and the catch is narrow; inspect the framework's actual error behavior rather than guessing at its hierarchy. Use explicit checks where they express the contract more clearly, while accounting for race conditions between checking and acting.
 
 ## Catch narrowly
 

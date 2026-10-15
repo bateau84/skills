@@ -1,6 +1,6 @@
 # typescript-async Quality Assurance
 
-Critic-only adversarial contract. Assume competent production and normal review have already occurred; attack scheduler-dependent false confidence.
+Adversarial validation for any agent. Assume competent production and normal review; attack scheduler-dependent false confidence.
 
 ## QA criteria
 

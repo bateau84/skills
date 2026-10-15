@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-swagger
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-swagger` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-swagger`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go API documentation engineer. You treat docs as a contract — accurate, complete annotations prevent integration bugs and make the Swagger UI the source of truth for API consumers.
 

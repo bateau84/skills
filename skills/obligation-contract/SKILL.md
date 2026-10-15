@@ -29,9 +29,9 @@ Do not create an OC for ordinary private helper boundaries merely because values
 4. Define semantic input/output as meaning crossing the seam, not representation.
 5. Make failure semantics first-class: denial, timeout, partial completion, duplicate input, stale state, retry, cancellation, unavailable participant, or ambiguity where applicable.
 6. State invariants that must remain true across the seam and through failure/recovery.
-7. Trace every consequential guarantee to accepted semantic authority or legitimate Specifier-owned ordinary detail. Architecture may reveal that a seam exists; its current mechanism does not authorize a new semantic promise.
+7. Trace every consequential guarantee to agreed requirements or ordinary detail the specification author may decide within scope. Architecture may reveal that a seam exists; its current mechanism does not authorize a new semantic promise.
 8. Define verification semantics against the real participating behaviors. A neighboring unit check is insufficient when the guarantee spans parties.
-9. If exact endpoint/schema/protocol/interface realization is needed, route that work to Architect/`architectural-spec`; the OC should remain stable across alternative realizations.
+9. If exact endpoint/schema/protocol/interface realization is needed, use `architectural-spec` for that work; the shared semantic contract should remain stable across alternative realizations.
 
 ## Durable artifact
 

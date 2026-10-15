@@ -26,11 +26,11 @@
       "id": "Professional-Charter-02",
       "name": "delegate-outcome-not-worker-recipe",
       "trap": "Keep coordinator instructions that prescribe the specialist's ordinary method, or remove the mutation boundary together with the recipe.",
-      "prompt": "A General directive currently says: 'For this maintenance task, tell Worker to edit config/permissions.json first, then add a branch in plugins/policy.ts, then create exactly two tests with these names.' Repository evidence establishes that those three files are the bounded mutation surface, but accepted architecture does not require that edit sequence. Rework the delegation rule to improve specialist autonomy while preserving mutation scope, evidence, and independent review.",
+      "prompt": "A coordinator instruction currently says: 'For this maintenance task, tell the implementer to edit config/permissions.json first, then add a branch in src/policy.ts, then create exactly two tests with these names.' Repository evidence establishes that these files are the bounded mutation surface, but agreed architecture does not require that edit sequence. Rework the handoff rule to improve practitioner autonomy while preserving scope, evidence, and independent review.",
       "expectations": [
         "Rewrites the coordinator delegation rule so it carries the end-to-end outcome, constraints, coherent mutation surface, and verification expectations rather than the exact edit sequence.",
         "Keeps the mutation boundary explicit and does not turn broader read-only understanding into broader mutation authority.",
-        "Leaves ordinary implementation technique to Worker and preserves independent Reviewer verification.",
+        "Leaves ordinary implementation technique to the practitioner and preserves independent verification when required by the project.",
         "Does not turn outcome-not-method into a universal ban on method constraints: accepted authority or a hard control-plane constraint may still fix the method when applicable."
       ],
       "negative_expectations": [

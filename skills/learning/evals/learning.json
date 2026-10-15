@@ -1,5 +1,5 @@
 {
-  "skill": "loom-learning",
+  "skill": "learning",
   "version": "1.0.0",
   "shape": 1,
   "cases": [
@@ -7,11 +7,11 @@
       "id": "Learning-01",
       "name": "record-confirmed-reusable-lesson-without-memory-as-law",
       "trap": "Store an unconfirmed theory as established learning, let semantic memory override current authority, or mark a heuristic validated from one correlated episode.",
-      "prompt": "A Diagnostic investigation has confirmed with observed evidence that a recurring 401 is caused by a stale issuer cache after provider rotation. The same mechanism is likely relevant to future incidents. Current accepted architecture remains authoritative. Explain how Loom should preserve this reusable lesson and how later agents should treat it.",
+      "prompt": "An investigation has confirmed with observed evidence that a recurring 401 is caused by a stale issuer cache after provider rotation. The same mechanism is likely relevant to future incidents. Current agreed architecture remains authoritative. Explain how an agent should preserve this reusable lesson and how later agents should treat it. No memory service is installed.",
       "expectations": [
-        "Specifies preserving the reusable lesson in canonical Loom learning with supporting evidence/provenance rather than relying only on conversational memory.",
+        "Preserves the reusable lesson in a project-selected durable record with supporting evidence/provenance rather than relying only on conversational memory or requiring a memory service.",
         "Treats a new heuristic at an evidence-appropriate provisional level unless independent support justifies stronger confidence.",
-        "Uses semantic indexing only as a recall aid and keeps canonical Loom state authoritative for the learning record.",
+        "Treats semantic indexing as optional recall assistance and keeps the source record authoritative for the lesson.",
         "States that current accepted authority and current direct evidence override recalled memory or heuristics."
       ],
       "negative_expectations": [

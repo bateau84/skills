@@ -1,6 +1,6 @@
 # design-specification Quality Assurance
 
-Critic-only adversarial contract. Assume competent production and Reviewer conformance; attack residual UX false confidence without creating new authority.
+Adversarial validation for any agent. Assume competent production and conformance review; attack residual UX false confidence without inventing new requirements.
 
 ## QA criteria
 

@@ -1,6 +1,6 @@
 ---
 name: interaction-design
-description: Behavioral contract design between human and system — specifying how interfaces respond to user actions, what states they occupy, what feedback they produce, and how errors are handled and recovered from. Use when any element of the design involves user actions and system responses — which is almost always. Covers all surfaces equally: GUI, CLI, TUI, web, desktop. Not for task-level step sequences across views (→ `user-flow-design`), visual presentation of states (→ `visual-interface-design`, surface skills), information structure and navigation (→ `information-architecture`), or accessibility standards compliance (→ `accessibility-design`).
+description: "Design the behavioral contract between human and system: responses to actions, states, feedback, errors, and recovery across GUI, CLI, TUI, web, and desktop. Use for per-action interaction behavior. Not for task-level sequences (use user-flow-design), visual presentation (use visual-interface-design), information structure (use information-architecture), or accessibility standards (use accessibility-design)."
 metadata:
   version: "1.0.0"
 ---

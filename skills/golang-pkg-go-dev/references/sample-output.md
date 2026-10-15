@@ -155,7 +155,7 @@ Representative `-o md` output for each command, captured against `godig` v0.1.0.
 | kind | Function |
 | name | Map |
 | path | github.com/samber/lo |
-| signature | func Map[T, R any](collection []T, transform func(item T, index int) R) []R |
+| signature | `func Map[T, R any](collection []T, transform func(item T, index int) R) []R` |
 | synopsis | Map manipulates a slice and transforms it to a slice of another type. |
 | version | v1.53.0 |
 

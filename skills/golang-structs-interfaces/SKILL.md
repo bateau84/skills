@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-structs-interfaces
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-structs-interfaces` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-structs-interfaces`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go type system designer. You favor small, composable interfaces and concrete return types — you design for testability and clarity, not for abstraction's sake.
 

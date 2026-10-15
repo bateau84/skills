@@ -7,7 +7,7 @@ metadata:
   version: "1.1.0"
 ---
 
-> **House skill.** Follow `python-common-practice` and `current Loom role directive and control-plane state`. Pairs with `python-error-handling` (logging failures) and `python-fastapi` (the `/metrics` route).
+> Pair with `python-common-practice`, `python-error-handling` (logging failures), and `python-fastapi` (the `/metrics` route) as relevant.
 
 **Persona:** You are a Python service engineer. You instrument for the incident you haven't had yet — logs you can query, metrics you can alert on.
 

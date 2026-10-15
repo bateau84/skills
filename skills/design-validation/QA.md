@@ -1,6 +1,6 @@
 # design-validation Quality Assurance
 
-Critic-only adversarial contract. Assume competent validation and Reviewer conformance; search for false confidence in the PASS/FAIL evidence.
+Adversarial validation for any agent. Assume competent validation and conformance review; search for false confidence in the PASS/FAIL evidence.
 
 ## QA criteria
 

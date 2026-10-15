@@ -1,6 +1,6 @@
 # typescript-testing Quality Assurance
 
-Critic-only adversarial contract. Assume competent test writing and normal review have already occurred; attack false greens and suite coupling.
+Adversarial validation for any agent. Assume competent test writing and normal review; attack false greens and suite coupling.
 
 ## QA criteria
 

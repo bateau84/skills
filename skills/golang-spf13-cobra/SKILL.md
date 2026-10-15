@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-spf13-cobra
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-spf13-cobra` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-spf13-cobra`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go CLI engineer building command trees that feel native to the Unix shell. You design the user-facing surface first, then wire behavior into the right hook.
 

@@ -8,14 +8,14 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-documentation
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-documentation` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-documentation`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go technical writer and API designer. You treat documentation as a first-class deliverable — accurate, example-driven, and written for the reader who has never seen this codebase before.
 
 **Modes:**
 
-- **Write mode** — generating or filling in missing documentation (doc comments, README, CONTRIBUTING, CHANGELOG, llms.txt). Work sequentially through the checklist in Step 2. Delegation follows `current Loom role directive and control-plane state` — only `general` dispatches sub-agents.
-- **Review mode** — auditing existing documentation for completeness, accuracy, and style. Cover every documentation layer (doc comments, README, CONTRIBUTING, CHANGELOG, library-specific extras). Within the current Loom task, covers all layers itself, sequentially.
+- **Write mode** — generating or filling in missing documentation (doc comments, README, CONTRIBUTING, CHANGELOG, llms.txt). Work through the applicable checklist in Step 2.
+- **Review mode** — auditing existing documentation for completeness, accuracy, and style. Cover every applicable documentation layer (doc comments, README, CONTRIBUTING, CHANGELOG, library-specific extras).
 
 # Go Documentation
 Write documentation that serves both humans and AI agents. Good documentation makes code discoverable, understandable, and maintainable.
@@ -78,13 +78,15 @@ Every Go project needs these (ordered by priority):
 
 A private project might not need a documentation website, llms.txt, Go Playground demos...
 
-## Parallelizing Documentation Work
+## Organizing Documentation Work
 
-When documenting a large codebase with many packages, cover these independent tasks. Within the current Loom task, works through them sequentially:
+When documenting a large codebase with many packages, cover these categories within the requested scope. One practitioner can work through them sequentially; separate contributors are optional, not prerequisites:
 
-- Assign each sub-agent to verify and fix doc comments in a different set of packages
-- Generate `ExampleXxx` test functions for multiple packages simultaneously
-- Generate project docs in parallel: one sub-agent per file (README, CONTRIBUTING, CHANGELOG, llms.txt)
+- Verify and fix doc comments package by package, including shared API constraints.
+- Add applicable `ExampleXxx` tests and verify them with the project's Go test checks.
+- Update applicable project docs (README, CONTRIBUTING, CHANGELOG, llms.txt), keeping examples, commands, and links consistent with the code and each other.
+
+If contributors are available and authorized, independent package/documentation work may proceed in parallel. Agree on ownership and a common code revision, coordinate shared files and test state using the host's actual facilities, and reconcile the combined documentation before handoff. Do not assume one contributor per file or require simultaneous generation.
 
 ## Step 3: Function & Method Doc Comments
 
@@ -130,7 +132,7 @@ For the full comment format, deprecated markers, interface docs, and file-level 
 
 ## Step 4: README Structure
 
-README SHOULD follow this exact section order. Copy the template from [templates/README.md](./assets/templates/README.md):
+A README can use the following section order when it fits the project; adapt existing repository conventions rather than requiring a separate template:
 
 1. **Title** — project name as `# heading`
 2. **Badges** — shields.io pictograms (Go version, license, CI, coverage, Go Report Card...)
@@ -154,7 +156,7 @@ For the full README guidance and application-specific sections, see [Project Doc
 
 **CONTRIBUTING.md** — Help contributors get started in under 10 minutes. Include: prerequisites, clone, build, test, PR process. If setup takes longer than 10 minutes, then you should improve the process: add a Makefile, docker-compose, or devcontainer to simplify it. See [Project Docs](./references/project-docs.md#contributingmd).
 
-**Changelog** — Track changes using [Keep a Changelog](https://keepachangelog.com/) format or GitHub Releases. Copy the template from [templates/CHANGELOG.md](./assets/templates/CHANGELOG.md). Each entry answers _what changed for the reader_ — internal refactors without user-visible impact belong in commit history. Don't inflate a fixed edge case into a broad "reliability improvement" claim. See [Project Docs](./references/project-docs.md#changelog).
+**Changelog** — Track changes using [Keep a Changelog](https://keepachangelog.com/) format or GitHub Releases. Each entry answers _what changed for the reader_ — internal refactors without user-visible impact belong in commit history. Don't inflate a fixed edge case into a broad "reliability improvement" claim. See [Project Docs](./references/project-docs.md#changelog).
 
 ## Step 6: Library-Specific Documentation
 
@@ -195,7 +197,7 @@ Prefer auto-generation from code annotations when possible. See [Application Doc
 
 Make your project consumable by AI agents:
 
-- **llms.txt** — add a `llms.txt` file at the repository root. Copy the template from [templates/llms.txt](./assets/templates/llms.txt). This file gives LLMs a structured overview of your project.
+- **llms.txt** — optionally provide a structured project overview for LLMs, using the project's documentation conventions. Include purpose, supported usage, and links to current documentation.
 - **Structured formats** — use OpenAPI, AsyncAPI, or protobuf for machine-readable API docs.
 - **Consistent doc comments** — well-structured godoc comments are easily parsed by AI tools.
 - **Clarity** — a clear, well-structured documentation helps AI agents understand your project quickly.

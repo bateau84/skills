@@ -30,7 +30,7 @@ Load the smallest relevant surface skills when platform-specific interaction is 
 7. **Distinguish correction ownership.**
    - **Implementation drift:** accepted design is clear; Worker can correct it.
    - **Design decision required:** design is ambiguous/wrong or a real constraint requires a new human-facing choice.
-   - **Missing product/behavior/architecture capability:** route to the owning authority; Designer does not fake it.
+   - **Missing product/behavior/architecture capability:** report the gap to the responsible collaborator or user; do not fake it in validation.
 8. **Record evidence limitations and negative space.** State untested scenarios, states, surfaces, input modes, environments, or observer-only checks. A PASS cannot claim more than was actually exercised.
 9. **Require human-observer verification when needed.** Rendered visual hierarchy, actual focus behavior, assistive-technology announcements, timing/animation, device ergonomics, or other effects not provable from available evidence remain explicitly unverified.
 10. **When no accepted Design Spec exists**, heuristic/usability findings are not spec deviations. State that design intent cannot be traced and avoid retroactively inventing one.

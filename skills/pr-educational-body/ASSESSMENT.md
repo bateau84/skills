@@ -1,6 +1,6 @@
 # pr-educational-body Reviewer Assessment
 
-Reviewer-only domain contract. It does not create Loom authority, product meaning, or proof.
+Domain-specific review guidance for any agent performing assessment. It does not establish product decisions or prove correctness by itself.
 
 ## Review criteria
 

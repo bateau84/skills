@@ -1,6 +1,6 @@
 ---
 name: web-ui-design
-description: Web-specific interface design — the browser as a co-host, URL as a first-class UX object, document-model vs app-model web, form design as a primary interaction concern, responsive behavior as interaction change, and web accessibility patterns. Use when designing any web application or website where users interact with the interface: SPAs, multi-page apps, forms, dashboards, admin interfaces. Load alongside Hallmark when designing the visual layer of a web product. Not for visual aesthetics (→ `hallmark`), Hallmark's visual anti-slop methodology (→ `hallmark`), CLI design (→ `cli-design`), TUI design (→ `tui-design`), desktop GUI (→ `desktop-ui-design`), or pure content sites with no interaction beyond navigation.
+description: "Web-specific interface design: browser behavior, URLs as UX, document vs app models, forms, responsive interactions, and accessibility patterns. Use for SPAs, multi-page apps, forms, dashboards, and admin interfaces. Add visual-interface-design for visual reasoning. Not for CLI design, TUI design, native desktop GUI, or pure content sites with no interaction beyond navigation."
 metadata:
   version: "1.0.0"
 ---
@@ -21,13 +21,13 @@ Web UI design is the structural and behavioral design of interfaces delivered th
 - Reviewing an existing web design for browser-model violations (back button broken, URL not reflecting state, zoom prevented)
 
 **Do NOT load this skill when:**
-- The work is visual aesthetics — color palettes, typographic scales, component archetypes, design tokens (→ `hallmark` for web-specific visual production, → `visual-interface-design` for surface-independent visual reasoning)
+- The work is visual aesthetics — use `visual-interface-design` for visual reasoning and the project's design system for concrete palettes, typography, components, and tokens.
 - The interface is a CLI (→ `cli-design`)
 - The interface is a TUI running in a terminal (→ `tui-design`)
 - The interface is a desktop GUI (→ `desktop-ui-design`)
 - The site is pure content with no meaningful interaction beyond links and page navigation
 
-**Boundary with Hallmark:** Hallmark owns the visual production of web UIs — macrostructures, component archetypes, anti-slop methodology, design tokens, responsive CSS implementation. This skill owns the interaction and structural design of web UIs — the browser model, URL design, navigation hierarchy, form behavior, state management, responsive interaction changes, and accessibility patterns. Load both when designing a web application from scratch. Do not reproduce Hallmark reference content here; load Hallmark directly when visual production is needed.
+**Boundary with visual and implementation guidance:** This skill addresses the browser model, URLs, navigation, form behavior, state, responsive interaction changes, and accessibility patterns. Use `visual-interface-design` for visual reasoning and `design-implementation` for UI realization; no external theme or cookbook is required.
 
 **Boundary with `interaction-design`:** `interaction-design` owns the generic behavioral contract (the eight canonical states, feedback taxonomy, error recovery principles) that applies across all surfaces. This skill owns how those principles manifest under the specific constraints of the browser host: what loading states look like in SPAs vs MPAs, how error states interact with browser-managed page titles, where focus goes after client-side navigation.
 
@@ -507,7 +507,7 @@ A red input field border without a visible error message fails WCAG 1.4.1 (use o
 
 ## AI-Agent Adaptations
 
-When a Designer AI agent applies this skill:
+When an agent applies this skill:
 
 **State the document/app model first.** Before any navigation or URL decisions, establish whether the design is MPA or SPA. An incorrect assumption propagates through the entire design.
 
@@ -515,7 +515,7 @@ When a Designer AI agent applies this skill:
 
 **Design all six error-state types for every data-dependent view.** An AI agent that designs only the happy path is producing an incomplete spec. Every async operation, every form, every data table needs all failure states specified.
 
-**Specify focus placement for every navigation and state change.** Keyboard interaction and focus management cannot be left to Worker's judgment. The spec must name where focus goes after: route changes, modal open, modal close, form submission (success and error), inline content updates.
+**Specify focus placement for meaningful navigation and state changes.** The design should name where focus goes after route changes, modal open/close, form submission (success and error), and relevant inline updates rather than leaving material behavior implicit.
 
 **Specify touch alternatives for every hover-only interaction.** Every interaction that relies on hover must have a touch-accessible alternative. Name it explicitly.
 

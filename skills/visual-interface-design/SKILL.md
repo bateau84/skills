@@ -1,6 +1,6 @@
 ---
 name: visual-interface-design
-description: Surface-independent visual design reasoning for application interfaces — how to use type, color, spacing, and visual hierarchy as a communication system, not decoration. Use when making visual decisions for any application interface: web app, desktop GUI, TUI, or CLI output. Load alongside `hallmark` when working on web products that have both marketing and application surfaces. Not for web-specific visual production (→ `hallmark`), surface rendering mechanics (→ `tui-design`, `web-ui-design`), interaction behavior (→ `interaction-design`), or implementing accessible code (→ `accessibility`).
+description: "Surface-independent visual design reasoning: use type, color, spacing, and visual hierarchy to communicate meaning. Use for visual decisions in web apps, desktop GUIs, TUIs, or CLI output. Not for surface rendering mechanics (use tui-design or web-ui-design), interaction behavior (use interaction-design), or accessibility implementation (use accessibility)."
 metadata:
   version: "1.0.0"
 ---
@@ -19,18 +19,18 @@ Visual interface design is the discipline of using visual properties — type, c
 - Specifying the visual semantics section of a Design Spec
 - Evaluating whether a described visual design correctly communicates its intended meaning
 
-**Load alongside `hallmark` when:**
-- Working on web products that have both application interfaces (logged-in views, dashboards) and marketing surfaces (landing pages, promotional content). `hallmark` handles the marketing surface; this skill handles the application surface.
+**Compose with project-specific visual guidance when useful:**
+- For products with application and marketing surfaces, preserve a coherent design language while respecting their different user goals. No external design skill is required.
 
 **Do NOT load this skill when:**
-- Designing for web marketing/landing pages (→ `hallmark`) — Hallmark teaches macrostructures, component archetypes, web design tokens, OKLCH palettes, Tailwind configuration, and the slop test for web visual production. None of that belongs here.
+- Producing framework-specific marketing-page layouts: use the project's design system and implementation conventions; this skill focuses on visual reasoning.
 - Choosing surface rendering mechanics: ANSI color codes, CSS layout engines, rendering APIs (→ `tui-design`, `web-ui-design`)
 - Specifying interaction states or behavior (→ `interaction-design`)
 
-**Hallmark boundary — explicitly enforced:**
-Hallmark is a **production skill**: it generates web visual artifacts. This skill is a **reasoning skill**: it teaches how to think about visual decisions before producing anything. Hallmark owns web themes, macrostructures (H1–H9, S1–S5, F1–F6), component archetypes, the slop test, web design tokens, OKLCH palettes, and responsive production implementation. This skill owns visual hierarchy principles, semantic color, typography reasoning, spacing logic, iconography criteria, data visualization principles, motion semantics, dark mode as a design decision, and surface-specific visual constraints (TUI character grids, desktop platform conventions, CLI output formatting). These territories do not overlap.
+**Reasoning and implementation boundary:**
+This skill teaches how to reason about visual hierarchy, semantic color, typography, spacing, iconography, data visualization, motion, dark mode, and surface constraints. Concrete themes, component catalogs, CSS frameworks, and token formats follow the project's design system. Use `design-implementation` to translate an agreed design into UI.
 
-The falsifiable test: if a piece of content in this skill is web-specific and would be equally at home in Hallmark's references, it violates the boundary. If it addresses TUI color constraints or CLI output alignment, it is correct.
+Keep portable visual principles here; put framework-specific rendering recipes in implementation or surface guidance.
 
 ---
 
@@ -527,9 +527,9 @@ Fix: visual weight must match task-relevance, not system-organizational-level.
 
 ## AI-Agent Adaptation
 
-A Designer AI agent cannot view a rendered interface, use a color picker, or observe how typography renders at actual size on target hardware. What is available is analytical reasoning applied to described visual decisions.
+Use the tools actually available. Screenshots, browser automation, and color sampling can support rendered checks when provided by the host; without them, limit claims to analytical reasoning about the described design. Do not assume access to target hardware or real-user observations.
 
-**Available to a Designer AI agent:**
+**Analytical checks available without rendered access:**
 - **Contrast ratio verification:** Given hex/RGB color values, calculate luminance ratio and flag failures against WCAG 4.5:1 and 3:1 thresholds. Deterministic — no visual judgment required.
 - **Grayscale test (analytical):** Given a described layout, reason about whether the hierarchy survives without color — if only color distinguishes elements, the hierarchy fails the test.
 - **Spacing scale audit:** Given a list of spacing values, verify they derive from a consistent scale and flag arbitrary values that break rhythm.
@@ -539,12 +539,12 @@ A Designer AI agent cannot view a rendered interface, use a color picker, or obs
 - **Gestalt reasoning from layout descriptions:** If told "the form label is 32px below the input field," apply gestalt proximity: the label reads as belonging to the input *above* it, not the input it labels. Spatial relationships described in text are sufficient to apply proximity and common-region principles.
 - **Anti-pattern detection from specification:** If the spec describes "icon-only navigation," apply the iconography failure pattern without seeing the icons. If the spec describes "animations on page load," apply the motion-must-not-slow-task-completion principle. The principles apply to design descriptions, not just rendered artifacts.
 
-**Not available — requires human visual judgment:**
+**Checks requiring rendered evidence, target conditions, or human research:**
 - Assessing whether a color palette "feels right" or has the intended emotional register
 - Evaluating visual tension, figure/ground quality, or gestalt grouping in rendered output
 - Verifying that visual hierarchy works in practice across different monitors, zoom levels, and ambient lighting conditions
 - Testing with real users for whether visual hierarchy guides attention correctly
-- Checking contrast ratios with a color picker tool (use luminance calculation from specified RGB/hex values instead)
+- Sampling rendered colors when a capture/color tool is available; otherwise calculate from specified RGB/hex values and disclose that boundary.
 
 **Design decision scope:** An AI agent doing visual interface design produces a visual semantics specification — a set of decisions and their communicative rationale expressed as named token references and precise numeric values (`color.status.error` instead of "make it red"; "16px / 24px line height" instead of "comfortable body text"). It does NOT produce a subjective aesthetic judgment that substitutes for human visual review. Mark visual decisions that depend on rendered evaluation as open design questions if the agent cannot verify them analytically.
 

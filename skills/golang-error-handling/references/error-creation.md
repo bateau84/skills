@@ -72,7 +72,7 @@ See [Low-Cardinality Error Messages](#low-cardinality-error-messages) for why th
 
 ### Decision table: which error strategy to use
 
-**Prefer making incorrect usage structurally impossible.** Agents hitting granular exception hierarchies must predict error object shapes, write branching logic, and anticipate edge cases — and they frequently get it wrong, catching too broadly and letting incorrect state propagate silently into subsequent steps. Ousterhout's "define errors out of existence" principle is directly supported by agentic failure data: 57.9% of decisive agent errors are epistemic — the agent had the information but acted on an unverified assumption. An API that can be called "successfully" in an incorrect way is especially hazardous. Design your error surface so that misuse produces an obvious, early failure rather than a plausible-looking wrong value.
+**Prefer making incorrect usage structurally impossible.** Ousterhout's "define errors out of existence" principle is a useful design heuristic: remove avoidable error cases through a clearer interface where possible. Complex error surfaces can tempt callers, human or agent, to guess error shapes or handle failures too broadly, allowing incorrect state to propagate. When an error case cannot be removed, make misuse produce an obvious, early failure rather than a plausible-looking wrong value. Keep the conditions callers must distinguish explicit; this rationale is not a measured claim about agent error rates.
 
 | Situation | Strategy | Example |
 | --- | --- | --- |

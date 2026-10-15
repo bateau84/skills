@@ -55,6 +55,6 @@ Go 1.22+ expanded PGO to devirtualize more interface calls. Go 1.23+ reduced PGO
 
 ## AI-Driven Code Review in CI
 
-Add an AI agent as a PR reviewer alongside traditional static analysis. When configured with this skill plugin, the agent loads the relevant Go skills — `golang-security` for security review, `golang-concurrency` for concurrency issues, `golang-error-handling` for error handling, and so on — giving it the same expertise as a senior Go reviewer. This catches architectural drift, logic bugs, missing context in errors, and subtle concurrency hazards that linters cannot detect.
+If AI-assisted review is useful to the project, provide relevant guidance such as `golang-security`, `golang-concurrency`, or `golang-error-handling` by file reads or a supported loader. No skill plugin or AI review service is required. Such review may surface issues beyond static analysis, but loading guidance does not establish senior-reviewer expertise or guarantee detection; validate findings and preserve required independent review.
 
-See the `golang-continuous-integration` skill for ready-to-use GitHub Actions assets for both Claude Code and GitHub Copilot.
+See `golang-continuous-integration` for optional review-integration guidance and `github-workflow` for workflow implementation. Use the chosen integration's documented configuration rather than assuming bundled Actions assets exist.

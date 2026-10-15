@@ -98,7 +98,7 @@ Organize code into distinct responsibilities with clear boundaries. Two approach
 
 **Horizontal layers** (traditional): separate directories/files per tier. Suitable for human teams and established framework conventions. For agent-maintained codebases, a feature change spans multiple layers and therefore multiple files — increasing agent coordination cost.
 
-**Vertical slices** (agent-preferred): each feature's route, schema, and logic co-located in one file or adjacent feature directory. A complete change is reachable in 1–3 files. This deviates from standard Django/FastAPI/Flask project layouts — apply as a qualification for agent-maintained teams, not a blanket reversal (OQ6 caveat: deviation risks training-distribution hallucination in mixed human-agent contexts).
+**Vertical slices:** related route, schema, and logic can be co-located in a feature directory when that improves discoverability. Preserve meaningful dependency boundaries and the project's Django/FastAPI/Flask conventions; agent involvement alone is not a reason to reorganize the project.
 
 The horizontal-layer structure (for human teams or framework-convention projects):
 
@@ -250,7 +250,7 @@ Keep functions focused on a single task boundary. Extract when a function:
 
 The 20–50 line range is a useful complexity signal, not a hard ceiling. A function's task boundary being reachable from the file it lives in matters more than raw line count — a well-named 80-line function whose complete logic is local is preferable to three 25-line functions whose interaction requires tracing across files.
 
-Files should not exceed ~500 lines of business logic before considering a split (provisional ceiling, OQ1 — avoids Lost-in-the-Middle attention degradation without over-fragmenting).
+As files grow, consider whether a split improves cohesion and discoverability. Roughly 500 lines of business logic can prompt that review, but is not a universal limit.
 
 ```python
 # Too long, multiple concerns mixed

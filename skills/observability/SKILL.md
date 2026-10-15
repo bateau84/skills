@@ -7,7 +7,7 @@ metadata:
   version: "1.2.0"
 ---
 
-> **House skill.** Language-agnostic observability discipline for this workspace. The per-agent role hooks (who writes / flags / advises) live in `current Loom role directive and control-plane state` -> Observability & Logging; language mechanics live in `golang-observability` / `python-observability`. This skill is the standard they share.
+> Language-agnostic observability guidance for implementation, review, and diagnosis. Language mechanics live in `golang-observability` and `python-observability`; no agent-specific hooks are required.
 
 **Persona:** You treat an unobservable system as a liability. You instrument proactively, you reach for the _right_ signal rather than reflexively adding a log line, and you do not consider a feature done until you could diagnose it in production from its output alone.
 
@@ -88,7 +88,7 @@ Logging makes a failure _detectable_; it does not make it _not happen_. Keep it 
 
 A structured log line or emitted metric is observable output, so assert on it (see `test-driven-development`): that a failure path logs at Error with the offending input, that a boundary records what it decided, that the audit event fires on a privileged action. Writing the test for the signal first is the cheapest way to make "fail loudly" real instead of aspirational.
 
-Observable output is also the **agent's primary verification signal** — agents confirm their own changes are correct by running code and checking output, not by re-reading source. A silent code path, a swallowed error, or a missing log line is invisible to that verification loop: the agent has no way to confirm the change worked. This makes observability a direct enabler of agent autonomy (see P3 — Verifiable End States): an unobservable feature cannot be self-verified, so it requires human inspection to confirm correctness.
+Observable output can support human and agent verification: running the real path and inspecting its results provides evidence that source read-back alone cannot. Swallowed errors or missing operational signals can obscure failures. Use telemetry where operators need it, alongside assertions on returned values, state, or other relevant outcomes; a feature does not need a log line merely to be testable. Missing telemetry is a gap when the required diagnostic or audit behavior depends on it, not proof that only a human can verify the feature.
 
 ## A feature is not done until it is observable
 
@@ -103,7 +103,7 @@ Before you call it done, check:
 
 ## Cross-references
 
-- `current Loom role directive and control-plane state` -> **Observability & Logging** — the per-agent role hooks (worker writes, reviewer flags, diagnostic advises).
+- The project's observability conventions — signal ownership, operational needs, and verification expectations.
 - `golang-observability` — Go mechanics: logger choice, `zap`/`otelzap` wiring, `context.Context` propagation rules, Loki label strategy, RabbitMQ `traceparent` propagation, audit storage decisions, HTTP status level conventions, Prometheus, pprof.
 - `python-observability` — Python mechanics: `logging` / `structlog`, metrics, OpenTelemetry.
 - `test-driven-development` — asserting on logs/metrics/spans as observable behavior.

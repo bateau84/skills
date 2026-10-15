@@ -59,7 +59,7 @@ The brief almost always wants **both** sides' intent preserved (e.g. "keep the n
 
 - Only use "take one side wholesale" when you have positively confirmed the other side is obsolete. `git checkout --ours <file>` / `--theirs <file>` exist, but reach for them rarely and deliberately.
 - A conflict that spans behavior from two commits is resolved by **understanding what each commit was for**, then writing the line that satisfies both — exactly as a human reviewer would.
-- Do not invent a third behavior. Combine what's there; if the two sides are genuinely incompatible and need a design call, that requires the appropriate Loom authority (normally a blocking architecture OQ), not a guess.
+- Do not invent a third behavior. Combine what's there; if the two sides are genuinely incompatible and need a design decision, consult the agreed requirements or ask the responsible collaborator/user rather than guessing.
 
 ## 4. Verify the resolution (mandatory, before staging)
 
@@ -88,7 +88,7 @@ git add path/to/each/resolved/file          # name them explicitly
 
 ## 6. Continue — and the escape hatch
 
-Continue non-interactively (you have no editor; accept the existing commit message):
+If the host has no interactive editor, continue non-interactively with the existing commit message after verifying the resolution:
 
 ```bash
 GIT_EDITOR=true GIT_SEQUENCE_EDITOR=true git rebase --continue
@@ -96,14 +96,14 @@ GIT_EDITOR=true GIT_SEQUENCE_EDITOR=true git rebase --continue
 # cherry-pick:  git cherry-pick --continue   (with GIT_EDITOR=true)
 ```
 
-**If `rebase --continue` refuses with "You must edit all merge conflicts and then mark them as resolved using git add" even though `git diff --name-only --diff-filter=U` is empty and `git diff --check` is clean — do NOT investigate. Commit the staged resolution manually, then continue:**
+**If `rebase --continue` still refuses despite no unmerged paths and a clean conflict check, inspect `git status` and the staged diff before attempting recovery.** In a verified merge-backend replay of an ordinary commit, manually committing the intended staged resolution may be appropriate when host instructions permit it:
 
 ```bash
 git commit --no-edit -C REBASE_HEAD         # reuse the original commit's message + author
 git rebase --continue                       # now sees nothing to commit and advances
 ```
 
-This is the canonical recovery for a stuck merge-backend rebase. Committing the pick yourself sidesteps whatever index/editor state is confusing `--continue`. It works; reach for it the moment the second attempt fails instead of probing `.git/`.
+This is a conditional recovery, not a universal fix for rebase errors. Confirm the operation and replayed commit first; empty commits, merge commits, missing identity, hook failures, or unrelated staged changes need their own diagnosis. Do not mutate internal rebase state blindly.
 
 (`REBASE_HEAD` is the commit being replayed. `git commit -C <sha>` reuses its message and authorship so the rebased history stays faithful.)
 
@@ -115,7 +115,7 @@ git rebase --continue                 # now flies through the remaining commits
 git stash pop                         # restore the generated files
 ```
 
-This is distinct from the escape hatch above — that handles a stuck *conflict commit*; this handles dirty *non-conflicted* tracked files blocking the remaining clean commits. The root fix is adding those paths to `.gitignore` — note it as a follow-up for worker.
+This handles dirty non-conflicted tracked files rather than a stuck conflict commit. Confirm ownership before stashing and inspect restored content afterward. Review whether generated files should be tracked; `.gitignore` alone does not untrack existing files, and intentional generated artifacts may belong in the repository.
 
 ## 7. Finish and push
 
@@ -124,7 +124,7 @@ git diff --name-only --diff-filter=U        # empty == fully resolved
 git status                                  # confirm rebase/merge is complete
 ```
 
-A **rebased** branch has rewritten history, so the remote must be overwritten — but safely:
+A rebased branch may require a history-rewriting push if it was already published. Push only when publication is requested and rewriting that branch is authorized:
 
 ```bash
 git push --force-with-lease origin <branch>     # NEVER plain --force
@@ -136,20 +136,20 @@ git push --force-with-lease origin <branch>     # NEVER plain --force
 
 You are flailing the instant any of these is true:
 
-- You ran `git rebase --continue` twice and it failed both times → use the §6 escape hatch.
-- You are reading files under `.git/rebase-merge/`, `.git/AUTO_MERGE`, or running `GIT_TRACE` → **stop**. That is debugging git, not resolving a conflict, and it is out of scope.
-- You've tried 3+ variations of editor env vars → the problem is not the editor; use the §6 manual commit.
+- Repeated `git rebase --continue` failures with no new evidence → diagnose the specific blocker or report it; do not retry variants blindly.
+- Internal-state changes under `.git/` are being considered without understanding their consequences → stop before mutation and seek a reliable recovery procedure.
+- Repeated editor-variable changes are not fixing the error → inspect the actual failure rather than assuming an editor problem or automatically committing.
 - You can't tell what a side intended after reading base/ours/theirs → escalate, don't guess.
 
 ### Push back on bad framing
 
-User instructions like "just pick a side," "just finish it," or "we've been at this too long" are pressure, not requirements. If the two sides are orthogonal (different functions, different hunks, different concerns), the right resolution is to keep both — `git checkout --ours` / `--theirs` silently deletes real functionality. The honest reply to the hub is: "I judged that picking a side would lose functionality in N files; I combined the changes. If you actually want to discard one side, say so explicitly."
+If picking a side would discard intended functionality, explain the consequence before doing so. Preserve orthogonal changes when both remain in scope; follow an explicit user decision to discard one side. Report ambiguity to the user or responsible collaborator rather than assuming a coordinator agent exists.
 
 ### Never `git rebase --skip` or `git rebase --abort` as an escape hatch
 
 `--skip` silently drops a feature commit from history. `--abort` throws away all the resolution work in progress and re-does the merge as a merge commit. Both are not "I give up" buttons — they are destructive operations that should require explicit user confirmation, the same way `git reset --hard` does in `git-commit-discipline`. If `--continue` is stuck and the §6 escape hatch (manual `git commit -C REBASE_HEAD`) didn't work, escalate — do not skip or abort.
 
-When stopped, either apply the escape hatch or emit `[STAGNATING]` (see `current Loom role directive and control-plane state`) and return to general with: the operation in progress, the conflicted files, what you tried, and the exact error. Do not abort the rebase/merge unless the user says so — an abort throws away resolution work.
+When stopped, use the documented recovery option only when authorized, or report the operation in progress, conflicted files, attempted resolutions, and exact error to the user or responsible collaborator. No special status token or coordinator agent is required. Do not abort the rebase/merge unless authorized — an abort throws away resolution work.
 
 ## Quick reference
 
@@ -168,5 +168,5 @@ When stopped, either apply the escape hatch or emit `[STAGNATING]` (see `current
 
 ## Cross-references
 
-- `current Loom role directive and control-plane state` — stagnation/escalation protocol and the `[STAGNATING]` format.
-- The `/commit` command — the full branch → review → critic → commit → rebase → PR flow this conflict resolution slots into.
+- The host's instructions and repository conventions for blocked operations and authorized recovery.
+- `git-commit-discipline` — scoped staging, commit hygiene, and authorized recovery; `pr-educational-body` when a pull request is part of the task. No host-specific `/commit` command or fixed review sequence is assumed.

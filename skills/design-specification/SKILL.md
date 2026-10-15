@@ -5,7 +5,7 @@ description: Produce an implementation-ready human-experience handoff from accep
 
 # Design Specification
 
-Use when accepted human-facing design must be explicit enough that Architect, Planner, Worker, Reviewer, and later Designer validation can proceed without rediscovering material UX decisions.
+Use when agreed human-facing design must be explicit enough for architecture, planning, implementation, review, and later validation without rediscovering material UX decisions. These are activities any agent may perform.
 
 The specification is a **human-experience contract**, not backend architecture and not a pixel blueprint.
 
@@ -26,7 +26,7 @@ The specification is a **human-experience contract**, not backend architecture a
 9. **Define surface/context adaptation.** Specify behavior when viewport, terminal size, input mode, device class, or interaction surface changes enough to affect task completion. Use native conventions for CLI/TUI/web/desktop rather than transplanting another surface's interaction model.
 10. **Separate behavior from appearance.** Behavioral intent must remain implementable if visual examples/mockups are removed. Record visual semantics only where hierarchy, meaning, trust, or design language depends on them.
 11. **Record consequential design decisions.** When meaningful alternatives existed, compare a small set of genuinely different directions against Stories/Scenarios, accessibility, existing design language, product capability, and constraints; record why the selected direction wins and what trade-off it accepts.
-12. **Resolve ambiguity before handoff.** A consequential UX question is either resolved, explicitly owned as a blocking OQ, or safely left as an ordinary implementation detail. "TBD" is not a design decision.
+12. **Resolve ambiguity before handoff.** A consequential UX question is either resolved, explicitly tracked as a blocking open question, or safely left as an ordinary implementation detail. "TBD" is not a design decision.
 13. **Run the implementation-without-UX-invention test.** A competent implementation team should be able to build the accepted journey without deciding material human semantics. If they would have to invent a state, response, recovery path, focus destination, or user-visible meaning, the design is incomplete.
 
 ## Durable handoff shape
@@ -35,16 +35,27 @@ Use only sections that apply; keep them proportional.
 
 ```markdown
 ## Experience context
+
 ## User Stories / Scenarios
+
 ## Information architecture
+
 ## User/task flows
+
 ## Views / regions / components
+
 ## States and interactions
+
 ## Failure / recovery / interruption
+
 ## Focus / input / accessibility
+
 ## Responsive / surface constraints
+
 ## Visual semantics
+
 ## Design decisions
+
 ## Open questions
 ```
 
@@ -52,6 +63,6 @@ Keep durable stories, scenarios and experience design discoverable in the reposi
 
 ## Boundary
 
-Do not choose backend protocols, persistence, service/component topology, schema, or other architecture merely because the design needs a capability. State the capability/experience dependency and leave structural realization to the relevant architecture owner.
+Do not choose backend protocols, persistence, topology, or schema merely because the design needs a capability. State the capability/experience dependency, then address structural realization through architecture work rather than hiding it in a UX decision.
 
-Do not duplicate complete BR/QS/OC semantics. Reconcile with the owning requirements documents where human-visible meaning overlaps.
+Do not duplicate complete requirement, quality-scenario, or shared-contract semantics. Reconcile with behavioral specification where human-visible meaning overlaps.

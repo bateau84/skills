@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-naming
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-naming` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-naming`. Pair with `golang-common-practice` for shared verification guidance.
 
 # Go Naming Conventions
 
@@ -100,7 +100,7 @@ These conventions are correct but non-obvious — they are the most common sourc
 
 **Subtest names:** Table-driven test case names in `t.Run()` should be fully lowercase descriptive phrases: `"valid id"`, `"empty input"` — not `"valid ID"` or `"Valid Input"`.
 
-**Exported names: maximally descriptive (agent navigability).** The scope-based shortening heuristic ("i is fine for a 3-line loop") applies to **local variables only**. For exported functions, methods, and types — the primary navigation surface for both humans and agents — abbreviation increases total session cost. An abbreviated exported name shifts cost from input tokens to reasoning tokens: empirically, a 17% input-token reduction produced a 67% session-cost increase because agents expand the reasoning phase to compensate for lost information. Prefer `VerifyOrderByAvailableAmount` over `verify`; the longer name eliminates the tool call to understand intent, making it cheaper overall. Zero-shot usability test: can a reader use this function correctly from its signature and a one-line docstring alone? If no, the name is too abbreviated.
+**Exported names: descriptive at the call site (human and agent navigability).** The scope-based shortening heuristic ("i is fine for a 3-line loop") applies to **local variables**, not automatically to public APIs. For exported functions, methods, and types, opaque abbreviations can force readers to inspect the implementation to infer intent. Prefer a name such as `VerifyOrderByAvailableAmount` over a vague `Verify` when that distinction matters, while avoiding information already supplied by the package or receiver. Usability test: can a reader understand the operation from its signature and a short doc comment? If not, inspect the name, documentation, and interface together. Clear naming can reduce unnecessary navigation; it does not guarantee fewer tool calls or lower session cost.
 
 ## Detailed Categories
 
@@ -134,7 +134,7 @@ For complete rules, examples, and rationale, see:
 | `userSlice` type-in-name | Types encode implementation detail — `users` describes what it holds, not how |
 | Inconsistent receiver names | Switching names across methods of the same type confuses readers — use one name consistently |
 | `snake_case` identifiers | Underscores conflict with Go's MixedCaps convention and tooling expectations — use `mixedCaps` |
-| Long names for short scopes | Name length should match scope — `i` is fine for a 3-line loop, `userIndex` is noise. **This applies to local variables only;** exported functions, methods, and types should be maximally descriptive |
+| Long names for short scopes | Name length should match scope — `i` is fine for a 3-line loop, `userIndex` is noise. **This applies to local variables;** exported functions, methods, and types should reveal intent at the call site without stuttering |
 | Naming constants by value | Values change, roles don't — `DefaultPort` survives a port change, `Port8080` doesn't |
 | `FetchCtx()` context variant | `WithContext` is the standard Go suffix — `FetchWithContext()` is instantly recognizable |
 | `sort()` in-place but no `In` | Readers assume functions return new values. `SortIn()` signals mutation |

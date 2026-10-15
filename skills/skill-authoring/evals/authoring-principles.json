@@ -69,6 +69,24 @@
         "Must not leave the destructive security-sensitive sequence as loose suggestions.",
         "Must not imply that skill prose itself grants key-management authority."
       ]
+    },
+    {
+      "id": "Authoring-05",
+      "name": "semantic-portability-and-standalone-practice",
+      "trap": "Declare a skill portable after removing framework names while retaining hidden services, required companion steps, or unsupported universal cost claims.",
+      "prompt": "Audit this proposed portable library guidance for a single agent or human with ordinary file tools: 'Load our plugin and ask a coordinator to grant the fixed docs/tasks namespace. Host locks make parallel auto-fix jobs safe. Recover from the tool snapshot if needed. SKILL.md covers drafting only; required correctness checks are in ASSESSMENT.md. Read QA.md as a critic persona to obtain independent review. Longer API names always reduce session cost by 67%, according to an uncited benchmark.' A neighboring skill documents a real database service for database integration testing. Recommend minimal repairs preserving useful teaching and explain what your audit can and cannot establish.",
+      "expectations": [
+        "Identifies substantive plugin, coordinator, namespace, lock, and snapshot assumptions rather than only renaming framework vocabulary.",
+        "Keeps necessary production checks in practitioner guidance and companions optional; allows self-review without claiming reviewer independence from files or personas.",
+        "Requires traceable measurement context for empirical precision, or removes it while preserving the qualitative naming/navigation principle without a universal cost guarantee.",
+        "Preserves the explicit database dependency for the real integration task instead of banning all external services.",
+        "Traces linked references, duplicated guidance, and evaluation expectations as relevant and states inspection limits; pattern checks alone are not comprehensive semantic proof."
+      ],
+      "negative_expectations": [
+        "Must not invent locks, snapshots, plugin availability, benchmark provenance, independent review, or a successful evaluation run.",
+        "Must not require a new hierarchy, report schema, or mandatory evaluation harness to use the repaired skill.",
+        "Must not blanket-rewrite unrelated technical guidance or remove legitimate task-specific integrations."
+      ]
     }
   ]
 }

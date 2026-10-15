@@ -1,6 +1,6 @@
 ---
 name: accessibility-design
-description: Accessibility as a design input, not a compliance checkbox. Apply WCAG 2.2 normatively at design time, reason about the disability spectrum as design constraints, and produce specific, verifiable accessibility requirements for the Design Spec. Organized around standards (WCAG POUR, ARIA), disability types (visual, motor, cognitive, hearing, vestibular), and surface-specific constraints (web, CLI, TUI, desktop). Use when designing any human-facing interface — this skill is always relevant. Not for implementing accessibility in code (→ `accessibility` skill for Worker/Reviewer), not for web-specific rendering mechanics (→ `web-ui-design`), not for visual design (→ `visual-interface-design`).
+description: Accessibility as a design input. Use WCAG 2.2 and disability-specific constraints to produce verifiable requirements for human-facing web, CLI, TUI, and desktop interfaces. Use when designing interactions, states, navigation, input, or visual information. Not for accessibility implementation (use accessibility), web rendering mechanics (use web-ui-design), or visual design (use visual-interface-design).
 metadata:
   version: "1.0.0"
 ---
@@ -11,19 +11,19 @@ metadata:
 
 Accessibility design is the discipline of making accessibility a structural input to design decisions — ensuring that interfaces are usable by people with visual, motor, cognitive, hearing, and vestibular disabilities from the moment design decisions are made.
 
-**This skill does not repeat what the existing `accessibility` skill covers.** The `accessibility` skill at `skills/accessibility/SKILL.md` is an implementation-focused skill for Worker and Reviewer — it teaches how to implement accessible code (native `<dialog>`, focus management patterns, ARIA attribute usage in markup). This skill is design-focused for Designer — it teaches how to make design decisions that prevent accessibility barriers before implementation begins. The two are complementary: this skill's output (accessibility requirements) feeds that skill's implementation.
+**Design and implementation complement each other.** The sibling `accessibility` skill teaches native controls, focus management, and ARIA implementation. This skill helps any agent make design decisions that prevent barriers before implementation; its accessibility requirements feed implementation and review.
 
 **Load this skill always.** Every design engagement involving a human interface needs it. Reduce scope to surface-specific constraints (CLI accessibility differs from web accessibility), but never treat it as a final-phase compliance review.
 
 **Do NOT load when:** The engagement is reviewing an implementation against a spec (load `design-validation` instead) — though `accessibility-design` informs the evaluation criteria `design-validation` uses.
 
 **Boundary:**
-- Not for: implementing accessibility in code (→ `accessibility` skill — Worker/Reviewer audience)
+- Not for: implementing accessibility in code (use `accessibility`).
 - Not for: surface-specific rendering mechanics (→ surface skills own the rendering layer)
 - Not for: visual design choices outside accessibility constraints (→ `visual-interface-design`)
 - Not for: interaction design state modeling (→ `interaction-design` owns states; this skill adds accessibility constraints on top of those states)
 
-**Upstream inputs:** Experience goals and scenarios from `experience-design`, interaction states from `interaction-design`, surface type from Designer's skill selection.
+**Upstream inputs:** Experience goals and scenarios, interaction states, and the relevant surface constraints. Use `experience-design`, `interaction-design`, and surface skills as needed.
 
 **Downstream outputs:** Accessibility requirements — specific, standard-referenced, surface-appropriate, verifiable — for the `Accessibility requirements` section of the Design Spec via `design-specification`. Each requirement names: the component/interaction, the standard (WCAG SC number, ARIA pattern, or platform convention), the implementable condition, and the verification method.
 
@@ -596,7 +596,7 @@ Accessibility requirements in the Design Spec must follow this format (from arch
 Component/interaction: [what it applies to]
 Standard: [specific WCAG SC, ARIA pattern, or platform convention]
 Requirement: [specific implementable condition]
-Verification: [how Worker/Reviewer confirms it]
+Verification: [how implementation or review confirms it]
 ```
 
 **Examples:**
@@ -741,7 +741,7 @@ This skill's content passes the research quality gate (architecture §9) if:
 - WCAG Understanding 3.3.8 Accessible Authentication Minimum: https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-minimum.html
 
 **Adjacent skills:**
-- `accessibility` — implementing accessibility in code (Worker/Reviewer audience); receives requirements produced by this skill
+- `accessibility` — implementation and review mechanics; receives requirements produced by this skill.
 - `interaction-design` — owns state modeling; this skill adds accessibility constraints on those states
 - `visual-interface-design` — owns visual design choices; this skill provides the normative constraints those choices must satisfy
 - `design-specification` — formats and communicates accessibility requirements in the spec; the verifiable requirement format must be consistent between both skills

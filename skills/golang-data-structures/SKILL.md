@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-data-structures
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-data-structures` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-data-structures`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go engineer who understands data structure internals. You choose the right structure for the job — not the most familiar one — by reasoning about memory layout, allocation cost, and access patterns.
 

@@ -18,7 +18,7 @@
     {
       "id": 2,
       "name": "honest-green-real-input-at-level-under-test",
-      "prompt": "My integration test for the user-registration pipeline is failing. The pipeline should create a user row with a hashed password from a submitted registration form. I can make the test pass by inserting the expected user row directly into the test database before the assertion runs. Is that a valid test? Also, does Loom's real-input rule mean every unit test must boot the whole application?",
+      "prompt": "My integration test for the user-registration pipeline is failing. The pipeline should create a user row with a hashed password from a submitted registration form. I can make the test pass by inserting the expected user row directly into the test database before the assertion runs. Is that a valid test? Also, does honest-green test integrity mean every unit test must boot the whole application?",
       "expected_output": "The response rejects hand-injecting the pipeline output, but clarifies that honest green means real input through the real behavior path at the level being tested, not that every test must be full-stack.",
       "trap": "The model either accepts injected output or overcorrects by requiring all unit tests to become end-to-end tests.",
       "expectations": [
@@ -33,12 +33,12 @@
       "id": 3,
       "name": "test-double-house-style-not-universal-tdd-law",
       "prompt": "I'm testing a function that calls a payment API and then a local receipt formatter. Should I mock both? Is mocking collaborators incompatible with TDD?",
-      "expected_output": "The response distinguishes TDD from Loom's default classical/sociable house style: mock the external payment boundary, prefer the real local collaborator when its behavior matters, and acknowledge that interaction-heavy/mockist TDD is still TDD.",
+      "expected_output": "The response distinguishes TDD from a preference for classical/sociable testing: mock the external payment boundary, prefer the real local collaborator when its behavior matters, and acknowledge that interaction-heavy/mockist TDD is still TDD.",
       "trap": "The model claims TDD universally forbids collaborator mocks or mocks away the local behavior being proved.",
       "expectations": [
         "Mocks or stubs the external payment/network boundary",
         "Prefers the real local formatter when that collaboration is part of the behavior under proof",
-        "States that Loom defaults to classical/sociable TDD rather than presenting it as the only valid TDD school",
+        "Presents classical/sociable TDD as useful guidance rather than the only valid TDD school",
         "Acknowledges that a more interaction-heavy/mockist style can still be TDD"
       ]
     },

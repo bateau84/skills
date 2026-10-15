@@ -8,7 +8,7 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-cli
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-cli` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-cli`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go CLI engineer. You build tools that feel native to the Unix shell — composable, scriptable, and predictable under automation.
 
@@ -56,11 +56,11 @@ myapp/
 └── go.sum
 ```
 
-`main.go` should be minimal — see [assets/examples/main.go](assets/examples/main.go).
+`main.go` should be minimal: call the command entry point and map returned errors to an exit status.
 
 ## Root Command Setup
 
-The root command initializes Viper configuration and sets up global behavior via `PersistentPreRunE`. See [assets/examples/root.go](assets/examples/root.go).
+When using Cobra and Viper, the root command initializes configuration and sets up global behavior via `PersistentPreRunE`. Use `golang-spf13-cobra` and `golang-spf13-viper` for implementation details.
 
 Key points:
 
@@ -71,11 +71,11 @@ Key points:
 
 ## Subcommands
 
-Add subcommands by creating separate files in `cmd/myapp/` and registering them in `init()`. See [assets/examples/serve.go](assets/examples/serve.go) for a complete subcommand example including command groups.
+Add subcommands according to the existing command structure, preferably with explicit constructor/registration functions. Use `golang-spf13-cobra` for subcommands and command groups.
 
 ## Flags
 
-See [assets/examples/flags.go](assets/examples/flags.go) for all flag patterns:
+Use `golang-spf13-cobra` for flag API examples. Consider these patterns:
 
 ### Persistent vs Local
 
@@ -96,7 +96,7 @@ This ensures `viper.GetInt("port")` returns the flag value, env var `MYAPP_PORT`
 
 ## Argument Validation
 
-Cobra provides built-in validators for positional arguments. See [assets/examples/args.go](assets/examples/args.go) for both built-in and custom validation examples.
+Cobra provides built-in validators for positional arguments; use `golang-spf13-cobra` for built-in and custom validation examples.
 
 | Validator                   | Description                          |
 | --------------------------- | ------------------------------------ |
@@ -116,7 +116,7 @@ Viper resolves configuration values in this order (highest to lowest precedence)
 3. **Config file** (persistent settings)
 4. **Defaults** (set in code)
 
-See [assets/examples/config.go](assets/examples/config.go) for complete Viper integration including struct unmarshaling and config file watching.
+Use `golang-spf13-viper` for Viper integration, struct unmarshaling, and config file watching where needed.
 
 ### Example Config File (.myapp.yaml)
 
@@ -137,7 +137,7 @@ With the setup above, these are all equivalent:
 
 ## Version and Build Info
 
-Version SHOULD be embedded at compile time using `ldflags`. See [assets/examples/version.go](assets/examples/version.go) for the version command and build instructions.
+Version can be embedded at compile time using `ldflags` or the project's release tooling. Use `golang-spf13-cobra` for a version command and preserve the existing build convention.
 
 ## Exit Codes
 
@@ -153,11 +153,11 @@ Exit codes MUST follow Unix conventions:
 | 127   | Command not found | Missing dependency                        |
 | 128+N | Signal N          | Terminated by signal (e.g., 130 = SIGINT) |
 
-See [assets/examples/exit_codes.go](assets/examples/exit_codes.go) for a pattern mapping errors to exit codes.
+Map known error categories to documented exit codes at the command boundary rather than exiting deep inside reusable logic.
 
 ## I/O Patterns
 
-See [assets/examples/output.go](assets/examples/output.go) for all I/O patterns:
+Use the following I/O patterns:
 
 - **stdout vs stderr**: NEVER write diagnostic output to stdout — stdout is for program output (pipeable), stderr for logs/errors/diagnostics
 - **Detecting pipe vs terminal**: check `os.ModeCharDevice` on stdout
@@ -166,15 +166,15 @@ See [assets/examples/output.go](assets/examples/output.go) for all I/O patterns:
 
 ## Signal Handling
 
-Signal handling MUST use `signal.NotifyContext` to propagate cancellation through context. See [assets/examples/signal.go](assets/examples/signal.go) for graceful HTTP server shutdown.
+Use `signal.NotifyContext` where signal cancellation must propagate through context, and call its stop function to release resources. Use `golang-context` and `golang-design-patterns` for cancellation and graceful shutdown guidance.
 
 ## Shell Completions
 
-Cobra generates completions for bash, zsh, fish, and PowerShell automatically. See [assets/examples/completion.go](assets/examples/completion.go) for both the completion command and custom flag/argument completions.
+Cobra generates completions for bash, zsh, fish, and PowerShell; use `golang-spf13-cobra` for completion commands and custom flag/argument completion APIs.
 
 ## Testing CLI Commands
 
-Test commands by executing them programmatically and capturing output. See [assets/examples/cli_test.go](assets/examples/cli_test.go).
+Test commands by executing them programmatically with controlled input and capturing output, errors, and exit status. Use `golang-testing` and `golang-spf13-cobra` for test mechanics.
 
 Use `cmd.OutOrStdout()` and `cmd.ErrOrStderr()` in commands (instead of `os.Stdout` / `os.Stderr`) so output can be captured in tests.
 

@@ -1,46 +1,58 @@
-# Portable agent skills
+# Skill Library
 
-This repository provides **methodology**, independent of any agent harness, control plane, agent role or execution workflow. The consuming repository defines its own authority, file layout, permissions, and task orchestration.
+Skills are on-demand methodology for any agent or human practitioner. Load them with a native skill tool or read the files directly; no particular agent structure or plugin is assumed.
 
-**Migration note:** This library was seeded from Loom and MATS. Some older skills still carry role names, product-specific paths or control-plane assumptions. They are legacy material to audit and migrate, not a license to impose those assumptions on new consumers. The skills touched by this change use repository-owned paths and coordination.
+## Context files
 
-## Skill components
+| File            | Activity               | Purpose                                                                      |
+| --------------- | ---------------------- | ---------------------------------------------------------------------------- |
+| `SKILL.md`      | Practice               | **How do I do this work well?** Required.                                    |
+| `ASSESSMENT.md` | Review                 | **Did the work satisfy its inputs and domain obligations?** Optional.        |
+| `QA.md`         | Adversarial validation | **How could this still be wrong after competent work and review?** Optional. |
 
-| File | Purpose | Required? |
-| --- | --- | --- |
-| `SKILL.md` | How to perform the specialized work | Yes |
-| `ASSESSMENT.md` | Independent, normal review of the result against accepted inputs | No |
-| `QA.md` | Independent adversarial checks for residual false confidence | No |
+Any agent may use any of these files for the relevant activity. Review and QA are different perspectives, not fixed agent identities or mandatory workflow stages. QA is not merely stricter assessment. Companions are optional and should add domain-specific value.
 
-Assessment and QA are distinct perspectives, not mandatory ceremonies or requirements for dedicated agent roles. Consumers may assign them to any capable independent agent.
+`SKILL.md` should support ordinary practice, including the checks needed to produce sound work, without requiring either companion. One agent may use all three perspectives, but switching files does not make its review independent; describe who performed the checks and what evidence they used when independence matters.
 
-## Selection and authority
+## Selecting methodology
 
-- Load the **smallest relevant skill set** for the task; use additional skills only when their distinct concerns matter.
-- Skills do not create product requirements, accept decisions for the user, grant tool permissions, or dictate workflow gates.
-- Prefer current repository authority and observed implementation over unsupported assumptions in examples or older instructions.
-- Leave repository-specific paths, IDs, document types, graph vocabulary, and mandatory updates to the consuming repository's `AGENTS.md` or equivalent policy.
-- Knowledge format, indexing, logging, graph mechanics, and their structural validation belong to the portable `okf-authoring` skill maintained in [nrkno/okf-mcp](https://github.com/nrkno/okf-mcp). Domain-specific skills decide substantive content.
+| Work                              | Useful skills                                                                                                           |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Product intent and discovery      | intent-grilling, anchor-authoring, product-discovery, risk-driven-planning                                              |
+| Human experience                  | user-story, design-scenario, design-specification, surface/design skills; design-validation for implemented experiences |
+| Observable requirements           | behavioral-spec, behavioral-requirement, quality-scenario, obligation-contract                                          |
+| Technical structure and contracts | architectural-design, architectural-decision, architectural-spec                                                        |
+| Delivery planning                 | work-decomposition, risk-driven-planning                                                                                |
+| End-to-end outcome proof          | product-acceptance                                                                                                      |
+| Documentation and knowledge       | documentation, learning, report-lifecycle, report-to-keep                                                               |
+| Cross-domain reconciliation       | solution-synthesis, product-lifecycle                                                                                   |
+| Implementation                    | software-engineering and task-relevant language/domain skills                                                           |
+| Review                            | relevant assessment companions; design-review for design artifacts                                                      |
+| Failure investigation             | narrow troubleshooting/domain skills matching observed symptoms                                                         |
+| Residual confidence testing       | a small set of QA companions for load-bearing or risky domains                                                          |
 
-## Documentation authoring
+These methods do not require a particular sequence, separate agents, additional approvals, or a master product document. Reuse the project's existing conversations, decisions, plans, and verification records. A documented decision establishes agreed scope; it does not by itself prove benefit or correctness.
 
-The documentation skills are independently selectable:
+## Loading discipline
 
-| Concern | Skill |
-| --- | --- |
-| Preserve agreed user intent in a durable Anchor | `anchor-authoring` |
-| Explore ambiguous user-owned product intent | `intent-grilling` |
-| User Story and human-facing Scenario | `user-story`, `design-scenario` |
-| Human-experience specification | `design-specification` |
-| Functional requirement | `behavioral-requirement` |
-| Shared semantic guarantees | `obligation-contract` |
-| Measurable quality condition | `quality-scenario` |
-| Architectural design, decision, specification | `architectural-design`, `architectural-decision`, `architectural-spec` |
-| Current implementation and publication documentation | `documentation` |
-| Task decomposition and cross-session handoff | `work-decomposition`, `feature-handoff` |
+Load the smallest useful set. A Go database task might use `golang-common-practice`, `golang-database`, and `golang-testing`, rather than every Go skill. Use `golang-how-to` or `python-how-to` for skill selection in those families.
 
-For material parallel work, first establish shared **outcomes and contracts**, then give agents bounded responsibility and verification expectations. A downstream handoff must make sense without the original conversation. The number of document types and review steps scales with real ambiguity and risk, not a fixed pipeline.
+For TypeScript, start with `typescript-common-practice` and add type safety, async, or testing guidance when material. Add `javascript-runtime` for execution semantics and `browser-runtime` for direct Web API work.
 
-**First principles are not an Anchor deliverable.** They may be synthesized later from repeated, evidenced product and engineering decisions, when they become apparent and useful.
+For human-facing work, combine information architecture, interaction design, user flows, visual interface design, accessibility, and surface-specific guidance only for dimensions in scope.
 
-Other language, framework, design, testing, and operational skills in this repository remain optional domain methods. See [PORTING.md](PORTING.md) for historical import decisions; it is not a present-day control-plane contract.
+Use `feature-handoff` when another component, repository, or fresh session needs a self-contained implementation request.
+
+Document paths, IDs, types, and mandatory updates belong to the consuming repository's `AGENTS.md` or equivalent. Metadata, indexing, logging, and graph mechanics belong to the portable `okf-authoring` skill maintained in [nrkno/okf-mcp](https://github.com/nrkno/okf-mcp); the skills here decide substantive content. **First principles are not an Anchor deliverable**: synthesize them later from repeated, evidenced decisions.
+
+Relative references resolve from the skill directory. Bare skill names refer to sibling directories. Examples and artifact identifiers describe useful formats; follow local naming and storage conventions. External CLIs, services, and MCP integrations are explicitly task-specific, not prerequisites for loading the library.
+
+Local `evals/` files contain behavioral scenarios and expected observations. They can be used manually or adapted to a host's evaluation tools; no evaluation framework is required.
+
+The collection also offers [optional root evaluation tooling](../docs/evaluations.md)
+for explicitly loaded baseline/candidate trials through a pinned external runner.
+It does not add a skill-loading runtime dependency or replace the preserved
+four-variant protocol/pilot. [Verification records](../docs/eval-verification.md)
+distinguish provider-free harness tests from unexecuted live model trials.
+
+See `PORTING.md` for provenance.

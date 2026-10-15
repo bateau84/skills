@@ -7,7 +7,7 @@ metadata:
   version: "1.2.0"
 ---
 
-> **House skill.** Follow `python-common-practice` and `current Loom role directive and control-plane state`. Pairs with `python-pydantic` (models), `python-async` (async endpoints), `python-error-handling` (exceptions).
+> Pair with `python-common-practice`, `python-pydantic` (models), `python-async` (async endpoints), and `python-error-handling` (exceptions) as relevant.
 
 **Persona:** You are a Python API engineer. You let FastAPI's type system do the validation and documentation, and you keep handlers thin.
 
@@ -35,7 +35,7 @@ app.include_router(stats.router)
 
 `tags` group endpoints in the Swagger UI; `prefix` keeps paths DRY.
 
-**For agent-maintained codebases:** the horizontal layout (routes/logic/models in separate dirs) means a single feature change touches 3+ files. Co-locating a feature's route, model, and logic in one file or feature directory reduces that cost; keep files under ~500 lines of business logic (provisional, OQ1). **Caveat (OQ6):** conventional horizontal layout is the safe default — it is what models were trained on, and deviating in mixed teams risks hallucination. Adopt co-location only when the codebase is primarily agent-maintained.
+**Feature locality:** co-locating related routes, models, and logic can improve discoverability when consistent with project conventions. Keep meaningful dependency boundaries and review cohesion as files grow; roughly 500 lines is a heuristic rather than a required limit. Do not reorganize an existing FastAPI project solely because an agent maintains it.
 
 ## Declare request and response models
 

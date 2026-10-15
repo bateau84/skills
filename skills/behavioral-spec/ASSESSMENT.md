@@ -1,11 +1,11 @@
 # behavioral-spec Reviewer Assessment
 
-Reviewer-only cross-artifact contract. Artifact-specific criteria live with behavioral-requirement, quality-scenario, and obligation-contract. Assess the resulting meaning and evidence, not whether the author reproduced a prescribed checklist or number of artifacts.
+Cross-artifact review guidance for any agent performing assessment. Artifact-specific criteria live with behavioral-requirement, quality-scenario, and obligation-contract. Assess the resulting meaning and evidence, not whether the author reproduced a prescribed checklist or number of artifacts.
 
 ## Review criteria
 
 - Every material commitment in the claimed ready scope has obligation coverage. Source-to-obligation relationships make omissions and the impact of changed authority visible; an open question is not satisfied coverage.
-- Every normative claim is sourced, necessarily derived, or a legitimate ordinary Specifier choice inside delegated authority. Consequential derivations explain what accepted commitment would fail without the obligation; source links alone are insufficient. Alternative realizations and reasonable preferences are not mislabeled as necessities.
+- Every normative claim is sourced, necessarily derived, or an ordinary specification choice within agreed scope. Consequential derivations explain what agreed commitment would fail without the obligation; source links alone are insufficient. Alternative realizations and reasonable preferences are not mislabeled as necessities.
 - Routine semantic choices are settled and explained within delegated authority; material new capability, scope, risk, guarantee, or reserved preference remains with its owner. Mere ambiguity has not caused unnecessary escalation.
 - Source modality is preserved: examples, preferences, permissions, and exploration language are not inflated into mandatory guarantees. Scope exclusions are distinguished from prohibitions, and a minimal version has coherent behavior within its accepted boundary.
 - Downstream design, architecture, tests, code, or implementation behavior has not silently become upstream source authority. Applicable accepted obligations remain binding unless properly superseded; conflicts are explicit.

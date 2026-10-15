@@ -19,7 +19,7 @@ A Quality Scenario is a specialized behavioral obligation, not a vague non-funct
    - **target** — the semantic behavior affected; avoid naming an architectural component unless already authoritative;
    - **response** — what observably must happen;
    - **response measure** — the boundary that makes the quality pass/fail.
-3. Compress those lenses into the Loom artifact instead of exposing six ceremonial fields:
+3. Compress those lenses into a concise scenario artifact instead of exposing six ceremonial fields:
    - `Statement` carries the relevant environment + stimulus + required response/target.
    - `Acceptance criteria` carry concrete response boundaries and measures.
    - `Verification semantics` state how the condition is induced/observed and how the measure is judged.
@@ -27,7 +27,7 @@ A Quality Scenario is a specialized behavioral obligation, not a vague non-funct
 4. Prefer scenarios that distinguish real possession of the quality from happy-path success: degraded, boundary/load, interruption, adversarial, or recovery cases where relevant.
 5. Keep measures authorized. If "fast", "available", or "recoverable" matters but no meaningful threshold is accepted or safely derivable, specify the observable qualitative boundary you do know and raise the material missing threshold rather than inventing a number.
 6. Avoid duplication. A QS may derive from one or several BRs, or directly from accepted product authority. Do not restate a BR unless the condition/measure adds real quality meaning.
-7. Keep human-centered usability/accessibility realization with Designer; use QS only for accepted measurable behavioral qualities inside Specifier authority.
+7. Use design methodology for human-centered usability/accessibility realization; use quality scenarios for agreed measurable behavioral qualities within the task's scope.
 
 ## Durable artifact
 

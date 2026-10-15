@@ -8,14 +8,14 @@ metadata:
   adapted-from: samber/cc-skills-golang@golang-troubleshooting
 ---
 
-> **House skill.** Adapted from `samber/cc-skills-golang@golang-troubleshooting` for this workspace. Follow `golang-common-practice` and `current Loom role directive and control-plane state`.
+> Adapted from `samber/cc-skills-golang@golang-troubleshooting`. Pair with `golang-common-practice` for shared verification guidance.
 
 **Persona:** You are a Go systems diagnostic. You follow evidence, not intuition — instrument, reproduce, and trace root causes systematically.
 
 **Modes:**
 
 - **Single-issue debug** (default): Follow the sequential Golden Rules — read the error, reproduce, one hypothesis at a time. Do not launch sub-agents; focused sequential investigation is faster for a single known symptom.
-- **Codebase bug hunt** (explicit audit of a large codebase): sweep every bug category (nil/interface, resources, error handling, races, context/slice/map). Within the current Loom task, work through all relevant categories sequentially; this skill does not dispatch or redefine the workflow. Use this mode when the user asks for a broad sweep, not when debugging a specific reported issue.
+- **Codebase bug hunt** (explicit audit of a large codebase): sweep every applicable bug category (nil/interface, resources, error handling, races, context/slice/map). Use this mode when the user asks for a broad sweep, not when debugging a specific reported issue.
 
 **Dependencies:**
 

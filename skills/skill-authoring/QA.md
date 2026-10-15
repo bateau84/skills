@@ -1,6 +1,6 @@
 # skill-authoring Quality Assurance
 
-Critic-only adversarial contract. Assume competent production and Reviewer conformance have already occurred; attack residual false confidence without creating new authority.
+Adversarial validation for any agent. Assume competent production and conformance review; attack residual false confidence without inventing new requirements.
 
 ## QA criteria
 
@@ -14,7 +14,7 @@ Critic-only adversarial contract. Assume competent production and Reviewer confo
 - Attack **authority laundering**: can reusable guidance quietly create semantics, permissions, destructive actions, credentials, or user decisions?
 - Attack **self-confirming evaluation**: can the candidate, its wording, or a synthetic scenario make the eval pass without exercising the real decision boundary or observable output?
 - Attack **source/provenance erosion**: did migration or compression preserve the sentence while losing why it exists, what evidence supported it, or which obsolete mechanics were intentionally rejected?
-- Test whether ASSESSMENT and QA are genuinely independent or merely duplicated checklists with different severity words.
+- Test whether ASSESSMENT and QA offer distinct conformance and residual-confidence methods or merely duplicate checklists with different severity words. Different files or personas do not establish reviewer independence; probe shared context and assumptions when that claim matters.
 
 ## QA depth
 

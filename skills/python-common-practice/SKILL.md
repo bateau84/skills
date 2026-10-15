@@ -1,19 +1,19 @@
 ---
 name: python-common-practice
-description: "Python verification, code-quality posture, and skill-family conventions for Loom-managed Python work. Load alongside any python-* implementation/review skill. Methodology only; Loom owns routing, authority, evidence, and gates."
+description: "Python verification, code-quality posture, and skill-family conventions. Use alongside relevant python-* implementation or review skills for repository-aware checks and diagnose-before-fixing discipline."
 license: MIT
 metadata:
   author: Bateau
-  version: "2.0.0-loom"
+  version: "3.0.0"
 ---
 
 # Python Common Practice
 
 The Python-specific base layer for the `python-*` skill family.
 
-## Loom boundary
+## Scope
 
-This skill does not dispatch agents, assign review severity, create escalation markers, or decide workflow gates. The active Loom role directive and control-plane state own those concerns.
+This skill provides engineering guidance for any agent. Follow the user's task, repository conventions, and host permissions; no role hierarchy or orchestration framework is assumed.
 
 Use it only to improve the quality and verification of already-authorized Python work.
 
@@ -33,7 +33,7 @@ Do not assume every project uses every tool. Read `pyproject.toml` and current r
 
 A domain skill may require stronger checks such as coverage, async tests, security scanning, or profiling. Treat those as verification expectations when relevant.
 
-When a Loom step relies on observed verification, record it through Loom evidence according to the active role directive.
+When conclusions rely on verification, record the commands, scope, and observed outcomes in the task summary or the project's verification record. Distinguish unrun checks and limitations from passing results.
 
 ## Diagnose before fixing
 
