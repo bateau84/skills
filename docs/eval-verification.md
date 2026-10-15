@@ -11,15 +11,15 @@ preserved. See [usage and boundaries](evaluations.md).
 
 ## Observed environment and source
 
-* Python `3.12.3`; Bun `1.3.14`; Podman available at `/usr/bin/podman`.
-* External runner HEAD:
+- Python `3.12.3`; Bun `1.3.14`; Podman available at `/usr/bin/podman`.
+- External runner HEAD:
   `1262ac8c2eebbd10af572e3e3560318f6113233b`.
   `git status --porcelain --ignored --untracked-files=all` returned no entries
   before and after the tests. Imports did not create dependency bytecode.
-* Loom methodology was read with `git show` from
+- Loom methodology was read with `git show` from
   `c16e2c793b8faa8d21cf2ca9833606676e461e79:scripts/run-evals.py`, not from its
   different current working-tree HEAD. No Loom runtime/source was edited.
-* V2 config/agent/permission/skill/read schemas were inspected at OpenCode
+- V2 config/agent/permission/skill/read schemas were inspected at OpenCode
   `v2.0.23`, Git object `0fd7e2829449b052abf0078666669302923d77af`:
   `packages/schema/src/config.ts`, `config/agent.ts`, `config/provider.ts`,
   `permission.ts`, and the core config-agent, skill-tool and read/file-access
@@ -28,7 +28,7 @@ preserved. See [usage and boundaries](evaluations.md).
   and core `plugin/skill.ts` plus `config/plugin/source.ts` to resolve the concrete
   runtime findings below. Source inspection is distinct from the real-image
   effective-config and observer proof subsequently recorded.
-* The load-bearing runner `opencode run --auto` consumer was also traced through
+- The load-bearing runner `opencode run --auto` consumer was also traced through
   the pinned CLI's `run/run.ts` and `run/noninteractive.ts`: `--auto` replies
   `once` to permission **asks**, without rewriting configured deny rules. Core
   `Permission.assert` rejects a deny before raising an ask. This source trace
@@ -36,14 +36,14 @@ preserved. See [usage and boundaries](evaluations.md).
 
 ## Commands and observed results
 
-| Command | Observed result |
-| --- | --- |
-| `bun run eval:harness-test` | **44 tests, OK**, exit 0; follow-up run 3.853 seconds; original 40 retained |
-| `bun run eval:validate` | `valid`, **235 cases / 50 skills**, provider calls 0 |
-| `bun run eval:list -- --skills product-acceptance` | PA1–PA9 printed with canonical and qualified IDs |
-| `bun run eval:list -- --skills work-decomposition` | WD1–WD7 printed with canonical and qualified IDs |
-| `git diff --check` | No whitespace errors |
-| `python3 -I -B scripts/tests/test_preservation.py --snapshot` | Incoming content digest below |
+| Command                                                       | Observed result                                                             |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `bun run eval:harness-test`                                   | **44 tests, OK**, exit 0; follow-up run 3.853 seconds; original 40 retained |
+| `bun run eval:validate`                                       | `valid`, **235 cases / 50 skills**, provider calls 0                        |
+| `bun run eval:list -- --skills product-acceptance`            | PA1–PA9 printed with canonical and qualified IDs                            |
+| `bun run eval:list -- --skills work-decomposition`            | WD1–WD7 printed with canonical and qualified IDs                            |
+| `git diff --check`                                            | No whitespace errors                                                        |
+| `python3 -I -B scripts/tests/test_preservation.py --snapshot` | Incoming content digest below                                               |
 
 The preservation test rechecks all incoming files beneath `skills/` and
 `evaluations/selective-enrichment/`, excluding only the intentionally appended
@@ -69,71 +69,71 @@ All names below passed in the final harness run. Test files are under
 
 **`test_eval_cases.py`**
 
-* `test_existing_corpus_has_219_cases_without_changing_source_ids`
-* `test_markdown_conversion_preserves_all_reviewed_fields_exactly`
-* `test_mismatched_skill_empty_rules_bad_ids_and_duplicate_ids_rejected`
-* `test_three_loom_formats`
+- `test_existing_corpus_has_219_cases_without_changing_source_ids`
+- `test_markdown_conversion_preserves_all_reviewed_fields_exactly`
+- `test_mismatched_skill_empty_rules_bad_ids_and_duplicate_ids_rejected`
+- `test_three_loom_formats`
 
 **`test_eval_cli.py`**
 
-* `test_empty_unknown_selectors_and_no_model_fail_before_invocation`
-* `test_native_target_only_cross_judge_explicit_model_reasoning_timeout_bounds`
-* `test_real_cli_provider_free_alias_modes_and_live_safeguards`
-* `test_selection_intersection_and_call_caps`
+- `test_empty_unknown_selectors_and_no_model_fail_before_invocation`
+- `test_native_target_only_cross_judge_explicit_model_reasoning_timeout_bounds`
+- `test_real_cli_provider_free_alias_modes_and_live_safeguards`
+- `test_selection_intersection_and_call_caps`
 
 **`test_eval_integration.py` — actual pinned runner APIs, injected invocation I/O**
 
-* `test_actual_comparison_material_policy_uses_boolean_fraction_delta`
-* `test_actual_runner_command_uses_generated_config_readonly_project_no_loom_and_never_pull`
-* `test_actual_runner_owned_storage_reread_tamper_and_summary`
-* `test_complete_native_absence_is_failure_not_diagnostic_success`
-* `test_completed_negative_exit_one_independent_of_relative_value`
-* `test_copilot_judge_unsupported_runtime_is_allowed_only_for_text_judgment`
-* `test_driver_negative_non_evidence_and_orchestration_exit_codes`
-* `test_driver_persists_four_call_summary_from_verified_artifacts`
-* `test_empty_output_and_invalid_judge_are_non_evidence_not_semantic_false`
-* `test_exact_required_input_or_result_unavailable_never_backfilled`
-* `test_four_calls_real_profile_fresh_projects_same_budget_blind_judges`
-* `test_incomplete_candidate_skips_judge_and_blocks_comparison`
-* `test_judge_tools_or_incomplete_capture_cannot_authorize_a_grade`
-* `test_missing_runtime_object_is_non_evidence_and_no_judge`
-* `test_observed_invocation_cannot_retry_even_on_matching_provider_error`
-* `test_parallel_pairs_have_distinct_projects_and_preserve_side_order`
-* `test_product_timeout_and_unsupported_boundary_are_non_evidence_no_retry`
-* `test_reference_read_must_start_after_successful_native_load_terminal`
-* `test_retries_only_runner_replay_safe_signature_and_attempts_persisted`
-* `test_unknown_actor_and_baseline_contamination_prevent_attribution`
+- `test_actual_comparison_material_policy_uses_boolean_fraction_delta`
+- `test_actual_runner_command_uses_generated_config_readonly_project_no_loom_and_never_pull`
+- `test_actual_runner_owned_storage_reread_tamper_and_summary`
+- `test_complete_native_absence_is_failure_not_diagnostic_success`
+- `test_completed_negative_exit_one_independent_of_relative_value`
+- `test_copilot_judge_unsupported_runtime_is_allowed_only_for_text_judgment`
+- `test_driver_negative_non_evidence_and_orchestration_exit_codes`
+- `test_driver_persists_four_call_summary_from_verified_artifacts`
+- `test_empty_output_and_invalid_judge_are_non_evidence_not_semantic_false`
+- `test_exact_required_input_or_result_unavailable_never_backfilled`
+- `test_four_calls_real_profile_fresh_projects_same_budget_blind_judges`
+- `test_incomplete_candidate_skips_judge_and_blocks_comparison`
+- `test_judge_tools_or_incomplete_capture_cannot_authorize_a_grade`
+- `test_missing_runtime_object_is_non_evidence_and_no_judge`
+- `test_observed_invocation_cannot_retry_even_on_matching_provider_error`
+- `test_parallel_pairs_have_distinct_projects_and_preserve_side_order`
+- `test_product_timeout_and_unsupported_boundary_are_non_evidence_no_retry`
+- `test_reference_read_must_start_after_successful_native_load_terminal`
+- `test_retries_only_runner_replay_safe_signature_and_attempts_persisted`
+- `test_unknown_actor_and_baseline_contamination_prevent_attribution`
 
 **`test_eval_judgment.py`**
 
-* `test_10pp_policy_trap_fixed_regression_and_absolute_verdict_independent`
-* `test_boolean_scores_include_negative_rule_compliance_and_declared_trap`
-* `test_rule_fractions_represent_exact_threshold_not_float_subtraction`
-* `test_strict_json_rule_ids_order_independent_exactly_once`
+- `test_10pp_policy_trap_fixed_regression_and_absolute_verdict_independent`
+- `test_boolean_scores_include_negative_rule_compliance_and_declared_trap`
+- `test_rule_fractions_represent_exact_threshold_not_float_subtraction`
+- `test_strict_json_rule_ids_order_independent_exactly_once`
 
 **`test_eval_runner.py`**
 
-* `test_adapter_hash_and_cli_version_required_no_pull_or_network`
-* `test_all_authored_python_and_embedded_provider_free_probes_compile`
-* `test_mutable_tags_and_missing_local_image_fail_before_execution`
+- `test_adapter_hash_and_cli_version_required_no_pull_or_network`
+- `test_all_authored_python_and_embedded_provider_free_probes_compile`
+- `test_mutable_tags_and_missing_local_image_fail_before_execution`
 
 **`test_eval_security.py`**
 
-* `test_all_treatments_disable_stock_skill_content_but_keep_native_loader`
-* `test_current_v2_effective_config_has_deny_default_and_narrow_allow`
-* `test_environment_drops_control_injection_but_keeps_credentials`
-* `test_practitioner_copy_filters_evaluator_resources_and_rejects_symlink_escape`
-* `test_provider_config_rejects_runtime_contamination`
+- `test_all_treatments_disable_stock_skill_content_but_keep_native_loader`
+- `test_current_v2_effective_config_has_deny_default_and_narrow_allow`
+- `test_environment_drops_control_injection_but_keeps_credentials`
+- `test_practitioner_copy_filters_evaluator_resources_and_rejects_symlink_escape`
+- `test_provider_config_rejects_runtime_contamination`
 
 **`test_preservation.py`**
 
-* `test_incoming_enrichment_rename_history_and_original_fixtures_unchanged`
+- `test_incoming_enrichment_rename_history_and_original_fixtures_unchanged`
 
 **`test_eval_probe.py` — follow-up regressions**
 
-* `test_probe_manifest_retains_failure_observation_and_private_permissions`
-* `test_real_runner_probe_builder_excludes_all_credential_mounts_and_environment`
-* `test_stock_browser_deny_extension_is_not_a_permission_mismatch_or_allow_exception`
+- `test_probe_manifest_retains_failure_observation_and_private_permissions`
+- `test_real_runner_probe_builder_excludes_all_credential_mounts_and_environment`
+- `test_stock_browser_deny_extension_is_not_a_permission_mismatch_or_allow_exception`
 
 These tests run the real project normalizer/profile, runner plan/paired lifecycle,
 canonical evidence validator/builders, replay-safe retry policy, classification,
@@ -144,10 +144,10 @@ a live model loaded a skill, obeyed permissions, or improved its practical answe
 
 ### Self-review defects found and fixed
 
-* Binary floating-point score subtraction can misclassify exactly 10pp. The
+- Binary floating-point score subtraction can misclassify exactly 10pp. The
   comparison now derives the delta from exact Boolean fractions; policy tests
   cover both exact 10pp and a smaller positive delta.
-* Aggregate observations sorted by start order do not prove completion order.
+- Aggregate observations sorted by start order do not prove completion order.
   A load starting at sequence 1 and completing at 3 must not authorize a read
   starting at 2. The new regression first failed (`pass` instead of expected
   `fail`), then passed after requiring available successful load terminal
@@ -210,15 +210,15 @@ base images, OpenCode npm/native packages and Containerfile apt prerequisites
 were acquired inside engine/build storage; nothing was installed into the host.
 No image pruning, external repository writes or credential mounts were used.
 
-| Identity | Observed value |
-| --- | --- |
-| Runner source | `1262ac8c2eebbd10af572e3e3560318f6113233b`, clean before/after |
-| OpenCode version | `opencode v2.0.23` |
-| Platform | `linux/amd64` |
-| Runtime user | `1000:1000` |
-| Immutable image ID | `sha256:819172b91c14b61dd289ec11647518713d5f24b3bc7eb60e87cfd6a937e47236` |
-| Local manifest digest | `sha256:461031b5a3f8ba6aa14bfb031d86e037c28ea12b16469745e6f7419cdc781ef4` |
-| Local tag (not used for eval execution) | `localhost/skills-eval-opencode:1262ac8` |
+| Identity                                | Observed value                                                            |
+| --------------------------------------- | ------------------------------------------------------------------------- |
+| Runner source                           | `1262ac8c2eebbd10af572e3e3560318f6113233b`, clean before/after            |
+| OpenCode version                        | `opencode v2.0.23`                                                        |
+| Platform                                | `linux/amd64`                                                             |
+| Runtime user                            | `1000:1000`                                                               |
+| Immutable image ID                      | `sha256:819172b91c14b61dd289ec11647518713d5f24b3bc7eb60e87cfd6a937e47236` |
+| Local manifest digest                   | `sha256:461031b5a3f8ba6aa14bfb031d86e037c28ea12b16469745e6f7419cdc781ef4` |
+| Local tag (not used for eval execution) | `localhost/skills-eval-opencode:1262ac8`                                  |
 
 This local receipt does not establish a published registry digest or signed
 build attestation. The harness still rejects tags, verifies local identity and
@@ -228,7 +228,7 @@ adapter bytes/version, and executes with `--pull=never`.
 
 1. The first effective-policy check failed despite an exact system match:
    stock's `opencode.browser` appends `{action: "browser", resource: "*",
-   effect: "deny"}` after generated rules. Source at the exact OpenCode pin
+effect: "deny"}` after generated rules. Source at the exact OpenCode pin
    confirmed the behavior. The checker now accepts only that exact known deny
    extension when the browser plugin is present; other extensions/allow rules
    still fail. A regression covers the observed shape and important near-misses.
@@ -263,8 +263,8 @@ or paid model was used in these real-image probes.
 Retained private mode-0600 manifests, written through the runner's owned store
 and reread before console success:
 
-* PA3: `.skill-evals/probe-fc3a844d67334d35954043fd3504cd65/run.json`
-* WD5: `.skill-evals/probe-a1496799cb1040aa859914214f88348e/run.json`
+- PA3: `.skill-evals/probe-fc3a844d67334d35954043fd3504cd65/run.json`
+- WD5: `.skill-evals/probe-a1496799cb1040aa859914214f88348e/run.json`
 
 Each includes image/version/platform/adapter hashes, project implementation
 hashes, actual/expected agent system and permission rules, skill/plugin catalogs,
@@ -275,21 +275,21 @@ not additions to the historical comparison or behavioral trial results.
 
 Observed in **both** probes:
 
-* baseline and judge skill IDs: **empty**;
-* candidate: **only `product-acceptance` / only `work-decomposition`**, respectively;
-* candidate files: `SKILL.md` plus `references/proof-and-example.md` /
+- baseline and judge skill IDs: **empty**;
+- candidate: **only `product-acceptance` / only `work-decomposition`**, respectively;
+- candidate files: `SKILL.md` plus `references/proof-and-example.md` /
   `references/boundaries-and-example.md`, respectively; exact hashes match the
   copied working-tree provenance after real file reads inside the container;
-* all three workspaces: kernel read-only, exact permitted file sets, no symlinks,
+- all three workspaces: kernel read-only, exact permitted file sets, no symlinks,
   no eval/rubric/ASSESSMENT/QA/AGENTS resources, no inherited Loom config-root or
   external plugin inventory;
-* actual effective systems and final permission rules match the generated
+- actual effective systems and final permission rules match the generated
   target/judge configs plus the known stock browser deny;
-* in-image collector → canonical `runtime_evidence/v1` → pinned host validation:
+- in-image collector → canonical `runtime_evidence/v1` → pinned host validation:
   **complete** native and Code Mode execution boundaries, closure available/true,
   0 starts, 0 terminals, 0 missing terminals, 0 observer/callback failures, no
   losses; Code Mode finality remains explicitly unsupported;
-* networking `none`; no auth/catalogue/database/config-root seed mounts and no
+- networking `none`; no auth/catalogue/database/config-root seed mounts and no
   provider credential variables forwarded; activation prompt `resume: false`.
 
 The empty captures prove instrumentation/schema interoperability and absence of
@@ -376,21 +376,21 @@ the new unsupported-representation guard rather than reproducing acceptance.
 
 ### Repair before startup, not verdict masking
 
-* Added `compile_provider_settings`: validate provider-only JSON, resolve only
+- Added `compile_provider_settings`: validate provider-only JSON, resolve only
   permitted env references as parsed JSON string values, then revalidate and
   serialize with escaping. OpenCode receives literal values, not raw substitution
   tokens. Quote-bearing values remain one provider string and cannot create
   agents/permissions/plugins/instructions/body configuration.
-* Every final generated config is checked for remaining native env/file markers,
+- Every final generated config is checked for remaining native env/file markers,
   including keys and generated resource paths. File refs, variable keys,
   undeclared/missing references and env values containing further native markers
   fail closed. No required value is silently dropped or changed to empty.
-* `--env` and native provider-env bindings must use names recognized by the
+- `--env` and native provider-env bindings must use names recognized by the
   **actual pinned runner** `sensitive_key` predicate. Unsupported `PROVIDER_AUTH`
   fails before image/model invocation; `PROVIDER_AUTH_TOKEN` is supported and
   its original value is passed to the existing runner inventory. The adapter
   does not implement a substitute sanitizer or relax role permissions.
-* CLI validation runs after environment isolation/runner compatibility loading
+- CLI validation runs after environment isolation/runner compatibility loading
   but before image/container startup. Profile construction enforces the same
   boundary for programmatic paired-driver callers. Header refs remain usable
   without hardcoding a user secret; see the supported env example in usage docs.
@@ -431,20 +431,20 @@ OpenCode, not a substituted executable or test-only config parser.
 The full provider-free suite now has **50 passing tests**, including all prior
 44 plus these six named regressions in `test_provider_security.py`:
 
-* `test_quote_payload_cannot_rewrite_generated_config`
-* `test_noninventoried_forwarding_and_unsafe_or_missing_references_fail_before_startup`
-* `test_actual_inventory_canonical_capture_result_and_paired_storage_hide_supported_env_credential`
-* `test_unsupported_env_cli_stops_before_any_image_or_model_invocation_without_logging_secret`
-* `test_every_generated_seed_rejects_residual_native_variables`
-* `test_effective_config_rejects_non_provider_overrides_even_without_variables`
+- `test_quote_payload_cannot_rewrite_generated_config`
+- `test_noninventoried_forwarding_and_unsafe_or_missing_references_fail_before_startup`
+- `test_actual_inventory_canonical_capture_result_and_paired_storage_hide_supported_env_credential`
+- `test_unsupported_env_cli_stops_before_any_image_or_model_invocation_without_logging_secret`
+- `test_every_generated_seed_rejects_residual_native_variables`
+- `test_effective_config_rejects_non_provider_overrides_even_without_variables`
 
 The ordinary real-image PA3 and WD5 probes were also rerun after this repair:
 both returned `image-and-effective-config-verified` with complete empty evidence,
 unchanged isolated skill catalogs and read-only exact practitioner files. Their
 new private manifests are:
 
-* `.skill-evals/probe-d0c50a83e3fa427f9d3719345812af92/run.json`
-* `.skill-evals/probe-f2b6d223496e4f14ab3f673fabbd2cd2/run.json`
+- `.skill-evals/probe-d0c50a83e3fa427f9d3719345812af92/run.json`
+- `.skill-evals/probe-f2b6d223496e4f14ab3f673fabbd2cd2/run.json`
 
 Fixture validation remains **235 cases / 50 skills**, the preservation checksum
 passes, and whitespace checks pass. Source pin remains

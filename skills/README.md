@@ -16,20 +16,20 @@ Any agent may use any of these files for the relevant activity. Review and QA ar
 
 ## Selecting methodology
 
-| Work                              | Useful skills                                                                                                           |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Product intent and discovery      | intent-grilling, anchor-authoring, product-discovery, risk-driven-planning                                              |
+| Work                              | Useful skills                                                                                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Product intent and discovery      | intent-grilling, anchor-authoring, product-discovery, risk-driven-planning                                                                                         |
 | Human experience                  | user-stories-and-scenarios, design-specification, surface/design skills, prototyping, visual-companion; design-validation for proposed and implemented experiences |
-| Observable requirements           | behavioral-spec (Behavioral Requirements, Quality Scenarios, Obligation Contracts)                                       |
-| Technical structure and contracts | architectural-design, architectural-decision, architectural-spec                                                        |
-| Delivery planning                 | work-decomposition, risk-driven-planning                                                                                |
-| End-to-end outcome proof          | product-acceptance                                                                                                      |
-| Documentation and knowledge       | documentation, learning; report and document lifecycle via `okf-authoring`                                              |
-| Product lifecycle coverage        | product-lifecycle                                                                                                       |
-| Implementation                    | software-engineering and task-relevant language/domain skills                                                           |
-| Review                            | relevant assessment companions; design-validation for proposed designs                                                  |
-| Failure investigation             | narrow troubleshooting/domain skills matching observed symptoms                                                         |
-| Residual confidence testing       | a small set of QA companions for load-bearing or risky domains                                                          |
+| Observable requirements           | behavioral-spec (Behavioral Requirements, Quality Scenarios, Obligation Contracts)                                                                                 |
+| Technical structure and contracts | architectural-design, architectural-decision, architectural-spec                                                                                                   |
+| Delivery planning                 | work-decomposition, risk-driven-planning                                                                                                                           |
+| End-to-end outcome proof          | product-acceptance                                                                                                                                                 |
+| Documentation and knowledge       | documentation, learning; report and document lifecycle via `okf-authoring`                                                                                         |
+| Product lifecycle coverage        | product-lifecycle                                                                                                                                                  |
+| Implementation                    | software-engineering and task-relevant language/domain skills                                                                                                      |
+| Review                            | relevant assessment companions; design-validation for proposed designs                                                                                             |
+| Failure investigation             | narrow troubleshooting/domain skills matching observed symptoms                                                                                                    |
+| Residual confidence testing       | a small set of QA companions for load-bearing or risky domains                                                                                                     |
 
 These methods do not require a particular sequence, separate agents, additional approvals, or a master product document. Reuse the project's existing conversations, decisions, plans, and verification records. A documented decision establishes agreed scope; it does not by itself prove benefit or correctness.
 

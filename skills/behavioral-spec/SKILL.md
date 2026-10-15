@@ -23,15 +23,15 @@ Read the accepted anchor and applicable accepted obligations. Extract actors, ca
 
 Where the anchor uses these headings, interpret them by semantic role; other anchor formats are equally valid:
 
-| Anchor element | Extract |
-| --- | --- |
-| Picture | Actors, objects, capabilities, and the intended situation. |
-| Done | Observable outcomes that distinguish fulfillment from activity. |
+| Anchor element  | Extract                                                                             |
+| --------------- | ----------------------------------------------------------------------------------- |
+| Picture         | Actors, objects, capabilities, and the intended situation.                          |
+| Done            | Observable outcomes that distinguish fulfillment from activity.                     |
 | Minimal version | The accepted capability boundary, not permission for incoherent behavior within it. |
-| Not this | Scope exclusions, distinguished from actual prohibitions. |
-| Forces | Binding constraints, preferences, and tensions, preserving their strength. |
+| Not this        | Scope exclusions, distinguished from actual prohibitions.                           |
+| Forces          | Binding constraints, preferences, and tensions, preserving their strength.          |
 
-Preserve source modality. A suggestion, example, preference, possibility, or exploration prompt does not become a mandatory guarantee merely because it appears in accepted context. An excluded capability is not automatically forbidden. Resolve consequential meanings of words such as *shared*, *automatic*, *available*, *cancelled*, and *complete*: could two implementers interpret them differently and produce observably different outcomes?
+Preserve source modality. A suggestion, example, preference, possibility, or exploration prompt does not become a mandatory guarantee merely because it appears in accepted context. An excluded capability is not automatically forbidden. Resolve consequential meanings of words such as _shared_, _automatic_, _available_, _cancelled_, and _complete_: could two implementers interpret them differently and produce observably different outcomes?
 
 For each candidate normative claim distinguish:
 
@@ -55,15 +55,15 @@ For each commitment ask: **what must be true for this to hold?** Follow conseque
 
 Use these lenses as discovery questions, not as a template that demands a requirement in every row:
 
-| Lens | Questions |
-| --- | --- |
-| Actors and authority | Who may initiate, observe, change, approve, or stop behavior? What may each party rely on? |
-| Inputs and boundaries | What happens with missing, invalid, duplicate, conflicting, stale, empty, or extreme inputs? |
-| State and lifecycle | What is true before, during, and after the behavior? Which transitions and terminal outcomes are allowed or forbidden? |
-| Time and ordering | What takes precedence? What happens when events overlap, arrive late, or occur in a different order? |
-| Failure and recovery | What happens on interruption, cancellation, timeout, partial success, dependency failure, retry, or restart? |
-| Information and evidence | What must remain identifiable, preserved, attributable, or observable? Can attempted work be mistaken for actual success? |
-| Shared boundaries | Where must independently realized parties agree on identity, ownership, status, completion, or responsibility? |
+| Lens                     | Questions                                                                                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Actors and authority     | Who may initiate, observe, change, approve, or stop behavior? What may each party rely on?                                                         |
+| Inputs and boundaries    | What happens with missing, invalid, duplicate, conflicting, stale, empty, or extreme inputs?                                                       |
+| State and lifecycle      | What is true before, during, and after the behavior? Which transitions and terminal outcomes are allowed or forbidden?                             |
+| Time and ordering        | What takes precedence? What happens when events overlap, arrive late, or occur in a different order?                                               |
+| Failure and recovery     | What happens on interruption, cancellation, timeout, partial success, dependency failure, retry, or restart?                                       |
+| Information and evidence | What must remain identifiable, preserved, attributable, or observable? Can attempted work be mistaken for actual success?                          |
+| Shared boundaries        | Where must independently realized parties agree on identity, ownership, status, completion, or responsibility?                                     |
 | Quality and preservation | Under which conditions must behavior remain useful and correct? What accepted compatibility, security, or existing behavior must remain unchanged? |
 
 Investigate a case when it could alter an accepted outcome, violate a constraint, or expose an unresolved responsibility. Include consequential combinations, especially concurrency and destructive effects; avoid a full Cartesian enumeration of irrelevant cases. A lens does not authorize new capabilities, numerical quality targets, automatic recovery, or new security mechanisms. Note consequential exclusions or assumptions with their basis instead of silently omitting them.
