@@ -23,15 +23,15 @@ invocation I/O; **they never call a provider or prove real native skill loading*
 The execution dependency is the **clean checkout**, not an arbitrary executable
 found on PATH:
 
-* Runner: [`bateau84/opencode-eval-runner`](https://github.com/bateau84/opencode-eval-runner)
+- Runner: [`bateau84/opencode-eval-runner`](https://github.com/bateau84/opencode-eval-runner)
   at `1262ac8c2eebbd10af572e3e3560318f6113233b`.
-* Resolution: `--runner-root /path/to/opencode-eval-runner`, then
+- Resolution: `--runner-root /path/to/opencode-eval-runner`, then
   `SKILLS_EVAL_RUNNER_ROOT`, then the local sibling `../opencode-eval-runner`
   relative to this repository (not the current shell directory).
-* The checkout must have no modified, untracked, or ignored files, including
+- The checkout must have no modified, untracked, or ignored files, including
   bytecode. Imports do not write bytecode there. Use a dedicated clean checkout
   rather than a dependency tree carrying unrelated experiments or cache files.
-* Its pinned Containerfile specifies OpenCode **2.0.23** and Copilot **1.0.83** in
+- Its pinned Containerfile specifies OpenCode **2.0.23** and Copilot **1.0.83** in
   separate transport images. Changing only the Python host code is insufficient.
 
 There is **no established current published immutable digest in this project**.
@@ -126,26 +126,26 @@ qualified source ID (`product-acceptance:PA3`). Numeric IDs are qualified, e.g.
 aliases selecting comma-separated skill names. With `--cases`, they restrict
 the selectable cases to those targets. Unknown and empty selectors fail before
 execution. `--all` is an explicit whole-suite choice (or all cases of selected
-targets); **do not blindly run the entire 235-case corpus**. Merely passing
+targets); **do not blindly run the entire case corpus**. Merely passing
 `--target-kind skill` does not authorize selecting everything.
 
-| Control | Default / semantics |
-| --- | --- |
-| `--iterations N` | 1 repetition per selected case; positive integer |
-| `--parallel N` | 1 concurrent pair; positive bounded number, not “unlimited” |
-| `--model` | Required; native OpenCode target only |
-| `--judge-model` | Target model by default for OpenCode; explicit when using a cross-transport judge |
-| `--judge-transport` | `opencode`, or `github-copilot-cli` with explicit model and `--copilot-image` |
-| `--reasoning LEVEL` | Common target/judge reasoning; omitted means provider default |
-| `--target-reasoning`, `--judge-reasoning` | Phase overrides; target control is identical in baseline and candidate |
-| `--engine` | `auto` (Podman then Docker), or explicit `podman`/`docker` |
-| `--network MODE` | Engine default, **live**, not an offline evaluation; `host` prints an isolation warning |
-| `--image`, `--opencode-image` | Aliases for the immutable OpenCode identity; no implicit image |
-| `--copilot-image` | Immutable Copilot judge identity if needed |
-| `--timeout-seconds`, `--inner-timeout` | 240 seconds per actual target/judge invocation |
-| `--container-timeout`, `--outer-timeout` | 300 seconds; at least 300 and inner +60 |
-| `--transport-retries N` | 0, range 0–5; only the runner's replay-safe transient routing policy |
-| `--artifact-dir`, `--output` | Aliases for a fresh single-run directory; default `.skill-evals/<generated-run-id>`; explicit relative paths are anchored to the repository root, not the shell cwd; absolute external paths are preserved |
+| Control                                   | Default / semantics                                                                                                                                                                                        |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--iterations N`                          | 1 repetition per selected case; positive integer                                                                                                                                                           |
+| `--parallel N`                            | 1 concurrent pair; positive bounded number, not “unlimited”                                                                                                                                                |
+| `--model`                                 | Required; native OpenCode target only                                                                                                                                                                      |
+| `--judge-model`                           | Target model by default for OpenCode; explicit when using a cross-transport judge                                                                                                                          |
+| `--judge-transport`                       | `opencode`, or `github-copilot-cli` with explicit model and `--copilot-image`                                                                                                                              |
+| `--reasoning LEVEL`                       | Common target/judge reasoning; omitted means provider default                                                                                                                                              |
+| `--target-reasoning`, `--judge-reasoning` | Phase overrides; target control is identical in baseline and candidate                                                                                                                                     |
+| `--engine`                                | `auto` (Podman then Docker), or explicit `podman`/`docker`                                                                                                                                                 |
+| `--network MODE`                          | Engine default, **live**, not an offline evaluation; `host` prints an isolation warning                                                                                                                    |
+| `--image`, `--opencode-image`             | Aliases for the immutable OpenCode identity; no implicit image                                                                                                                                             |
+| `--copilot-image`                         | Immutable Copilot judge identity if needed                                                                                                                                                                 |
+| `--timeout-seconds`, `--inner-timeout`    | 240 seconds per actual target/judge invocation                                                                                                                                                             |
+| `--container-timeout`, `--outer-timeout`  | 300 seconds; at least 300 and inner +60                                                                                                                                                                    |
+| `--transport-retries N`                   | 0, range 0–5; only the runner's replay-safe transient routing policy                                                                                                                                       |
+| `--artifact-dir`, `--output`              | Aliases for a fresh single-run directory; default `.skill-evals/<generated-run-id>`; explicit relative paths are anchored to the repository root, not the shell cwd; absolute external paths are preserved |
 
 At **one case, one repetition, no retries**, nominal and maximum spend are
 **2 target calls + 2 judge calls**. With `C` cases, `I` repetitions and `R` retries,
@@ -187,12 +187,12 @@ integrity validation. The final summary separately rereads all successful jobs.
 
 Output choices (append to the same explicitly authorized live command):
 
-| Choice | Behavior |
-| --- | --- |
-| Neither flag | Human progress/results; no full pair/summary JSON dump |
-| `--verbose` | Same human results plus bounded per-attempt duration, host exit, failure code, and retry/replay-safety diagnostics |
-| `--json` | JSONL `live-spend-plan`, `run-started`, `verified-pair`, `verified-summary` events; final event adds `report_path` and `latest_report_path`; human live/isolation notices go to stderr |
-| Both flags | Rejected by argument parsing (exit 2), before execution |
+| Choice       | Behavior                                                                                                                                                                               |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Neither flag | Human progress/results; no full pair/summary JSON dump                                                                                                                                 |
+| `--verbose`  | Same human results plus bounded per-attempt duration, host exit, failure code, and retry/replay-safety diagnostics                                                                     |
+| `--json`     | JSONL `live-spend-plan`, `run-started`, `verified-pair`, `verified-summary` events; final event adds `report_path` and `latest_report_path`; human live/isolation notices go to stderr |
+| Both flags   | Rejected by argument parsing (exit 2), before execution                                                                                                                                |
 
 `--json` preserves existing machine event IDs/fields, including the detailed
 `pairs` array in the final summary, with the intentional diagnostic privacy
@@ -360,7 +360,7 @@ destination, not a published result at startup). Its existing `verified-summary`
 event gains additive string **`report_path`** and **`latest_report_path`**, while its
 previous IDs, result fields, detailed `pairs` and durable `run.json` summary remain
 unchanged. Consumers must tolerate these added fields/events. On an exceptional
-orchestration exit *before* a final summary,
+orchestration exit _before_ a final summary,
 successful recovery publication instead emits a JSONL
 `{"event":"results-report","artifact_dir":"<directory>","report_path":"<per-run-path>","latest_report_path":"<root-path>"}` event; this is a report
 location, **not** a `verified-summary` or a success verdict. Existing preceding
@@ -380,10 +380,10 @@ human output includes the verified aggregate, artifact directory and `run.json`
 location, then separate per-run/latest publication statuses and the safe failure
 explanation. JSON emits `verified-summary` with unchanged result fields/IDs plus:
 
-* `report_publication`: `per_run` and `latest` statuses (`published`, `failed`, or
+- `report_publication`: `per_run` and `latest` statuses (`published`, `failed`, or
   `not-written`) and a safe `failure` object containing `code` and `message`;
-* `evaluation_finalized`: whether the durable evaluation summary was finalized;
-* `evaluation_exit_code`: the unchanged evaluation exit (0/1/2) when finalized,
+- `evaluation_finalized`: whether the durable evaluation summary was finalized;
+- `evaluation_exit_code`: the unchanged evaluation exit (0/1/2) when finalized,
   otherwise `null` for a still-running/incomplete owned run.
 
 `report_path` is included only for a confirmed per-run publication;
@@ -426,13 +426,13 @@ its judge. Different pairs may run concurrently. All four invocation workspaces
 are disposable and distinct; the real checkout is never mounted writable or
 used as the invocation workspace.
 
-* Baseline: no skill files, no skill/reference tool allowance.
-* Candidate: just the selected skill directory's practitioner bytes. `evals/`,
+- Baseline: no skill files, no skill/reference tool allowance.
+- Candidate: just the selected skill directory's practitioner bytes. `evals/`,
   ASSESSMENT, QA, evaluator resources, hidden config, AGENTS instructions and
   agent directories are excluded. All symlinks are rejected, including internal
   ones. The native `skill` tool is allowed only for the selected ID; `read` only
   for exact copied files. Reads must follow the successful native load.
-* Judges: empty workspaces, all tools denied. Each sees only its own response,
+- Judges: empty workspaces, all tools denied. Each sees only its own response,
   scenario/common instruction, and rubric, never the other treatment's answer,
   loading trace or practitioner guidance. The response might still reveal style
   clues; this is not a claim of perfect experimental blinding.
@@ -494,7 +494,7 @@ For example, a custom header can keep its credential outside the config file:
   "providers": {
     "private-provider": {
       "canonical": "openai",
-      "headers": {"Authorization": "Bearer {env:PROVIDER_AUTH_TOKEN}"}
+      "headers": { "Authorization": "Bearer {env:PROVIDER_AUTH_TOKEN}" }
     }
   }
 }
@@ -518,7 +518,7 @@ required facts are **non-evidence**. `skills_loaded`, text, tool convenience
 arrays, or collector-shaped prose never backfill an authoritative gap. An
 OpenCode judge additionally requires complete no-tool evidence. Copilot's
 unsupported native boundary is permissible only for its text-only judge role.
-Unsupported Code Mode *finality* does not invalidate unrelated native evidence.
+Unsupported Code Mode _finality_ does not invalidate unrelated native evidence.
 
 Targets must produce nonempty text. Judges return strict `judgment/v1` JSON with
 one result for every exact positive (`E1…`) and forbidden (`N1…`) rule ID, strict
@@ -530,20 +530,20 @@ Behavior score is the fraction of satisfied positive rules, avoided forbidden
 rules, and—when declared—avoided trap. Candidate absolute PASS requires every
 rule plus treatment integrity. Relative skill value is separate:
 
-* regression if a trap regresses or score delta is negative;
-* material improvement if a trap is fixed or the delta is at least **10pp**;
-* smaller positive delta: improvement; zero: neutral.
+- regression if a trap regresses or score delta is negative;
+- material improvement if a trap is fixed or the delta is at least **10pp**;
+- smaller positive delta: improvement; zero: neutral.
 
 The threshold uses exact Boolean fractions, not floating-point rounding. It is
 a **policy**, not statistical significance. Treatment integrity failure prevents
 attributed improvement even if answer scores are available; a higher score is
 not candidate absolute PASS.
 
-| Exit | Meaning |
-| --- | --- |
-| 0 | Every selected pair has complete usable evidence and every candidate passes |
-| 1 | Completed behavioral negative or non-evidence |
-| 2 | Configuration/orchestration/storage/integrity failure; no complete run proof |
+| Exit | Meaning                                                                      |
+| ---- | ---------------------------------------------------------------------------- |
+| 0    | Every selected pair has complete usable evidence and every candidate passes  |
+| 1    | Completed behavioral negative or non-evidence                                |
+| 2    | Configuration/orchestration/storage/integrity failure; no complete run proof |
 
 The runner owns run-directory claims, paired artifacts, integrity IDs, atomic
 storage, and reread/verification. `run.json` summaries and console verdicts are
@@ -557,8 +557,10 @@ a skill-loading prerequisite.
 
 ## Corpus, history and source lineage
 
-The 48 existing JSON fixture files retain their bytes and their 219 normalized
-cases. Three Loom-style source shapes are accepted: arrays, `{skill, cases}`,
+The original 48 JSON fixture files produced 219 normalized cases. Later
+consolidation merged several skills' fixtures (moving their cases unchanged)
+and removed `report-lifecycle`'s single case, leaving 218. Three Loom-style
+source shapes are accepted: arrays, `{skill, cases}`,
 and `{skill_name, evals}`. Normalized IDs are `SKILL-<skill>-<source-id>`; source
 IDs and expectation text are preserved.
 

@@ -1,6 +1,6 @@
 ---
 name: design-validation
-description: Evaluate the real implemented human-facing experience against accepted design, representative Scenarios, accessibility, and usability evidence without silently redesigning it.
+description: Evaluate the real implemented human-facing experience against accepted design, representative Scenarios, accessibility, and usability evidence without silently redesigning it. Also use to review a proposed design before implementation for coherence, state coverage, accessibility, and implementation-ready precision.
 ---
 
 # Design Validation
@@ -9,7 +9,7 @@ Answer: **does the real implementation express the accepted design and allow the
 
 Validation is evidence, not design authority. Do not revise accepted design merely to make implementation pass.
 
-Load the smallest relevant surface skills when platform-specific interaction is materially under test, and load the implementation-focused `accessibility` skill when accessibility conformance is materially under test. Those skills provide specialist checks; this skill owns the evidence method and drift judgment.
+Load the smallest relevant surface skills when platform-specific interaction is materially under test, and load the implementation-focused `accessibility-implementation` skill when accessibility conformance is materially under test. Those skills provide specialist checks; this skill owns the evidence method and drift judgment.
 
 ## Method
 
@@ -28,7 +28,7 @@ Load the smallest relevant surface skills when platform-specific interaction is 
 5. **Do a second-pass usability attack.** Apply the relevant usability heuristics and a cognitive walkthrough to catch issues the design itself failed to anticipate. Keep these separate from spec deviations: they may indicate an upstream design gap rather than implementation drift.
 6. **Judge severity by human consequence.** Consider task blockage, ambiguity, data/safety consequence, loss of control/recovery, trust, accessibility exclusion, frequency, and primary-journey impact—not pixel distance.
 7. **Distinguish correction ownership.**
-   - **Implementation drift:** accepted design is clear; Worker can correct it.
+   - **Implementation drift:** accepted design is clear; the implementer can correct it.
    - **Design decision required:** design is ambiguous/wrong or a real constraint requires a new human-facing choice.
    - **Missing product/behavior/architecture capability:** report the gap to the responsible collaborator or user; do not fake it in validation.
 8. **Record evidence limitations and negative space.** State untested scenarios, states, surfaces, input modes, environments, or observer-only checks. A PASS cannot claim more than was actually exercised.
@@ -60,3 +60,21 @@ PASS only when the exercised accepted journeys and load-bearing design assertion
 Accept minor implementation variation when it preserves task completion, meaning, accessibility, and design semantics. Do not fail on harmless pixel differences.
 
 A scenario blocked by a missing/mock product capability is evidence that the intended experience does not exist; it cannot pass through a prototype substitute.
+
+## Before implementation: reviewing a proposed design
+
+Review the design itself before implementation.
+
+Check for:
+
+- clear user goal and task flow;
+- complete material states: default, loading, empty, error, success, disabled/recovery as applicable;
+- visible system status and recoverability;
+- keyboard/focus/accessibility behavior;
+- responsive or surface-specific constraints;
+- honest content: no fabricated metrics, testimonials, capabilities, or guarantees;
+- consistent hierarchy and interaction grammar;
+- no accidental technical-realization decisions outside Designer authority;
+- enough precision for downstream implementation and validation.
+
+Return concrete findings. Do not replace the design with a different preferred aesthetic unless the accepted design is actually defective.

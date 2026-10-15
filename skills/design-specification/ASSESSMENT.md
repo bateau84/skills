@@ -13,7 +13,7 @@ Reviewer applies the **implementation-without-UX-invention test**: a competent i
 - Responsive/surface adaptation changes the interaction model deliberately rather than only rearranging pixels.
 - Behavioral intent stands independently of mockups/visual styling; visual semantics communicate meaning rather than hide behavior.
 - Consequential design choices retain rationale/alternatives, while backend/API/schema/persistence realization remains outside Designer authority.
-- Human-visible meaning is compatible with accepted Specifier obligations where they overlap; disagreements are surfaced rather than normalized.
+- Human-visible meaning is compatible with accepted behavioral obligations where they overlap; disagreements are surfaced rather than normalized.
 
 ## Review depth
 

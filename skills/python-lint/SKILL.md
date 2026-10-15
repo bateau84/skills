@@ -51,7 +51,7 @@ Rule-set picks that earn their keep:
 | --- | --- | --- |
 | `E`, `F` | pycodestyle + Pyflakes | the baseline — real errors and undefined names |
 | `I` | isort | import ordering, so you never sort by hand |
-| `UP` | pyupgrade | rewrites old syntax to your `target-version` (pairs with `python-modernize` thinking) |
+| `UP` | pyupgrade | rewrites old syntax to your `target-version` |
 | `B` | flake8-bugbear | likely-bug patterns (mutable defaults, `except` too broad) |
 | `SIM` | flake8-simplify | collapses needless complexity |
 | `ASYNC` | flake8-async | blocking calls inside `async def` — critical for async services (→ See `python-async`) |

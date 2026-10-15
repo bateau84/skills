@@ -16,20 +16,20 @@ Any agent may use any of these files for the relevant activity. Review and QA ar
 
 ## Selecting methodology
 
-| Work                              | Useful skills                                                                                                           |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Product intent and discovery      | intent-grilling, anchor-authoring, product-discovery, risk-driven-planning                                              |
-| Human experience                  | user-story, design-scenario, design-specification, surface/design skills; design-validation for implemented experiences |
-| Observable requirements           | behavioral-spec, behavioral-requirement, quality-scenario, obligation-contract                                          |
-| Technical structure and contracts | architectural-design, architectural-decision, architectural-spec                                                        |
-| Delivery planning                 | work-decomposition, risk-driven-planning                                                                                |
-| End-to-end outcome proof          | product-acceptance                                                                                                      |
-| Documentation and knowledge       | documentation, learning, report-lifecycle, report-to-keep                                                               |
-| Cross-domain reconciliation       | solution-synthesis, product-lifecycle                                                                                   |
-| Implementation                    | software-engineering and task-relevant language/domain skills                                                           |
-| Review                            | relevant assessment companions; design-review for design artifacts                                                      |
-| Failure investigation             | narrow troubleshooting/domain skills matching observed symptoms                                                         |
-| Residual confidence testing       | a small set of QA companions for load-bearing or risky domains                                                          |
+| Work                              | Useful skills                                                                                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Product intent and discovery      | intent-grilling, anchor-authoring, product-discovery, risk-driven-planning                                                                                         |
+| Human experience                  | user-stories-and-scenarios, design-specification, surface/design skills, prototyping, visual-companion; design-validation for proposed and implemented experiences |
+| Observable requirements           | behavioral-spec (Behavioral Requirements, Quality Scenarios, Obligation Contracts)                                                                                 |
+| Technical structure and contracts | architectural-design, architectural-decision, architectural-spec                                                                                                   |
+| Delivery planning                 | work-decomposition, risk-driven-planning                                                                                                                           |
+| End-to-end outcome proof          | product-acceptance                                                                                                                                                 |
+| Documentation and knowledge       | documentation, learning; report and document lifecycle via `okf-authoring`                                                                                         |
+| Product lifecycle coverage        | product-lifecycle                                                                                                                                                  |
+| Implementation                    | software-engineering and task-relevant language/domain skills                                                                                                      |
+| Review                            | relevant assessment companions; design-validation for proposed designs                                                                                             |
+| Failure investigation             | narrow troubleshooting/domain skills matching observed symptoms                                                                                                    |
+| Residual confidence testing       | a small set of QA companions for load-bearing or risky domains                                                                                                     |
 
 These methods do not require a particular sequence, separate agents, additional approvals, or a master product document. Reuse the project's existing conversations, decisions, plans, and verification records. A documented decision establishes agreed scope; it does not by itself prove benefit or correctness.
 
@@ -40,6 +40,8 @@ Load the smallest useful set. A Go database task might use `golang-common-practi
 For TypeScript, start with `typescript-common-practice` and add type safety, async, or testing guidance when material. Add `javascript-runtime` for execution semantics and `browser-runtime` for direct Web API work.
 
 For human-facing work, combine information architecture, interaction design, user flows, visual interface design, accessibility, and surface-specific guidance only for dimensions in scope.
+
+Grafana and Prometheus skills share a `grafana-` prefix where they are Grafana-specific (`grafana-app-observability`, `grafana-infrastructure-monitoring`, `grafana-dashboards`, `grafana-loki`, `grafana-mimir`); `prometheus`, `promql`, and `opentelemetry` stay vendor-neutral. Terraform provider skills use the `terraform-provider-` prefix.
 
 Use `feature-handoff` when another component, repository, or fresh session needs a self-contained implementation request.
 
