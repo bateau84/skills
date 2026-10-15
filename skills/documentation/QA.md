@@ -1,15 +1,16 @@
-# documentation Quality Assurance
+# Documentation Quality Assurance
 
-Adversarial validation for any agent. Assume competent production and conformance review; attack residual false confidence without inventing new requirements.
+Attack residual false confidence after competent normal assessment. No dedicated adversarial agent role is required.
 
 ## QA criteria
 
-- Follow a cold reader trying a high-consequence operation: can stale or ambiguous docs make them do the wrong thing?
-- Search for duplicated facts across docs that can diverge after the next change.
-- Attack docs that are locally true but omit a prerequisite, failure mode, migration state, security boundary, or operational consequence.
-- Compare living documentation with actual product behavior at seams rather than only file-level descriptions.
-- Look for "current reality" text that quietly normalizes an implementation-authority conflict.
+- Walk through a high-consequence operation as a new user: can stale, ambiguous or incomplete guidance cause the wrong action?
+- Identify duplicated facts across documents that can diverge after the next change.
+- Probe omitted prerequisites, failure states, compatibility limits, migrations, security boundaries and operational consequences.
+- Compare assembled real behavior with the documented path rather than trusting file-level descriptions.
+- Challenge current-reality claims that normalize a violation of accepted product authority.
+- Verify that OKF graph/conformance success has not been mistaken for runtime or content correctness.
 
 ## QA depth
 
-Increase QA depth where a shared wrong assumption could survive both competent production and normal review.
+Increase scrutiny where error or ambiguity could cause material harm or spread across agents and users.

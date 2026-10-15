@@ -10,7 +10,7 @@ EXCLUDED = {
     "skills/product-acceptance/evals/evals.json",
     "skills/work-decomposition/evals/evals.json",
 }
-EXPECTED = "abee72b9b30cf09ca7106fbd053239214949ad98c5738c842ca98b1989a3ba1f"
+EXPECTED = "020fd35471e1c71712822bb7c7dc9f9c0b47c2e41309305f2544ff69e9c301ac"
 
 
 def incoming_digest():

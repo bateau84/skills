@@ -35,20 +35,31 @@ Use only sections that apply; keep them proportional.
 
 ```markdown
 ## Experience context
+
 ## User Stories / Scenarios
+
 ## Information architecture
+
 ## User/task flows
+
 ## Views / regions / components
+
 ## States and interactions
+
 ## Failure / recovery / interruption
+
 ## Focus / input / accessibility
+
 ## Responsive / surface constraints
+
 ## Visual semantics
+
 ## Design decisions
+
 ## Open questions
 ```
 
-Use repository conventions for durable stories, scenarios, and design records. Example locations include `user-stories/`, `scenarios/`, and `docs/design/<feature>/`; no particular layout is required.
+Keep durable stories, scenarios and experience design discoverable in the repository's documented structure. Do not prescribe an Anchor-rooted layout; use the consuming repository's policy and applicable OKF authoring rules.
 
 ## Boundary
 

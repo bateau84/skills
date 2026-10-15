@@ -1,15 +1,17 @@
-# intent-grilling Quality Assurance
+# Intent Grilling Quality Assurance
 
-Adversarial validation for any agent. Assume competent production and conformance review; attack residual false confidence without inventing new requirements.
+Adversarially examine residual misunderstandings after a competent normal assessment. This companion does not require a dedicated agent role.
 
 ## QA criteria
 
-- Look for premature closure where a superficially complete brief hides one user-owned branch that would materially change scope or success.
-- Look for over-interviewing that turns routine expert choices into user burden.
-- Attack recommendations that bias the user by presenting only one plausible framing.
-- Test ambiguous user replies that could be recorded as stronger acceptance than intended.
-- Ask whether repository/research evidence resolved a factual branch but was accidentally promoted into product preference.
+- Challenge premature closure where one user-owned branch still materially changes success or scope.
+- Look for over-interviewing that offloads normal expert decisions to the user.
+- Test whether a recommendation was presented as though no reasonable alternatives existed.
+- Test replies that might be misread as stronger acceptance than the user intended.
+- Check whether external research or the existing implementation was silently elevated to product preference.
+- Try a fresh-session handoff: can a receiver identify actual decisions and open questions without the interview transcript?
+- Verify that broader first principles were not fabricated during initial questioning.
 
 ## QA depth
 
-Increase QA depth where a shared wrong assumption could survive both competent production and normal review.
+Increase scrutiny where the same misunderstanding could propagate across several independent agents.

@@ -4,11 +4,11 @@ Skills are on-demand methodology for any agent or human practitioner. Load them 
 
 ## Context files
 
-| File | Activity | Purpose |
-| --- | --- | --- |
-| `SKILL.md` | Practice | **How do I do this work well?** Required. |
-| `ASSESSMENT.md` | Review | **Did the work satisfy its inputs and domain obligations?** Optional. |
-| `QA.md` | Adversarial validation | **How could this still be wrong after competent work and review?** Optional. |
+| File            | Activity               | Purpose                                                                      |
+| --------------- | ---------------------- | ---------------------------------------------------------------------------- |
+| `SKILL.md`      | Practice               | **How do I do this work well?** Required.                                    |
+| `ASSESSMENT.md` | Review                 | **Did the work satisfy its inputs and domain obligations?** Optional.        |
+| `QA.md`         | Adversarial validation | **How could this still be wrong after competent work and review?** Optional. |
 
 Any agent may use any of these files for the relevant activity. Review and QA are different perspectives, not fixed agent identities or mandatory workflow stages. QA is not merely stricter assessment. Companions are optional and should add domain-specific value.
 
@@ -16,20 +16,20 @@ Any agent may use any of these files for the relevant activity. Review and QA ar
 
 ## Selecting methodology
 
-| Work | Useful skills |
-| --- | --- |
-| Product intent and discovery | intent-grilling, product-discovery, risk-driven-planning |
-| Human experience | user-story, design-scenario, design-specification, surface/design skills; design-validation for implemented experiences |
-| Observable requirements | behavioral-spec, behavioral-requirement, quality-scenario, obligation-contract |
-| Technical structure and contracts | architectural-design, architectural-decision, architectural-spec |
-| Delivery planning | work-decomposition, risk-driven-planning |
-| End-to-end outcome proof | product-acceptance |
-| Documentation and knowledge | documentation, learning, report-lifecycle, report-to-keep |
-| Cross-domain reconciliation | solution-synthesis, product-lifecycle |
-| Implementation | software-engineering and task-relevant language/domain skills |
-| Review | relevant assessment companions; design-review for design artifacts |
-| Failure investigation | narrow troubleshooting/domain skills matching observed symptoms |
-| Residual confidence testing | a small set of QA companions for load-bearing or risky domains |
+| Work                              | Useful skills                                                                                                           |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Product intent and discovery      | intent-grilling, anchor-authoring, product-discovery, risk-driven-planning                                              |
+| Human experience                  | user-story, design-scenario, design-specification, surface/design skills; design-validation for implemented experiences |
+| Observable requirements           | behavioral-spec, behavioral-requirement, quality-scenario, obligation-contract                                          |
+| Technical structure and contracts | architectural-design, architectural-decision, architectural-spec                                                        |
+| Delivery planning                 | work-decomposition, risk-driven-planning                                                                                |
+| End-to-end outcome proof          | product-acceptance                                                                                                      |
+| Documentation and knowledge       | documentation, learning, report-lifecycle, report-to-keep                                                               |
+| Cross-domain reconciliation       | solution-synthesis, product-lifecycle                                                                                   |
+| Implementation                    | software-engineering and task-relevant language/domain skills                                                           |
+| Review                            | relevant assessment companions; design-review for design artifacts                                                      |
+| Failure investigation             | narrow troubleshooting/domain skills matching observed symptoms                                                         |
+| Residual confidence testing       | a small set of QA companions for load-bearing or risky domains                                                          |
 
 These methods do not require a particular sequence, separate agents, additional approvals, or a master product document. Reuse the project's existing conversations, decisions, plans, and verification records. A documented decision establishes agreed scope; it does not by itself prove benefit or correctness.
 
@@ -42,6 +42,8 @@ For TypeScript, start with `typescript-common-practice` and add type safety, asy
 For human-facing work, combine information architecture, interaction design, user flows, visual interface design, accessibility, and surface-specific guidance only for dimensions in scope.
 
 Use `feature-handoff` when another component, repository, or fresh session needs a self-contained implementation request.
+
+Document paths, IDs, types, and mandatory updates belong to the consuming repository's `AGENTS.md` or equivalent. Metadata, indexing, logging, and graph mechanics belong to the portable `okf-authoring` skill maintained in [nrkno/okf-mcp](https://github.com/nrkno/okf-mcp); the skills here decide substantive content. **First principles are not an Anchor deliverable**: synthesize them later from repeated, evidenced decisions.
 
 Relative references resolve from the skill directory. Bare skill names refer to sibling directories. Examples and artifact identifiers describe useful formats; follow local naming and storage conventions. External CLIs, services, and MCP integrations are explicitly task-specific, not prerequisites for loading the library.
 

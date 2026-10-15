@@ -7,7 +7,7 @@ description: Capture a concrete human-centered end-to-end Scenario that exercise
 
 Use when design needs a concrete situation against which journeys, interaction states, recovery, and later Product Acceptance can be evaluated.
 
-A Design Scenario is **human-centered**. It is distinct from Specifier's Quality Scenario: SC describes a person's situation and journey; QS describes a measurable system quality under a stimulus/environment.
+A Design Scenario is **human-centered**. It is distinct from a system Quality Scenario: SC describes a person's situation and journey; QS describes a measurable system quality under a stimulus/environment.
 
 ## Method
 
@@ -23,10 +23,9 @@ A Design Scenario is **human-centered**. It is distinct from Specifier's Quality
 
 ## Durable artifact
 
-```text
-docs/design/<anchor-slug>/scenarios/
-  sc-NNN-<descriptive-slug>.md
-```
+Use the consuming repository's OKF relationship vocabulary and heading rules when publishing the document. The example `## Derived from` heading is illustrative; relationship type and path are repository-owned.
+
+Use the consuming repository's document path and naming rules. A numbered scenario may use `sc-NNN-<descriptive-slug>.md`; no Anchor-rooted layout is required by this skill.
 
 ```markdown
 # SC-NNN — <descriptive title>
@@ -46,6 +45,6 @@ docs/design/<anchor-slug>/scenarios/
 **Observable outcome:**
 <what success/recovery/failure looks like to the person>
 
-**Derived from:**
+## Derived from
 - <US and/or closest accepted human-facing authority>
 ```
