@@ -1,10 +1,10 @@
 ---
 name: golang-testing
-description: "Production-ready Golang tests — table-driven tests, testify suites and mocks, parallel tests, fuzzing, fixtures, goroutine leak detection with goleak, snapshot testing, code coverage, integration tests, idiomatic test naming. Use when writing or reviewing Go tests, choosing a testing approach, setting up Go test CI, or debugging flaky/slow tests. For testify-specific APIs, consult the testify documentation (→ See `golang-pkg-go-dev` skill); for measurement methodology see `golang-benchmark`."
+description: "Production-ready Golang tests — table-driven tests, testify suites and mocks, parallel tests, fuzzing, fixtures, goroutine leak detection with goleak, snapshot testing, code coverage, targeted mutation testing, integration tests, idiomatic test naming. Use when writing or reviewing Go tests, choosing a testing approach, setting up Go test CI, or debugging flaky/slow tests. For testify-specific APIs, consult the testify documentation (→ See `golang-pkg-go-dev` skill); for measurement methodology see `golang-benchmark`."
 license: MIT
 metadata:
   author: Bateau
-  version: "1.0.0"
+  version: "1.1.0"
   adapted-from: samber/cc-skills-golang@golang-testing
 ---
 
@@ -201,7 +201,6 @@ Key differences in `synctest`:
 
 - `time.Sleep` advances synthetic time instantly when the goroutine blocks
 - `time.After` fires when synthetic time reaches the duration
-- All goroutines run to blocking points before time advances
 - Test execution is deterministic and repeatable
 
 ## Test Timeouts
@@ -351,6 +350,18 @@ go tool cover -func=coverage.out
 # Total coverage percentage
 go tool cover -func=coverage.out | grep total
 ```
+
+## Targeted mutation testing
+
+Coverage shows execution, not whether assertions reject wrong behavior. After the relevant suite is green, consider a few mutations of changed or high-risk decisions: inclusive boundaries, authorization, error propagation, retry limits, or required state updates. Mutation testing complements fuzzing, race detection, and integration tests; it does not replace them or impose a score target.
+
+**Manual fallback:** preserve current edits and use an isolated test copy containing the actual candidate. Run the relevant package/tests with `go test -count=1` and a deliberate `-timeout` value; confirm tests were collected. Change one production decision with the tests fixed, rerun, and identify the failing test and reason. A compile error, no-test-files result, or unexplained timeout is not an assertion-based kill. For a meaningful survivor, add a contract-derived test and prove that it rejects the mutant. Restore only the probe change, inspect the diff, and rerun the relevant suite; do not reset unrelated work.
+
+**Automation:** [Gremlins](https://gremlins.dev/latest/usage/commands/unleash/) is an option when compatible with the repository's Go version and build layout. Prefer an existing pinned installation. Inspect `gremlins unleash --help` and the installed version's configuration before using `gremlins unleash`; bound source/package scope, time, and concurrency rather than starting with the whole repository. Record build tags and test selection. Do not assume Go test flags can be passed unchanged to Gremlins.
+
+Gremlins normally selects tests from the mutated package. Cross-package behavior may require its documented integration mode or a separate targeted integration probe; that broader run can cost substantially more. Check which source actually compiled and which tests ran before triaging a survivor.
+
+Record tool/version, candidate, baseline, scope, raw outcomes, survivor reasons, and restoration in existing verification notes. Keep invalid/uncovered/timeout/untested outcomes separate from meaningful kills; justify equivalence and exclusions rather than changing tests to chase a score. If tooling is unavailable, use the manual procedure or state the limitation and alternative evidence. Loading this skill does not authorize installation or a new CI gate. `test-driven-development` contains the shared method and deeper triage guidance.
 
 ## Integration Tests
 

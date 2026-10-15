@@ -1,10 +1,10 @@
 ---
 name: typescript-testing
-description: "TypeScript/JavaScript testing mechanics across Bun test, Vitest, Jest, and similar runners: awaited async assertions, deterministic timers and concurrency, module/global mock isolation, runtime-vs-type-level tests, environment selection, regression tests, and false-green avoidance. Use when writing or reviewing tests for TypeScript/JavaScript code. Pair with test-driven-development for red-green-refactor process."
+description: "TypeScript/JavaScript testing mechanics across Bun test, Vitest, Jest, and similar runners: awaited async assertions, deterministic timers and concurrency, module/global mock isolation, runtime-vs-type-level tests, environment selection, regression tests, targeted mutation testing, and false-green avoidance. Use when writing or reviewing tests for TypeScript/JavaScript code. Pair with test-driven-development for red-green-refactor process."
 license: MIT
 metadata:
   author: Bateau
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 > **House skill.** test-driven-development owns test-first process and honest behavioral intent. This skill owns TypeScript/JavaScript test mechanics and common false-green modes. Use the repository's existing runner rather than introducing another by default.
@@ -138,6 +138,18 @@ Snapshots are appropriate for stable, reviewable structures. Avoid giant snapsho
 While developing, run the focused test first. Before completion, run the relevant containing suite and the repository's TypeScript typecheck and lint checks.
 
 If a test is expected to catch a regression, temporarily break or otherwise falsify the behavior when practical to confirm the test actually fails for the intended reason. Restore that deliberate mutation before continuing, then rerun the test and inspect the final diff so no falsification change survives into the delivered work.
+
+## Targeted mutation testing
+
+Use that deliberate falsification selectively for changed or high-risk guards, boundaries, rejection/cancellation paths, and state effects. Mutate production behavior, not the assertions, and do not require a whole-repository run or a score target.
+
+**Manual fallback:** preserve current edits in an isolated test copy containing the candidate. Establish a passing baseline with the intended tests collected, apply one plausible production defect with tests fixed, then rerun in the same runtime/environment. Verify the failure belongs to the intended assertion rather than setup or detached async work. For a real survivor, add a contract-derived test that fails on the mutant and passes on restored code. Remove only the probe change, inspect the final diff, and rerun relevant tests/typecheck/lint; do not reset unrelated edits.
+
+**Automation:** [StrykerJS](https://stryker-mutator.io/docs/stryker-js/plugins/) provides runner plugins including Vitest and Jest, plus a TypeScript checker. Reuse the project's pinned tools and runner. Set explicit production-file `mutate` globs, exclude tests and in-source test blocks, and bound runtime/concurrency before invoking the local `stryker run` command. Confirm transforms and imports execute mutated source, not stale generated JavaScript.
+
+For Bun or other setups, do not assume a compatible native plugin or replace the runner just for mutation testing. The [command runner](https://stryker-mutator.io/docs/stryker-js/configuration/) is a possible adapter only after verifying the actual test command, failure exit behavior, sandbox execution, and compatibility. It lacks the coverage-based optimizations of integrated runners and may be slower; a manual sample is a valid fallback. The [Vitest runner's related-test filtering](https://stryker-mutator.io/docs/stryker-js/vitest-runner/) can miss indirect/API-driven consumers; verify selection or use its documented configuration rather than claiming that unselected behavior passed.
+
+Keep TypeScript checker rejections and deliberate public type-contract probes separate from runtime assertion kills. Report candidate, tool/plugin versions, scope, baseline, raw outcomes, survivor triage, justified exclusions, and restoration in existing verification notes. Preserve timeout/error/uncovered/untested outcomes and the tool's score definition; do not weaken tests or exclusions to chase a number. Missing tooling is a limitation to state, not permission to install dependencies or add CI gates. `test-driven-development` contains the shared method and deeper triage guidance.
 
 ## Completion check
 

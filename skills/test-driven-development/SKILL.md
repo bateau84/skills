@@ -1,10 +1,10 @@
 ---
 name: test-driven-development
-description: "Test-Driven Development workflow for any language — use tests to drive behavior and design through a tight red-green-refactor loop. Use when implementing a feature test-first, choosing the next example, turning a bug into a regression test, evolving an API from tests, deciding when to Fake It or Triangulate, or judging whether TDD evidence really proves the claimed behavior. Covers the Test List, Red-Green-Refactor, Obvious Implementation / Fake It / Triangulation, design feedback, refactoring discipline, boundary tests, test doubles, and honest-green test integrity. Pair with the language testing skill for mechanics."
+description: "Test-Driven Development workflow for any language — use tests to drive behavior and design through a tight red-green-refactor loop. Use when implementing a feature test-first, choosing the next example, turning a bug into a regression test, evolving an API from tests, deciding when to Fake It or Triangulate, judging whether TDD evidence really proves the claimed behavior, or using targeted mutation testing to challenge a green suite. Covers the Test List, Red-Green-Refactor, Obvious Implementation / Fake It / Triangulation, design feedback, refactoring discipline, boundary tests, test doubles, and honest-green test integrity. Pair with the language testing skill for mechanics."
 license: MIT
 metadata:
   author: Bateau
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 > Language-agnostic TDD methodology with explicit guidance about test integrity and test doubles. Language mechanics live in skills such as `golang-testing` and `python-testing`. Follow the project's testing conventions and the host's execution permissions.
@@ -144,6 +144,16 @@ If a meaningful test cannot pass without bypassing the behavior, fix the impleme
 
 The fingerprint to watch for is: *"the test passes because I supplied the thing the system was supposed to create."*
 
+## Mutation testing — challenge a green suite
+
+Mutation testing deliberately changes production behavior and checks whether the tests detect it. A mutation caught by a relevant failing test is **killed**; one that still passes **survives**. Unlike coverage, this tests the strength of assertions; unlike fuzzing, it changes code rather than inputs. It complements TDD and boundary tests, not replaces them.
+
+Use it selectively after relevant tests are green: prioritize changed decisions, boundary conditions, authorization, state transitions, recovery, and bugs that escaped tests. Start with a few realistic manual mutations or a narrowly scoped existing tool. A trivial change need not gain another stage, tool dependency, or score target.
+
+Before a probe, preserve the current work and use an isolated test copy that includes the actual candidate changes. Establish a passing baseline with real tests collected, change one production behavior without changing the tests, and inspect why the tests fail or remain green. Classify survivors rather than assuming each is a defect; do not count build/setup failures or unexplained timeouts as assertion-based kills. Restore only the deliberate mutation, retain justified test improvements, and rerun the relevant suite and final diff check.
+
+Use [targeted mutation testing](./references/mutation-testing.md) for the bounded procedure, survivor triage, and evidence format. Language testing skills own tool compatibility and execution details. When mutation testing is skipped or blocked for material risk, briefly record why and what evidence remains; do not present an unrun probe as passing.
+
 ## Test doubles — choosing boundaries
 
 TDD itself does not require one mocking school. Prefer a **classical/sociable style** when real local collaboration is part of the claim:
@@ -208,6 +218,7 @@ Never advance to the next behavior on a red bar or an unexplained green bar.
 - **Green at all costs** — weakening assertions, skipping cases, or seeding outputs merely to obtain green.
 - **Refactor plus behavior change** — silently adding requirements while supposedly cleaning up.
 - **Round-trip only** — letting two mutually wrong implementations validate each other.
+- **Mutation-score theater** — widening exclusions, weakening behavior, or adding brittle tests merely to reach a number; calling a manual sample a whole-suite score.
 
 ## Cross-references
 
