@@ -15,3 +15,16 @@ Reviewer verifies the suite cannot go green for TypeScript or JavaScript-specifi
 - regression tests reproduce the defining failure before relying on the fix and include important rejection, failure, or cancellation paths;
 - parameterized tests remain diagnosable and snapshots are small and stable enough to review meaningfully;
 - final evidence includes focused or containing tests and applicable repository typecheck and lint verification.
+
+### Targeted mutation testing
+
+When mutation evidence is used, verify that:
+
+- source/test globs, tool/plugin/runtime versions, configuration, and time/concurrency limits are explicit; tests and in-source test blocks are not mutation targets;
+- the selected StrykerJS runner matches the project; a custom command or Bun integration is verified locally rather than assumed supported;
+- the baseline collects the intended tests and runs the mutated source through the actual transform/import path, not old build output or a mocked module;
+- related-test filtering has not omitted API-driven integration tests or other indirect consumers;
+- runtime assertion kills are distinguished from TypeScript checker rejection, setup failures, timeouts, and uncovered code; ordinary typechecking still runs when required;
+- survivors, exclusions, and score denominator are explained; restoration preserves wanted edits and is followed by relevant tests/typecheck/lint.
+
+Use the mutation section in `SKILL.md`. No universal score or runner migration is required merely to perform this review.

@@ -50,6 +50,18 @@ Reviewer verifies that TDD generated discriminating behavioral and design eviden
 - round-trip tests are supplemented by independent known-answer tests when both halves could agree on the same wrong representation;
 - operator-facing logs, metrics, traces, or events are asserted only when they are accepted observable behavior, using stable semantic fields rather than brittle formatting.
 
+### Mutation-testing evidence, when material
+
+- depth is proportionate to changed behavior and risk, with bounded source/test scope and runtime; missing optional automation or a universal score is not itself a blocker;
+- the baseline actually collected and passed the intended tests against the candidate, including relevant pending edits;
+- mutations change production behavior while tests remain fixed during each probe; claimed kills identify a relevant failing test, not merely a nonzero exit;
+- surviving mutants are triaged into real gaps, uncovered/unselected behavior, justified equivalence/out-of-scope behavior, or unresolved cases; uncertainty is not relabeled equivalence;
+- compile/setup failures, timeouts, and untested mutants remain visible; reported scores retain the tool's definition, denominator, version, and scope;
+- new tests follow the accepted contract and demonstrably reject the defect; exclusions and expectations were not weakened to improve a number;
+- deliberate mutations are removed, unrelated work survives, and the final diff plus relevant suite were checked; skipped/blocked checks for material risk state their limits and alternative evidence.
+
+Use the procedure and result distinctions in [targeted mutation testing](./references/mutation-testing.md); do not create another mandatory workflow stage.
+
 ### Regression discipline
 
 - bugs are reproduced by regression tests before the fix when practical;

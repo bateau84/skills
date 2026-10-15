@@ -1,10 +1,10 @@
 ---
 name: python-testing
-description: "Production-ready Python tests with pytest — fixtures, parametrize, pytest-asyncio for async tests, monkeypatch, tmp_path, conftest.py scoping, markers, coverage, and testing FastAPI/httpx code. Use when writing or reviewing pytest tests, setting up fixtures, testing async code, parametrizing cases, mocking dependencies, or configuring pytest in pyproject.toml. Also use when the user mentions pytest, unittest, fixtures, mocking, or test coverage in Python."
+description: "Production-ready Python tests with pytest — fixtures, parametrize, pytest-asyncio for async tests, monkeypatch, tmp_path, conftest.py scoping, markers, coverage, targeted mutation testing, and testing FastAPI/httpx code. Use when writing or reviewing pytest tests, setting up fixtures, testing async code, parametrizing cases, mocking dependencies, or configuring pytest in pyproject.toml. Also use when the user mentions pytest, unittest, fixtures, mocking, or test coverage in Python."
 license: MIT
 metadata:
   author: Bateau
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 > Pair with `python-common-practice` for shared verification guidance.
@@ -41,7 +41,7 @@ def repo(settings):
     conn.close()
 ```
 
-Scope deliberately: default `function` (fresh per test, safest). Use `module`/`session` only for expensive, read-only setup — shared mutable fixtures leak state between tests and create order-dependent flakiness.
+Scope deliberately: default `function` (fresh per test, safest). Use `module`/`session` only for expensive, read-only setup — shared mutable fixtures leak state and create order-dependent flakiness.
 
 ## Parametrize instead of loops
 
@@ -104,6 +104,18 @@ pytest --cov=src --cov-report=term-missing        # coverage with missing lines
 ```
 
 Coverage is a floor, not a goal: 100% coverage with no assertions tests nothing. Chase uncovered *branches* that carry risk, not the percentage.
+
+## Targeted mutation testing
+
+After the relevant suite is green, consider a few mutations for changed or high-risk comparisons, guards, exception paths, and state updates. Mutation testing changes production code to challenge the tests; coverage only shows execution. Neither a whole-repository run nor a fixed mutation score is required.
+
+**Manual fallback:** preserve current edits and use an isolated test copy containing the candidate. Run the selected pytest cases and confirm they actually collected and passed rather than only skipping/xfailing. Change one production behavior with tests fixed, rerun, and inspect the failing assertion. Verify imports resolve to the mutated source, not another installed package or a monkeypatched replacement. An import/setup/type-check failure or unexplained timeout is not an assertion-based kill. For a real survivor, add a contract-derived test and prove it rejects the mutant. Restore only the probe change, inspect the diff, and rerun the relevant suite without discarding unrelated work.
+
+**Automation:** [mutmut](https://mutmut.readthedocs.io/en/latest/) is an option for a compatible pytest project. Prefer the repository's pinned environment. Check the installed version's help and documentation before choosing source paths, test selection, timeout/concurrency settings, or configuration keys; these can differ between versions. Bound the scope before using `mutmut run`, then inspect outcomes with `mutmut browse`. Verify copied fixtures/configuration and imported source. Do not treat cached/incremental results as a fresh run when dependencies, configuration, fixtures, or the candidate changed without the tool accounting for them.
+
+`mutmut apply` writes a mutant into source. Use it only in an isolated, recoverable copy and verify restoration even after interruption. Do not install tools or publish reports merely because the command appears here; a safe manual sample or a stated limitation is preferable to unsupported setup.
+
+Record candidate, tool/Python versions, source/test scope, budget, baseline, actual outcomes, and final restoration in existing verification notes. Triage survivors into real gaps, missing execution, justified equivalence/out-of-scope behavior, or unresolved cases. Keep invalid/timeout/error/untested outcomes visible and report any score with its definition and denominator. Never weaken expected values, skip a hard test, or add an unjustified exclusion to raise that score. `test-driven-development` contains the shared method and deeper triage guidance.
 
 ## Common mistakes
 

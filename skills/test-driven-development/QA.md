@@ -23,6 +23,19 @@ Try examples such as:
 
 If a materially wrong implementation survives, the suite is under-specified.
 
+### Challenge mutation-testing claims
+
+When valuable and permitted, turn one plausible wrong implementation into a bounded manual mutation or inspect a narrow automated run. Follow [targeted mutation testing](./references/mutation-testing.md) for isolation, baseline, budget, classification, and restoration.
+
+- change an inclusive boundary, remove a guard, or suppress a required effect; verify the test notices the broken contract rather than merely touching the line;
+- check whether a reported kill is only a compile/setup error, flaky test, or unexplained timeout;
+- trace a survivor through test selection, mocks, generated output, and imported code before accepting a claim of equivalent behavior;
+- inspect exclusions and the score denominator for high-risk code hidden from the report;
+- challenge a high score with a realistic defect outside the generated operator set; do not interpret a sampled or partial run as whole-system proof;
+- inspect the restored candidate and final diff so a probe cannot leave broken production code or erase unrelated work.
+
+A known equivalent mutation need not be killed. A real missing mandatory behavior cannot be waived merely because the overall score is high. Do not broaden QA into a full-repository mutation campaign by default.
+
 ### Attack RED evidence
 
 Check whether the claimed Red could have failed before the intended behavioral assertion because of:
