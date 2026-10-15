@@ -1,6 +1,6 @@
 ---
 name: golang-observability
-description: "Go production observability — structured logging with slog, Prometheus metrics, OpenTelemetry tracing, continuous profiling with pprof/Pyroscope, alerting, and Grafana dashboards. Use when instrumenting a Go service for production monitoring, adding metrics or tracing, migrating from zap/logrus/zerolog to slog, correlating logs and traces, or setting up alerting. Not for slog multi-handler pipelines (→ See `golang-samber-slog`), benchmark profiling (→ See `golang-benchmark`), or optimization patterns (→ See `golang-performance`)."
+description: "Go production observability — structured logging with slog, Prometheus metrics, OpenTelemetry tracing, continuous profiling with pprof/Pyroscope, alerting, and Grafana dashboards. Use when instrumenting a Go service for production monitoring, adding metrics or tracing, migrating from zap/logrus/zerolog to slog, correlating logs and traces, or setting up alerting. Not for benchmark profiling (→ See `golang-benchmark`), or optimization patterns (→ See `golang-performance`)."
 license: MIT
 metadata:
   author: Bateau

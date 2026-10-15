@@ -69,4 +69,4 @@ If you find yourself writing a "if slow step is X, try fix Y" table, stop. The t
 - **Node event loop** → a single blocking op stalls all concurrent requests. Profile with `--prof` or clinic.js.
 - Percentile shapes are heuristic categories, not a partition — a wide spread can be both tail and bimodal. When in doubt, plot the histogram.
 
-For language-specific optimization patterns, load the language performance skill (`golang-performance`, `python-async`, `app-observability`, `golang-benchmark`).
+For language-specific optimization patterns, load the language performance skill (`golang-performance`, `python-async`, `grafana-app-observability`, `golang-benchmark`).

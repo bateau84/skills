@@ -17,6 +17,17 @@ Framework-specific tool calls and role-exclusive operations have been replaced w
 
 `loom-learning` is now `learning`. Optional `ASSESSMENT.md` and `QA.md` files retain distinct conformance and residual-confidence methods without requiring dedicated reviewer or critic agents.
 
+## Consolidation
+
+- `behavioral-requirement`, `quality-scenario`, and `obligation-contract` became references under `behavioral-spec`; their review, QA, and eval content moved with them.
+- `user-story` and `design-scenario` merged into `user-stories-and-scenarios`.
+- `design-review` became the pre-implementation section of `design-validation`.
+- `report-lifecycle` and `report-to-keep` were removed; report and document lifecycle now lives in the `okf-authoring` skill in `nrkno/okf-mcp`.
+- `solution-synthesis` was removed; it described hub coordination rather than reusable method.
+- Renamed for discoverability: `provider-*` → `terraform-provider-*`; `infrastructure` → `grafana-infrastructure-monitoring`; `app-observability` → `grafana-app-observability`; `dashboarding` → `grafana-dashboards`; `loki` / `mimir` → `grafana-loki` / `grafana-mimir`; `accessibility` → `accessibility-implementation`.
+
+The frozen baselines under `evaluations/selective-enrichment/` keep their original skill names; they are a historical record.
+
 ## Preserved methodology
 
 The library retains product and behavioral specification, architecture, delivery planning, acceptance, design, accessibility, documentation, Git, Go, Python, JavaScript/TypeScript, observability, infrastructure, Terraform, MCP construction, TDD, and performance guidance.

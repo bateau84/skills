@@ -25,7 +25,7 @@ class CliTests(unittest.TestCase):
                                       cwd=temp, capture_output=True, text=True, timeout=10)
                 self.assertEqual(proc.returncode, code, proc.stderr)
                 if argv == ["--validate"]:
-                    self.assertIn('"fixture_cases": 235', proc.stdout)
+                    self.assertIn('"fixture_cases": 234', proc.stdout)
                 if "--list" in argv:
                     self.assertEqual(len(proc.stdout.splitlines()), 7)
                 if code == 2:

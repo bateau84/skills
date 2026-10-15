@@ -18,12 +18,12 @@ class CaseTests(unittest.TestCase):
             expected = markdown_document((folder / "cases.md").read_text(), skill)
             self.assertEqual(actual, expected)
             self.assertEqual(len(actual["cases"]), count)
-        self.assertEqual(len(discover(ROOT)), 235)
+        self.assertEqual(len(discover(ROOT)), 234)
 
-    def test_existing_corpus_has_219_cases_without_changing_source_ids(self):
+    def test_existing_corpus_has_218_cases_without_changing_source_ids(self):
         cases = discover(ROOT)
         existing = [c for c in cases if c.skill not in {"product-acceptance", "work-decomposition"}]
-        self.assertEqual(len(existing), 219)
+        self.assertEqual(len(existing), 218)
         numeric = next(c for c in cases if c.id == "SKILL-python-testing-1")
         self.assertEqual(numeric.source_id, 1)
         self.assertEqual(numeric.selectors, (numeric.id, "python-testing:1"))

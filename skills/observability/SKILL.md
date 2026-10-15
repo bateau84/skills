@@ -1,6 +1,6 @@
 ---
 name: observability
-description: "Logs, metrics, and traces written into code as a first-class deliverable — structured logging, log levels, metrics cardinality, request-flow tracing, and correlation. Use when deciding what to log, choosing between a log / metric / trace, separating operational vs audit vs diagnostic logs, instrumenting a feature or boundary, or judging whether code is observable enough to ship. Not for language or APM mechanics (→ See `golang-observability`, `python-observability`, `app-observability`)."
+description: "Logs, metrics, and traces written into code as a first-class deliverable — structured logging, log levels, metrics cardinality, request-flow tracing, and correlation. Use when deciding what to log, choosing between a log / metric / trace, separating operational vs audit vs diagnostic logs, instrumenting a feature or boundary, or judging whether code is observable enough to ship. Not for language or APM mechanics (→ See `golang-observability`, `python-observability`, `grafana-app-observability`)."
 license: MIT
 metadata:
   author: Bateau

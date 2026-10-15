@@ -1,6 +1,6 @@
 ---
 name: behavioral-spec
-description: Derive bounded, implementation-independent requirements from agreed product intent through goal refinement, coverage lenses, obstacle analysis, provenance tracking, and counterexample checks. Use to select and reconcile behavioral requirements, quality scenarios, and shared contracts without expanding scope.
+description: Derive bounded, implementation-independent requirements from agreed product intent through goal refinement, coverage lenses, obstacle analysis, provenance tracking, and counterexample checks. Use to select, author, and reconcile Behavioral Requirements (BR), Quality Scenarios (QS), and Obligation Contracts (OC) without expanding scope. Not for concrete API/schema/protocol realization (use architectural-spec) or human-centered stories and scenarios (use user-stories-and-scenarios).
 ---
 
 # Behavioral Specification
@@ -150,4 +150,8 @@ In this layout, use separate BR/QS/OC numbering. The bundle index is navigation 
 
 Existing flat BR/OC bundles remain valid until an intentional migration updates them and their references; do not move artifacts merely to match this example.
 
-Load the artifact-specific skill before authoring each artifact type.
+Read the artifact reference before authoring each artifact type:
+
+- [Behavioral Requirement](references/behavioral-requirement.md)
+- [Quality Scenario](references/quality-scenario.md)
+- [Obligation Contract](references/obligation-contract.md)

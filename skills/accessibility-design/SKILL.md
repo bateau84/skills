@@ -11,14 +11,14 @@ metadata:
 
 Accessibility design is the discipline of making accessibility a structural input to design decisions — ensuring that interfaces are usable by people with visual, motor, cognitive, hearing, and vestibular disabilities from the moment design decisions are made.
 
-**Design and implementation complement each other.** The sibling `accessibility` skill teaches native controls, focus management, and ARIA implementation. This skill helps any agent make design decisions that prevent barriers before implementation; its accessibility requirements feed implementation and review.
+**Design and implementation complement each other.** The sibling `accessibility-implementation` skill teaches native controls, focus management, and ARIA implementation. This skill helps any agent make design decisions that prevent barriers before implementation; its accessibility requirements feed implementation and review.
 
 **Load this skill always.** Every design engagement involving a human interface needs it. Reduce scope to surface-specific constraints (CLI accessibility differs from web accessibility), but never treat it as a final-phase compliance review.
 
 **Do NOT load when:** The engagement is reviewing an implementation against a spec (load `design-validation` instead) — though `accessibility-design` informs the evaluation criteria `design-validation` uses.
 
 **Boundary:**
-- Not for: implementing accessibility in code (use `accessibility`).
+- Not for: implementing accessibility in code (use `accessibility-implementation`).
 - Not for: surface-specific rendering mechanics (→ surface skills own the rendering layer)
 - Not for: visual design choices outside accessibility constraints (→ `visual-interface-design`)
 - Not for: interaction design state modeling (→ `interaction-design` owns states; this skill adds accessibility constraints on top of those states)
@@ -51,7 +51,7 @@ Design questions:
 - Are time limits user-controllable — can the user pause, extend, or disable them?
 - Is the tab order logical — does it follow the visual reading order?
 
-The designer's obligation: if you cannot describe the keyboard path to every function, the design is incomplete. This is a design specification gap, not an implementation detail to leave for Worker.
+The designer's obligation: if you cannot describe the keyboard path to every function, the design is incomplete. This is a design specification gap, not an implementation detail to leave for the implementer.
 
 ### Understandable — Does labeling match user mental models?
 
@@ -139,7 +139,7 @@ Screen readers convert visual interfaces to a serialized, linear audio or braill
 
 - **Accessible names are design deliverables:** Every interactive element and every informative image must have an accessible name specified in the design. Not "an icon button" — "an icon button with accessible name 'Close dialog'." The accessible name is a design requirement, not an implementation detail.
 
-- **Dynamic content announcements are design decisions:** When content updates without a page reload, screen reader users do not see visual changes. The design must specify which updates are announced live (status messages, loading states, error messages, search results) and which are not. This is a `aria-live` region decision — the designer specifies it, the worker implements it.
+- **Dynamic content announcements are design decisions:** When content updates without a page reload, screen reader users do not see visual changes. The design must specify which updates are announced live (status messages, loading states, error messages, search results) and which are not. This is a `aria-live` region decision — the designer specifies it, the implementer implements it.
 
 **Low Vision**
 
@@ -321,7 +321,7 @@ Design obligations:
 - When visual position and logical order diverge, note this in the spec with the intended reading order
 - Groups of related controls should be reached as a group
 
-Design failure: a three-column layout where the design shows the right column as visually prominent (perhaps larger text), but the intended tab order is left-to-right across all three columns. Without specifying this, the worker implements DOM order, which may not match the visual layout if CSS grid or flexbox reorders elements.
+Design failure: a three-column layout where the design shows the right column as visually prominent (perhaps larger text), but the intended tab order is left-to-right across all three columns. Without specifying this, the implementer implements DOM order, which may not match the visual layout if CSS grid or flexbox reorders elements.
 
 ### Focus States as a Design State
 
@@ -387,7 +387,7 @@ Design implications of each mode:
 
 **By heading:** Heading hierarchy must be semantic, not presentational. The design must specify heading levels (H1, H2, H3) based on content hierarchy, not based on visual size. Design failure: "use a large, bold font for section titles" without specifying H2. A developer who renders large bold text as a `<p>` element with CSS creates a visual hierarchy with no semantic structure — screen reader users cannot navigate by heading.
 
-**By interactive elements:** Every interactive element must have an accessible name. The ARIA naming order (highest priority to lowest): `aria-labelledby` → `aria-label` → `<label>` association → `title` attribute → element content (for buttons). The designer specifies the accessible name; the worker implements the most appropriate HTML mechanism.
+**By interactive elements:** Every interactive element must have an accessible name. The ARIA naming order (highest priority to lowest): `aria-labelledby` → `aria-label` → `<label>` association → `title` attribute → element content (for buttons). The designer specifies the accessible name; the implementer implements the most appropriate HTML mechanism.
 
 ### The Reading Order Problem
 
@@ -401,7 +401,7 @@ This works. But consider:
 Visual layout: Recent Activity (right sidebar, visually prominent) | Main Content (left column) | Navigation (top, reused across pages)
 Intended reading order: Navigation | Main Content | Recent Activity
 
-If the visual layout is achieved with CSS float or flexbox order, the DOM order may follow source order (Navigation | Main Content | Recent Activity), which is correct. But if the designer specifies visual prominence without specifying reading order, the worker may implement this differently.
+If the visual layout is achieved with CSS float or flexbox order, the DOM order may follow source order (Navigation | Main Content | Recent Activity), which is correct. But if the designer specifies visual prominence without specifying reading order, the implementer may implement this differently.
 
 **Design obligation:** For any layout where visual position is used to establish priority, specify whether the visual priority matches the intended reading order. If they differ, specify the intended reading order explicitly.
 
@@ -741,7 +741,7 @@ This skill's content passes the research quality gate (architecture §9) if:
 - WCAG Understanding 3.3.8 Accessible Authentication Minimum: https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-minimum.html
 
 **Adjacent skills:**
-- `accessibility` — implementation and review mechanics; receives requirements produced by this skill.
+- `accessibility-implementation` — implementation and review mechanics; receives requirements produced by this skill.
 - `interaction-design` — owns state modeling; this skill adds accessibility constraints on those states
 - `visual-interface-design` — owns visual design choices; this skill provides the normative constraints those choices must satisfy
 - `design-specification` — formats and communicates accessibility requirements in the spec; the verifiable requirement format must be consistent between both skills

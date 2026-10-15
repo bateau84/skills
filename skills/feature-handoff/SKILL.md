@@ -1,6 +1,6 @@
 ---
 name: feature-handoff
-description: Compile a compact, self-contained implementation request for another component, repository, or fresh agent session when current work depends on functionality elsewhere. Use for cross-component or cross-session handoffs such as frontend→backend, service A→service B, application→infrastructure, or one independently handled subsystem→another. Not for task orchestration, implementation plans, or authoring durable requirements and architecture (use behavioral-spec, obligation-contract, or architectural-spec for those artifacts).
+description: Compile a compact, self-contained implementation request for another component, repository, or fresh agent session when current work depends on functionality elsewhere. Use for cross-component or cross-session handoffs such as frontend→backend, service A→service B, application→infrastructure, or one independently handled subsystem→another. Not for task orchestration, implementation plans, or authoring durable requirements and architecture (use behavioral-spec or architectural-spec for those artifacts).
 ---
 
 # Feature Handoff
@@ -17,7 +17,7 @@ A handoff packages the need already established by the current work. It does not
 - Do not promote an idea, example, or implementation convenience into a requirement.
 - Describe the required outcome before proposing a mechanism.
 - Do not prescribe the receiving component's internal implementation unless the interface or mechanism is itself part of the established dependency.
-- If the handoff exposes a correctness-sensitive semantic seam that needs durable normative authority, use `obligation-contract` instead of hiding that work inside the handoff.
+- If the handoff exposes a correctness-sensitive semantic seam that needs durable normative authority, use `behavioral-spec` instead of hiding that work inside the handoff.
 - If the work is really a durable behavioral specification, use `behavioral-spec`. A feature handoff may reference such artifacts but does not replace them.
 
 ## Requirement levels

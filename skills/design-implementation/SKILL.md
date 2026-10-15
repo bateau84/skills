@@ -13,7 +13,7 @@ Translate the agreed design into working UI using the project's components, toke
 
 ## Establish the contract
 
-Read the relevant design and existing implementation patterns. Identify user goals, interactions, states, responsive behavior, accessibility, copy, and capability dependencies. Resolve material ambiguity before inventing user-visible behavior. Use `design-specification` for an incomplete handoff and `accessibility` for implementation mechanics.
+Read the relevant design and existing implementation patterns. Identify user goals, interactions, states, responsive behavior, accessibility, copy, and capability dependencies. Resolve material ambiguity before inventing user-visible behavior. Use `design-specification` for an incomplete handoff and `accessibility-implementation` for implementation mechanics.
 
 ## State completeness
 

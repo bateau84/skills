@@ -126,7 +126,7 @@ qualified source ID (`product-acceptance:PA3`). Numeric IDs are qualified, e.g.
 aliases selecting comma-separated skill names. With `--cases`, they restrict
 the selectable cases to those targets. Unknown and empty selectors fail before
 execution. `--all` is an explicit whole-suite choice (or all cases of selected
-targets); **do not blindly run the entire 235-case corpus**. Merely passing
+targets); **do not blindly run the entire case corpus**. Merely passing
 `--target-kind skill` does not authorize selecting everything.
 
 | Control | Default / semantics |
@@ -557,8 +557,10 @@ a skill-loading prerequisite.
 
 ## Corpus, history and source lineage
 
-The 48 existing JSON fixture files retain their bytes and their 219 normalized
-cases. Three Loom-style source shapes are accepted: arrays, `{skill, cases}`,
+The original 48 JSON fixture files produced 219 normalized cases. Later
+consolidation merged several skills' fixtures (moving their cases unchanged)
+and removed `report-lifecycle`'s single case, leaving 218. Three Loom-style
+source shapes are accepted: arrays, `{skill, cases}`,
 and `{skill_name, evals}`. Normalized IDs are `SKILL-<skill>-<source-id>`; source
 IDs and expectation text are preserved.
 

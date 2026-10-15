@@ -63,7 +63,7 @@ Remember: The best library is often no library at all. Go's standard library is 
 ## Cross-References
 
 - → See `golang-dependency-management` skill for adding, auditing, and managing dependencies
-- → See `golang-samber-do` skill for samber/do dependency injection details
-- → See `golang-samber-oops` skill for samber/oops error handling details
+- → See `golang-dependency-injection` skill for DI library trade-offs, including samber/do
+- → See `golang-error-handling` skill for error libraries, including samber/oops
 - → See `golang-stretchr-testify` skill for testify testing details
 - → See `golang-grpc` skill for gRPC implementation details

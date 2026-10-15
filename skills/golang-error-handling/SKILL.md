@@ -1,6 +1,6 @@
 ---
 name: golang-error-handling
-description: "Wrap, propagate, and inspect errors in Go — `%w`, `errors.Is`, `errors.As`, `errors.Join`, sentinel errors, custom error types, `panic`/`recover`, and the single handling rule. Use when creating or wrapping errors, designing an error API, deciding between error wrapping and panic, or inspecting errors up the call stack. Not for samber/oops structured errors (→ See `golang-samber-oops`), samber/mo sum types (→ See `golang-samber-mo`), or slog setup (→ See `golang-observability`)."
+description: "Wrap, propagate, and inspect errors in Go — `%w`, `errors.Is`, `errors.As`, `errors.Join`, sentinel errors, custom error types, `panic`/`recover`, and the single handling rule. Use when creating or wrapping errors, designing an error API, deciding between error wrapping and panic, or inspecting errors up the call stack. Not for slog setup (→ See `golang-observability`)."
 license: MIT
 metadata:
   author: Bateau

@@ -1,6 +1,6 @@
 ---
 name: golang-dependency-injection
-description: "google/wire, uber-go/dig, uber-go/fx, samber/do, manual constructor injection, and service containers in Go. Use when designing service architecture, setting up dependency injection, refactoring tightly coupled code, or managing singletons and service factories. Not for samber/do container lifecycle and health checks (→ See `golang-samber-do`)."
+description: "google/wire, uber-go/dig, uber-go/fx, samber/do, manual constructor injection, and service containers in Go. Use when designing service architecture, setting up dependency injection, refactoring tightly coupled code, or managing singletons and service factories."
 license: MIT
 metadata:
   author: Bateau

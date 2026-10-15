@@ -53,6 +53,11 @@ skill README and two newly added JSON copies. Its pre-edit digest is:
 abee72b9b30cf09ca7106fbd053239214949ad98c5738c842ca98b1989a3ba1f
 ```
 
+> **Later change:** `test_preservation.py` guarded the import only. It was
+> removed after the migration merged, because it hashed every file under
+> `skills/` and therefore failed on any intended skill edit. The test inventory
+> below is the historical record of this verification run.
+
 The original 48 JSON fixture files still produce 219 cases. Adding the exact
 Markdown-field copies adds acceptance 9 + decomposition 7 = **235**, not a new
 interpretation of the historical pilot scores.
