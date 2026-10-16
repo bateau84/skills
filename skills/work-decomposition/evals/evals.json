@@ -1,6 +1,6 @@
 {
   "skill": "work-decomposition",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "shape": 1,
   "common_instruction": "Work from the supplied task and evidence packet within its stated scope. Produce the requested practical artifact and rationale. Treat supplied facts as evidence for this decision exercise, not as actions you performed. State missing evidence and unresolved decisions precisely; continue independent work where possible. Use available reference material when useful. Do not invent requirements, tool execution, or results.",
   "cases": [
@@ -45,6 +45,18 @@
       "name": "honest surface uncertainty and decision ownership",
       "prompt": "Planning-only analysis has inspected `api/export` and its caller tests. A background consumer and generated schema are suspected but not inspected. The accepted promise says “export accepted records”; whether “accepted” includes deferred records is unresolved and user-owned. Choose candidate grouping/discovery and identify the exact decision question. Distinguish ordinary serialization/test choices from product semantics. Do not assert guessed paths exist, compile final write scopes, or block unrelated inspection. Later executable handoff will need complete authorized surfaces.",
       "expectations": ["Label unknown targets unverified and assign discovery; preserve exact decision for owner, continue independent work. No invented deferred-record semantics or needless approval of ordinary mechanics. Planning-only exact scope deferral is legitimate; executable handoff must cover real consumers/tests/generated source once known."]
+    },
+    {
+      "id": "WD8",
+      "name": "oversized coherent theme needs context-bounded split",
+      "prompt": "A proposal has one task, “modernize configuration,” owned by one backend agent. Current inspection shows three substantial stages: first diagnose precedence behavior across `config/load` and `config/merge`; then choose among already-authorized compatibility realizations based on that result; then migrate `runtime/session` and prove old/new configuration behavior. The same owner could do all of it, but the diagnosis can materially change the later migration and the final proof is independently meaningful. Produce candidate groups and explain the sizing decision. Do not split by file count or invent new semantics.",
+      "expectations": ["Split the broad task at meaningful discovery/decision/implementation or verification boundaries so later work starts from a compact result; justify context/reasoning and retry cost. Preserve one owner where appropriate and avoid one-task-per-file fragmentation. No fixed numeric task/step limit."]
+    },
+    {
+      "id": "WD9",
+      "name": "execution discovers larger scope and re-slices remaining work",
+      "prompt": "An implementation task was reasonably planned as one focused change. During execution, investigation completes and establishes a previously unknown generated consumer, a migration requirement, and a separate compatibility proof. The investigation evidence remains valid, but continuing would substantially enlarge the working set and reasoning chain. State how decomposition should adapt without discarding valid completed work or pretending the original task size is still appropriate.",
+      "expectations": ["Preserve the completed investigation as evidence/result and re-slice only the remaining work into coherent context-bounded units. Do not force continuation, restart valid work, or treat replanning as failure. Keep dependencies and proof ownership explicit."]
     }
   ]
 }
