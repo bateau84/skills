@@ -1,11 +1,11 @@
 ---
 name: work-decomposition
-description: Find coherent work groups, change surfaces, and dependencies before creating a delivery plan. Use when agreed work admits several splits, one-task-per-file fragmentation, hidden integration work, or shared-state parallelism risks. Not for inventing product requirements or fixed scheduling policy.
+description: Find coherent, context-bounded work groups, change surfaces, and dependencies before creating a delivery plan. Use when agreed work admits several splits, oversized execution units, one-task-per-file fragmentation, hidden integration work, or shared-state parallelism risks. Not for inventing product requirements or fixed scheduling policy.
 ---
 
 # Work Decomposition
 
-**Analyze finely; dispatch coarsely.** Ten concerns may need only three execution units. Optimize for the smallest coherent decomposition that preserves obligations, real boundaries, and a way to prove the assembled outcome—not for task count.
+**Analyze finely; dispatch coherently.** Ten concerns may need three execution units, or a broad concern may need several. Optimize for execution units that preserve obligations and real boundaries **while keeping the executor's active context and reasoning horizon bounded**. Task count is not an objective: excessive fragmentation adds handoffs, while oversized groups increase rereading, reasoning load, retry cost, and the chance that important context is displaced.
 
 This skill proposes work groups and dependency/coordination facts for the project's delivery plan; it does not require a planner agent, scheduler, or plugin. Ordinary realization choices belong within implementation scope. Accepted product meaning, design, architecture, constraints, and exclusions remain inputs: ask their decision owner about unresolved semantics, do not hide a changed promise inside an implementation group. A decision update needs explicit authorization and a named owner, not just a writable requirements file.
 
@@ -24,7 +24,7 @@ Read-only discovery can extend beyond likely write paths. A natural change surfa
 
 ## 2. Group, then test every proposed separation
 
-Prefer a **merge** when concerns share the natural owner, dependency position, closely related surface, and verification story; fit a manageable session; and gain no meaningful independent execution from separation. Route registration, validation, handler, serialization, and API annotation for one small endpoint usually belong together. Separate bullets, names, files, clauses, or stories are not separation reasons.
+Prefer a **merge** when concerns share the natural owner, dependency position, closely related surface, and verification story; fit one focused execution loop with a bounded working set; and gain no meaningful independent execution or context reduction from separation. Route registration, validation, handler, serialization, and API annotation for one small endpoint usually belong together. Separate bullets, names, files, clauses, or stories are not separation reasons.
 
 Keep groups **separate** when merging would hide a consequential boundary:
 
@@ -36,9 +36,26 @@ Keep groups **separate** when merging would hide a consequential boundary:
 | Shared mutable resource requiring coordinated publication | Prevents lost writes, incompatible snapshots, or unsafe tests. |
 | Multiple independently delivered product stages | Makes integration/proof prerequisites visible; does not require one task per seam. |
 | Meaningful independent parallelism | Allows genuinely independent progress, not theoretical concurrency with repeated coordination. |
-| Context/session feasibility | Keeps one execution unit understandable and verifiable without losing the overall obligation. |
+| Context and reasoning feasibility | Keeps one execution unit understandable and verifiable without requiring several independent reasoning threads or a large changing working set. |
 
-For each surviving boundary, name what breaks if it is removed. If nothing material breaks, mark a merge candidate. Conversely, try splitting a broad group: if a safety, dependency, or ownership concern disappears inside it, separate or make that responsibility explicit. A deep-module group may own implementation, tests, and docs across several files; it need not be one task per layer.
+For each surviving boundary, name what breaks if it is removed. If nothing material breaks, mark a merge candidate. Conversely, try splitting a broad group: if a safety, dependency, ownership, **context-load, or reasoning-horizon** concern disappears inside it, separate or make that responsibility explicit. A deep-module group may own implementation, tests, and docs across several files; it need not be one task per layer.
+
+### Size by execution fit, not by task count
+
+Before keeping a candidate group intact, test its expected execution shape:
+
+- **Primary outcomes:** can parts become independently useful or complete?
+- **Context surface:** how many distinct modules, contracts, documents, or subsystems must stay active in the executor's working set?
+- **Reasoning transitions:** does the work require several substantial stages such as investigate → decide → implement → migrate → prove?
+- **Uncertainty:** can an early observation or decision materially reshape later work?
+- **Verification independence:** can a subset be proved meaningfully on its own?
+- **Retry cost:** if the last stage fails, how much valid work must be reread or repeated?
+
+Split when these signals indicate multiple independent reasoning threads, a large changing working set, or a discovery/decision whose result can materially reshape dependent implementation. Merge when the work is tightly coupled and splitting mostly creates handoffs, duplicated context loading, or artificial coordination.
+
+Do not impose a fixed maximum for steps, files, tokens, or task count. A small number of difficult transitions can justify separation; many mechanical edits with one context and proof boundary can remain together.
+
+Treat decomposition as revisable. If execution discovers materially more scope, uncertainty, or context than was reasonably visible during planning, preserve the completed evidence and **re-slice the remaining work**. Do not force an executor to continue merely because the original group was written as one task, and do not invalidate completed work that still satisfies its contract.
 
 ## 3. Preserve guarantees and the assembled proof path
 
@@ -62,6 +79,7 @@ For each group provide:
 - **Obligations preserved:** identifiers or plain-language guarantees translated into outcome/constraint/proof; seam participants and integration owner.
 - **Verification:** falsifiable local and cross-boundary expectations; relevant specialist guidance only where useful.
 - **Assembled scenarios enabled:** which accepted outcomes/scenarios, required peer groups, and proof owner; `none` with reason where appropriate.
+- **Execution fit:** why the group fits one focused loop; note context surface, material reasoning transitions, uncertainty, and retry/verification boundary.
 - **Boundary reason:** consequence of merging, or `merge candidate`.
 
 Use identifiers and scheduling detail only as requested by the project. Candidate analysis is not a final schedule. Preserve necessary work when groups are later merged or split; do not let compression erase proof or safety ownership.
