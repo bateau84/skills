@@ -28,7 +28,7 @@ Any agent may use any of these files for the relevant activity. Review and QA ar
 | Retrospectives and improvement     | retrospective for balanced reflection on work, successes, friction, and optional experiments; learning for durable lessons                                        |
 | Engineering memory (Synabun MCP)  | synabun-memory for selective recall, reusable lessons, and cleanup (Synabun required); learning for store-independent practice                                    |
 | Product lifecycle coverage        | product-lifecycle                                                                                                                                                  |
-| Implementation                    | software-engineering and task-relevant language/domain skills                                                                                                      |
+| Implementation                    | software-engineering, major-version-upgrade for breaking stack migrations, and task-relevant language/domain skills                                                |
 | Review                            | relevant assessment companions; design-validation for proposed designs                                                                                             |
 | Failure investigation             | narrow troubleshooting/domain skills matching observed symptoms                                                                                                    |
 | Residual confidence testing       | a small set of QA companions for load-bearing or risky domains                                                                                                     |
