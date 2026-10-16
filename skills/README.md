@@ -25,6 +25,7 @@ Any agent may use any of these files for the relevant activity. Review and QA ar
 | Delivery planning                 | work-decomposition, risk-driven-planning                                                                                                                           |
 | End-to-end outcome proof          | product-acceptance                                                                                                                                                 |
 | Documentation and knowledge       | documentation, learning; report and document lifecycle via `okf-authoring`                                                                                         |
+| Engineering memory (Synabun MCP)  | synabun-memory for selective recall, reusable lessons, and cleanup (Synabun required); learning for store-independent practice                                    |
 | Product lifecycle coverage        | product-lifecycle                                                                                                                                                  |
 | Implementation                    | software-engineering and task-relevant language/domain skills                                                                                                      |
 | Review                            | relevant assessment companions; design-validation for proposed designs                                                                                             |
