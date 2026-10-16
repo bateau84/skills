@@ -1,0 +1,78 @@
+{
+  "skill": "major-version-upgrade",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "MajorVersionUpgrade-01",
+      "name": "multi-major-framework-upgrade-requires-migration-map",
+      "trap": "A framework is bumped across two major versions and an automated codemod makes the build green, encouraging the implementer to skip the intervening migration guidance, changed defaults, and semantic verification.",
+      "prompt": "Upgrade our web framework from v3 to v5. The vendor has separate v3→v4 and v4→v5 migration guides. The v4 guide removes one request API and changes the default request-body limit; the v5 guide changes middleware ordering and raises the minimum runtime version. There is an official codemod. CI currently covers build and unit tests only. We want the smallest safe upgrade, not a broad refactor. Describe how you would carry out and verify the change.",
+      "expectations": [
+        "Treats the work as a migration from v3 to v5 and inspects both intervening major-version guides rather than only v5 documentation.",
+        "Establishes a pre-upgrade baseline and distinguishes build/unit proof from runtime request and middleware behavior.",
+        "Inventories request handling, middleware, effective body-limit configuration, runtime/toolchain declarations, tests, CI, deployment images, and relevant transitive/plugin changes.",
+        "Uses the codemod only as an editing aid and reviews its semantic output.",
+        "Makes the old body-limit behavior explicit if it remains an accepted requirement and verifies middleware ordering through representative integration behavior.",
+        "Treats the runtime-version floor as part of the upgrade rather than an unrelated follow-up.",
+        "Keeps unrelated framework cleanup or modernization out of the upgrade."
+      ],
+      "negative_expectations": [
+        "Must not declare success merely because the codemod runs and unit tests pass.",
+        "Must not skip the v3→v4 migration surface.",
+        "Must not weaken tests or silently accept changed defaults without checking accepted behavior."
+      ]
+    },
+    {
+      "id": "MajorVersionUpgrade-02",
+      "name": "persistent-state-and-rolling-deploy-make-rollback-load-bearing",
+      "trap": "The new component can read old data but writes a new on-disk format, while deployment is rolling. A code revert looks safe until an old replica encounters state written by the new version.",
+      "prompt": "We need to upgrade a storage library from v7 to v8. v8 reads v7 files, but once it writes a file the old v7 library cannot read that file again. Our service runs four replicas and deploys one replica at a time. The team says rollback is easy because we can just revert the dependency commit. How should the upgrade be handled?",
+      "expectations": [
+        "Rejects the source-revert-only rollback assumption because new state can cross an irreversible compatibility boundary.",
+        "Treats mixed v7/v8 replicas and shared persisted state as a primary migration risk.",
+        "Determines whether the rollout must become atomic, writes must be paused, state must be isolated, or another accepted compatibility strategy is required before implementation.",
+        "Tests old-state/new-code, new-state/old-code when rollback is claimed, mixed-version operation if allowed, interruption/restart, and the actual restore or recovery path.",
+        "Requires a tested recovery or explicitly accepted no-rollback boundary before non-disposable migration."
+      ],
+      "negative_expectations": [
+        "Must not describe git revert as sufficient rollback.",
+        "Must not test only an all-v7 state followed by an all-v8 state.",
+        "Must not execute destructive or one-way migration on non-disposable state without an accepted recovery strategy."
+      ]
+    },
+    {
+      "id": "MajorVersionUpgrade-03",
+      "name": "transitive-runtime-and-plugin-drift-are-part-of-upgrade",
+      "trap": "The direct dependency changes cleanly, but the resolver also upgrades plugins, drops a native helper, and raises the language runtime floor. The team treats lockfile churn as irrelevant noise.",
+      "prompt": "Upgrade DataSDK from v2 to v3. The manifest change is one line and the code still compiles. The lockfile shows 18 transitive changes, PluginA moved to a new major, NativeHelper disappeared, and DataSDK v3 now requires a newer language runtime than production currently uses. What should be investigated before calling this upgrade complete?",
+      "expectations": [
+        "Treats the runtime floor, plugin major change, removed native helper, and transitive graph changes as part of the migration surface.",
+        "Checks production/container/CI/toolchain declarations rather than assuming the developer runtime represents deployment.",
+        "Investigates why PluginA and NativeHelper changed and whether their behavior, packaging, platform support, or initialization was relied on.",
+        "Compares the before/after dependency graph and validates representative runtime behavior, not only compilation.",
+        "Keeps any forced runtime or plugin upgrade explicit in scope and avoids unrelated dependency modernization."
+      ],
+      "negative_expectations": [
+        "Must not dismiss the lockfile as generated noise.",
+        "Must not claim completion while production cannot run the target runtime.",
+        "Must not assume compilation proves the removed helper or plugin change is harmless."
+      ]
+    },
+    {
+      "id": "MajorVersionUpgrade-04",
+      "name": "routine-patch-bump-does-not-require-major-migration-ceremony",
+      "trap": "A migration discipline is over-applied to a routine patch release with no breaking contract, producing unnecessary process and scope.",
+      "prompt": "Bump ExampleLib from 4.2.3 to 4.2.4. The vendor marks it as a patch-only bugfix release with no configuration, API, runtime, protocol, or persistence changes. Our existing dependency update checks cover build, unit tests, and the affected integration test. How should this be handled?",
+      "expectations": [
+        "Recognizes this as routine dependency maintenance rather than a major-version migration.",
+        "Uses normal software-engineering and relevant dependency/testing practice with proportionate verification.",
+        "Still checks the resolved graph for surprising drift if the package manager changes more than expected, but does not impose major-upgrade rollout or rollback ceremony without a concrete risk."
+      ],
+      "negative_expectations": [
+        "Must not require a full multi-major migration map for a patch-only release with no breaking contract.",
+        "Must not manufacture mixed-version, data-migration, or rollback work with no plausible relevance."
+      ]
+    }
+  ]
+}
