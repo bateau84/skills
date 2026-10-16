@@ -1,6 +1,6 @@
 ---
 name: retrospective
-description: Facilitate a retrospective (retro, sprint retro, lessons learned) after a milestone, sprint, incident response, or meaningful batch of engineering or agent work. Use to examine what worked, what was difficult, what to preserve, and what to try next. Not for deliverable acceptance, incident root-cause diagnosis, or memory cleanup alone.
+description: Facilitate a retrospective (retro, coding-session retro, sprint retro, lessons learned) after a coding session, milestone, sprint, incident response, or meaningful batch of engineering or agent work. Use to examine what worked, what was difficult, what to preserve, and what to try next. Not for deliverable acceptance, incident root-cause diagnosis, or memory cleanup alone.
 ---
 
 # Retrospective
@@ -9,7 +9,7 @@ A retrospective examines **how work happened** so future work can benefit from t
 
 ## When and what to review
 
-Use after a meaningful milestone, sprint, difficult implementation, incident response, or representative batch of work; revisit at a useful cadence if work is ongoing. Do not require a retro after every task. Keep the window bounded and state whether the work actually finished; a stalled or partial effort can still be reflected on without declaring completion.
+Use after a coding session, meaningful milestone, sprint, difficult implementation, incident response, or representative batch of work; revisit at a useful cadence if work is ongoing. **A single session is a valid scope**, including the current or unfinished session when requested. If the user gives no scope, start with the current session or the most clearly relevant work in context; do not invent a larger milestone. Do not require a retro after every task. Keep the window bounded and state whether the work actually finished.
 
 Establish the intended outcome, observed result, work in scope, participants, and any earlier improvement experiments due for follow-up. If the available work is too thin to support meaningful conclusions, offer a narrower conversation or defer the full retrospective rather than inventing patterns.
 
@@ -25,6 +25,17 @@ Establish the intended outcome, observed result, work in scope, participants, an
 8. **Choose experiments only when justified.** Suggest at most one or two small, reversible, high-value changes, with a reason, an observable next-retro check (quantitative or qualitative), and a responsible owner or decision-maker if known. Zero is valid. Present proposals for an appropriate decision; the retrospective itself does not authorize editing code, agents, skills, plugins, policies, or memories beyond the permissions already granted for the task.
 
 Adapt facilitation depth to the amount of work and its significance. A short retrospective with one meaningful lesson is better than a ceremonial report with fabricated sections.
+
+## Optional engineering-environment opportunities
+
+**Only after exploring what worked and what was difficult**, use these prompts when a concrete episode suggests an opportunity. They are not a mandatory audit or a reason to manufacture improvements.
+
+- **Navigation and information access:** If locating code, understanding dependencies, or obtaining logs or documentation was difficult, examine where discovery broke down. Would a small pointer to authoritative docs, clearer ownership, or appropriately scoped read-only access have helped? Prefer discoverable references over copying large documents into always-on prompts.
+- **Automated checks before more instructions:** When a mechanical error escaped, inspect the repository's *existing* test, lint, type-check, build, hook, and CI commands first. Ask whether a useful check already exists but is skipped, unwired, misconfigured, or silently failing. Where reliable and proportionate, prefer deterministic checks for mechanically detectable mistakes; reserve reviewer guidance for judgments a check cannot make. Propose new checks only after examining existing coverage and maintenance cost. Absence of a particular check is not automatically a defect.
+- **Instruction and context overhead:** When long steering files or repeated reminders seemed ineffective, examine redundant or non-actionable instructions. Consider brief navigation pointers or on-demand skills instead of expanding global prompts. Implementation and review may need different context, but do not impose one universal division of responsibility or remove essential rules without evidence.
+- **Tool economy:** If repeated searches, tool failures, or high token/time costs materially affected the work, investigate the *reason*: poor discovery, missing information, redundant exploration, or an appropriate deep investigation. Tool-call counts and token usage alone do not establish waste; efficiency changes should not sacrifice correctness or necessary evidence.
+
+Keep any supported environmental observation within the normal **keep doing**, **difficulties**, **learning**, or **optional experiments** sections. Do not silently edit checks, instructions, tools, or permissions as part of the retrospective.
 
 ## Output and follow-through
 

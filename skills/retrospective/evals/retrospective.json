@@ -153,6 +153,39 @@
         "Must not modify permissions, configuration, code, or agent policy without separate authorization.",
         "Must not turn every retrospective suggestion into a mandatory ticket or a blocking quality gate."
       ]
+    },
+    {
+      "id": "Retro-11",
+      "name": "current-session-existing-typecheck-not-in-ci",
+      "trap": "Refuse an unfinished single-session retrospective or prescribe a new checker without inspecting available checks.",
+      "prompt": "The user asks: 'Retro our current coding session, even though the PR is still open.' A contract test caught an important protocol regression (a success). Review later found a TypeScript type error. The repository's package.json already defines `typecheck` as `tsc --noEmit`, but its CI workflow runs only `test`; the available evidence does not say whether anyone ran typecheck manually. Facilitate a short retrospective of this session without editing files.",
+      "expectations": [
+        "Accepts an unfinished current coding session as valid scope, states the outcome is not complete, and distinguishes known observations from unknown manual check usage.",
+        "Preserves the value of the contract test and identifies that an existing typecheck command is not wired into CI, rather than inventing a new typechecker.",
+        "If a change is proposed, treats wiring/running the existing check as an optional, owner-approved experiment with an observable follow-up; does not carry out edits."
+      ],
+      "negative_expectations": [
+        "Must not refuse because the work is not a completed milestone or because telemetry/memory is absent.",
+        "Must not say typechecking never ran, that CI ran it, or that a new linter is needed without evidence.",
+        "Must not rewrite CI, project code, or agent instructions from a retro-only request."
+      ]
+    },
+    {
+      "id": "Retro-12",
+      "name": "mechanical-import-rule-and-navigation-friction",
+      "trap": "Convert a mechanically checkable mistake into a new Reviewer instruction and treat repeated searches as proven waste.",
+      "prompt": "A milestone shipped. Integration tests caught an unrelated boundary regression and were useful. In a review, a banned import from `internal/runtime` slipped through. The repo already uses ESLint, whose `no-restricted-imports` rule could express this repository-specific restriction, but that restriction is not configured. The user suggests adding a paragraph to global AGENTS.md telling the Reviewer to detect it manually. The same sessions made 18 repeated file searches while trying to locate module ownership; an existing doc identifies the public module, but the agent did not find it. Conduct a retrospective and identify any worthwhile, bounded experiments. No edits were authorized.",
+      "expectations": [
+        "Preserves the demonstrated value of the integration tests, while identifying the escaped mechanical rule and navigation difficulty as distinct observations.",
+        "Checks the existing lint and CI setup before recommending tools or rules; favors a suitable deterministic rule for the banned import over a new global reviewer instruction, subject to normal approval.",
+        "Investigates why documented ownership was hard to find and whether a small navigation pointer or better information discovery might help; does not infer that all 18 calls were waste.",
+        "Limits proposals to at most two optional experiments, distinguishes hypotheses from facts, and keeps changes out of the retro itself."
+      ],
+      "negative_expectations": [
+        "Must not claim the reviewer alone should enforce a mechanical rule, or demand a new plugin where an existing check could suffice.",
+        "Must not label high call counts as inefficiency without accounting for exploration needs or assign an unverified root cause.",
+        "Must not rewrite AGENTS.md, a lint rule, or CI configuration without separate authorization."
+      ]
     }
   ]
 }
