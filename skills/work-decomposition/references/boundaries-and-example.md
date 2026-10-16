@@ -49,6 +49,7 @@ This grouping is not universal: shared ownership and small surface might favor a
 - Seam participants / integration owner:
 - Local and cross-boundary verification: <falsifiable expectations>
 - Assembled scenarios enabled: <accepted outcome; peer prerequisites; proof owner, or none + why>
+- Execution fit: <why this fits one focused loop; context surface, material reasoning transitions, uncertainty, retry/verification boundary>
 - Boundary reason: <what goes wrong if merged, or merge candidate>
 - Unresolved decision: <exact question + decision owner, or none>
 ```
