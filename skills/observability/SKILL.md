@@ -9,11 +9,11 @@ metadata:
 
 > Language-agnostic observability guidance for implementation, review, and diagnosis. Language mechanics live in `golang-observability` and `python-observability`; no agent-specific hooks are required.
 
-**Persona:** You treat an unobservable system as a liability. You instrument proactively, you reach for the _right_ signal rather than reflexively adding a log line, and you do not consider a feature done until you could diagnose it in production from its output alone.
+**Persona:** You help operators understand important behavior with the least necessary signal. Preserve accepted diagnostic and audit obligations, and don't add instrumentation solely because a failure or boundary can be imagined.
 
 ## The first principle
 
-Observability is the ability to understand a system's internal state from its external outputs. It is a **deliverable of the work, not a favor to your future self** — wired in as you build, the same way tests are. But it is _not_ free (see Economics below), so it is a deliberate design choice at every point: the goal is the **most signal for the least noise, cost, and risk.**
+Observability is the ability to understand system behavior from external outputs. Add or maintain it where accepted operational needs or a credible material diagnostic gap require it—not as an automatic deliverable of every code change. Its cost, noise, and disclosure risk are real; seek the **most relevant signal for the least overhead.**
 
 ## Three pillars — reach for the right one
 
@@ -27,7 +27,7 @@ The reflex "I want to see how the code is processing" usually wants a **trace**,
 
 The mistake to avoid: fossilizing print-debugging as **narration logs** ("entering X", "got here", "value=5"). That play-by-play is what a trace (or a diagnostic session) gives you for free, and it becomes pure noise in production. Log _decisions and outcomes_; trace _flow_; measure _aggregates_.
 
-Traces are the under-used pillar. On any multi-step or cross-service path, a span tree answers "what happened and how long did each part take" far better than a scatter of logs you have to reassemble by hand. Set up the tracer early; add spans to service methods, DB queries, external calls, and queue operations.
+On a material cross-service diagnostic path, a span tree can show causality better than scattered logs. Add tracing where that visibility is needed and supported by the deployment; do not instrument every method, query, and external call by default.
 
 ## Log categories — they are not one thing
 
@@ -41,17 +41,15 @@ Split logs by audience and purpose; they have different levels, retention, and s
 
 A single event can warrant entries in more than one stream — an auth failure is an _audit_ record _and_ an _operational_ warning — but write them deliberately to their stream; do not conflate them.
 
-### Audit log hard rules
+### Audit logging when required
 
-1. Every audit record answers the six questions: _who_ (`actor.id`, `actor.type`), _did what_ (`event.action`), _to what_ (`resource.type`, `resource.id`), _outcome_ (`success` / `failure`), _when_ (`timestamp`, UTC, immutable), _from where_ (`source.ip`, `request_id`).
-2. **Never sampled, never dropped.** Audit travels on a separate pipeline with no shared fate with operational logs — backpressure on ops must never shed audit records.
-3. **Immutable.** Append-only storage (WORM / hash-chaining / sequence-gapped alerting). No engineer, including you, may delete or alter.
-4. **GDPR erasure tension:** Pseudonymise the actor identity at write time (hash + pepper, or per-user encryption key). The audit record persists; the link to the person is severable. This is complex — flag it as a design decision early, not a surprise at launch.
-5. **Synchronous durability is mandatory.** An in-memory buffer that hasn't flushed before a crash means lost evidence. Audit writes must survive process death.
+Security and compliance audit behavior must follow the **actual accepted contract, regulations, and threat model**. Identify which actions require audit events, who must consume them, and what loss, retention, access, and integrity guarantees apply. For genuinely required durable audit records, protect against unauthorized alteration or loss with mechanisms suited to that contract.
+
+A dedicated, immutable, unsampled pipeline or synchronous write may be necessary for high-assurance auditing, but none is a universal obligation for every application log. Do not introduce WORM storage, hash chains, GDPR pseudonymization machinery, or separate log infrastructure solely because the task adds an ordinary operational event. Missing mandatory audit guarantees are material findings; optional stronger ones are advisory.
 
 ## The discipline (what turns expensive spray into cheap signal)
 
-- **Log at the boundaries, not in the hot loop** — inputs received, external/IO calls (DB, network, queue) and their outcome, state transitions, and every error path. The edge where data enters or leaves a component is the right place; the interior of a tight loop is the wrong one.
+- **Log material outcomes at useful boundaries, not in hot loops** — capture decisions and failure context that operators actually need. An external call or possible error path does not automatically deserve its own log.
 - **Log an error exactly once, at the handler.** Below the handler, wrap and propagate (`fmt.Errorf("get user %s: %w", id, err)` / raise with context). Do not log _and_ return — every layer that does creates a duplicate. The single log at the top handler carries the full chain plus the request context. This is the difference between a useful error trail and a wall of repeated noise.
 - **Structured over freeform.** Emit key/value fields rather than interpolated prose. A structured field is greppable, aggregatable, and _assertable in a test_. Use JSON in production (shipped to the aggregator) and a human-readable format (logfmt / colourised) on the developer terminal — one logger, two handlers.
 - **Canonical fields.** Every record carries at minimum: `timestamp` (UTC, ISO 8601 or ns-epoch), `level`, `message`, `service.name`. Add when in scope: `trace_id` + `span_id` (correlation), `service.version` (tie incidents to releases), `environment` (never mix prod/staging), `error.type` + `error.message` (on error paths), `caller` (file:line, on Error/Debug). Put data in named fields, never baked into the message string — `"user 12345 paid $99"` is unqueryable; `user_id=u_12345 amount=99.99` is searchable.
@@ -86,20 +84,19 @@ Logging makes a failure _detectable_; it does not make it _not happen_. Keep it 
 
 ## Observability is testable behavior
 
-A structured log line or emitted metric is observable output, so assert on it (see `test-driven-development`): that a failure path logs at Error with the offending input, that a boundary records what it decided, that the audit event fires on a privileged action. Writing the test for the signal first is the cheapest way to make "fail loudly" real instead of aspirational.
+When a diagnostic or audit signal is part of the **accepted behavior**, assert on its externally useful property (see `test-driven-development`). Don't add logging tests or instrumentation requirements for every possible failure. Never emit secrets or raw sensitive inputs merely to make a test inspectable.
 
 Observable output can support human and agent verification: running the real path and inspecting its results provides evidence that source read-back alone cannot. Swallowed errors or missing operational signals can obscure failures. Use telemetry where operators need it, alongside assertions on returned values, state, or other relevant outcomes; a feature does not need a log line merely to be testable. Missing telemetry is a gap when the required diagnostic or audit behavior depends on it, not proof that only a human can verify the feature.
 
-## A feature is not done until it is observable
+## Completion and proportionate visibility
 
-Before you call it done, check:
+Before calling an operationally significant change done, ask:
 
-1. Could an operator who has never read the code diagnose a failure from its output alone?
-2. Is every external call and error path observable (log / metric / span), carrying a correlation id?
-3. Is the right pillar used — trace for flow, metric for aggregate, log for the event?
-4. Are audit-worthy actions on their own stream?
-5. Does anything log a secret or PII? (Must be _no_.)
-6. Is diagnostic detail cheap to disable in production?
+1. Does the accepted outcome require operator-visible diagnostics or audit evidence, and is that signal available?
+2. Are newly affected **material** failures distinguishable without exposing secrets or creating excessive noise?
+3. Does the signal match the repository's existing observability practice rather than add a second logging or tracing system?
+
+A change with no new operational diagnostic obligation can finish with its existing logs and behavior-level tests. Missing evidence of a **required** audit or diagnostic promise is a gap; a hypothetical stronger observability guarantee is not an automatic blocker.
 
 ## Cross-references
 
@@ -110,4 +107,4 @@ Before you call it done, check:
 
 ---
 
-This skill is the standard; the language `*-observability` skills are the mechanics. Load both for an instrumentation task.
+This skill covers signal design. Load the language-specific skill when the task actually needs those implementation mechanics.
