@@ -10,34 +10,34 @@ metadata:
 
 > Adapted from `samber/cc-skills-golang@golang-how-to`. Selects relevant sibling `golang-*` skills in this library, regardless of installation location.
 
-**Persona:** You are a Go skills orchestrator. For every Go task, identify all relevant skills and load them together — a task rarely belongs to a single skill.
+**Persona:** You are a Go skills selector. Find the smallest useful set of guidance for the actual change. Loading more skills does not increase the task's scope or make every checklist item mandatory.
 
 **Not for:** replacing specialist `golang-*` guidance; this skill routes to it.
 
 **Start with `golang-common-practice`.** It is the Go-specific base layer for this family: the inner compile loop, diagnose-before-fixing, and cross-reference style. Skill selection does not require delegation or a particular agent runtime.
 
-**Go code navigation:** prefer `gopls` for semantic lookup: definitions, references, implementations, symbols, and type information. Use `rg`/`grep` for literal text or when `gopls` cannot answer.
+**Go code navigation:** use `gopls` for semantic queries when available and appropriately bounded; use `rg`/`grep` for literal and targeted lookup, especially if full-workspace tooling is expensive or unavailable.
 
 **Modes:**
 
-- **Orchestrate** — for any Go coding, review, debug, or setup task, load the primary skill plus all applicable secondary skills simultaneously.
+- **Orchestrate** — select the primary skill and load only secondary skills whose techniques materially apply to the current work. Do not load a whole cluster by default.
 - **Disambiguate** — when two skills seem to overlap, use the boundary lines below to pick the owner.
 - **Configure** — add a `## Required Go skills` block to the project's `AGENTS.md`. See [Configure mode](#configure-mode).
 
 ## Skill loading
 
-For each task, read or load the primary skill and applicable secondary skills. Bare names refer to sibling directories in this library; use a native loader if available, otherwise read their `SKILL.md` files directly. No fixed installation path is assumed.
+For each task, start with the relevant primary skill; load secondary skills only for affected behavior or credible in-scope risks. The table is a discovery aid, **not an unconditional checklist or instruction to add functionality**. Bare names refer to sibling directories; use a native loader if available, otherwise read their `SKILL.md` files directly.
 
-| Intent | Primary | Also load |
+| Intent | Primary | Consider when relevant |
 | --- | --- | --- |
 | Design an API, choose a pattern | `golang-design-patterns` | `golang-structs-interfaces`, `golang-naming` |
-| Implement a feature, service, or I/O boundary | `golang-design-patterns` | `golang-observability` (instrument as you build), `golang-error-handling` |
+| Implement a feature, service, or I/O boundary | `golang-design-patterns` | `golang-error-handling`; `golang-observability` when operational signals materially change |
 | Name a type, function, or package | `golang-naming` | `golang-code-style` |
 | Handle errors idiomatically | `golang-error-handling` | `golang-safety` (nil-heavy code) |
 | Write goroutines, channels, sync | `golang-concurrency` | `golang-context` (if cancellation) |
 | Pass deadlines / cancel operations | `golang-context` | `golang-concurrency` (if goroutines) |
 | Design structs, embed, use interfaces | `golang-structs-interfaces` | `golang-design-patterns` |
-| Database queries and transactions | `golang-database` | `golang-error-handling`, `golang-security` |
+| Database queries and transactions | `golang-database` | `golang-error-handling`; `golang-security` for untrusted input or changed security boundaries |
 | Build a CLI command tree | `golang-spf13-cobra` | `golang-cli`, `golang-spf13-viper` (if config) |
 | Layer config from flags/env/file | `golang-spf13-viper` | `golang-spf13-cobra` |
 | Write tests | `golang-testing` | `golang-safety` (if edge-case heavy) |

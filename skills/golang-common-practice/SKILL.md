@@ -20,18 +20,9 @@ Use this skill only to improve the quality and verification of already-authorize
 
 ## Inner verification loop
 
-After each meaningful implementation change, run the checks applicable to the repository:
+After each coherent implementation change, run the **smallest relevant check** for changed packages or affected behavior. For example, adapt `go test ./path/to/package`, `go build ./path/to/package`, or a configured linter to the actual repository. Broaden to `./...`, `go vet`, race detection, vulnerability scans, fuzzing, or benchmarks when changed behavior, repository policy, or credible material risk makes that coverage necessary.
 
-```bash
-go build ./...
-go vet ./...
-go test ./...
-golangci-lint run   # when configured
-```
-
-Add `go test -race ./...` when concurrency is load-bearing.
-
-A domain skill may require stronger checks such as `govulncheck`, fuzzing, benchmarks, or profiling. Treat those as verification expectations when relevant.
+An unrelated existing warning or optional hardening idea is not a mandate to expand the change. Record what was checked and the limits of those results; do not claim full-suite validation from a focused check.
 
 Do not use automatic fix flags as a substitute for understanding changes.
 

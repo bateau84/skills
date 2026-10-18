@@ -1,6 +1,6 @@
 ---
 name: golang-security
-description: "Security best practices and vulnerability prevention for Golang. Covers injection (SQL, command, XSS), cryptography, filesystem safety, network security, cookies, secrets management, memory safety, and logging. Apply when writing, reviewing, or auditing Go code for security, or when working on any risky code involving crypto, I/O, secrets management, user input handling, or authentication. Includes configuration of security tools."
+description: "Security best practices and vulnerability prevention for Go. Use for security reviews and changes affecting trust boundaries, untrusted input, credentials, authorization, crypto, or other material security risks. Ordinary internal I/O alone does not require a security audit. Includes targeted security tooling and threat modeling."
 license: MIT
 metadata:
   author: Bateau
@@ -10,13 +10,13 @@ metadata:
 
 > Adapted from `samber/cc-skills-golang@golang-security`. Pair with `golang-common-practice` for shared verification guidance; follow the project's severity convention when reporting findings.
 
-**Persona:** You are a senior Go security engineer. You apply security thinking both when auditing existing code and when writing new code — threats are easier to prevent than to fix.
+**Persona:** You are a senior Go security engineer. Find credible, reachable risks under the actual deployment and trust model, distinguish required fixes from optional defense in depth, and preserve safe defaults on affected paths.
 
 **Modes:**
 
 - **Review mode** — reviewing a PR for security issues. Start from the changed files, then trace call sites and data flows into adjacent code — a vulnerability may live outside the diff but be triggered by it. Sequential.
 - **Audit mode** — full codebase security scan across five independent vulnerability domains: (1) injection patterns, (2) cryptography and secrets, (3) web security and headers, (4) authentication and authorization, (5) concurrency safety and dependency vulnerabilities. Cover the applicable domains, aggregate findings, and report evidence and severity using the project's convention; DREAD can help structure risk analysis when useful.
-- **Coding mode** — use when writing new code or fixing a reported vulnerability. Follow the skill's sequential guidance, then run a vulnerability-pattern grep pass over the newly written code before finishing.
+- **Coding mode** — use when writing code at a security-relevant boundary or fixing a reported vulnerability. Apply targeted checks to affected paths rather than initiating a repository-wide audit.
 
 **Dependencies:**
 
@@ -36,7 +36,7 @@ Before writing or reviewing code, ask three questions:
 2. **What can an attacker control?** — Which inputs flow into sensitive operations? (SQL queries, shell commands, HTML output, file paths, cryptographic operations)
 3. **What is the blast radius?** — If this defense fails, what's the worst outcome? (Data leak, RCE, privilege escalation, denial of service)
 
-**Co-locate security and permission checks with the code they protect.** Agents navigate by lexical search — they find a new route file, write the handler, and stop. A permission check living only in a distant middleware file or config will not be discovered when the route is added (Anthropic/Ronacher, Jun 2025). If centralisation is required for DRY, add a clearly-named assertion at every guarded call site — something an agent can find by keyword search, e.g. `authz.RequireRole(...)` or `mustCheckPermission()` — so the check is never silently omitted.
+**Make authorization coverage visible and enforceable.** Check the repository's actual enforcement path, including middleware or shared guards, before adding endpoint checks. Use local assertions where a new privileged action would otherwise bypass or obscure enforcement; do not duplicate complete authorization mechanisms at every call site without a credible bypass path.
 
 ## Severity Levels
 
@@ -58,13 +58,11 @@ Before flagging a security issue, trace the full data flow through the codebase 
 3. **Examine the trust boundary** — if the data never crosses a trust boundary (e.g., internal service-to-service with mTLS), the risk profile is different.
 4. **Read the surrounding code, not just the diff** — middleware, interceptors, or wrapper functions may already provide a layer of defense.
 
-**Severity adjustment, not dismissal:** upstream protection does not eliminate a finding — defense in depth means every layer should protect itself. But it changes severity: a SQL concatenation reachable only through a strict input parser is medium, not critical. Always report the finding with adjusted severity and note which upstream defenses exist and what would happen if they were removed or bypassed.
-
-**When downgrading or skipping a finding:** add a brief inline comment (e.g., `// security: SQL concat safe here — input is validated by parseUserID() which returns int`) so the decision is documented, reviewable, and won't be re-flagged by future audits.
+**Relevance before severity:** upstream validation, isolation, and actual reachability may eliminate an alleged vulnerability in the accepted deployment. Confirm the data path and plausible bypass before reporting a defect. A genuinely reachable flaw may still merit blocking remediation even if the user did not name it. A redundant defense for a hypothetical stronger threat model is optional hardening, not a required finding. Do not add code comments or extra controls solely to justify dismissing non-issues.
 
 ## Threat Modeling (STRIDE)
 
-Apply STRIDE to every trust boundary crossing and data flow in your system: **S**poofing (authentication), **T**ampering (integrity), **R**epudiation (audit logging), **I**nformation Disclosure (encryption), **D**enial of Service (rate limiting), **E**levation of Privilege (authorization). Score each threat using DREAD (Damage, Reproducibility, Exploitability, Affected users, Discoverability) to prioritize remediation — Critical (8-10) demands immediate action.
+Use STRIDE for **material, changed trust boundaries** or an explicit system security assessment: **S**poofing, **T**ampering, **R**epudiation, **I**nformation Disclosure, **D**enial of Service, **E**levation of Privilege. Prioritize by reachable attack path, actual exposure, and consequence; DREAD may help, but a score alone neither creates a product requirement nor authorizes out-of-scope work. Do not expand an ordinary code change into full-system threat modeling.
 
 For the full methodology with Go examples, DFD trust boundaries, DREAD scoring, and OWASP Top 10 mapping, see **[Threat Modeling Guide](./references/threat-modeling.md)**.
 
@@ -138,8 +136,8 @@ go test -fuzz=Fuzz
 | Severity | Mistake | Fix |
 | --- | --- | --- |
 | High | `math/rand` for tokens | Output is predictable — attacker can reproduce the sequence. Use `crypto/rand` |
-| Critical | SQL string concatenation | Attacker can modify query logic. Parameterized queries keep data and code separate |
-| Critical | `exec.Command("bash -c")` | Shell interprets metacharacters (`;`, `\|`, `` ` ``). Pass args separately to avoid shell parsing |
+| Critical when exploitable | SQL concatenation with untrusted input | Attacker-controlled input can alter query logic; use parameterized queries |
+| Critical when exploitable | Attacker-controlled shell commands | A shell can interpret untrusted metacharacters; use explicit arguments or demonstrate the relevant input boundary |
 | High | Trusting unsanitized input | Validate at trust boundaries — internal code trusts the boundary, so catching bad input there protects everything |
 | Critical | Hardcoded secrets | Secrets in source code end up in version history, CI logs, and backups. Use env vars or secret managers |
 | Medium | Comparing secrets with `==` | `==` short-circuits on first differing byte, leaking timing info. Use `crypto/subtle.ConstantTimeCompare` |
@@ -156,7 +154,7 @@ go test -fuzz=Fuzz
 | High | Security through obscurity | Hidden URLs are discoverable via fuzzing, logs, or source | Authentication + authorization on all endpoints |
 | High | Trusting client headers | `X-Forwarded-For`, `X-Is-Admin` are trivially forged | Server-side identity verification |
 | High | Client-side authorization | JavaScript checks are bypassed by any HTTP client | Server-side permission checks on every handler |
-| High | Middleware-only permission checks | Agents adding new routes navigate by search and won't find a check in a distant middleware file — new routes ship unprotected | Co-locate an explicit call (`authz.RequireRole(...)`) at every guarded handler; middleware remains as a second layer, not the only one |
+| High when reachable | Privileged route bypasses authorization | A new route may not be covered by existing middleware or guards | Verify central enforcement for the route, or add an explicit guard where coverage is missing |
 | High | Shared secrets across envs | Staging breach compromises production | Per-environment secrets via secret manager |
 | Critical | Ignoring crypto errors | `_, _ = encrypt(data)` silently proceeds unencrypted | Always check errors — fail closed, never open |
 | Critical | Rolling your own crypto | Custom encryption hasn't been analyzed by cryptographers | Use `crypto/aes` GCM, `golang.org/x/crypto/argon2` |
