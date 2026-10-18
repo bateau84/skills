@@ -36,7 +36,7 @@ Split logs by audience and purpose; they have different levels, retention, and s
 | Category | Purpose / audience | Typical level | Retention & handling |
 | --- | --- | --- | --- |
 | **Operational** | What the system did, for the operators running it (request handled, job ran, dependency degraded). | Info / Warn | Short-to-medium; the bulk of your volume — keep it lean. |
-| **Audit** | Who did what, for compliance and security (authn, authz decisions, data access, config change). | Info (dedicated stream) | Long, often regulated; **immutable, access-controlled, never mixed into ops logs**. |
+| **Audit** | Required accountability for selected security, compliance, or privileged actions. | Info (dedicated when needed) | Retention, integrity, and access control follow the accepted contract and applicable rules. |
 | **Diagnostic** | Why something happened, for the developer debugging it (branch taken, computed value, intermediate state). | Debug | Off or sampled in prod; on-demand. Must be cheap to disable. |
 
 A single event can warrant entries in more than one stream — an auth failure is an _audit_ record _and_ an _operational_ warning — but write them deliberately to their stream; do not conflate them.
