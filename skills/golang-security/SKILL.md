@@ -136,8 +136,8 @@ go test -fuzz=Fuzz
 | Severity | Mistake | Fix |
 | --- | --- | --- |
 | High | `math/rand` for tokens | Output is predictable — attacker can reproduce the sequence. Use `crypto/rand` |
-| Critical | SQL string concatenation | Attacker can modify query logic. Parameterized queries keep data and code separate |
-| Critical | `exec.Command("bash -c")` | Shell interprets metacharacters (`;`, `\|`, `` ` ``). Pass args separately to avoid shell parsing |
+| Critical when exploitable | SQL concatenation with untrusted input | Attacker-controlled input can alter query logic; use parameterized queries |
+| Critical when exploitable | Attacker-controlled shell commands | A shell can interpret untrusted metacharacters; use explicit arguments or demonstrate the relevant input boundary |
 | High | Trusting unsanitized input | Validate at trust boundaries — internal code trusts the boundary, so catching bad input there protects everything |
 | Critical | Hardcoded secrets | Secrets in source code end up in version history, CI logs, and backups. Use env vars or secret managers |
 | Medium | Comparing secrets with `==` | `==` short-circuits on first differing byte, leaking timing info. Use `crypto/subtle.ConstantTimeCompare` |
@@ -154,7 +154,7 @@ go test -fuzz=Fuzz
 | High | Security through obscurity | Hidden URLs are discoverable via fuzzing, logs, or source | Authentication + authorization on all endpoints |
 | High | Trusting client headers | `X-Forwarded-For`, `X-Is-Admin` are trivially forged | Server-side identity verification |
 | High | Client-side authorization | JavaScript checks are bypassed by any HTTP client | Server-side permission checks on every handler |
-| High | Middleware-only permission checks | Agents adding new routes navigate by search and won't find a check in a distant middleware file — new routes ship unprotected | Co-locate an explicit call (`authz.RequireRole(...)`) at every guarded handler; middleware remains as a second layer, not the only one |
+| High when reachable | Privileged route bypasses authorization | A new route may not be covered by existing middleware or guards | Verify central enforcement for the route, or add an explicit guard where coverage is missing |
 | High | Shared secrets across envs | Staging breach compromises production | Per-environment secrets via secret manager |
 | Critical | Ignoring crypto errors | `_, _ = encrypt(data)` silently proceeds unencrypted | Always check errors — fail closed, never open |
 | Critical | Rolling your own crypto | Custom encryption hasn't been analyzed by cryptographers | Use `crypto/aes` GCM, `golang.org/x/crypto/argon2` |
