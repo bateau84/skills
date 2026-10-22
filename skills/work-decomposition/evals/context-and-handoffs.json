@@ -1,0 +1,66 @@
+{
+  "skill": "work-decomposition",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "Context-01",
+      "name": "split decision from dependent implementation",
+      "prompt": "Plan agreed work to add restart recovery to a local job service. The existing storage helper is understood, but the accepted recovery policy still needs its owner to decide whether interrupted external effects can be retried. The remaining work includes the storage change, worker integration, a status UI and proof of the actual restart path. Identify small coherent work groups and the useful result each should hand to the next. Do not invent retry policy.",
+      "trap": "One oversized task mixes unresolved meaning, design, implementation and proof, or each file becomes a separate task.",
+      "expectations": [
+        "Separates the unresolved policy decision from dependent implementation and identifies its owner.",
+        "Groups tightly related implementation and regression tests while keeping independently useful work bounded.",
+        "Preserves ownership of final real restart-path proof and useful references between tasks."
+      ],
+      "negative_expectations": [
+        "Does not silently choose a retry promise or declare the unresolved policy satisfied.",
+        "Does not impose a fixed file, token or task count."
+      ]
+    },
+    {
+      "id": "Context-02",
+      "name": "keep a small change coherent",
+      "prompt": "A confirmed bug in one CLI command returns exit code zero after failure. The accepted change is the corrected return value, two focused regression tests and one affected help example. The behavior is already agreed and no shared-resource conflict exists. Propose work groups and a proportionate handoff.",
+      "trap": "The method fragments a small coherent fix into planning, implementation, test, documentation and handoff-report tasks.",
+      "expectations": [
+        "Keeps the closely related fix, tests and help update in one coherent group.",
+        "Describes a useful result with the actual revision, check results and any limits, not a compulsory separate report."
+      ],
+      "negative_expectations": [
+        "No extra requirements, architecture or mandatory multi-agent stages.",
+        "No invented need for a plugin or result service."
+      ]
+    },
+    {
+      "id": "Context-03",
+      "name": "split unfinished work without losing evidence",
+      "prompt": "A task to implement a local cache has produced the parser and its tests at revision abc123. It then reveals a separate compatibility choice and a large invalidation subsystem that were not understood during planning. Repeated resumed runs now reread unrelated modules without progress. The original task is not complete. Revise the remaining groups and handoff plan.",
+      "trap": "Starting a fresh session with the same broad task or claiming completion merely because the remaining work was reassigned.",
+      "expectations": [
+        "Preserves completed parser evidence and checks its applicability to the current revision.",
+        "Splits the compatibility decision and dependent invalidation work into useful bounded groups.",
+        "Carries remaining acceptance and integration checks explicitly and marks the original outcome incomplete."
+      ],
+      "negative_expectations": [
+        "No erasure of earlier valid work and no false completion.",
+        "No arbitrary resume-count threshold offered as proof that all further work should stop."
+      ]
+    },
+    {
+      "id": "Context-04",
+      "name": "handoff references retain important limits",
+      "prompt": "Prepare context for the next task from an existing result: an adapter was tested at revision abc123 with a simulated external service; real provider compatibility remains unverified. A source design document defines the accepted guarantee. A newer code revision def456 exists. The automatic result excerpt omits the provider limitation. Explain what should cross the task boundary and what the next owner should check.",
+      "trap": "The next task receives a transcript dump or treats a sampled result and unchanged task label as fresh proof.",
+      "expectations": [
+        "Uses exact full result and source references, revision identity, the evidence limit and remaining check.",
+        "Distinguishes a useful historical result from proof that def456 satisfies the accepted provider guarantee.",
+        "Uses an existing result or note rather than requiring a new report format."
+      ],
+      "negative_expectations": [
+        "Does not turn a mock-based pass into live-provider compatibility.",
+        "Does not drop the remaining guarantee to simplify the handoff."
+      ]
+    }
+  ]
+}

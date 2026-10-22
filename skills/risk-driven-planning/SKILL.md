@@ -5,21 +5,22 @@ description: Front-load decisive uncertainty during product discovery, solution 
 
 # Risk-Driven Planning
 
-Do not elaborate a product direction, design, architecture, or task graph on an unverified fact that could materially invalidate that commitment. Apply this during discovery, solution development, or planning whenever that risk exists.
+Before detailing a product direction, design, architecture or plan, resolve unknowns whose answers could invalidate the next commitment. Do not try to eliminate every possible uncertainty before useful work can begin.
 
 ## Classify uncertainty
 
-- **Verified/local:** evidence is current enough for the decision being made.
-- **Carryable:** uncertain, but either answer leaves the current bounded commitment viable; retain the assumption and its limits.
-- **Blocking for this commitment:** a different answer could invalidate feasibility, architecture, decomposition, dependency order, scope, or required acceptance evidence. Resolve it before making the dependent commitment, not before all independent work.
+- **Verified/local:** evidence is current enough for this decision.
+- **Carryable:** uncertain, but either answer leaves the current bounded work viable; retain the assumption and its limits.
+- **Blocking for this commitment:** a different answer could invalidate feasibility, architecture, task boundaries, dependency order, scope, or required acceptance evidence. Resolve it before the dependent commitment, not before all independent work.
 
 ## Method
 
-1. Enumerate the few assumptions the current decision or candidate plan relies on.
-2. Classify each assumption by what a different answer would change.
-3. For blocking uncertainty, identify the cheapest discriminating observation, research, prototype, or technical probe and its expected evidence. Route that work to the authorized owner before dependent detail proceeds.
-4. Treat a bounded authorized experiment as legitimate work to reduce uncertainty, not as proof of its own hypothesis. In particular, consciously accepted uncertainty about product value is not automatically a blocker to that experiment.
-5. Place risky but executable work early when its result can invalidate substantial downstream effort. Preserve valid independent work rather than restarting everything.
-6. Add focused verification where the risk becomes observable; record actual evidence and update affected decisions through their existing owners. A proposed probe is not an executed result.
+1. Identify the few assumptions this decision or proposed task relies on.
+2. For each, explain what a different answer would actually change. A possible concern is not automatically a new requirement.
+3. For blocking uncertainty, choose the smallest observation, research question, prototype or technical check that can distinguish the relevant answers. Give it a bounded outcome and an authorized owner before detailing dependent implementation.
+4. Treat an authorized experiment as work that reduces uncertainty, not proof of its own hypothesis. Consciously accepted uncertainty about product value does not automatically block that experiment.
+5. Place risky but executable work early when its result could invalidate substantial later effort. Preserve valid independent work rather than restarting everything.
+6. Verify the risk where it becomes observable. Record actual evidence and update affected decisions through their existing owners. A proposed check is not an executed result.
+7. If the same question returns without new evidence or a decision, do not repeat the same broad investigation. Save what is known and the remaining question, then narrow the check or identify the actual decision owner. A fresh conversation does not resolve the uncertainty, and a loop limit never waives a required guarantee.
 
-This skill does not perform research, authorize writes, create product or architecture decisions, or add workflow stages. A write-capable probe needs normal execution authority. Skills and advisory investigations cannot waive established verification requirements or turn an unresolved product guarantee into an accepted trade-off.
+This skill does not perform research, authorize writes, create product or architecture decisions, or add workflow stages. A write-capable check needs normal execution authority. Skills and advisory investigations cannot waive required verification or turn an unresolved product guarantee into an accepted trade-off.

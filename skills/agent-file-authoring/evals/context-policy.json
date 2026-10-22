@@ -1,0 +1,38 @@
+{
+  "skill": "agent-file-authoring",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "ContextPolicy-01",
+      "name": "repair conflicting independent-review instructions",
+      "prompt": "Revise a coordinator charter whose dispatch template says Always include all previous findings, while its review rule says Ask for an independent first opinion. The host can automatically inject prior result and review text. Preserve discovery of real defects and useful follow-up review. Explain the small production change and the behavior cases it needs.",
+      "trap": "Adding another be independent sentence without removing the unconditional history rule.",
+      "expectations": [
+        "Replaces conflicting wording with different context for independent first assessment and follow-up.",
+        "Checks automatic history as well as the dispatch prompt, with a capability-aware fallback.",
+        "Requires own observations first and later reconciliation of unresolved findings before the final verdict.",
+        "Preserves permissions and keeps one existing result usable for handoff."
+      ],
+      "negative_expectations": [
+        "Does not claim that merely starting a new session guarantees independence.",
+        "Does not hide earlier defects permanently or add a mandatory new review stage."
+      ]
+    },
+    {
+      "id": "ContextPolicy-02",
+      "name": "avoid universal freshness or resumption rules",
+      "prompt": "A proposed charter says Always resume an agent after it has been dispatched, and a proposed patch adds Always start fresh after two resumes. The intended policy is fresh context for new bounded tasks, while a useful same-task review, research question or design refinement can continue. Rewrite the conflicting policy without losing work or weakening completion checks.",
+      "trap": "Replacing one rigid rule with another while the same oversized task and lost evidence remain.",
+      "expectations": [
+        "Replaces both universal rules with a task- and progress-based choice.",
+        "Preserves exact useful handoff references and evidence limits when switching sessions.",
+        "Treats lack of progress as a reason to narrow or change the approach, not automatic approval."
+      ],
+      "negative_expectations": [
+        "No fixed numeric cap presented as proof of context quality.",
+        "No new agent hierarchy or parallel reporting system."
+      ]
+    }
+  ]
+}
