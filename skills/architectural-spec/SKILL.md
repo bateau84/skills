@@ -11,6 +11,10 @@ Use this skill when behavior and structural choices are accepted and implementat
 
 A specification realizes architecture; it does not create new architecture or product semantics. If exact specification reveals the need for a new store, protocol family, compatibility layer, lifecycle state, trust boundary, synchronization mechanism, or other material structural choice, return to design/decision work. Route missing observable semantics to the owning authority.
 
+## Reader orientation
+
+Before detailed fields, interfaces or state tables, briefly explain in ordinary language what the two sides must agree on, why, and one representative example of a successful or failed exchange. Keep exact technical names and unambiguous rules in the specification itself. The example must agree with those rules and does not create an additional guarantee. If you cannot explain the contract without assuming new product meaning, return that choice to its owner instead of adding speculative cases.
+
 ## Method
 
 1. **Trace authority.** Identify the accepted behavior and parent architecture this contract realizes, plus any authoritative external protocol or current compatibility surface.

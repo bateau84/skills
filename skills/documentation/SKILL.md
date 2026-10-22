@@ -7,6 +7,10 @@ description: Maintain truthful documentation of current implemented behavior and
 
 This skill governs **truthful content** about the implemented application and published use. It does not grant authority to redefine intended product behavior.
 
+## Explain before detailing
+
+Lead with what the reader needs to know or do, one concrete example when useful, and the important limits. Use everyday words and short sentences where they preserve meaning. Explain necessary technical terms when they first appear; keep exact commands, identifiers, and guarantees in the detailed sections. A friendly summary must not overstate what works or hide an important failure. Don't add a separate glossary or document just to satisfy this guidance.
+
 Use the repository's `AGENTS.md` for document locations and update obligations. Use `okf-authoring`, maintained in `nrkno/okf-mcp`, when document metadata, index/log, or relationship maintenance is required; do not duplicate those formatting rules here.
 
 ## Current implementation and operation

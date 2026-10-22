@@ -15,6 +15,10 @@ Own **what must be observably or semantically true**, not structural realization
 
 An agent writing specifications may resolve ordinary semantic detail within the agreed task. It may not silently create a new capability, scope, material guarantee, risk acceptance, or user-reserved preference. This method adds no roles, approval stages, or mandatory modeling notation. An "anchor" here means the project's agreed product intent or brief, not a required artifact system.
 
+## Make the intended behavior easy to check
+
+For substantial requirements, start the bundle index or existing overview with a brief explanation in everyday language: what the user wants to accomplish, what success looks like, one useful example (including an important failure when relevant), and what is deliberately outside scope. This lets the user check the interpretation before technical wording spreads into design and architecture. It is an explanation of the accepted requirements, **not a second source of requirements**. If the explanation and precise clauses disagree, resolve the mismatch; don't bury it in jargon or silently invent a stronger promise. Ordinary specification choices remain with the author, not a new user sign-off.
+
 ## Common method
 
 ### 1. Establish the accepted meaning

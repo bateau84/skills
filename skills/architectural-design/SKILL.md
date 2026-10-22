@@ -11,6 +11,12 @@ Use this skill when several components or boundaries must fit together coherentl
 
 Architecture owns technical realization, not product semantics. Accepted behavioral guarantees are constraints. Do not add retry/recovery policy, user-visible failure meaning, guarantees, or lifecycle semantics that accepted authority has not defined.
 
+## Start with the reason and the result
+
+For substantial designs, explain the proposed system in plain language before diagrams and internal mechanisms. State the problem, the selected approach, why it is sufficient, one real example of how it will behave, and important limitations. Keep exact invariants and integration details in the technical sections. If the explanation depends on a new product promise, send that meaning to its owner rather than quietly designing around it.
+
+An additional review concern earns redesign only when it threatens an accepted guarantee or exposes a credible material failure under the actual operating conditions. Record unsupported stronger guarantees as advisory rather than reopening settled choices; do not ignore actual safety, data-loss, or incorrect-outcome risks.
+
 ## Method
 
 1. **Ground the design.** Load accepted behavioral/design authority, relevant existing architecture, and current-system facts the design depends on. Separate verified facts from assumptions.

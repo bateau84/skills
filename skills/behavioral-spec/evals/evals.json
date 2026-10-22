@@ -220,6 +220,23 @@
         "Must not treat transport delivery as equivalent to semantic consumption.",
         "Must not omit duplicate behavior or provenance continuity."
       ]
+    },
+    {
+      "id": "BehavioralSpec-07",
+      "name": "plain-language-save-meaning-without-inventing-sync",
+      "trap": "Requirements are precise but opaque to their owner, or an imagined multi-device conflict creates obligations the user did not request.",
+      "prompt": "A user says: 'I want to save a draft on this laptop and reopen it after restarting the app. Keep this first version local; I don't need sync or sharing.' Existing code briefly displays 'Saved' before its disk write finishes, and a previous review suggested multi-device conflict reconciliation. Draft the minimal behavior requirements for the accepted local version. Make the intended interpretation understandable to the user before detailed clauses; use one concrete example of success and one failed-save case.",
+      "expectations": [
+        "Opens with an ordinary-language interpretation and examples that let the user check what saving promises, including not reporting success before the accepted durable result.",
+        "States observable local save-and-reopen behavior and a falsifiable outcome, keeping technical storage mechanism and UI design choices outside the requirements.",
+        "Separates a credible failed-write concern from speculative multi-device conflict handling under excluded sync and sharing.",
+        "Keeps the plain-language explanation consistent with the exact requirements; it does not form a competing normative contract."
+      ],
+      "negative_expectations": [
+        "Must not invent sync, multi-device leases, distributed conflict resolution, or cloud backup as mandatory requirements.",
+        "Must not treat a transient 'Saved' label as proof that the stored data is already durable.",
+        "Must not make ordinary storage choices into a mandatory user approval gate."
+      ]
     }
   ]
 }

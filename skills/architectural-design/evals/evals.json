@@ -40,6 +40,23 @@
         "Must not invent timeout, retry, or indeterminate-authorization product semantics.",
         "Must not add a separate credential microservice solely because it sounds more secure if the same obligations can be enforced with a smaller local boundary."
       ]
+    },
+    {
+      "id": "Design-03",
+      "name": "local-job-status-converges-after-speculative-review",
+      "trap": "A hypothetical multi-region failure keeps architecture review open, while a real restart-status risk remains insufficiently designed and the explanation is unreadable.",
+      "prompt": "Design a job-status capability for an existing single-host service using SQLite. A user can start a job and later see running, succeeded, or failed. After service restart, previously unfinished work must not be shown as successful without evidence; automatic retry is not promised. A reviewer twice demanded distributed leader election for cross-region split-brain, but the product has no cross-region deployment and there is no new evidence. Explain the selected design in language the user can validate, preserve precise state and proof details, and decide what actually needs work.",
+      "expectations": [
+        "Starts with a clear description of what the user will observe and one example involving restart, then provides adequate structural detail.",
+        "Preserves the accepted honest-status requirement and defines where its state and recovery evidence will come from.",
+        "Chooses the least complex complete local design and treats unrelated repeated cross-region review as advisory rather than a blocker.",
+        "Names any actually unresolved product meaning without inventing an automatic retry promise."
+      ],
+      "negative_expectations": [
+        "No mandatory distributed consensus, external broker, or cross-region redesign based on the same unsupported hypothetical.",
+        "No false declaration of success when restart leaves work state unknown.",
+        "No replacement of exact state rules with only a friendly summary."
+      ]
     }
   ]
 }

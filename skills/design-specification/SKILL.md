@@ -9,6 +9,10 @@ Use when agreed human-facing design must be explicit enough for architecture, pl
 
 The specification is a **human-experience contract**, not backend architecture and not a pixel blueprint.
 
+## Make the intended experience visible
+
+Lead a substantial handoff with a short, plain-language walkthrough of one representative user task: what the person tries to do, what they see, what happens if it succeeds, and what an important failure or interruption looks like. Explain the key design choice and any scope limit without making the reader decode UX terms. The detailed flows, states and accessibility rules below remain authoritative; the walkthrough must agree with them and with the accepted product goal. It is not a new approval step.
+
 ## Method
 
 1. **Ground the handoff.** Start from accepted product intent, relevant User Stories/Scenarios, existing experience language, and the specialist design work actually needed. State required capability/information dependencies explicitly. A dependency is not evidence of a gap: flag a missing capability only when current evidence establishes that it does not exist, rather than designing around mocks or inventing absence.

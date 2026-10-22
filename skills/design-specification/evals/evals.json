@@ -41,6 +41,23 @@
         "Must not make hover-only or mouse-only controls the sole mobile/touch path.",
         "Must not claim the backend lacks per-record outcome capability when the supplied context does not establish that absence."
       ]
+    },
+    {
+      "id": "DesignSpec-03",
+      "name": "plain-language-import-journey-with-technical-detail",
+      "trap": "A human-readable design summary is missing or contradicts the precise states, or the effort to simplify deletes important error and accessibility behavior.",
+      "prompt": "Write an implementation-ready experience handoff for a web form that imports a local contacts file. The user chooses a file and submits it. A successful import shows how many contacts were added. A malformed file produces an understandable error and can be corrected and tried again. A temporary connection failure may occur; the product does not promise offline queueing or automatic retry. Explain the experience first so a non-designer can check it, then provide enough flow/state/accessibility detail for implementation.",
+      "expectations": [
+        "Begins with a short everyday walkthrough of choosing a file, completing an import, and handling an important failure.",
+        "Defines concrete controls, progress/error/success states and meaningful keyboard/focus/error feedback needed by an implementer.",
+        "Keeps the walkthrough and detailed interaction contract consistent, with no new offline or automatic-retry guarantee.",
+        "Leaves backend protocol and storage decisions to architecture."
+      ],
+      "negative_expectations": [
+        "No dense UX jargon replacing the explanation of what the person sees and does.",
+        "No simplification that drops the necessary failure, retry, or accessible feedback behavior.",
+        "No new offline queue, auto-retry, or backend mechanism invented as a design requirement."
+      ]
     }
   ]
 }
