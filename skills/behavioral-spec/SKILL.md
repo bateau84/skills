@@ -19,6 +19,12 @@ An agent writing specifications may resolve ordinary semantic detail within the 
 
 For substantial requirements, start the bundle index or existing overview with a brief explanation in everyday language: what the user wants to accomplish, what success looks like, one useful example (including an important failure when relevant), and what is deliberately outside scope. This lets the user check the interpretation before technical wording spreads into design and architecture. It is an explanation of the accepted requirements, **not a second source of requirements**. If the explanation and precise clauses disagree, resolve the mismatch; don't bury it in jargon or silently invent a stronger promise. Ordinary specification choices remain with the author, not a new user sign-off.
 
+## Improve existing requirement documents
+
+When an existing requirement bundle relevant to the task is too opaque for a reader to verify the intended behavior, revise the unclear explanation **and the affected requirement wording** where needed, rather than adding a second summary that disagrees with the clauses. Preserve accepted meaning, identifiers, source links, priority, conditions, exceptions, verification criteria, and relationships. Replace unnecessary jargon with observable examples; keep exact terms where they distinguish real guarantees.
+
+If rewriting reveals a genuine uncertainty about what was promised, do not decide it by editing prose. Identify the smallest consequential decision and its authority, and continue independent work. Do not reopen a settled requirement or sweep through unrelated historical bundles for readability alone.
+
 ## Common method
 
 ### 1. Establish the accepted meaning

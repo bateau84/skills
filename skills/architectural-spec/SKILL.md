@@ -15,6 +15,10 @@ A specification realizes architecture; it does not create new architecture or pr
 
 Before detailed fields, interfaces or state tables, briefly explain in ordinary language what the two sides must agree on, why, and one representative example of a successful or failed exchange. Keep exact technical names and unambiguous rules in the specification itself. The example must agree with those rules and does not create an additional guarantee. If you cannot explain the contract without assuming new product meaning, return that choice to its owner instead of adding speculative cases.
 
+## Improve existing specifications
+
+If an existing specification needed for the current change is hard to interpret, rewrite its relevant explanation and organization so a reader can understand what the interface guarantees. Keep exact names, types, ordering, version/compatibility rules, failure outcomes, and testable conditions. Do not trade precision for readability or silently modify an accepted contract. If two meanings remain possible, identify the decision owner and block only the dependent part; don't rebuild unrelated specifications just for style.
+
 ## Method
 
 1. **Trace authority.** Identify the accepted behavior and parent architecture this contract realizes, plus any authoritative external protocol or current compatibility surface.

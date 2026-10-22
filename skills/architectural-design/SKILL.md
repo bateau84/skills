@@ -17,6 +17,12 @@ For substantial designs, explain the proposed system in plain language before di
 
 An additional review concern earns redesign only when it threatens an accepted guarantee or exposes a credible material failure under the actual operating conditions. Record unsupported stronger guarantees as advisory rather than reopening settled choices; do not ignore actual safety, data-loss, or incorrect-outcome risks.
 
+## Improve existing architecture documents
+
+When modifying or relying on an existing architecture document whose explanation obscures why a decision was made or what the system will actually do, rewrite the **relevant sections in place**. Start from the accepted goal and current decision, make the reasoning and example understandable, and simplify unnecessary prose rather than layering a new overview on top. Preserve interfaces, invariants, failure guarantees, deployment limits, recorded trade-offs, and references unless an authorized design change explicitly replaces them.
+
+An opaque description of a load-bearing decision needs clarification before dependent implementation relies on it. Minor writing quality elsewhere is not a new review blocker or authority to redesign the system. Leave unrelated old documents alone unless documentation improvement is itself the task.
+
 ## Method
 
 1. **Ground the design.** Load accepted behavioral/design authority, relevant existing architecture, and current-system facts the design depends on. Separate verified facts from assumptions.

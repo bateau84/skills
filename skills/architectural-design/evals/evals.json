@@ -57,6 +57,23 @@
         "No false declaration of success when restart leaves work state unknown.",
         "No replacement of exact state rules with only a friendly summary."
       ]
+    },
+    {
+      "id": "Design-04",
+      "name": "rewrite opaque architecture without changing its contracts",
+      "trap": "An agent changes an accepted architecture while simplifying the prose or starts a wholesale redesign and docs migration because the current text is dense.",
+      "prompt": "Update the explanation in an existing accepted architecture design for a single-host job runtime. Its current text talks about 'durability-before-acknowledgement fencing', 'cross-process idempotency discipline', and 'post-restart truth preservation' without showing what people will observe. The accepted design uses SQLite to durably record accepted jobs before replying success, prevents running the same logical job twice at the same time, and never labels interrupted jobs as successful merely because the process restarted. It does not promise automatic retries. Rewrite the relevant design rationale into plain language and a concrete example while retaining the exact load-bearing guarantees and references. Do not implement code or start a redesign.",
+      "expectations": [
+        "Rewrites the relevant explanation and reasoning in place rather than only adding a cosmetic introduction.",
+        "Preserves durable acceptance, duplicate-execution prevention, and truthful status after restart, including limits on automatic retry.",
+        "Provides a concrete user-facing example of a restarted job and explains why the chosen local approach meets the accepted goal.",
+        "Retains technical definitions and references where needed by implementers, without unnecessary new documents, mechanisms, or review gates."
+      ],
+      "negative_expectations": [
+        "No removal or weakening of the crash and duplicate-execution guarantees to make the prose shorter.",
+        "No new external queue, distributed coordination system, or automatic-retry guarantee.",
+        "No wholesale migration of unrelated architectural documents."
+      ]
     }
   ]
 }

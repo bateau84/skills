@@ -13,6 +13,10 @@ The specification is a **human-experience contract**, not backend architecture a
 
 Lead a substantial handoff with a short, plain-language walkthrough of one representative user task: what the person tries to do, what they see, what happens if it succeeds, and what an important failure or interruption looks like. Explain the key design choice and any scope limit without making the reader decode UX terms. The detailed flows, states and accessibility rules below remain authoritative; the walkthrough must agree with them and with the accepted product goal. It is not a new approval step.
 
+## Improve existing design handoffs
+
+When changing or relying on a design whose wording makes the user journey difficult to validate, rewrite the affected walkthrough, flows and explanations **within the existing handoff**, not as an extra document that leaves the original confusion in place. Keep the accepted user outcomes, important states, error and recovery paths, accessibility behavior, and links to source decisions intact. An unresolved material difference in intended experience needs its owner; an old document's minor style issues do not justify delaying unrelated work or redesigning the experience.
+
 ## Method
 
 1. **Ground the handoff.** Start from accepted product intent, relevant User Stories/Scenarios, existing experience language, and the specialist design work actually needed. State required capability/information dependencies explicitly. A dependency is not evidence of a gap: flag a missing capability only when current evidence establishes that it does not exist, rather than designing around mocks or inventing absence.

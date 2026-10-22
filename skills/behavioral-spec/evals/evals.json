@@ -237,6 +237,23 @@
         "Must not treat a transient 'Saved' label as proof that the stored data is already durable.",
         "Must not make ordinary storage choices into a mandatory user approval gate."
       ]
+    },
+    {
+      "id": "BehavioralSpec-08",
+      "name": "rewrite existing opaque requirements without new guarantees",
+      "trap": "An agent puts a plain-language summary atop confusing obligations, or rewrites technical clauses and quietly changes their accepted meaning.",
+      "prompt": "Improve this existing requirement document, which its owner cannot validate because of jargon. Accepted behavior: a local CLI task reports 'finished' after its execution stops, and reports 'succeeded' only when its requested outcome is actually confirmed. A task can finish without success. Existing document BR-021 says 'Termination of execution shall induce the terminal done disposition, non-equivalent to positively verified objective satisfaction.' The document has source links and checks for a task that crashes, fails, or stops normally. Rewrite only this relevant document into clear, testable language with one concrete example. Do not change the accepted meanings, source, ID, or the checks. No changes to runtime architecture are requested.",
+      "expectations": [
+        "Replaces jargon in the affected requirement itself instead of only appending a friendlier summary that leaves BR-021 opaque.",
+        "Preserves BR-021's status semantics, source references, and checks for normal stop, crash, and failure; does not conflate finished and succeeded.",
+        "Explains one example of execution ending without objective success so the document owner can check the interpretation.",
+        "Leaves unrelated requirements and architecture out of scope and does not invent new reporting states or mandatory approval steps."
+      ],
+      "negative_expectations": [
+        "No claim that any finished run automatically succeeded.",
+        "No deletion or weakening of existing crash/failure coverage or accepted provenance.",
+        "No wholesale rewrite of unrelated documentation."
+      ]
     }
   ]
 }

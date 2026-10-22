@@ -11,6 +11,12 @@ This skill governs **truthful content** about the implemented application and pu
 
 Lead with what the reader needs to know or do, one concrete example when useful, and the important limits. Use everyday words and short sentences where they preserve meaning. Explain necessary technical terms when they first appear; keep exact commands, identifiers, and guarantees in the detailed sections. A friendly summary must not overstate what works or hide an important failure. Don't add a separate glossary or document just to satisfy this guidance.
 
+## Improve existing documentation
+
+When a document needed for the current work makes the actual behavior, usage, or important limit hard to understand, **rewrite the affected content**, not just prepend a friendly introduction to otherwise opaque text. Keep supported commands, error cases, warnings, links, and current-versus-planned distinctions accurate. Validate changed factual claims against available source or observed operation. Keep the existing document and navigation structure unless changing it clearly improves use.
+
+A wording problem alone is not a reason to stop unrelated delivery or rewrite a repository's whole documentation history. Correct a meaning or usage ambiguity before someone relies on it; improve minor prose while touching relevant sections, or leave unrelated cleanup for a separate, explicitly scoped task. Do not rewrite accepted product or architecture decisions under the guise of documentation cleanup.
+
 Use the repository's `AGENTS.md` for document locations and update obligations. Use `okf-authoring`, maintained in `nrkno/okf-mcp`, when document metadata, index/log, or relationship maintenance is required; do not duplicate those formatting rules here.
 
 ## Current implementation and operation
