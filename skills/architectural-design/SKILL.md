@@ -11,6 +11,18 @@ Use this skill when several components or boundaries must fit together coherentl
 
 Architecture owns technical realization, not product semantics. Accepted behavioral guarantees are constraints. Do not add retry/recovery policy, user-visible failure meaning, guarantees, or lifecycle semantics that accepted authority has not defined.
 
+## Start with the reason and the result
+
+For substantial designs, explain the proposed system in plain language before diagrams and internal mechanisms. State the problem, the selected approach, why it is sufficient, one real example of how it will behave, and important limitations. Keep exact invariants and integration details in the technical sections. If the explanation depends on a new product promise, send that meaning to its owner rather than quietly designing around it.
+
+An additional review concern earns redesign only when it threatens an accepted guarantee or exposes a credible material failure under the actual operating conditions. Record unsupported stronger guarantees as advisory rather than reopening settled choices; do not ignore actual safety, data-loss, or incorrect-outcome risks.
+
+## Improve existing architecture documents
+
+When modifying or relying on an existing architecture document whose explanation obscures why a decision was made or what the system will actually do, rewrite the **relevant sections in place**. Start from the accepted goal and current decision, make the reasoning and example understandable, and simplify unnecessary prose rather than layering a new overview on top. Preserve interfaces, invariants, failure guarantees, deployment limits, recorded trade-offs, and references unless an authorized design change explicitly replaces them.
+
+An opaque description of a load-bearing decision needs clarification before dependent implementation relies on it. Minor writing quality elsewhere is not a new review blocker or authority to redesign the system. Leave unrelated old documents alone unless documentation improvement is itself the task.
+
 ## Method
 
 1. **Ground the design.** Load accepted behavioral/design authority, relevant existing architecture, and current-system facts the design depends on. Separate verified facts from assumptions.
