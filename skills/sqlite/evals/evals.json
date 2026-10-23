@@ -1,0 +1,90 @@
+{
+  "skill": "sqlite",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "SQLite-01",
+      "name": "foreign-keys-follow-physical-connections",
+      "trap": "One successful startup PRAGMA and a single-connection test conceal unenforced foreign keys on later pool connections.",
+      "prompt": "A Go service stores a 600 MB SQLite file. Startup runs db.Exec('PRAGMA foreign_keys=ON') once, then the pool grows to eight connections. Orders.customer_id references customers.id, but orphan orders occasionally appear. Write the repair plan and the decisive regression check. Keep the existing driver and schema unless evidence requires a change.",
+      "expectations": [
+        "Identifies the physical-connection scope and proposes the driver's supported per-connection initialization or equivalent verified connection handling.",
+        "Applies and reads back foreign_keys outside an active transaction; inspects existing orphans separately from preventing new ones.",
+        "Provides a concrete real-database check that acquires distinct/new physical connections and verifies invalid child inserts fail through each relevant path.",
+        "Labels any driver-specific implementation or test that could not be executed as unverified."
+      ],
+      "negative_expectations": [
+        "Must not claim another single startup Exec initializes all future pool connections.",
+        "Must not treat integrity_check returning ok as proof that existing foreign-key violations are absent.",
+        "Must not change databases or remove the foreign key merely to suppress the symptom."
+      ]
+    },
+    {
+      "id": "SQLite-02",
+      "name": "upsert-preserves-children",
+      "trap": "REPLACE looks like a compact upsert but deletes the existing parent and triggers its cascading child deletion.",
+      "prompt": "SQLite schema: accounts(id INTEGER PRIMARY KEY, name TEXT NOT NULL); invoices(id INTEGER PRIMARY KEY, account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE). With foreign keys enabled, a sync job uses INSERT OR REPLACE INTO accounts(id,name) VALUES(?,?). Existing invoices disappear when an account name changes. Provide corrected SQL and a minimal regression fixture that preserves account identity and invoices.",
+      "expectations": [
+        "Explains the replacement delete and supplies parameterized INSERT ... ON CONFLICT(id) DO UPDATE SET name=excluded.name or an equivalent correct update strategy.",
+        "The fixture includes an existing account with an invoice, the name update, and assertions on account identity, new name and preserved invoice.",
+        "Covers insertion of a previously absent account and the runtime's support for the chosen syntax."
+      ],
+      "negative_expectations": [
+        "Must not disable foreign keys, remove ON DELETE CASCADE, or restore deleted invoices after replacement as the primary fix.",
+        "Must not call REPLACE an in-place update or replace it with OR IGNORE that silently keeps the old name."
+      ]
+    },
+    {
+      "id": "SQLite-03",
+      "name": "rebuild-preserves-schema-and-enforcement",
+      "trap": "A table-copy migration preserves rows while losing indexes/triggers, retargeting references, or silently failing to change foreign-key enforcement inside a transaction.",
+      "prompt": "A 900 MB SQLite database needs a table rebuilt to change an amount column's representation. The migration runner starts a transaction before executing each migration. The draft then turns foreign_keys off, renames payments to payments_old, creates payments, copies data, drops payments_old and commits. There are indexes, an audit trigger and a child foreign key. Review this draft and produce a concrete corrected migration approach, including failure recovery and data-conversion checks. No database access is available in this task.",
+      "expectations": [
+        "Identifies that toggling foreign_keys inside the existing transaction is ineffective and adapts the migration-runner transaction boundary explicitly.",
+        "Uses the documented replacement-table ordering rather than renaming the old table first, and inventories/recreates required indexes, triggers and dependent views.",
+        "Specifies checks for exact amount conversion, foreign_key_check before committing, enforcement restoration on all paths and schema-version consistency.",
+        "Accounts for a verified backup, lock time and temporary disk headroom; presents the plan as unexecuted."
+      ],
+      "negative_expectations": [
+        "Must not approve the draft solely because copied row counts match.",
+        "Must not use writable_schema or direct catalog edits as the routine shortcut.",
+        "Must not claim a migration or restore ran without database access."
+      ]
+    },
+    {
+      "id": "SQLite-04",
+      "name": "wal-does-not-create-multi-host-writers",
+      "trap": "WAL is mistaken for multi-host shared storage or unlimited write concurrency, and longer timeouts hide overload.",
+      "prompt": "Our 700 MB SQLite file is mounted over NFS by two application hosts. Writes sometimes fail with database is locked. A proposal enables WAL, opens 40 connections per host and sets a five-minute busy timeout. We can change deployment but do not need sharding. Assess the proposal and give a practical next step with evidence to collect.",
+      "expectations": [
+        "Rejects standard WAL over this multi-host network-filesystem deployment and retains SQLite's single-writer limitation.",
+        "Offers a concrete suitable deployment path such as one local database owner exposed through the application, or a client/server database if shared access is required.",
+        "Separates writer duration/arrival rate and lock waits from query execution; bounds retry/timeout behavior by caller deadlines.",
+        "Checks the actual embedded runtime and current WAL correctness guidance if WAL is part of the suitable replacement deployment."
+      ],
+      "negative_expectations": [
+        "Must not approve WAL plus larger pools as a multi-host concurrency solution.",
+        "Must not prescribe sharding based on the 700 MB size.",
+        "Must not present a five-minute timeout as added write capacity."
+      ]
+    },
+    {
+      "id": "SQLite-05",
+      "name": "in-memory-pool-identity-and-lifetime",
+      "trap": "Each :memory: connection has a separate database, while reconnects can destroy the lifetime assumed by a passing single-connection test.",
+      "prompt": "A local index service switched from a file to ':memory:' and now uses a pool. One connection creates tables and loads 150 MB; requests on another sometimes report 'no such table'. Tests use one connection and pass. Recommend a minimal fix and a regression test, preserving the accepted in-memory requirement; explain what must be checked if a shared named memory database is considered.",
+      "expectations": [
+        "Explains that separate plain :memory: connections are separate databases and proposes a simple connection-ownership design consistent with the required concurrency.",
+        "If shared named memory is proposed, checks driver URI support, exact database identity, connection lifetime and the changed shared-cache locking behavior rather than treating it as a free tuning flag.",
+        "Provides a test that uses the real pool paths and closes/reopens relevant connections to verify the intended data lifetime.",
+        "Keeps memory and concurrency consequences explicit for the accepted in-memory design."
+      ],
+      "negative_expectations": [
+        "Must not fix the error by silently creating unrelated schemas on each private connection.",
+        "Must not assume enabling WAL shares a plain :memory: database.",
+        "Must not claim the single-connection test proves pool correctness."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "skill": "sql",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "SQL-01",
+      "name": "independent-child-aggregates",
+      "trap": "A readable join multiplies two independent child collections; SUM(DISTINCT) then hides valid repeated amounts.",
+      "prompt": "Write corrected SQL for this report: every customer, total order amount in cents, and ticket count. Schema: customers(id PRIMARY KEY), orders(id PRIMARY KEY, customer_id, amount_cents NOT NULL), tickets(id PRIMARY KEY, customer_id). Customers are 1 and 2; customer 1 has two orders worth 100 cents each and two tickets; customer 2 has no children. Customers with no orders or tickets must report zero totals and counts. The current query left joins both children and groups by customer. A proposed fix is SUM(DISTINCT amount_cents). Provide the SQL and the expected rows for this data.",
+      "expectations": [
+        "Produces SQL that independently aggregates orders and tickets (or another cardinality-safe equivalent) and retains customers without children.",
+        "Expected rows are customer 1 with 200 cents and 2 tickets, and customer 2 with 0 cents and 0 tickets under this report's explicit empty-result meaning.",
+        "Explains the fan-out mechanism and rejects distinct amount values as an identity for orders."
+      ],
+      "negative_expectations": [
+        "Must not sum multiplied order inputs or use SUM(DISTINCT amount_cents) as the fix.",
+        "Must not lose customer 2 or count its null-extended child row as a ticket."
+      ]
+    },
+    {
+      "id": "SQL-02",
+      "name": "nullable-anti-join",
+      "trap": "NOT IN with one NULL produces an unexpected unknown result and can remove every unmatched parent.",
+      "prompt": "users(id PRIMARY KEY) contains 1, 2, 3. blocked(user_id NULL) contains 2 and NULL. We need users who have no matching blocked row; NULL is an incomplete import record and must not block everyone. Existing SQL is SELECT id FROM users WHERE id NOT IN (SELECT user_id FROM blocked). Give corrected SQL and the exact expected IDs. Keep the incomplete import record.",
+      "expectations": [
+        "Produces a NULL-safe absence query such as correlated NOT EXISTS, matching blocked.user_id to users.id.",
+        "Returns IDs 1 and 3, with explicit ordering if presenting an ordered query result.",
+        "Preserves incomplete import rows and explains their effect on the original predicate."
+      ],
+      "negative_expectations": [
+        "Must not silently delete or rewrite imported NULL data to make the query pass.",
+        "Must not claim NOT IN is equivalent without addressing the nullable input."
+      ]
+    },
+    {
+      "id": "SQL-03",
+      "name": "cursor-ties-and-live-data",
+      "trap": "A timestamp-only cursor skips equal timestamps; a cursor is mistaken for a snapshot.",
+      "prompt": "For SQLite and PostgreSQL, design next-page SQL for events(id globally unique, tenant_id, created_at NOT NULL) ordered by created_at DESC, id DESC, 50 rows per page. Several events share the last timestamp. Bind tenant_id and the cursor. The UI accepts live changes, but a separate export requires a consistent full result while writers continue. Provide query shapes and explain what differs for the export; timestamps are immutable.",
+      "expectations": [
+        "Uses the full descending (created_at,id) cursor tuple or an equivalent lexicographic predicate and preserves tenant_id in each page.",
+        "Separates first-page behavior from later pages and uses engine-appropriate bound placeholders.",
+        "Distinguishes accepted live UI traversal from a consistent export and proposes a suitable snapshot or explicit equivalent design with resource/lifetime trade-offs."
+      ],
+      "negative_expectations": [
+        "Must not use only created_at < last_created_at or omit the unique tie-breaker.",
+        "Must not promise that keyset pagination alone supplies a fixed snapshot across writes.",
+        "Must not impose snapshot semantics on the UI when live changes are explicitly accepted."
+      ]
+    },
+    {
+      "id": "SQL-04",
+      "name": "bound-values-and-controlled-identifiers",
+      "trap": "Binding values is confused with safely substituting arbitrary identifiers or ORDER BY expressions.",
+      "prompt": "An API searches records by tenant_id and a user-supplied name. It also accepts sort='name' or sort='created_at', direction='asc' or 'desc'. A developer builds SQL by concatenating all four fields, then proposes replacing the ORDER BY column with one bound value. Provide a safe query-building outline; do not add an ORM.",
+      "expectations": [
+        "Binds tenant_id and search values through the actual driver's parameter API.",
+        "Maps sort keys and direction through explicit allowed choices and composes only trusted identifier/expression fragments.",
+        "Keeps tenant scope and adds deterministic tie-breaking where pagination requires it."
+      ],
+      "negative_expectations": [
+        "Must not concatenate untrusted SQL fragments or claim a bound value becomes a column identifier.",
+        "Must not rely on escaping arbitrary input as the primary value-binding mechanism."
+      ]
+    },
+    {
+      "id": "SQL-05",
+      "name": "window-frame-and-final-order",
+      "trap": "A default peer-inclusive window frame gives tied rows the same running total despite a per-row contract.",
+      "prompt": "payments(id PRIMARY KEY, account_id, paid_at NOT NULL, amount_cents NOT NULL) contains account 9 payments (id 1, time 10:00, amount 100) and (id 2, time 10:00, amount 200). The report needs each payment in paid_at,id order and a per-payment running total, so the totals must be 100 then 300. Fix SUM(amount_cents) OVER (PARTITION BY account_id ORDER BY paid_at). Give the full SELECT.",
+      "expectations": [
+        "Produces a window partitioned by account_id ordered by paid_at and id with explicit ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW or a demonstrably equivalent per-row frame.",
+        "Adds an outer ORDER BY matching the promised output order.",
+        "Shows the tied rows produce totals 100 and 300, without merging them."
+      ],
+      "negative_expectations": [
+        "Must not leave timestamp peers with the same cumulative total.",
+        "Must not assume the window's ordering guarantees final result order."
+      ]
+    }
+  ]
+}

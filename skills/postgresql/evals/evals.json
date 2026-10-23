@@ -1,0 +1,91 @@
+{
+  "skill": "postgresql",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "PostgreSQL-01",
+      "name": "concurrent-index-migration-recovery",
+      "trap": "A valid index statement fails inside the migration runner's transaction, and a later interrupted concurrent build can leave a misleading existing index name.",
+      "prompt": "Write a migration plan for adding an index on orders(customer_id, created_at) to a busy 700 MB PostgreSQL database. Our migration runner wraps each file in BEGIN/COMMIT. The previous attempt used CREATE INDEX CONCURRENTLY and failed; a later manual attempt left an index with the desired name. We cannot pause writes for a long build. Include the SQL or runner changes and how you decide whether that existing index is usable. You have no database connection in this exercise.",
+      "expectations": [
+        "Produces a migration approach that runs the concurrent index build outside a transaction block using the runner's supported mechanism, or identifies the missing runner capability explicitly.",
+        "Specifies inspecting the existing index definition and validity before reuse, with a concrete dependency-aware recovery path for an invalid or mismatched index.",
+        "Accounts for build load, waiting transactions, and completion verification without promising zero impact.",
+        "Labels database verification as proposed because no connection is available."
+      ],
+      "negative_expectations": [
+        "Must not wrap CREATE INDEX CONCURRENTLY in BEGIN/COMMIT.",
+        "Must not accept the existing index name or IF NOT EXISTS as sufficient proof of correctness.",
+        "Must not claim the migration ran or the index is valid."
+      ]
+    },
+    {
+      "id": "PostgreSQL-02",
+      "name": "whole-transaction-retry-and-unknown-commit",
+      "trap": "Retrying only the failed statement reuses a stale business decision, while blindly retrying an unknown commit can apply a transfer twice.",
+      "prompt": "Our PostgreSQL money-transfer function reads a balance, deducts it, credits another account, and sends a receipt. It uses Serializable. On SQLSTATE 40001 it retries just the last UPDATE. On a network error from COMMIT it reruns the function. Review this design and sketch corrected transaction/error handling with a practical test plan. Preserve the requirement that one transfer ID applies at most once.",
+      "expectations": [
+        "Replaces statement-only retries with bounded whole-transaction retries, including the balance read and decisions.",
+        "Separates a known serialization failure from an ambiguous COMMIT result and uses the stable transfer ID for reconciliation or idempotent application.",
+        "Keeps the receipt outside unsafe repeated effects or uses a transactional outbox/equivalent mechanism consistent with the at-most-once transfer requirement.",
+        "Provides two-session conflict and commit-ambiguity checks with persisted balances/transfer IDs as the observable oracle."
+      ],
+      "negative_expectations": [
+        "Must not replay an uncertain commit as though rollback were known.",
+        "Must not weaken isolation or remove the accepted transfer invariant merely to stop errors.",
+        "Must not claim retries or receipt delivery are proven without execution evidence."
+      ]
+    },
+    {
+      "id": "PostgreSQL-03",
+      "name": "rls-owner-test-false-confidence",
+      "trap": "Schema-owner tests and persistent session settings hide the difference between tested access and a pooled application's actual role/context.",
+      "prompt": "A PostgreSQL service has tenant_id on invoices and an RLS policy using current_setting('app.tenant_id'). The migration connection owns the tables and all existing tests use it. Production uses a separate application role through a transaction-mode pool; middleware sets app.tenant_id once when a client connects. A review says tenant isolation is covered because the SQL has a WHERE tenant_id clause. What specific code/configuration and verification changes are needed?",
+      "expectations": [
+        "Identifies that table-owner behavior normally bypasses RLS and proposes checking the actual application's privileges and policy behavior.",
+        "Moves tenant context to a scope compatible with the pool and transaction, ensuring each request's queries share the correct transaction/context and missing context cannot silently broaden access.",
+        "Provides allowed and denied read/write tests for two tenants using the application role, plus sequential or concurrent pooled requests that can reveal state leakage.",
+        "Treats query predicates as useful but insufficient evidence of the claimed RLS boundary."
+      ],
+      "negative_expectations": [
+        "Must not treat owner/superuser test success as proof of RLS enforcement.",
+        "Must not assume a session SET follows a client through transaction pooling.",
+        "Must not disable RLS or grant BYPASSRLS to fix a failing test."
+      ]
+    },
+    {
+      "id": "PostgreSQL-04",
+      "name": "ordinary-schema-and-bulk-import",
+      "trap": "A batch import can appear fast while allowing duplicate or cross-tenant references, and a foreign-key declaration does not create a child-side index automatically.",
+      "prompt": "Draft PostgreSQL DDL and an import approach for tenant-scoped orders. Each tenant's upstream order_id may be reused by another tenant; every order must belong to a customer of the same tenant. Customers are identified by (tenant_id, customer_id). Store an exact total and an event instant. We import 250,000 orders at a time and usually list one customer's orders newest first. Existing application code uses database/sql, and schema migrations are part of this task. No live database is provided.",
+      "expectations": [
+        "Produces usable DDL with tenant-scoped order uniqueness, a required tenant/customer relationship enforced by a composite foreign key, and deliberate exact-total and instant types.",
+        "Proposes a justified access-path index for the stated customer/order query and recognizes that the foreign key itself does not create the referencing-side index.",
+        "Describes a COPY/staging or other bounded bulk approach with explicit validation, failure/atomicity behavior, and preservation of the accepted constraints.",
+        "Provides checks for duplicate orders, a cross-tenant customer reference, and representative query behavior, clearly marked as unexecuted."
+      ],
+      "negative_expectations": [
+        "Must not refuse authorized schema work merely because the caller uses Go.",
+        "Must not rely only on an application-side existence check or customer_id alone to enforce the tenant relationship.",
+        "Must not drop live uniqueness or foreign-key enforcement as an unexplained speed shortcut."
+      ]
+    },
+    {
+      "id": "PostgreSQL-05",
+      "name": "diagnostic-execution-boundary",
+      "trap": "A statement presented as a SELECT contains a data-modifying CTE, and rollback cannot make an executed diagnostic universally side-effect-free.",
+      "prompt": "I only want a plan inspection, no data changes. The query is WITH moved AS (DELETE FROM jobs WHERE finished_at < $1 RETURNING id) SELECT archive_job(id) FROM moved. archive_job may call an external service and allocate a sequence value. A teammate suggests BEGIN; EXPLAIN ANALYZE ...; ROLLBACK on production. Provide the inspection approach and explain what can actually be concluded without running it.",
+      "expectations": [
+        "Uses a non-ANALYZE plan inspection for the authorized plan-only task and examines function/query dependencies before making execution assumptions.",
+        "Identifies the delete, sequence, and possible external effects as reasons rollback is not a universal safety guarantee.",
+        "Separates estimated-plan findings from actual runtime evidence; any future executed experiment is scoped to an appropriate disposable target and isolated external effects."
+      ],
+      "negative_expectations": [
+        "Must not execute EXPLAIN ANALYZE on production under the plan-only instruction.",
+        "Must not claim the top-level SELECT or ROLLBACK makes this query read-only.",
+        "Must not report measured runtime or a proved performance improvement from an estimated plan."
+      ]
+    }
+  ]
+}

@@ -4,14 +4,14 @@
     {
       "id": 1,
       "name": "measure-before-optimize-and-percentile-shape",
-      "prompt": "Our endpoint is slow — p99 is 8 seconds. The obvious culprit is the 4 sequential database queries, so I'm going to parallelize them with goroutines. Right?",
+      "prompt": "Our endpoint is slow \u2014 p99 is 8 seconds. The obvious culprit is the 4 sequential database queries, so I'm going to parallelize them with goroutines. Right?",
       "expected_output": "The response treats the 4-query framing as a hypothesis, not a diagnosis; reads the percentile shape before proposing a fix; notes parallelism makes the request as slow as the slowest leg; and instruments (per-step timing) before optimizing.",
       "trap": "Without the skill, the model jumps straight to a fix (parallelization or caching) without measuring, and misreads a tail problem as a structural one.",
       "expectations": [
         "Treats '4 sequential queries' as a hypothesis, not a diagnosis; does not jump to parallelization",
         "Reads the percentile shape first (p50 fine + p99 bad = tail problem; identify the shape before fixing)",
         "Notes parallelizing N queries makes the request as slow as the slowest leg (does not fix a tail)",
-        "Instruments before optimizing — per-step timing, and the fix waits for the data"
+        "Instruments before optimizing \u2014 per-step timing, and the fix waits for the data"
       ]
     },
     {
@@ -37,6 +37,21 @@
         "Recognizes p99 worse than p99.9 as reverse tail, usually a measurement artifact",
         "Recognizes all-percentiles-bad as a structural problem (cumulative cost or a sequential bottleneck)",
         "Recognizes p50 fine + p99 bad as a tail problem (one thing occasionally slow), not all requests slow"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "identified-sql-bottleneck-handoff",
+      "trap": "Instrumentation-first guidance can obstruct a known reproducible database problem by demanding an arbitrary monitoring delay.",
+      "prompt": "We already have representative full-result timings, equivalent-result checks, current statistics and actual query plans for a slow PostgreSQL report on a disposable 600 MB copy. Application timings isolate the slow work to a sort spill. We want to run a bounded tuning experiment now. Do we need another 24 hours of production instrumentation first? Explain how this task should proceed and which methodology applies.",
+      "expectations": [
+        "Recognizes the measured SQL bottleneck and routes detailed tuning to sql-performance.",
+        "Uses the existing evidence to proceed with a bounded experiment and comparable correctness/resource measurements.",
+        "Requests only additional information that is needed for the concrete proposed experiment."
+      ],
+      "negative_expectations": [
+        "Must not impose a fixed 4\u201324-hour production monitoring wait despite sufficient evidence.",
+        "Must not claim an optimization succeeded without the corresponding measurements."
       ]
     }
   ]

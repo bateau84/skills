@@ -1,9 +1,11 @@
 # Transactions, Isolation Levels, and Locking
 
+The SQL/isolation examples below use PostgreSQL semantics. Confirm the actual database and driver support; use `sqlite` for SQLite transactions, which do not support `SELECT FOR UPDATE`. Use `sql`/`postgresql` to select the invariant and retry strategy, then apply these Go resource-lifetime patterns.
+
 ## Basic transaction pattern
 
 ```go
-tx, err := db.BeginTxx(ctx, nil) // default isolation (READ COMMITTED)
+tx, err := db.BeginTxx(ctx, nil) // database/driver default; verify effective isolation
 if err != nil {
     return fmt.Errorf("beginning transaction: %w", err)
 }
@@ -20,15 +22,15 @@ if err := tx.Commit(); err != nil {
 
 ```go
 tx, err := db.BeginTxx(ctx, &sql.TxOptions{
-    Isolation: sql.LevelSerializable, // strongest guarantee
+    Isolation: sql.LevelSerializable, // requires engine/driver support and retry handling
 })
 ```
 
 | Level | Use when |
 | --- | --- |
-| `LevelReadCommitted` | Default — good for most operations |
-| `LevelRepeatableRead` | Need consistent reads within a transaction |
-| `LevelSerializable` | Financial operations, inventory, anything with strict consistency |
+| `LevelReadCommitted` | PostgreSQL's usual default; statements can observe different snapshots |
+| `LevelRepeatableRead` | A stable PostgreSQL transaction snapshot; not every invariant is protected |
+| `LevelSerializable` | Serializable execution where required; handle whole-transaction retries |
 
 ## SELECT FOR UPDATE — prevent race conditions
 
@@ -38,7 +40,7 @@ err := tx.GetContext(ctx, &balance, "SELECT balance FROM accounts WHERE id = $1 
 // Row is locked until tx.Commit() or tx.Rollback()
 ```
 
-Use `FOR UPDATE` when you read a value, compute something from it, and then write it back. Without the lock, concurrent transactions can read stale data.
+Use PostgreSQL `FOR UPDATE` when locking these selected rows protects the read-modify-write invariant. An atomic conditional update or constraint can be simpler. A lock on existing rows does not automatically protect an invariant involving absent rows or unrelated predicates; choose the engine's suitable isolation/constraint strategy. Keep all statements on `tx` and handle retryable failures across the whole transaction.
 
 ## Locking variants
 

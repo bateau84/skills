@@ -1,6 +1,6 @@
 ---
 name: python-database
-description: "Python database access with stdlib `sqlite3` — parameterized queries, connection context managers, `sqlite3.Row` factory, transactions, the repository pattern, schema migrations via `PRAGMA user_version`, and SQLite pragmas (WAL, foreign_keys). Use when writing or reviewing SQLite code, building a repository over a file-based embedded DB, running migrations on a local SQLite file, or any time the user mentions `sqlite3`, WAL, or `aiosqlite`. Not for SQLAlchemy, Django ORM, PostgreSQL, MySQL, or async server-side DBs (→ See `python-database-orm`)."
+description: "Python database access with stdlib sqlite3 — bound queries, connection context managers, sqlite3.Row, transaction control, repositories and per-connection setup. Use when writing, reviewing or debugging Python sqlite3/aiosqlite call sites or Python migration integration. Use sqlite for engine/WAL/file behavior, sql for query/schema design, and sql-performance for measured tuning. Not for SQLAlchemy, Django ORM or server database drivers (use python-database-orm)."
 license: MIT
 metadata:
   author: Bateau
@@ -14,6 +14,8 @@ metadata:
 # SQLite with `sqlite3`
 
 The stdlib `sqlite3` module is enough for an embedded DB — no ORM required. Keep all SQL behind a repository so the rest of the code depends on methods, not on the schema. This is sortarr's `db/{connection,migrations,repository}` layout.
+
+Use `sqlite` for engine semantics and lifecycle, `sql` for query/schema meaning, and `sql-performance` for measured tuning. This skill supplies Python integration rather than a separate engine policy.
 
 ## Parameterize every query — never format SQL
 
@@ -40,9 +42,13 @@ import sqlite3
 
 @contextmanager
 def get_connection(db_path: str):
-    con = sqlite3.connect(db_path)
+    con = sqlite3.connect(db_path, autocommit=True)  # Python 3.12+
     con.row_factory = sqlite3.Row     # rows behave like dicts: row["title"]
     try:
+        con.execute("PRAGMA foreign_keys = ON")   # before a transaction exists
+        if con.execute("PRAGMA foreign_keys").fetchone()[0] != 1:
+            raise RuntimeError("SQLite foreign-key enforcement unavailable")
+        con.autocommit = False                   # explicit transaction handling
         yield con
     finally:
         con.close()
@@ -52,7 +58,7 @@ def get_connection(db_path: str):
 
 ## Transactions — commit or roll back as a unit
 
-`sqlite3` opens an implicit transaction; **nothing persists until `commit()`**. Wrap a multi-statement change so a failure rolls back cleanly. The connection used as a context manager commits on success and rolls back on exception:
+Transaction behavior depends on Python's `autocommit`/legacy `isolation_level` settings; do not assume all connections open implicit transactions. With the explicit `autocommit=False` setup above, wrap related writes so a failure rolls back. The connection used as a context manager commits on success and rolls back on exception:
 
 ```python
 with get_connection(db_path) as con:
@@ -62,6 +68,8 @@ with get_connection(db_path) as con:
 ```
 
 Note the two `with`s do different jobs: the outer closes the connection; the inner (`with con:`) is the transaction boundary.
+
+With `autocommit=True`, `with con:` does not create a multi-statement transaction. For Python before 3.12, use a documented explicit-SQL or legacy transaction mode with foreign-key setup outside any transaction. Check the deployed [sqlite3 transaction-control documentation](https://docs.python.org/3/library/sqlite3.html#transaction-control).
 
 ## Repository pattern
 
@@ -74,7 +82,8 @@ class Repository:
 
     def save_decision(self, d: MatchDecision) -> None:
         self._con.execute(
-            "INSERT OR REPLACE INTO decisions (video_id, verdict) VALUES (?, ?)",
+            "INSERT INTO decisions (video_id, verdict) VALUES (?, ?) "
+            "ON CONFLICT(video_id) DO UPDATE SET verdict = excluded.verdict",
             (d.video_id, d.verdict),
         )
 
@@ -87,18 +96,22 @@ class Repository:
 
 Return `None` for "not found" — that's expected absence, not an error (→ See `python-error-handling`).
 
+The save example assumes `video_id` has a primary-key/unique constraint and the SQLite runtime supports UPSERT (3.24.0+). It updates the existing row; `INSERT OR REPLACE` can delete it and trigger cascading child deletion. See [SQLite UPSERT](https://www.sqlite.org/lang_upsert.html) and the `sqlite` skill.
+
 ## Migrations
 
-Apply schema changes idempotently at startup with a versioned migration runner (`PRAGMA user_version`), so the app self-migrates and there's no separate command. Each migration runs once, in order, inside a transaction. Use `CREATE TABLE IF NOT EXISTS` and additive `ALTER TABLE` so re-running is safe.
+Use the project's versioned migration process; a small embedded application may use `PRAGMA user_version`. Choose startup or a separate migration step from deployment/concurrency needs. `IF NOT EXISTS` does not verify an existing schema matches the desired one. Follow `sqlite` for supported ALTER/rebuild procedures, dependent objects, transaction and foreign-key sequencing, failure recovery and backup checks.
 
-## Pragmas worth setting
+## Connection settings and WAL
 
 ```python
-con.execute("PRAGMA foreign_keys = ON")     # off by default in sqlite3 — enforce FKs
-con.execute("PRAGMA journal_mode = WAL")    # concurrent readers + a writer; better throughput
+# Apply to every actual connection before its first transaction, as above.
+con.execute("PRAGMA foreign_keys = ON")
+if con.execute("PRAGMA foreign_keys").fetchone()[0] != 1:
+    raise RuntimeError("SQLite foreign-key enforcement unavailable")
 ```
 
-`foreign_keys` is **off by default** — turn it on per connection or referential integrity isn't enforced.
+Verify foreign-key enforcement per connection rather than relying on defaults. Changing it inside a transaction has no effect. Choose WAL only after checking deployment/filesystem, durability and checkpoint needs with `sqlite`; it is a persistent database-mode choice, not an unconditional connection initializer.
 
 ## Sync `sqlite3` on an async event loop
 
@@ -135,7 +148,7 @@ Don't share one connection across tasks or threads — `sqlite3` connections are
 | Sharing one connection across tasks/threads | Open per request or per job; `sqlite3` connections aren't concurrency-safe. |
 | Mocking the DB in tests | Use a real `tmp_path` SQLite DB — it's fast and catches SQL errors. |
 
-**Diagnose:** 1- `ruff`/`bandit` — flag string-formatted SQL (`S608`) 2- `EXPLAIN QUERY PLAN <sql>` — confirm an index is used before "optimizing" 3- run the test suite against a real `tmp_path` DB — SQL typos surface immediately.
+**Diagnose:** use configured lint/security checks for unsafe SQL construction and a real `tmp_path` SQLite database for SQL/transaction checks. Use `EXPLAIN QUERY PLAN` plus representative full-result timings through `sql-performance`; a scan may be appropriate, and an index being used does not prove improvement.
 
 ## References
 

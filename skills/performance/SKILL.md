@@ -1,6 +1,6 @@
 ---
 name: performance
-description: Use when investigating latency reports, designing performance-critical systems, or reviewing code where response time, throughput, or resource consumption could regress — when measurement before optimization, percentile analysis, or profiling methodology would prevent premature or wrong fixes.
+description: Use when investigating latency reports, designing performance-critical systems, or reviewing code where response time, throughput, or resource consumption could regress — when measurement before optimization, percentile analysis, or profiling methodology would prevent premature or wrong fixes. For an identified SQLite/PostgreSQL query or database bottleneck, use sql-performance.
 license: MIT
 metadata:
   author: Bateau
@@ -8,6 +8,8 @@ metadata:
 ---
 
 ## When to load
+
+This skill focuses on locating and understanding an application performance problem. For an already identified SQL bottleneck, use `sql-performance` and reuse sufficient existing measurements; its bounded experiments do not require a fresh 4–24-hour monitoring period.
 
 - **architect** — designing a performance-critical system
 - **worker** — implementing a hot path or data-intensive operation
@@ -26,7 +28,7 @@ p50 fine + p99 bad is a tail problem, not a slow endpoint. Bimodal distributions
 What does the code path look like (branches, conditional logic)? Is the slowness clustered by time, user cohort, or deploy? What does the existing instrumentation show? A 5-minute question round shifts hypothesis ranking more than an hour of analysis. If the answer is "I don't have that data," that's the first instrumentation to add — not a reason to guess.
 
 ### 4. Instrument before optimizing.
-Add per-step timing (HTTP middleware, handler-level breakdown, DB query timing). Wait 4-24 hours. Look at the slow 1% specifically. The instrumentation is the deliverable; the fix waits for the data.
+Use sufficient existing measurements before adding more instrumentation. When evidence is missing, add per-step timing (HTTP middleware, handler-level breakdown, DB query timing) and choose an observation window that can capture the problem. Look at the relevant slow cohort. For an identified SQL bottleneck, continue with `sql-performance`; no fixed monitoring delay is required before a bounded experiment.
 
 ## Instrumentation recipe
 
