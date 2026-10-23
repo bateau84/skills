@@ -1,0 +1,38 @@
+{
+  "skill": "golang-database",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "GoDatabaseComposition-01",
+      "name": "authorized-sqlite-schema-and-atomic-update",
+      "trap": "A Go driver skill blocks authorized schema work or emits PostgreSQL row-locking SQL for SQLite.",
+      "prompt": "In a Go service using database/sql and SQLite, add a versioned migration for counters(id INTEGER PRIMARY KEY, value INTEGER NOT NULL CHECK(value >= 0)). The user explicitly requested the schema change; use the existing migration tool. Implement the Go operation that adds a positive delta to one counter atomically and reports a missing row. A teammate recommends SELECT value ... FOR UPDATE, then UPDATE with the value computed in Go. Describe the migration and Go/SQL approach, including the important checks.",
+      "expectations": [
+        "Proceeds with the authorized migration using sql/sqlite methodology rather than refusing schema authorship or creating a new approval stage.",
+        "Uses a SQLite-supported atomic update or transaction strategy and does not emit SELECT FOR UPDATE.",
+        "Keeps parameter binding, request context, commit/rollback ownership and affected-row/error handling explicit.",
+        "Includes a real SQLite check of concurrent updates or the relevant invariant and missing-ID behavior."
+      ],
+      "negative_expectations": [
+        "Must not impose a blanket prohibition on AI-authored schema or migration SQL.",
+        "Must not use PostgreSQL FOR UPDATE syntax or assume READ COMMITTED is the SQLite driver default."
+      ]
+    },
+    {
+      "id": "GoDatabaseComposition-02",
+      "name": "pool-waits-are-not-an-increase-order",
+      "trap": "A cumulative Go pool wait counter is treated as proof that adding connections will improve database throughput.",
+      "prompt": "A Go PostgreSQL service has MaxOpenConns=25. DB.Stats().WaitCount increased since startup. The database CPU is already saturated and requests sometimes keep Rows open while waiting on another service. A proposed fix sets MaxOpenConns to 250 immediately. What evidence and change should come first?",
+      "expectations": [
+        "Distinguishes cumulative counters from wait rates/durations and correlates them with request timing and engine load.",
+        "Investigates and fixes unnecessary held results/connections and separates SQL work from external waits.",
+        "Treats pool capacity as constrained by database resources and compares bounded alternatives before raising it."
+      ],
+      "negative_expectations": [
+        "Must not automatically increase MaxOpenConns from the cumulative WaitCount alone.",
+        "Must not claim a larger pool increases database capacity or solves leaked/held rows."
+      ]
+    }
+  ]
+}

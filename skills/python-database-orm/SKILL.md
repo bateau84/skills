@@ -15,7 +15,7 @@ metadata:
 
 ## When to use / scope
 
-Load this skill for any server-based Python database work: ORM setup, async driver configuration, connection pool tuning, migration tooling, or N+1 debugging. This covers SQLAlchemy 2.x (sync and async), asyncpg, and Django ORM. For stdlib `sqlite3` and embedded-database patterns, see the `python-database` skill instead — it covers `sqlite3` module usage, WAL mode, and SQLite-specific pragmas. This skill is for databases that run as a separate process: PostgreSQL, MySQL, MariaDB, and their ecosystems.
+Load this skill for server-based Python driver/ORM work: ORM setup, async driver configuration, pool APIs, migration tooling, or N+1 debugging. This covers SQLAlchemy 2.x (sync and async), asyncpg, and Django ORM. Use `sql` for query/schema meaning, `postgresql` or `sqlite` for engine semantics, and `sql-performance` for measured tuning. For stdlib `sqlite3` call sites, see `python-database`.
 
 ## SQLAlchemy 2.x sync
 
@@ -291,7 +291,7 @@ async def create_user(data: UserCreate, db: AsyncSession = Depends(get_session))
 
 ## Real-DB testing
 
-Integration tests must run against a real PostgreSQL instance. `sqlite:///:memory:` is not a faithful substitute — it lacks PostgreSQL-specific types (`JSONB`, `ARRAY`, `UUID`), has different SQL dialect behavior (`ILIKE` vs `LIKE`), no `ON CONFLICT DO UPDATE` semantics, and different locking behavior. Tests that pass on SQLite will silently pass on wrong assumptions.
+Claims about PostgreSQL behavior need a real PostgreSQL instance. `sqlite:///:memory:` is not a faithful substitute: type, collation, SQL and locking semantics differ. SQLite does support [ON CONFLICT DO UPDATE](https://www.sqlite.org/lang_upsert.html) on compatible versions; shared syntax alone does not prove identical engine behavior. Use SQLite tests for SQLite claims and PostgreSQL tests for PostgreSQL claims.
 
 **testcontainers-python** spins up a real Postgres container per test session:
 

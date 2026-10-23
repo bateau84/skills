@@ -1,8 +1,12 @@
-# Database Performance
+# Go Database Performance Integration
+
+Use this reference for Go pool observations and batch APIs. Use `sql` for query/pagination semantics and `sql-performance` plus its relevant engine reference for plans, indexes, statistics and resource tuning. Follow the task and repository authority for execution; this reference neither grants permission nor forbids already authorized changes.
 
 ## Connection Pool Sizing
 
 ### Configuration
+
+Values below illustrate the API. Choose them from engine capacity, request concurrency and measured pool behavior; they are not defaults for every application. See [Go connection management](https://go.dev/doc/database/manage-connections).
 
 ```go
 db, err := sqlx.Connect("postgres", dsn)
@@ -38,7 +42,7 @@ slog.Info("db pool",
 )
 ```
 
-If `WaitCount` keeps climbing, increase `MaxOpenConns` or optimize slow queries.
+`WaitCount` and `WaitDuration` are cumulative. Compare deltas over an interval with request rate and latency. Investigate held transactions, unclosed results, slow work and server contention before changing capacity; raising `MaxOpenConns` can overload the database.
 
 ### Prometheus Metrics
 
@@ -101,19 +105,19 @@ func init() {
 **Alert thresholds:**
 
 - Open connections approaching `MaxOpenConns` → risk of request queuing
-- Wait count climbing steadily → pool is exhausted, increase `MaxOpenConns`
+- Increasing wait rate/duration → investigate held connections, slow queries and engine capacity before resizing
 - Idle connections too high → reduce `MaxIdleConns` or lower `ConnMaxIdleTime`
 
 ## Batch Processing
 
 Avoid two extremes:
 
-- **Row-by-row** — N round trips for N rows, extremely slow
-- **One giant batch** — locks tables, consumes memory, can timeout and block other queries
+- **Row-by-row** — can incur avoidable network/commit overhead; embedded SQLite has different round-trip costs
+- **One giant batch** — can consume memory, hold locks or exceed parameter/time limits
 
-### Sweet spot: 100–1,000 rows per batch
+### Choose a bounded batch size
 
-Adjust based on row size and database load. Larger rows → smaller batches.
+Measure batches against row width, bind-parameter limits, lock duration, memory and recovery needs. The 500-row example is illustrative. It commits statements separately; use an appropriate transaction when the accepted operation must be all-or-nothing, or design restart/idempotency for partial progress.
 
 ### Batch INSERT with sqlx
 
@@ -135,7 +139,7 @@ func insertUsersBatch(ctx context.Context, db *sqlx.DB, users []User) error {
 
 ### Bulk INSERT with pgx (PostgreSQL COPY protocol)
 
-For maximum throughput on PostgreSQL, use `pgx.CopyFrom` which uses the binary COPY protocol — significantly faster than multi-row INSERT:
+For suitable PostgreSQL bulk loads, consider `pgx.CopyFrom` and compare it against the actual workload. This example materializes input rows; use a bounded/streaming source for large input and preserve required transaction/constraint behavior:
 
 ```go
 rows := make([][]any, len(users))
@@ -149,64 +153,12 @@ _, err := pool.CopyFrom(ctx,
 )
 ```
 
-### Cursor-based pagination (avoid OFFSET)
+## Query and index work
 
-For reading large datasets, use cursor-based pagination instead of `OFFSET`. OFFSET re-scans skipped rows, getting slower as you paginate deeper:
+Use `sql` for a complete pagination order and cursor tuple, including a unique tie-breaker and explicit snapshot/live-result semantics. An offset is valid for suitable workloads; do not promise constant-time cursor traversal without measuring its access path.
 
-```go
-// ✗ Bad — OFFSET re-scans rows, O(offset + limit)
-SELECT * FROM events ORDER BY created_at LIMIT 100 OFFSET 10000
+Use `sql-performance` for the measured query → plan → change → comparison loop. Inspect the real schema and existing indexes through available database tooling; no particular MCP service is required. Choose an index from predicates, ordering and workload costs rather than a universal most-selective-first rule. Do not remove an index from low scan counts alone: check constraint ownership, rare/critical uses and the observation window.
 
-// ✓ Good — cursor-based, O(limit) regardless of depth
-SELECT * FROM events WHERE created_at > $1 ORDER BY created_at LIMIT 100
-```
+Estimated plans and executed plans are different operations. `EXPLAIN ANALYZE` executes SQL and can have side effects; use the engine reference to choose a suitable environment and measurement method. Keep Go context deadlines, result cleanup, bind/prepared behavior and full result consumption representative in before/after measurements.
 
-## Indexing Strategy
-
-**Never create or drop indexes yourself.** Index changes affect production query performance and write throughput. Always suggest to the developer and let them decide.
-
-### Use SQL MCP to check existing indexes
-
-When a SQL MCP tool is available, query the database to check existing indexes before suggesting new ones:
-
-```sql
--- PostgreSQL: list indexes on a table
-SELECT indexname, indexdef
-FROM pg_indexes
-WHERE tablename = 'users';
-
--- Check for unused indexes (low scan count relative to writes)
-SELECT schemaname, relname, indexrelname, idx_scan, idx_tup_read
-FROM pg_stat_user_indexes
-WHERE idx_scan < 10
-ORDER BY idx_scan;
-```
-
-### When to suggest adding indexes
-
-- Foreign key columns (PostgreSQL does NOT auto-index foreign keys)
-- Columns frequently used in `WHERE`, `JOIN`, or `ORDER BY`
-- Composite indexes for multi-column queries (leftmost column is most selective)
-- Partial indexes for filtered queries (`WHERE active = true`)
-
-### When to suggest removing indexes
-
-- Indexes with near-zero `idx_scan` count (nobody reads them)
-- Duplicate indexes (same columns in same order)
-- Indexes on write-heavy tables that slow down INSERT/UPDATE/DELETE
-- Wide composite indexes where a narrower one would suffice
-
-Always present findings as suggestions with data (scan counts, table size), never execute DDL yourself.
-
-## Query Performance Tips
-
-- **`EXPLAIN ANALYZE`** before optimizing — measure, don't guess
-- **List columns explicitly** — avoid `SELECT *`, it fetches unnecessary data and breaks struct scanning when schema changes
-- **Use `LIMIT`** for pagination, always with an `ORDER BY`
-- **Prefer `EXISTS` over `COUNT`** for existence checks — `EXISTS` stops at the first match
-- **Avoid N+1 queries** — use `JOIN` or batch `WHERE id IN (...)` instead of querying in a loop
-- **Suggest improvements, never execute them** — performance changes (indexes, query rewrites, configuration) need human review in context of production data and workload patterns
-
-Batch operations SHOULD use 100–1,000 rows per batch — adjust based on row size and database load. Cursor-based pagination MUST replace `OFFSET` for large datasets — the cursor column MUST be chosen based on actual indexes (e.g., `created_at`, `user_id`). NEVER create indexes blindly — check existing indexes, measure with `EXPLAIN ANALYZE`, and present findings as suggestions. N+1 queries MUST be eliminated — use `JOIN` or batch `WHERE id IN (...)`.
-
-→ See `golang-observability` skill for database metrics and query monitoring. → See `promql-cli` skill for querying pool metrics (`db_open_connections`, `db_in_use_connections`, `db_idle_connections`) via CLI.
+Use `golang-observability` for Go database metrics and `promql` for interpreting exported pool measurements.

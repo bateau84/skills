@@ -5,12 +5,16 @@
       "id": 1,
       "name": "transaction-boundary",
       "prompt": "Record a sync run atomically: insert a row into `sync_runs` AND update `last_sync_at` in the `state` table. Both operations must succeed or fail together. Use the `get_connection(db_path)` context manager already in the codebase.\n\n```python\nfrom contextlib import contextmanager\nimport sqlite3\n\n@contextmanager\ndef get_connection(db_path: str):\n    con = sqlite3.connect(db_path)\n    con.row_factory = sqlite3.Row\n    try:\n        yield con\n    finally:\n        con.close()\n\ndef record_sync_run(db_path: str, started: str) -> None:\n    with get_connection(db_path) as con:\n        con.execute(\"INSERT INTO sync_runs (started) VALUES (?)\", (started,))\n        con.execute(\"UPDATE state SET last_sync_at = ?\", (started,))\n```\n\nIs this implementation transactionally correct? Fix any issues.",
-      "trap": "The `get_connection` context manager manages connection lifecycle (open/close) NOT transactions. Without an inner `with con:` block, sqlite3 uses auto-commit mode — if the second execute raises, the first may already be committed. Two `with` statements are needed: outer for connection lifecycle, inner `with con:` for the transaction boundary.",
+      "trap": "The supplied connection context manager only closes the connection. Under sqlite3 legacy transaction control, the DML transaction is not committed and close rolls it back; this is not per-statement auto-commit. Correct integration must match the actual transaction mode and make both writes commit or roll back together.",
       "expectations": [
         "Identifies the missing explicit transaction boundary (get_connection manages lifecycle, not transactions)",
         "Adds an inner `with con:` block wrapping both execute() calls as one atomic transaction",
         "Explains the outer `with` closes the connection; the inner `with con:` commits on success, rolls back on exception",
         "Does NOT treat the outer get_connection as sufficient for transactional atomicity"
+      ],
+      "negative_expectations": [
+        "Must not falsely describe the supplied default legacy DML behavior as per-statement auto-commit.",
+        "Must not imply that with con: begins a transaction when autocommit=True."
       ]
     },
     {
@@ -28,13 +32,46 @@
     {
       "id": 3,
       "name": "wal-concurrent-readers",
-      "prompt": "The service has an APScheduler job that writes to SQLite every minute. During busy request periods, read queries from FastAPI handlers become noticeably slower — sometimes blocking for the entire duration of the write. The DB uses the default journal mode. Diagnose the cause and suggest a pragma that would allow reads and the scheduled write to proceed with much less contention.",
-      "trap": "Without the skill, the model may suggest indexes, query optimization, or connection pooling. The skill-specific answer is `PRAGMA journal_mode = WAL`, which allows concurrent readers while a writer has the lock. The default DELETE journal mode requires exclusive locking that blocks all readers.",
+      "prompt": "A Python SQLite service on one host and a local SSD has a scheduled writer and concurrent request readers. The deployed SQLite runtime is supported and patched; transactions are short, and the current rollback journal produces measured reader/writer contention. Explain whether WAL is a suitable experiment and what must be checked before adopting it. No change to the accepted power-loss durability guarantee is requested.",
+      "trap": "WAL can reduce reader/writer interference in this deployment, but an unconditional pragma recipe can hide the single-writer limit, checkpoint work and durability changes.",
       "expectations": [
-        "Identifies the default journal mode causes exclusive write locks that block concurrent reads",
-        "Suggests PRAGMA journal_mode = WAL",
-        "Explains WAL allows concurrent reads during a write",
-        "Does NOT limit the primary recommendation to indexes or query optimization without mentioning WAL"
+        "Proposes WAL as a suitable measured experiment for the stated same-host local-filesystem workload, and verifies effective journal mode.",
+        "Explains readers can coexist with a writer while writes remain serialized.",
+        "Preserves the accepted durability contract and checks checkpoint/reader lifetimes, full workload timings and contention."
+      ],
+      "negative_expectations": [
+        "Must not claim WAL adds parallel writers or apply it blindly to arbitrary deployments.",
+        "Must not silently weaken synchronous/durability behavior."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "identity-preserving-python-save",
+      "trap": "A Python repository save uses REPLACE as if it were UPDATE and deletes dependent rows through a cascading foreign key.",
+      "prompt": "Use Python sqlite3 to save parent(id INTEGER PRIMARY KEY, name). child(id PRIMARY KEY, parent_id REFERENCES parent(id) ON DELETE CASCADE) already contains a child of parent 1. FK enforcement is enabled. Existing save SQL is INSERT OR REPLACE INTO parent(id,name) VALUES (?,?). The requirement is to update name for an existing ID, insert a new ID when absent, and preserve existing children. Provide replacement Python/SQL and a real-database verification plan.",
+      "expectations": [
+        "Emits parameter-bound INSERT ... ON CONFLICT(id) DO UPDATE SET name=excluded.name or a correct atomic equivalent supported by the runtime.",
+        "Keeps transaction commit/rollback ownership explicit rather than adding an unrelated commit inside a caller-owned unit.",
+        "Checks an existing parent update with the child retained, a new parent insert, and rollback or constraint failure in a real SQLite fixture."
+      ],
+      "negative_expectations": [
+        "Must not retain REPLACE while claiming it is an identity-preserving update.",
+        "Must not disable foreign keys or change the cascade contract to hide the error."
+      ]
+    },
+    {
+      "id": 5,
+      "name": "autocommit-context-is-not-atomic",
+      "trap": "The familiar with con: spelling does not create a transaction on a connection using autocommit=True.",
+      "prompt": "On Python 3.12+, a helper returns sqlite3.connect(path, autocommit=True). The caller uses with con: around two INSERT statements that must succeed together. The second INSERT violates a constraint. Is the first INSERT rolled back? Provide a corrected connection/transaction setup that also enables and verifies foreign keys, without closing the connection early.",
+      "expectations": [
+        "Explains that the first INSERT may already be committed and with con: is not a multi-statement transaction with autocommit=True.",
+        "Provides an explicit transaction mode or BEGIN/COMMIT/ROLLBACK sequence that protects both writes.",
+        "Initializes and verifies PRAGMA foreign_keys outside any active transaction and accounts for Python autocommit=False opening transactions."
+      ],
+      "negative_expectations": [
+        "Must not claim with con: alone ensures atomicity for autocommit=True.",
+        "Must not switch foreign-key enforcement inside an already active transaction and assume it took effect."
       ]
     }
   ]

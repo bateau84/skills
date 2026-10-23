@@ -29,6 +29,7 @@ Any agent may use any of these files for the relevant activity. Review and QA ar
 | Engineering memory (Synabun MCP)  | synabun-memory for selective recall, reusable lessons, and cleanup (Synabun required); learning for store-independent practice                                    |
 | Product lifecycle coverage        | product-lifecycle                                                                                                                                                  |
 | Implementation                    | software-engineering, major-version-upgrade for breaking stack migrations, and task-relevant language/domain skills                                                |
+| SQL and relational data            | sql for schema/query meaning; sqlite or postgresql for engine behavior; sql-performance for measured query and workload tuning                                     |
 | Review                            | relevant assessment companions; design-validation for proposed designs                                                                                             |
 | Failure investigation             | narrow troubleshooting/domain skills matching observed symptoms                                                                                                    |
 | Residual confidence testing       | a small set of QA companions for load-bearing or risky domains                                                                                                     |
@@ -38,6 +39,8 @@ These methods do not require a particular sequence, separate agents, additional 
 ## Loading discipline
 
 Load the smallest useful set. A Go database task might use `golang-common-practice`, `golang-database`, and `golang-testing`, rather than every Go skill. Use `golang-how-to` or `python-how-to` for skill selection in those families.
+
+For database work, select `sql` for joins, aggregates, constraints and pagination; add `sqlite` or `postgresql` when engine behavior matters. Use `sql-performance` for slow queries, indexes, plans, imports and measured growth. It has separate SQLite and PostgreSQL references, so only the relevant engine detail needs loading. Start with the roughly 100 MB–1 GB workload and let measured concurrency, working-set and maintenance limits drive future scale decisions. Language database skills add driver/ORM integration; they do not replace the SQL or engine method. An already identified SQL bottleneck can go directly to `sql-performance`; use `performance` when the slow application component is still unknown.
 
 For TypeScript, start with `typescript-common-practice` and add type safety, async, or testing guidance when material. Add `javascript-runtime` for execution semantics and `browser-runtime` for direct Web API work.
 
