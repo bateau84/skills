@@ -1,6 +1,6 @@
 ---
 name: feature-handoff
-description: Compile a compact, self-contained implementation request for another component, repository, or fresh agent session when current work depends on functionality elsewhere. Use for cross-component or cross-session handoffs such as frontend→backend, service A→service B, application→infrastructure, or one independently handled subsystem→another. Not for task orchestration, implementation plans, or authoring durable requirements and architecture (use behavioral-spec or architectural-spec for those artifacts).
+description: Compile a compact, self-contained implementation request for another component, repository, or fresh agent session when current work depends on functionality elsewhere. Use for cross-component or cross-session handoffs such as frontend→backend, service A→service B, application→infrastructure, or one independently handled subsystem→another. Not for general GitHub issue authoring (use github-issue), task orchestration, implementation plans, or authoring durable requirements and architecture (use behavioral-spec or architectural-spec for those artifacts).
 ---
 
 # Feature Handoff

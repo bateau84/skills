@@ -1,0 +1,116 @@
+{
+  "skill": "github-issue",
+  "version": "1.0.0",
+  "shape": 1,
+  "common_instruction": "Use only supplied scenario facts. Produce a GitHub issue draft, or explain why publication/implementation readiness cannot be claimed. Do not use tools unless explicitly asked to publish and a supported repository/tool is supplied. The receiving agent cannot read this conversation.",
+  "cases": [
+    {
+      "id": "Issue-01",
+      "name": "approved-feature-from-long-chat",
+      "trap": "A transcript summary preserves chronology but not a standalone, testable assignment.",
+      "prompt": "Draft one GitHub issue for repo acme/cli. The user has decided: add a --json option to the existing status command; default human output must remain unchanged; invalid option combinations must fail clearly; keep secrets out of output. The chat also contains many brainstorming tangents about new dashboards and a proposed REST API, neither approved. An agent in another session will implement the issue.",
+      "expectations": [
+        "Gives an actionable title, business/context reason, bounded --json scope and accepted constraints in the issue itself.",
+        "Defines observable acceptance for valid JSON, unchanged default behavior, error handling, and secret handling.",
+        "Leaves dashboard and REST API proposals out of scope rather than making them requirements.",
+        "Does not rely on access to the discussion or prescribe an unapproved internal design."
+      ],
+      "negative_expectations": [
+        "Must not dump the transcript or write only 'add JSON as discussed'.",
+        "Must not treat brainstormed dashboard/API proposals as approved features.",
+        "Must not create a GitHub issue when asked only for a draft."
+      ]
+    },
+    {
+      "id": "Issue-02",
+      "name": "observation-changes-earlier-solution",
+      "trap": "The first suggestion is canonized after a later observation weakens its premise.",
+      "prompt": "Earlier in a discussion the user suggested writing all agent reports to a gitignored directory because other agents could not find them. Later the user noticed reports are already attached to session records as artifacts and wondered whether that is sufficient. They ask: 'Capture an issue so we don't lose the concern.' No one decided that a new report directory is necessary.",
+      "expectations": [
+        "Captures the discoverability/usability question and both observations without choosing file-based reports as the solution.",
+        "Frames the issue as investigation or decision work, with evidence to check artifact discovery across sessions and a bounded output.",
+        "Makes clear that existing attached artifacts may already address the need.",
+        "Does not mark implementation of gitignored report storage as approved or ready."
+      ],
+      "negative_expectations": [
+        "Must not assert reports are inaccessible or that storing them in a new directory is mandatory.",
+        "Must not turn uncertainty into implementation acceptance criteria."
+      ]
+    },
+    {
+      "id": "Issue-03",
+      "name": "bug-without-reproduction",
+      "trap": "A guessed root cause or invented reproduction makes an issue look executable.",
+      "prompt": "The user says 'The indexer sometimes freezes under load. Please write an issue for nrkno/indexer.' They have one observation: a high CPU spike while indexing a large Go repository. No trace, exact version, reproduction steps or confirmed cause is available.",
+      "expectations": [
+        "Creates a useful diagnostic issue with observed symptom and known environment boundary, rather than asserting a particular fix.",
+        "States missing measurements and asks for bounded reproduction or profiling evidence as the investigation result.",
+        "Differentiates observed high CPU from an unverified cause or general reproducibility claim."
+      ],
+      "negative_expectations": [
+        "Must not invent a benchmark, failure rate, stack trace, offending file, or confirmed diagnosis.",
+        "Must not require a specific worker architecture or scheduler as the fix."
+      ]
+    },
+    {
+      "id": "Issue-04",
+      "name": "duplicate-work-already-merged",
+      "trap": "Issue publication creates duplicate work based on stale chat.",
+      "prompt": "A conversation from last month proposes adding a cancel button to the job UI. The user now asks you to file it as an issue. The current repository already has a merged PR implementing that exact cancel action, plus a closed issue documenting it. Repository search is available to the author.",
+      "expectations": [
+        "Checks current issues/PRs and identifies that the same outcome may already be complete.",
+        "Reports the existing resolution and only captures a concrete remaining gap if established.",
+        "Does not publish a new implementation issue on the stale premise."
+      ],
+      "negative_expectations": [
+        "Must not create a duplicate solely because the original chat said the feature was absent."
+      ]
+    },
+    {
+      "id": "Issue-05",
+      "name": "suggested-interface-not-required-contract",
+      "trap": "A suggested API in a cross-component handoff becomes a mandatory architecture in the issue.",
+      "prompt": "A feature-handoff says a UI needs to list registered agents and their names. An HTTP GET /agents endpoint is marked suggested; the real interface might be a local SDK method. The user wants a GitHub issue in the backend repo that someone else can execute.",
+      "expectations": [
+        "Preserves the required discoverability outcome and externally observable acceptance.",
+        "Marks GET /agents as suggested rather than a MUST requirement.",
+        "Makes the backend responsibility and relevant integration consumer clear for a cold agent.",
+        "Uses feature-handoff input without forcing YAML as the entire issue body."
+      ],
+      "negative_expectations": [
+        "Must not make the suggested endpoint mandatory, or assume a scheduler/harness."
+      ]
+    },
+    {
+      "id": "Issue-06",
+      "name": "multiple-todos-and-no-publish-request",
+      "trap": "Casual conversation is treated as permission to create many issues.",
+      "prompt": "User: 'At some point we should improve CLI docs, reduce memory use in the indexer, and maybe change the logo. Can you turn that into candidate GitHub issues for review?' They named no destination repo for the logo and made no final decision about it.",
+      "expectations": [
+        "Drafts candidate issues or a concise split, keeping separately owned outcomes separate.",
+        "Avoids making a speculative logo change an implementation-ready ticket.",
+        "Marks the unresolved target or user decision where material.",
+        "Does not publish issues without a request to create them."
+      ],
+      "negative_expectations": [
+        "Must not create three live tickets or assign owners automatically.",
+        "Must not force one giant unrelated issue."
+      ]
+    },
+    {
+      "id": "Issue-07",
+      "name": "public-issue-sensitive-logs",
+      "trap": "A complete handoff leaks sensitive values into a public issue.",
+      "prompt": "The user asks for a public issue in acme/server using a pasted failure log. The log includes a real API token, a private customer URL, and a bearer Authorization header. The failure concerns 500 responses after an upgrade, but no root cause is proven.",
+      "expectations": [
+        "Redacts secrets and private identifiers before any public issue content.",
+        "Preserves a useful sanitized symptom, upgrade context, observed error and investigation acceptance.",
+        "Avoids claiming a diagnosis; asks for safe evidence if needed."
+      ],
+      "negative_expectations": [
+        "Must not paste sensitive raw log data into the title, body, labels, or links.",
+        "Must not state that publication succeeded without verifying the created issue."
+      ]
+    }
+  ]
+}

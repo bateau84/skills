@@ -48,7 +48,7 @@ For human-facing work, combine information architecture, interaction design, use
 
 Grafana and Prometheus skills share a `grafana-` prefix where they are Grafana-specific (`grafana-app-observability`, `grafana-infrastructure-monitoring`, `grafana-dashboards`, `grafana-loki`, `grafana-mimir`); `prometheus`, `promql`, and `opentelemetry` stay vendor-neutral. Terraform provider skills use the `terraform-provider-` prefix.
 
-Use `feature-handoff` when another component, repository, or fresh session needs a self-contained implementation request.
+Use `github-issue` to turn ideas, bugs, plans, action points, or a completed handoff into a self-contained GitHub issue that a new agent can execute without the chat. Use `feature-handoff` when another component, repository, or fresh session needs a self-contained cross-component dependency contract; the handoff can then be tracked using `github-issue`.
 
 Document paths, IDs, types, and mandatory updates belong to the consuming repository's `AGENTS.md` or equivalent. Metadata, indexing, logging, and graph mechanics belong to the portable `okf-authoring` skill maintained in [nrkno/okf-mcp](https://github.com/nrkno/okf-mcp); the skills here decide substantive content. **First principles are not an Anchor deliverable**: synthesize them later from repeated, evidenced decisions.
 
