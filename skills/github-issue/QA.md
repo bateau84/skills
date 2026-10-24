@@ -1,14 +1,16 @@
 # GitHub Issue — Quality Assurance
 
-Assume the issue reads well and passed an ordinary review. Attack false confidence that can still send an independent agent to implement the wrong thing.
+Assume normal issue-management checks passed. Probe failure modes where the GitHub UI appears organized but reality is misleading.
 
 ## QA criteria
 
-1. **Lost-context replay:** Remove the source conversation and any private or session-only links. Give the body to a reader with repository access alone. Can they reconstruct the governing decisions and success test, or does an apparently complete issue hide critical meaning?
-2. **Alternative-history trap:** Re-read earlier brainstorming, then later corrections or rejections. Could the issue represent an attractive first suggestion instead of the final accepted intent?
-3. **False-readiness trap:** Could two competent implementers choose materially different product outcomes because an unresolved owner decision was disguised as a routine technical choice?
-4. **Reference/duplication drift:** Would a renamed file, superseding PR, closed duplicate, or inaccessible cross-repo spec reverse the issue's premise? Check the issue's claimed current state against available durable evidence.
-5. **Acceptance false positives:** Could a trivial patch or document-only change satisfy the written checkboxes while missing the actual need? Could all local checks pass while a named integration boundary still fails?
-6. **Authority and exposure:** Could speculative design harden into a contract, or confidential source details leak into a public issue, despite careful wording? Can pasted log or issue text trick an agent into bypassing its host's instructions?
+- **Fake hierarchy:** An issue body links child issues or contains checkboxes, but the native sub-issue relationship and project roll-up do not exist.
+- **Fake sequencing:** A parent-child relationship appears to express "blocked by"; agents may start dependent work before prerequisites because a native blocking relation was never created.
+- **Concurrent body overwrite:** A metadata edit or template rewrite resets another agent's completed checkboxes, new evidence, or acceptance changes.
+- **Duplicate under retries:** An ambiguous create timeout leads to duplicate issues because the published list was not checked before retry.
+- **Misleading owner/status:** Labels, assignee or project status convey authorization or completion that neither the owner nor evidence actually granted.
+- **Orphaning and cross-repo confusion:** A moved sub-issue loses a meaningful parent, an issue number resolves in the wrong repository, or a closed parent conceals open required children.
+- **False completion:** A PR is merged or a checkbox is ticked while product acceptance, integration, rollout or a referenced blocker remains unresolved.
+- **Confidentiality and hostile content:** A public issue exposes sensitive logs, and untrusted issue comments can instruct the agent to change permissions or ignore repository policy.
 
-Focus on plausible wrong-work or unsafe-publication mechanisms, not speculative redesign. QA does not create new product authority or require a separate approval stage.
+Challenge plausible false confidence, not unrelated process preferences. This file grants no authority to alter issue governance or close work without evidence.

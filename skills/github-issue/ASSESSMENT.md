@@ -1,18 +1,19 @@
 # GitHub Issue — Reviewer Assessment
 
-Review the **authored issue**, not the quality of the conversation it came from. Can a capable agent start from the issue without the original chat and pursue the correct outcome?
+Review a GitHub issue operation for correctness of **tracking state**, not merely the quality of its wording.
 
 ## Review criteria
 
-1. **Ownership and unit of work:** The target repository and coherent outcome are grounded; unrelated ideas were not silently bundled, and connected dependent work was not separated without a contract.
-2. **Decision fidelity:** Compare the issue to accepted user intent and durable sources. Rejected ideas, tentative proposals, optional examples, and agent recommendations were not promoted into MUST behavior.
-3. **Current-state accuracy:** Asserted paths, behavior, dependencies, existing fixes, and related issues/PRs are verified where accessible, or clearly marked unverified.
-4. **Cold-start completeness:** Problem, reason, outcome, relevant context, accepted scope/exclusions, constraints, and accessible source references let a fresh agent work without asking for the old transcript.
-5. **Readiness and uncertainty:** Implementation, investigation or decision work is correctly distinguished. Blocking choices have an explicit owner/next decision, not false implementation acceptance criteria.
-6. **Testable completion:** Acceptance checks reflect observable behavior or bounded findings, including regression/cross-boundary proof when material; they do not require one unapproved internal design.
-7. **Proportionate detail:** The issue is self-contained without becoming an implementation plan, transcript dump, guessed file inventory, or new workflow policy.
-8. **Publication discipline:** Sensitive information is removed; requested publication/metadata is grounded; duplication is checked where possible; published title/body/URL are verified, with failures stated honestly.
+1. **Correct target and record:** Owner/repo, issue identity and actual current body/state were verified, and likely duplicate or completed work was checked before creating a new issue.
+2. **Intent preserved:** A provided work handoff or existing issue contract was represented without inventing acceptance, owner, priority or required architecture.
+3. **Right tracking construct:** Local Markdown checkboxes, independent sub-issues, blockers, issue type, labels, projects and milestones are distinguished by their actual semantics; parent-child is not mistaken for prerequisite order.
+4. **Meaningful granularity:** Children have their own outcome and acceptance; trivial task bullets have not been turned into a swarm of issues or a hierarchy for its own sake.
+5. **Metadata grounded:** Labels, types, assignees, milestones and projects exist and are legitimately intended; no arbitrary user/bot assignment or fake `agent:ready`-style approval.
+6. **State preservation:** Existing checked boxes, discussion, manually edited criteria and concurrent updates are retained when the body changes.
+7. **Lifecycle truthful:** Progress, closure and reopening follow evidence and project rules; a linked PR or a closed parent does not silently certify unfinished child work.
+8. **Side-effect and security discipline:** Mutations were actually requested and permitted; no sensitive information was published; unsupported native relationships were not represented as successfully applied.
+9. **Verification:** Published body, metadata and relationship changes were re-read; URLs and success claims are based on tool results rather than intent to mutate.
 
-## Evidence boundary
+## Evidence limits
 
-A clear issue can still describe the wrong task. Readability alone is not evidence that decisions were preserved. A linked artifact is not enough if the future reader cannot access it. A checked acceptance box is not proof that implementation succeeded; this skill concerns issue authoring only.
+An issue that is correctly labeled, linked and closed may still contain the wrong requirements. Use `work-handoff` assessment if the issue was constructed from a conversation and intent fidelity is in doubt.
