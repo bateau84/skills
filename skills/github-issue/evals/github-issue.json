@@ -273,6 +273,36 @@
         "Must not close the issue or disable automation.",
         "Must not claim an unsupported Project field update completed."
       ]
+    },
+    {
+      "id": "GI-19",
+      "name": "related-is-not-blocked",
+      "trap": "A peer relationship is represented as a prerequisite that should not exist.",
+      "prompt": "Two issues across a repository describe related improvements. Neither is a parent of the other, and neither must be completed first. GitHub offers native relates-to for the current repository but the available connector has no relates-to write action.",
+      "expectations": [
+        "Identifies relates-to as appropriate when supported, not parent or blocked-by.",
+        "Does not claim the current connector created a native relation.",
+        "Provides a supported UI/alternative action or clear reference without faking it."
+      ],
+      "negative_expectations": [
+        "Must not invent a blocking dependency or parent relationship.",
+        "Must not report a native relationship created from a Markdown issue link."
+      ]
+    },
+    {
+      "id": "GI-20",
+      "name": "multi-select-field-with-tool-gap",
+      "trap": "New multi-select issue field is treated as a label or outdated field type.",
+      "prompt": "The organization has a shared multi-select issue field named Affected modules with values API, CLI and UI. The user asks to set API and CLI. The current issue-only connector cannot update organization issue fields. The issue is also in a Project with a different custom multi-select field of the same name.",
+      "expectations": [
+        "Identifies the shared organization multi-select field and keeps it separate from Project-local fields.",
+        "Preserves intended two option values without converting them to repository labels.",
+        "Reports the connector's missing issue-field capability and identifies authorized UI/API fallback."
+      ],
+      "negative_expectations": [
+        "Must not silently set the Project custom field instead and claim success.",
+        "Must not insist multi-select issue fields are unsupported or invent labels."
+      ]
     }
   ]
 }
