@@ -12,9 +12,11 @@ Load this reference for GitHub issue types, milestones, Project membership, Proj
 | Milestone | Repository, covers issues/PRs | Release or delivery group, roll-up and optional due date | Individual issue deadline or cross-repo Project |
 | Organization issue field | Organization-defined, value on **the issue** | Shared Priority, Effort, Severity, Start/Target date | Project-local custom field |
 | GitHub Project | User or organization | Cross-repository table, board or roadmap | Repository milestone |
-| Project custom field | Individual Project item | Local Status, Iteration, estimates, notes or priority | Issue state or shared organization issue field |
+| Project-local field | Individual Project item | Built-in Status; custom Iteration, estimates, notes or priority | Issue state or shared organization issue field |
 | Issue form/template | Repository | Collect bug details, examples and reproduction | Native typed issue field |
-| Sub-issue / blocked-by | Native issue relationships | Separate deliverables / prerequisites | Markdown reference or checkbox |
+| Sub-issue / blocked-by / relates-to | Native issue relationships | Separate deliverables / prerequisites / related work | Markdown reference or checkbox |
+
+GitHub also introduced a native **relates-to** relationship in public preview in August 2026 for peer issues that are connected without implying containment or blocking. Use it when available; do not fake a blocked-by dependency to mark merely related issues.
 
 An issue can belong to multiple Projects; the same Project-local field name may have a **different value in each Project**. Organization issue field values remain the same across Projects, because they belong to the issue. Prefer one authoritative source for a concept such as Priority; avoid hidden duplicates in labels, org fields and per-Project fields.
 
@@ -29,7 +31,7 @@ All four are optional and can coexist. No combination is required as a universal
 
 ## 3. Organization issue fields
 
-Organizations can configure structured **issue fields**. Supported types are **single-select, text, number, date**. They may provide Priority, Effort, Start date and Target date defaults when enabled, but each organization can edit or delete them. Verify actual names/options before setting a value.
+Organizations can configure structured **issue fields**. Supported types include **single-select, multi-select, text, number and date**, where enabled. Multi-select became generally available in August 2026; inspect the actual organization and available API/tool support. They may provide Priority, Effort, Start date and Target date defaults when enabled, but each organization can edit or delete them. Verify actual names/options before setting a value.
 
 - **Shared value:** An issue's field is consistent across Projects and repositories within the organization. A Project can display issue fields as columns; editing such a column edits the **issue's shared field**, not a new Project field.
 - **Pinned fields:** Organization admins can pin fields to particular issue types, or issues without a type. Pinned fields appear in the sidebar/create modal. An unpinned field with no value may be hidden until `Add field` is selected. Absence from one view is not proof the field does not exist.
@@ -46,9 +48,9 @@ A GitHub Project can contain issues, PRs and **Project draft issues**, including
 
 - **Membership:** Check whether the item is already in the relevant Project or will be auto-added by a configured workflow. Verify any requested addition; avoid duplicate work or membership in unrelated Projects.
 - **Views:** Project table, board and roadmap views support filtering, sorting, grouping and field display. Views do not create separate issue contracts.
-- **Project custom fields:** Available types include **single-select, text, number, date, iteration**. Common local fields include Status, Priority, Estimate, Notes or Sprint; **names and options vary by Project**. Iterations represent configured recurring time blocks, not mandatory issue deadlines.
+- **Project fields:** Projects have a local built-in **Status** field; custom types include **single-select, multi-select, text, number, date, iteration** where supported. Common local fields include Status, Priority, Estimate, Notes or Sprint; **names and options vary by Project**. Iterations represent configured recurring time blocks, not mandatory issue deadlines.
 - **Built-in issue columns:** Project views can also show issue fields, assignees, issue types, milestones, parent/sub-issue progress and linked PRs. These display the connected issue's data rather than independent local values.
-- **Status versus state:** An issue is open/closed; `Status` may be a Project custom single-select field. A Project automation may set status to Done when an issue closes, or close an issue when a status changes. Inspect the configured workflows before changing either.
+- **Status versus state:** An issue is open/closed; `Status` is a Project-local single-select field, not the issue's open/closed state. A Project automation may set status to Done when an issue closes, or close an issue when a status changes. Inspect the configured workflows before changing either.
 - **Project drafts:** Draft issues exist only in a Project until converted into repository issues. They can have title, body, assignee and custom fields; repository labels/milestones require conversion. Do not report a repository issue number, state or URL before creation.
 - **Permissions:** Check actual Project access and GitHub CLI's `project` token scope. Issue permissions alone do not prove Project field write capability. Do not modify credentials, scopes or Project workflows as an unannounced side effect.
 
@@ -112,6 +114,7 @@ The `gh project` family needs the appropriate `project` token scope. Check with 
 - [Milestones](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones)
 - [Projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects)
 - [Project field types](https://docs.github.com/en/issues/planning-and-tracking-with-projects/understanding-fields)
+- [Multi-select generally available and relates-to preview (August 2026)](https://github.blog/changelog/2026-08-07-connecting-issues-and-multi-select-field-support/)
 - [Project items and drafts](https://docs.github.com/en/issues/planning-and-tracking-with-projects/managing-items-in-your-project/adding-items-to-your-project)
 - [Project automations](https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-built-in-automations)
 - [Issue forms](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms)
