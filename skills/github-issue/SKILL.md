@@ -1,6 +1,6 @@
 ---
 name: github-issue
-description: Manage GitHub Issues: create, triage, assign, label, type, edit, link, track and close; use checkboxes, native sub-issues and dependencies, milestones, Projects, project custom fields, organization issue fields and templates. Use when publishing a prepared handoff as an issue or maintaining GitHub issue metadata. Not for extracting accepted work from chat (use work-handoff).
+description: Manage GitHub Issues - create, triage, assign, label, type, edit, link, track and close; use checkboxes, native sub-issues and dependencies, milestones, Projects, project custom fields, organization issue fields and templates. Use when publishing a prepared handoff as an issue or maintaining GitHub issue metadata. Not for extracting accepted work from chat (use work-handoff).
 ---
 
 # GitHub Issue
