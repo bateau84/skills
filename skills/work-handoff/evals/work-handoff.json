@@ -124,6 +124,57 @@
         "Must not paste credentials, internal URLs or the private transcript.",
         "Must not imply a fix is already approved or a GitHub issue was created."
       ]
+    },
+    {
+      "id": "WH-09",
+      "name": "plain-language-auditable-accepted-change",
+      "trap": "A polished technical handoff is executable by an agent but unreadable to the person who made the request.",
+      "prompt": "A user approved adding `--json` to an existing `status` command so scripts can consume its output. They specifically said the normal human-readable output and existing exit codes must stay unchanged. The agent's draft says: 'Establish a structured status serialization modality with strict legacy invocation equivalence and comprehensive observational verification.' Produce a finished handoff for both the original user and an agent with no chat history.",
+      "expectations": [
+        "Explains in everyday words why JSON output is wanted and what changes for the user, not just technical abstraction.",
+        "Makes the unchanged default output and exit codes explicit in the same clear language used for the requested outcome.",
+        "Uses concrete observable acceptance checks for JSON output and preserved existing behavior.",
+        "Keeps the exact `--json` flag and `status` command names and allows a human to compare each promise to the given decisions."
+      ],
+      "negative_expectations": [
+        "Must not retain the opaque draft as the operative requirement while adding only a friendly summary.",
+        "Must not add an API, change exit codes or weaken the unchanged-default guarantee.",
+        "Must not demand a separate human approval ceremony."
+      ]
+    },
+    {
+      "id": "WH-10",
+      "name": "rewrite-opaque-handoff-in-place",
+      "trap": "An accessible overview is appended but the original dense implementation requirements remain confusing or contradictory.",
+      "prompt": "Revise this existing handoff, preserving agreed behavior: 'Objective: Cross-system terminal outcome normalization. Requirements: Consumer MUST distinguish cancellation from success; producer MUST return `cancelled` on user cancellation; interrupted work MUST NOT be reported `completed`; UI examples MAY display a grey cancellation label. Acceptance: enforce terminal semantic fidelity.' The source decision was that cancelled work must be clearly reported as cancelled, never successful; a grey UI label was only an example. The user wants plain language they can check, not a new summary next to the same opaque clauses.",
+      "expectations": [
+        "Rewrites the actual objective, requirements and acceptance into direct everyday language in the handoff itself.",
+        "Preserves the exact `cancelled` and `completed` status values and the agreed no-false-success behavior.",
+        "Separates the optional grey label example from required behavior and defines concrete observable checks.",
+        "Allows the human to see what was agreed without decoding phrases like 'terminal semantic fidelity'."
+      ],
+      "negative_expectations": [
+        "Must not preserve confusing requirement text unchanged under an easier introduction.",
+        "Must not require the example grey label or change terminal outcomes.",
+        "Must not remove precise status names solely for readability."
+      ]
+    },
+    {
+      "id": "WH-11",
+      "name": "plain-but-not-vague-cross-team-bug",
+      "trap": "Converting jargon to friendly language removes the actual operating limits or proof path.",
+      "prompt": "A team identified that the Go indexer can use excessive CPU when indexing a large repository. There is no confirmed root cause; accepted work is to investigate, capture a repeatable CPU profile if possible, and report evidence and a recommended next step without implementing a guessed fix. A handoff goes to another team. Write it so an engineer and the requesting human both understand it.",
+      "expectations": [
+        "States the observed high CPU symptom, why it matters, and the investigation goal in straightforward language.",
+        "Keeps uncertain diagnosis separate from facts and states that a fix has not yet been authorized.",
+        "Describes a bounded deliverable in human-checkable terms, including what to report if profiling cannot reproduce the issue.",
+        "Includes technical detail only where it helps the receiving engineer gather correct evidence."
+      ],
+      "negative_expectations": [
+        "Must not write a jargon-heavy investigation charter with no recognizable output.",
+        "Must not invent a root cause, benchmark, threshold or mandatory implementation.",
+        "Must not omit evidence limitations to keep the handoff simple."
+      ]
     }
   ]
 }

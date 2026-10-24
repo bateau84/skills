@@ -2,6 +2,12 @@
 
 Use this **optional specialization** of `work-handoff` when one component, repository, service, or fresh session needs behavior supplied by another. It preserves the existing `feature-handoff` technique without making its extra interface detail mandatory for ordinary bugs or enhancements.
 
+## Explain the handoff before the interface details
+
+Open with ordinary words describing **what the first component needs**, **what the receiving component should provide**, and **what the user or caller will notice**. A concrete example is often clearer than a list of internal names. Keep source and target names, required-versus-suggested status, exact fields, exceptions and acceptance conditions visible afterward; the easy explanation must not replace or contradict them.
+
+If using the YAML variant below, make the `objective`, `need`, requirement text and acceptance text understandable to a person reading it directly. Keep the legacy machine-readable shape when a consumer needs it; do not silently change its schema in the name of readability.
+
 ## Contract boundary
 
 Identify the **source** need and the **target** responsibility. State what must hold **across that seam**, not which internal files or design pattern the receiver should choose. The source's current implementation is not by itself authority to demand one architecture.

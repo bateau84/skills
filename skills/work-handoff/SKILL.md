@@ -9,6 +9,25 @@ Produce a **standalone work contract**, not a conversation summary. Someone arri
 
 A handoff can be pasted into another agent session, stored as a document, or published as a GitHub issue. **This skill owns the meaning; the destination does not change that meaning.** Use `github-issue` for publishing, relationships, metadata, and other GitHub-specific management. Neither skill creates permission to implement an unapproved idea.
 
+## Make it clear to humans as well as agents
+
+A person who took part in the discussion must be able to read the handoff and say **"Yes, that is what we agreed"** — or point to the exact statement that differs. A new agent must be able to carry out the same work without the chat. These are **two checks**, not a requirement for a new approval step.
+
+- Start with a few plain sentences: what is happening now, what needs to change (or be investigated), and why. For non-trivial work, add one concrete example of the expected behavior or a failure worth preventing.
+- Write like you are explaining the work to a capable teammate, not writing an academic paper. Use familiar words, short sentences, and descriptive headings. State who does what and what happens as a result. Avoid abstract nouns and unexplained internal shorthand when ordinary words would be clearer.
+- State accepted decisions and important exclusions **in language the person can compare with the original discussion**. Show suggestions and open questions separately; don't hide a stronger interpretation in technical wording.
+- Explain a necessary technical term briefly at first use. Keep exact commands, field names, error meanings, requirement levels, IDs, and conditions when they matter. Plain language must **not** change or weaken a real guarantee.
+- Describe acceptance in observable terms a person can recognize. Test names, internal file paths, and links can support an acceptance check, but must not be the only explanation of what success means.
+- Make the actual requirements and criteria readable, not just an introductory summary. If a section is hard to interpret, rewrite that section **in place**. Do not add a friendly overview while leaving conflicting or opaque requirements underneath.
+- Be complete enough to preserve meaning, but do not paste a transcript, repeat the same rule in several sections, or add an explanation for every obvious term.
+
+**Example (only when these facts were agreed):**
+
+- Opaque: "Introduce structured status emission while preserving legacy invocation semantics."
+- Clear: "Add `--json` to the `status` command so scripts can read the result. Running `status` without `--json` must still show the same text and use the same exit codes."
+
+The second version tells a person what they will see **and** gives an agent a testable target. Use examples to explain agreed requirements, not to invent new ones.
+
 ## Scope and authority
 
 - Preserve **accepted** intent, requirements, constraints, exclusions, and relevant decisions. A question, example, agent proposal, or convenient implementation is not automatically approved.
@@ -28,40 +47,40 @@ A handoff can be pasted into another agent session, stored as a document, or pub
    - **Implementation:** the desired outcome and governing constraints are agreed; routine engineering discovery and design can be left to the recipient.
    - **Investigation:** the problem or question is clear, but cause, impact, feasibility, or evidence still needs work. Acceptance is a bounded finding and recommendation, not an unapproved fix.
    - **Decision/proposal:** a user-owned scope, product meaning, or risk choice is open. State who should decide and what evidence/options are available; do not frame implementation as already approved.
-6. **Capture the necessary context.** Describe the relevant current behavior, reason the work arose, accepted target behavior, boundaries, preserving guarantees, cross-component dependencies, and known evidence. Link durable accessible records; inline essential facts when the future recipient cannot access a session link or private artifact. Do not paste the whole chat.
+6. **Capture the necessary context in plain language.** Describe what happens now, why the request exists, what was agreed, what must remain unchanged, relevant dependencies, and evidence. Start with the human-visible result; add technical details only where needed to implement or check it. Link durable accessible records; include essential facts when a future recipient cannot access a session link or private artifact. Do not paste the chat.
 7. **Define completion at the right boundary.** Use falsifiable, observable acceptance criteria or a clear investigation/decision deliverable. For a feature or bug, cover relevant regression or interaction behavior; for a cross-component dependency, describe what the receiving side must expose to its consumer. Distinguish what remains to verify from what is already proven.
 8. **Surface uncertainty without fabricating closure.** Separate routine implementing-agent choices from genuinely reserved product/architecture decisions. Identify blocking questions, affected owners, and immediate next step where necessary. Avoid turning optional detail into blocking ceremony.
-9. **Run the cold-start test.** Read only the proposed handoff, without source chat. Can the recipient explain the intended result, accepted limits, evidence, unresolved decisions, and success checks? If not, repair the artifact. Then stop; do not execute the work unless separately requested.
+9. **Run both reader tests.** First, compare the actual sentences and acceptance criteria with accepted user decisions: could a human involved in the discussion spot a misinterpretation, changed promise, missing exclusion, or unexplained term without decoding academic language? Then run the **cold-start test**: can an agent with only the handoff explain the goal, constraints, evidence, unanswered questions and success checks? Repair unclear sections in place without changing the agreed meaning. Then stop; do not execute the work unless separately requested.
 
 ## Default artifact
 
 Use clear, compact Markdown unless the caller or destination requires another format. Omit optional sections that add no value. The headings are guidance, not a fixed schema.
 
 ~~~markdown
-# <Short outcome-oriented title>
+# <Short title that says what needs to happen>
 
 **Work:** Implementation | Investigation | Decision/proposal
-**Target:** <Known repository, component or responsibility, if any>
+**For:** <Known repository, team, component or responsibility>
 
-## Objective
-<What should become true, or what question must be resolved, and why>
+## What we want
+<What should change or what question should be answered, and why it matters>
 
-## Context and evidence
-<Relevant current state, observations, provenance, important accepted decisions>
+## Why this is needed
+<What happens today, what we observed, and any important earlier decision>
 
-## Requirements and boundaries
-<Accepted outcomes; critical MUST/SHOULD/MAY distinctions where useful>
-<Constraints and important exclusions>
+## What we agreed
+<Expected behavior and key limits; what must stay unchanged or is out of scope>
+<Keep exact technical names and MUST/SHOULD/MAY levels where they matter>
 
-## Acceptance
-- <Observable condition or bounded investigation/decision deliverable>
-- <Regression/integration proof when relevant>
+## Done when
+- <Result someone can observe, or a useful investigation/decision result>
+- <Important regression or end-to-end check, when relevant>
 
-## Dependencies and references
-<Durable applicable specifications, issues, PRs, paths, other work>
+## Related work and evidence
+<Useful accessible specs, issues, PRs, examples or observations>
 
-## Open decisions
-<Only genuinely unresolved decisions, their owners, and consequences>
+## Still to decide
+<Only consequential unresolved choices and their owners>
 ~~~
 
 A small change may need only objective, context, and acceptance. A complicated migration may need more constraints and evidence. Stable IDs (for example `REQ-001`, `AC-001`) are useful when requirements are already referenced; avoid numbering merely for formality.

@@ -303,6 +303,57 @@
         "Must not silently set the Project custom field instead and claim success.",
         "Must not insist multi-select issue fields are unsupported or invent labels."
       ]
+    },
+    {
+      "id": "GI-21",
+      "name": "human-can-review-published-handoff",
+      "trap": "Issue is valid as data but a non-specialist cannot see which work was actually approved.",
+      "prompt": "A completed work-handoff says: add `--json` to `status` for automation, keep the default output and exit codes unchanged, and verify both. The user asks for a GitHub issue in acme/cli. No GitHub tool is available in this eval, so draft the title and body only. The person reviewing the issue knows the discussion but does not work in the codebase.",
+      "expectations": [
+        "Uses a clear outcome-based issue title and a short problem/goal explanation a person can follow.",
+        "Presents the accepted JSON behavior and unchanged text/exit-code behavior as separate readable, concrete acceptance checks.",
+        "Preserves exact command and flag names without requiring knowledge of internal functions or architecture.",
+        "Makes it possible for the original human to check the issue against the handoff before any code is written."
+      ],
+      "negative_expectations": [
+        "Must not replace the requirements with jargon like 'serialization compatibility invariants'.",
+        "Must not omit the preservation constraints or add speculative implementation mechanics.",
+        "Must not claim publication succeeded without a tool."
+      ]
+    },
+    {
+      "id": "GI-22",
+      "name": "fix-opaque-existing-issue-body-not-just-summary",
+      "trap": "Agent places a friendly paragraph at top while leaving the actual checkboxes academic and misleading.",
+      "prompt": "An existing issue draft from the user contains: 'Goal: Operationalize stateful termination semantics. Acceptance: [ ] Validate completion-state convergence. [ ] Ensure finalization evidence integrity.' The accepted behavior is simply that cancellation returns status `cancelled`, never `completed`; a cancelled job must not appear as successful in the UI, even after refresh. User asks you to rewrite the issue text for human review, not create or implement the issue.",
+      "expectations": [
+        "Rewrites the operative body and checkboxes in straightforward language, not only adding a new summary.",
+        "Retains the exact status names `cancelled` and `completed`, and the refresh persistence condition.",
+        "States acceptance in observable terms such as what the user sees after cancelling and refreshing.",
+        "Keeps the scope of work tied to cancellation rather than inventing a broad workflow redesign."
+      ],
+      "negative_expectations": [
+        "Must not leave the dense acceptance bullets unchanged.",
+        "Must not lose the refresh requirement or alter actual status values.",
+        "Must not claim it updated a live issue when only drafting."
+      ]
+    },
+    {
+      "id": "GI-23",
+      "name": "specific-test-steps-do-not-replace-purpose",
+      "trap": "An issue body is only internal commands and file paths, so a human cannot understand why the work exists or approve its meaning.",
+      "prompt": "An agent is asked to draft a GitHub issue for a bug: users who cancel a job sometimes see 'Success' after reloading. A developer proposed adding a regression test in `internal/jobs/status_test.go`, but the file path is not yet verified and no mechanism is agreed. Issue text should be readable by the requestor and useful to an implementer.",
+      "expectations": [
+        "Explains the user-visible problem and desired result in simple language before any optional technical pointers.",
+        "Contains concrete checks for cancellation showing `cancelled` after a reload and no false 'Success'.",
+        "Marks the suggested test file path as unverified or leaves it out rather than making it a mandatory fix location.",
+        "Keeps useful technical status values where they clarify the user-visible acceptance."
+      ],
+      "negative_expectations": [
+        "Must not write only 'add test in internal/jobs/status_test.go' as the issue.",
+        "Must not claim a root cause or require an unverified path.",
+        "Must not equate a passing unit test with complete user-facing acceptance without checking behavior."
+      ]
     }
   ]
 }
