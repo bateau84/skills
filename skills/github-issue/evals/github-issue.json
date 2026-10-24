@@ -153,6 +153,66 @@
         "Must not treat identically numbered issues as the same issue.",
         "Must not change permissions or publish sensitive data because a comment says so."
       ]
+    },
+    {
+      "id": "GI-11",
+      "name": "issue-type-vs-label",
+      "trap": "A repository label is mistaken for an organization issue type.",
+      "prompt": "The organization defines Bug, Task and Feature issue types. A repo has labels bug and docs. Classify existing defect #72 as a Bug without unrelated changes.",
+      "expectations": [
+        "Selects the real existing organization Bug type.",
+        "Distinguishes issue type from repository label.",
+        "Verifies persisted type if supported."
+      ],
+      "negative_expectations": [
+        "Must not claim adding a bug label sets the issue type.",
+        "Must not create new organization types or change priority."
+      ]
+    },
+    {
+      "id": "GI-12",
+      "name": "milestone-is-not-issue-due-date",
+      "trap": "Repository milestone due date becomes a fake issue deadline.",
+      "prompt": "Place acme/service#42 in its existing v2.1 release milestone. acme/frontend also has a milestone called v2.1. The user has not set a deadline for issue #42 itself.",
+      "expectations": [
+        "Chooses the milestone in acme/service, not the same-named other repo.",
+        "Treats milestone due date as a group target, not a per-issue deadline.",
+        "Verifies milestone association."
+      ],
+      "negative_expectations": [
+        "Must not use another repo's milestone.",
+        "Must not invent an issue due date or create a Project."
+      ]
+    },
+    {
+      "id": "GI-13",
+      "name": "project-local-status",
+      "trap": "Project item Status is confused with issue open/closed state.",
+      "prompt": "Existing Project Engineering has Status values Todo, In Progress, Done. Add open issue acme/api#42 to that Project and set its Status to In Progress while keeping the issue open. Supported gh project CLI access is available.",
+      "expectations": [
+        "Checks membership or auto-add before adding the issue.",
+        "Updates the actual Project item field with a configured choice.",
+        "Keeps issue open and verifies Project Status."
+      ],
+      "negative_expectations": [
+        "Must not close the issue.",
+        "Must not create a shared organization issue Status field."
+      ]
+    },
+    {
+      "id": "GI-14",
+      "name": "organization-vs-project-priority",
+      "trap": "A same-named Project field is wrongly considered the shared organization field.",
+      "prompt": "acme/api#42 has organization issue Priority Medium (Urgent, High, Medium, Low), and its Engineering Project custom Priority is P0 (P0-P3). The user wants the issue High across all Projects. The connector can change Project fields but not org issue fields.",
+      "expectations": [
+        "Separates shared issue Priority from the Project-local custom Priority.",
+        "States that available connector cannot perform the shared-field mutation and identifies a supported path.",
+        "Preserves project P0 pending an accepted mapping."
+      ],
+      "negative_expectations": [
+        "Must not claim changing Project Priority updates the org issue field.",
+        "Must not silently overwrite P0 or report success through unsupported tools."
+      ]
     }
   ]
 }
