@@ -9,13 +9,28 @@ Use GitHub Issues as a **durable record of tracked work**. This skill owns GitHu
 
 For a long conversation, feature dependency, bug observation, or plan requiring semantic consolidation, use `work-handoff` first. For an already clear user request or an existing issue, this skill can be used directly. Do not require a handoff artifact just to edit a label or close an issue.
 
+## Write issues that humans can read and verify
+
+The issue is for **people as well as agents**. A human should understand the need and be able to check whether the proposed change matches the discussion; the next agent should be able to act on it without the chat. GitHub metadata and checkboxes do not make unclear prose acceptable.
+
+- Give the issue a short, meaningful title. Start the body with **what is wrong or needed, what should happen instead, and why it matters** in everyday words. For meaningful changes, include one concrete user-visible example.
+- Use familiar headings such as "Problem", "What we want", "Must stay the same" and "Done when", or the repository's existing template. Choose only headings the issue needs; do not force a form on a one-line bug.
+- Put agreed outcomes, exclusions and open questions where a person can **compare them directly with the request**. Preserve the prepared `work-handoff` meaning when publishing it; changing the format must not change the promise.
+- Use clear acceptance checkboxes: describe behavior a person or tester can observe, not only implementation steps like "update parser" or vague claims like "ensure correct lifecycle alignment". Add exact commands, paths, payloads or protocol names where they make the check precise, and explain unfamiliar terms briefly.
+- Avoid academic wording, unexplained abbreviations and walls of text. Do not remove security, compatibility, failure conditions or correct technical names just to make an issue short or friendly.
+- **Read the entire saved body.** A readable summary is not enough if the actual requirements remain obscure underneath. When revising an issue, improve the relevant wording in place while preserving checked items, acceptance details, links and concurrent human edits.
+
+For example, if it was agreed that the old behavior must stay the same, prefer "Add `--json` to `status` for scripts. Without `--json`, the text and exit codes stay unchanged" over "Establish backward-compatible status serialization semantics."
+
+**Two-reader check before publishing or replacing a body:** Could a human involved in the request say which parts match or conflict with the agreement? Could a fresh agent explain what to do and how to tell it worked? If not, rewrite the issue text; do not treat an extra summary comment as a fix.
+
 ## First inspect, then mutate
 
 1. **Identify the repository and issue.** Confirm the owner/repo and the current issue/PR if supplied. Respect repository instructions, issue templates and GitHub permissions; an issue number is not globally unique.
 2. **Read the current record.** For edits, fetch the title, body, state, type, labels, assignees, milestone, organization issue fields, Project membership/field values, relationships and discussion **as available**. Different metadata may require different permissions and APIs. Read parent and linked issues when they affect a proposed transition. For new issues, search open/closed issues and merged/open PRs for duplicates and already-delivered work.
 3. **Decide the intended operation.** Creating an issue, setting issue metadata, adding a Project item, setting a Project-local field, assigning ownership, changing hierarchy, declaring a dependency, and closing work are distinct actions. Apply only the operations actually requested or clearly supported by project conventions.
 4. **Use the smallest meaningful GitHub structure.** Keep a few local checks in one issue. Create distinct issues only for separately owned, independently trackable outcomes; use real GitHub relationships where warranted.
-5. **Preserve the authoritative content.** Use the agreed handoff/body as the source of what must be done. GitHub fields and links explain tracking, not new requirements. When editing, preserve existing checked boxes, updates, human edits, and verified evidence; do not overwrite concurrent changes from an old snapshot.
+5. **Preserve and clarify the agreed content.** Use the accepted handoff/body as the source of what must be done. Present it in language both people and agents can follow; compare the actual criteria, constraints and examples to the accepted work before publishing. GitHub fields and links explain tracking, not new requirements. When editing, preserve existing checked boxes, updates, human edits, and verified evidence; do not overwrite concurrent changes from an old snapshot.
 6. **Execute with an available supported tool.** Use authorized GitHub integration, GitHub CLI, or UI. Verify the tool actually supports each operation. Never pretend a Markdown link created a native sub-issue or dependency.
 7. **Verify and report.** Re-fetch created/changed issues and relationships. Return the real issue URL and meaningful metadata or changes made; say exactly what failed or remained unverified. After an ambiguous failure, search before retrying to avoid duplicates.
 

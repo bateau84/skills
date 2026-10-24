@@ -7,6 +7,8 @@ Assume normal issue-management checks passed. Probe failure modes where the GitH
 - **Fake hierarchy:** An issue body links child issues or contains checkboxes, but the native sub-issue relationship and project roll-up do not exist.
 - **Fake sequencing:** A parent-child relationship appears to express "blocked by"; agents may start dependent work before prerequisites because a native blocking relation was never created.
 - **Concurrent body overwrite:** A metadata edit or template rewrite resets another agent's completed checkboxes, new evidence, or acceptance changes.
+- **Readable front, opaque contract:** The introduction is understandable but the acceptance checkboxes still use vague or academic terms, hide rejected options or include an invented stronger promise. A human approves the apparent goal without noticing the actual work would differ.
+- **Simplification hides regression:** A well-intentioned rewrite drops a necessary failure condition, compatibility guarantee or precise term, making the issue easier to read but impossible to verify against the approved behavior.
 - **Duplicate under retries:** An ambiguous create timeout leads to duplicate issues because the published list was not checked before retry.
 - **Misleading owner/status:** Labels, assignee or Project status convey authorization or completion that neither the owner nor evidence actually granted.
 - **Two sources of Priority:** The organization issue field and a Project custom field have the same name but different values, and an agent wrongly treats them as one.
