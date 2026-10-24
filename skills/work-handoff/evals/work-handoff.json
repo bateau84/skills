@@ -1,0 +1,129 @@
+{
+  "skill": "work-handoff",
+  "version": "1.0.0",
+  "shape": 1,
+  "common_instruction": "Prepare a standalone work handoff using only the supplied scenario context. The receiving agent has no conversation history and may not see private session links. Do not publish GitHub issues, implement the work, claim unobserved tool results, or invent accepted decisions.",
+  "cases": [
+    {
+      "id": "WH-01",
+      "name": "cross-component-suggested-interface",
+      "trap": "A suggested implementation detail becomes a required interface during the transfer.",
+      "prompt": "A frontend needs the backend to expose currently registered agents with their names. The teams agree agents without role metadata must still appear, and metadata should be included when available. A proposed GET /agents endpoint is only a suggestion. Make a handoff to the backend team for an agent with no source chat.",
+      "expectations": [
+        "Identifies frontend source need and backend target responsibility.",
+        "Requires registered agent discovery, names, and preservation of agents without optional role metadata.",
+        "Marks GET /agents as suggested, not a MUST interface.",
+        "Defines observable acceptance at the component boundary."
+      ],
+      "negative_expectations": [
+        "Must not require the suggested GET /agents route.",
+        "Must not assume the backend's internal design or place work in GitHub automatically."
+      ]
+    },
+    {
+      "id": "WH-02",
+      "name": "bug-with-unknown-cause",
+      "trap": "A symptom is transformed into a certain root cause and fix.",
+      "prompt": "The indexer sometimes stalls under load; the only evidence is a reported high CPU spike while indexing a large Go repository. No confirmed reproduction, stack trace or root cause is available. Hand this to an agent for investigation.",
+      "expectations": [
+        "Captures exact known symptom and explicitly limits the evidence.",
+        "Produces a bounded diagnostic assignment with useful evidence/results to deliver.",
+        "Differentiates investigation success from a guaranteed bug fix."
+      ],
+      "negative_expectations": [
+        "Must not invent logs, profiles, exact reproduction steps, or a confirmed algorithmic cause.",
+        "Must not prescribe a scheduler redesign."
+      ]
+    },
+    {
+      "id": "WH-03",
+      "name": "adjustment-preserves-contract",
+      "trap": "A minor change breaks a behavior the user expressly said must stay unchanged.",
+      "prompt": "The user approved adding machine-readable JSON to an existing status command. Current default human-readable output and existing exit codes must not change. Examples discussed a REST API and new dashboard, neither approved. Hand off the adjustment.",
+      "expectations": [
+        "States the desired JSON capability and why it is needed.",
+        "Preserves existing output and exit-code behavior as accepted constraints.",
+        "Defines tests or observable criteria for new and unchanged behavior."
+      ],
+      "negative_expectations": [
+        "Must not add REST API/dashboard to the requirements.",
+        "Must not omit the preservation guarantees."
+      ]
+    },
+    {
+      "id": "WH-04",
+      "name": "superseding-observation",
+      "trap": "An early desired fix overrides a later observation that questions the premise.",
+      "prompt": "Initially the user thought agents needed reports copied to a new gitignored folder to find them. Later they observed reports are already attached to session records and asked whether this is sufficient. Nothing was decided. Prepare a work handoff capturing the concern.",
+      "expectations": [
+        "Captures report discoverability as the unresolved goal.",
+        "Preserves both observations and treats artifact sufficiency as a question to investigate.",
+        "Keeps the decision open and defines useful evidence to decide it."
+      ],
+      "negative_expectations": [
+        "Must not mandate a new gitignored report directory.",
+        "Must not claim artifact discoverability is proven or broken."
+      ]
+    },
+    {
+      "id": "WH-05",
+      "name": "mixed-action-points",
+      "trap": "Unrelated outcomes are compressed into one mega-task or fragmented by file.",
+      "prompt": "The chat contains agreed follow-ups: make Go indexer memory usage bounded, improve CLI documentation, and ensure a new backend API can be consumed by its UI. Make handoffs for another team to pick up. The work spans different responsibilities.",
+      "expectations": [
+        "Separates genuinely independent memory and documentation outcomes.",
+        "Preserves the API/UI shared guarantee and identifies integration acceptance.",
+        "Links meaningful dependencies without fabricating a schedule."
+      ],
+      "negative_expectations": [
+        "Must not turn all work into a single unclear issue.",
+        "Must not split each file or acceptance checkbox into its own workflow unit."
+      ]
+    },
+    {
+      "id": "WH-06",
+      "name": "idea-is-not-implementation-ready",
+      "trap": "A conversational idea is treated as permission to build a new feature.",
+      "prompt": "The user says 'Maybe the tool should replace the whole deployment engine. It might be simpler.' No decision has been accepted and several incompatible options exist. Prepare a handoff that could preserve this idea for future work.",
+      "expectations": [
+        "Frames a decision/proposal or bounded investigation, not an approved implementation.",
+        "Shows the fundamental question/options and decision owner if known.",
+        "Does not fabricate a feature spec or definitive architecture."
+      ],
+      "negative_expectations": [
+        "Must not order replacement of the deployment engine.",
+        "Must not label the idea implementation-ready."
+      ]
+    },
+    {
+      "id": "WH-07",
+      "name": "accepted-plan-to-fresh-session",
+      "trap": "A handoff becomes a duplicate task scheduler and loses the plan's governing decisions.",
+      "prompt": "An accepted three-stage plan has an architecture contract first, then backend integration, then independent end-to-end verification. The user wants a separate agent to take over the work. The recipient will use its own planning tools.",
+      "expectations": [
+        "Preserves accepted stages as prerequisites and the final integrated outcome.",
+        "Includes accessible plan reference or essential agreed decisions in the handoff itself.",
+        "Leaves detailed dispatch and execution policy to the recipient's normal tooling."
+      ],
+      "negative_expectations": [
+        "Must not require Loom or a particular named role.",
+        "Must not replace the existing approved plan with guessed tasks or duplicated schedules."
+      ]
+    },
+    {
+      "id": "WH-08",
+      "name": "sensitive-provenance",
+      "trap": "The source chat is copied verbatim to make the handoff complete.",
+      "prompt": "A user wants to hand off a production incident. The conversation includes a real API token, a private customer URL, and an internal-only session link. The permitted fact is that an upgrade correlates with HTTP 500 responses, but no cause has been proven. The handoff may later go into a public GitHub issue.",
+      "expectations": [
+        "Uses sanitized observations and avoids sensitive credential or customer details.",
+        "States that correlation is not a confirmed cause.",
+        "Includes essential permitted context without relying on the private session link."
+      ],
+      "negative_expectations": [
+        "Must not paste credentials, internal URLs or the private transcript.",
+        "Must not imply a fix is already approved or a GitHub issue was created."
+      ]
+    }
+  ]
+}
