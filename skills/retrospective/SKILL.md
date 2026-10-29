@@ -5,26 +5,32 @@ description: Facilitate a retrospective (retro, coding-session retro, sprint ret
 
 # Retrospective
 
-A retrospective examines **how work happened** so future work can benefit from the experience. It is not a pass/fail assessment of the deliverable, an incident investigation, a blame exercise, or a quota of process changes. **A useful retrospective may recommend no changes.** Treat successful practices as important evidence, not just background to failure analysis.
+A retrospective examines **how work happened** so future work can benefit from the experience. It is not a pass/fail assessment of the deliverable, an incident investigation, a blame exercise, or a quota of process changes. **A useful retrospective may recommend no changes.** Treat successful practices as important evidence, not just background to failure analysis. **There is only one method: an evidence-led deep retrospective.** It examines the original work rather than producing a summary-only alternative. Depth of conclusions must match evidence quality; missing host history is an explicit limit, not permission to treat the coordinator's account as proof.
 
 ## When and what to review
 
 Use after a coding session, meaningful milestone, sprint, difficult implementation, incident response, or representative batch of work; revisit at a useful cadence if work is ongoing. **A single session is a valid scope**, including the current or unfinished session when requested. If the user gives no scope, start with the current session or the most clearly relevant work in context; do not invent a larger milestone. Do not require a retro after every task. Keep the window bounded and state whether the work actually finished.
 
-Establish the intended outcome, observed result, work in scope, participants, and any earlier improvement experiments due for follow-up. If the available work is too thin to support meaningful conclusions, offer a narrower conversation or defer the full retrospective rather than inventing patterns.
+Establish the intended outcome, observed result, work in scope, participants, and any earlier improvement experiments due for follow-up. If direct evidence is too thin to support meaningful conclusions, report an **incomplete deep retrospective**, naming unavailable sources and questions left unresolved. Do not invent a shorter retrospective tier or larger milestone.
 
 ## Facilitate the reflection
 
-1. **Gather an evidence-based timeline.** Use the records already available: conversations or sessions, plans, commits and PRs, test and CI outcomes, reviews, incident notes, action/task evidence, and relevant memory. Use telemetry only when present and helpful. Bound the search to relevant work; do not dump entire logs into context. Missing Loom, a memory service, or telemetry must not prevent a useful retrospective.
+1. **Independently reconstruct the work.** Start from original sessions and relevant child-agent sessions when accessible, then corroborate with plans, commits/PRs, tests, CI, reviews, incident notes, task records and participants. Examine actual user requests/corrections, dispatched agents and original prompts, skill loads, tool calls/outcomes/retries, handoffs and final responses where recorded. Use bounded native traces or full session exports, following pages and relevant child-session links; do not dump entire transcripts into context. General's summary is a navigation aid, **not independent proof**. Prefer a separate investigator (the Researcher responsibility when available), but never require a named agent or one host. If full history is unavailable, state the exact coverage, compaction gaps and missing sources instead of calling the window complete.
 2. **Follow up on previous experiments first.** For each accepted experiment, distinguish implemented from merely agreed, then report observed benefit, no benefit, harm, inconclusive evidence, or no opportunity to try it. Compare measures only when their definitions and collection methods are comparable. Do not repeat a previously rejected change without new evidence.
 3. **Ask what worked.** Identify helpful decisions, techniques, tools, collaboration, recovery, and unexpectedly effective approaches. Explain the enabling conditions and whether the success might transfer to another situation. Ask what should be protected from unnecessary change.
 4. **Ask what was difficult.** Find friction, delays, rework, avoidable confusion, surprises, and unmet expectations. Include collaboration, handoffs, human experience, and tooling, not only technical failures. Give specific episodes rather than generic complaints.
-5. **Understand, don't guess.** Distinguish observed events, participants' accounts, hypotheses, and confirmed causes. Check plausible alternatives and conflicting evidence. An agent reporting success, a green test, a review verdict, a skill load, or a correlated metric does not by itself prove a good user outcome or a causal explanation. Multiple accounts of the same event are not independent confirmation.
+5. **Understand, don't guess.** Link material episodes to original session/message/tool-call IDs or other stable sources when available. Compare intent, dispatch prompt, actual tools/skills, agent response, verification and user experience before explaining friction. Distinguish observed events, participants' accounts, hypotheses, and confirmed causes. Check plausible alternatives and conflicting evidence. An agent reporting success, a green test, a review verdict, a skill load, or a correlated metric does not by itself prove a good user outcome or a causal explanation. Multiple accounts of the same event are not independent confirmation.
 6. **Invite the people's perspective.** Share a provisional, balanced account and ask participants, especially the person receiving the work, what felt effective or painful and what the evidence missed. Incorporate corrections without erasing disagreements. If participation is unavailable, label the missing perspective; do not simulate it.
 7. **Distil learning before proposing change.** Separate (a) successful practices worth repeating, (b) supported failure lessons, (c) unanswered questions worth investigating, and (d) possible improvements. Preserve both positive and negative experience, including the conditions under which a lesson applies. Do not turn a single episode into a universal rule.
 8. **Choose experiments only when justified.** Suggest at most one or two small, reversible, high-value changes, with a reason, an observable next-retro check (quantitative or qualitative), and a responsible owner or decision-maker if known. Zero is valid. Present proposals for an appropriate decision; the retrospective itself does not authorize editing code, agents, skills, plugins, policies, or memories beyond the permissions already granted for the task.
 
-Adapt facilitation depth to the amount of work and its significance. A short retrospective with one meaningful lesson is better than a ceremonial report with fabricated sections.
+Apply the same independent deep method to every requested scope; bound the search by relevant work rather than an arbitrary event count. When original history cannot be accessed, inspect what is available and report which claims remain unverified. Never call a summary-only handoff a completed retrospective. One well-grounded lesson is better than a ceremonial report with fabricated sections.
+
+## Session evidence and privacy
+
+Review event order, not just counts: which user decisions changed direction; why agents were chosen; what dispatch prompts actually required; whether skills loaded when needed and were applied; tool failures and retries; handoffs and independent verification; and relevant child sessions. Compare token/time costs only across comparable windows and task difficulty. A long investigation or failed call is not automatically waste. Identify gaps from missing history, compaction, inaccessible children and truncated output.
+
+Access prompts and tool output only within the host's existing permissions and the user's authorized scope. Prefer short, redacted findings with source IDs over raw prompt/output copies. Do not persist secrets, private conversation dumps or complete transcripts in reports or memory. No new access rights, automatic capture, role mandate or surveillance are implied.
 
 ## Optional engineering-environment opportunities
 
@@ -41,7 +47,7 @@ Keep any supported environmental observation within the normal **keep doing**, *
 
 Summarize succinctly, with source pointers where available:
 
-- **Scope and outcome:** what was attempted and what is known about the result.
+- **Scope, outcome and evidence coverage:** what was attempted, what is known, which original sessions and child sessions were examined, and where trace evidence is incomplete.
 - **Previous experiments:** what was tried and whether it helped, harmed, or remains untested.
 - **Keep doing:** effective practices, why they helped, and conditions for reuse.
 - **Difficulties:** material friction and its effect, without assigning blame.
