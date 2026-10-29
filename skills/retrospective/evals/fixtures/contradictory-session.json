@@ -1,0 +1,69 @@
+{
+  "purpose": "Synthetic independent-retrieval evaluation; never treat this file as a real user session.",
+  "root_session_id": "session_general",
+  "sessions": [
+    {
+      "id": "session_general",
+      "parentID": null,
+      "messages": [
+        {
+          "id": "msg_001",
+          "type": "user",
+          "text": "Update the config reader without changing existing privacy rules.",
+          "time": 1
+        },
+        {
+          "id": "msg_002",
+          "type": "assistant",
+          "text": "Delegating implementation.",
+          "time": 2
+        },
+        {
+          "id": "msg_005",
+          "type": "user",
+          "text": "You have missed my privacy constraint again. Please recheck.",
+          "time": 5
+        },
+        {
+          "id": "msg_008",
+          "type": "assistant",
+          "text": "Fixed after review and user correction; final tests passed.",
+          "time": 8
+        }
+      ]
+    },
+    {
+      "id": "session_coder",
+      "parentID": "session_general",
+      "messages": [
+        {
+          "id": "msg_003",
+          "type": "tool",
+          "tool": "edit",
+          "status": "error",
+          "time": 3
+        },
+        {
+          "id": "msg_004",
+          "type": "tool",
+          "tool": "edit",
+          "status": "completed",
+          "time": 4
+        },
+        {
+          "id": "msg_006",
+          "type": "review",
+          "text": "Privacy safeguard not validated on the first attempt.",
+          "time": 6
+        },
+        {
+          "id": "msg_007",
+          "type": "test",
+          "status": "pass",
+          "time": 7
+        }
+      ]
+    }
+  ],
+  "notes": "An edit-tool error does not itself establish an unauthorized write; do not infer a confirmed root cause."
+}
