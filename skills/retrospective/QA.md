@@ -17,6 +17,9 @@ Adversarial checks for an apparently balanced, well-sourced retrospective. Look 
 | An effective one-off practice is written as permanent agent policy. | Scope, preconditions, conflicting cases, and strength of evidence must be preserved. |
 | Logs are missing and participant feedback is unavailable. | No confident root-cause narrative, invented satisfaction, or automatic change should follow. |
 | The retro proposes no changes and is labeled unproductive. | Verified successes and lessons can make a zero-proposal retrospective valuable. |
+| General reports a clean first pass but child sessions show retries and repeated user correction. | Reconstruct the original chronology, including dispatch prompts, child outcomes and user feedback, before accepting the handoff. |
+| The API returns only post-compaction session context. | Never call this a complete transcript; identify missing earlier messages and obtain an authorized full export where available. |
+| A report reproduces raw tool outputs or dispatch prompts as citations. | Use bounded redacted evidence and source IDs rather than persisting secrets or full transcripts. |
 | A retro's proposed change is recorded as implemented and successful. | Proposals, approval, implementation, observation, and learning require distinct evidence. |
 | A missed mechanical error prompts another Reviewer or AGENTS.md instruction. | First inspect existing lint/type-check/test commands and whether they are run; a deterministic check may address the mechanism more reliably. |
 | Numerous tool calls are labeled waste while key files were difficult to discover. | Consider missing navigation pointers, hidden dependencies, unavailable information, and necessary exploratory work before declaring calls excessive. |
