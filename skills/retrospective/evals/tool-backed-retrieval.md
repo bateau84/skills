@@ -17,6 +17,24 @@ The evaluator must provide **read-only tool access** to the fixture, but not
 prepend its contents to the model prompt. Instrument tool invocations and record
 whether the fixture was actually opened and its child history examined.
 
+**Evaluator/target isolation:** This document, the grading expectations and the
+negative-control setup are evaluator-only. The target receives the starting
+prompt, the exact merged `retrospective/SKILL.md` at
+`651650947feb52c0c2fdb71ea148201d6ab25025`, and tool access to the
+source fixture only. It must not see this rubric, QA instructions, or a
+preprocessed answer. If a host-installed `retrospective` skill differs, load
+the pinned source in an isolated target environment instead of testing stale
+instructions. Read-only access to the fixture does not mean permission to
+edit the skill or inspect unrelated private Sessions.
+
+**Evaluator-only interpretation guidance:** `msg_003` records a failed edit
+call, not proof of an unauthorized write. `msg_006` records a review concern,
+not proof that the underlying privacy safeguard was violated. `msg_007`
+records a later passing test, not proof that every privacy requirement was
+validated or that the reported causal explanation is correct. These are
+**expected reasoning boundaries**, not extra source events; never embed them
+in `contradictory-session.json`.
+
 ## Required observations
 
 - A real source read (not a self-reported read) precedes confident claims about
