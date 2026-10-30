@@ -2,12 +2,14 @@ import sys
 import subprocess
 import tempfile
 import unittest
+import os
 from pathlib import Path
+from unittest.mock import patch
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from eval_cases import discover
-from run_evals import parser, select, validate_live, call_budget
+from run_evals import parser, select, validate_live, call_budget, freeze_environment
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -25,11 +27,29 @@ class CliTests(unittest.TestCase):
                                       cwd=temp, capture_output=True, text=True, timeout=10)
                 self.assertEqual(proc.returncode, code, proc.stderr)
                 if argv == ["--validate"]:
-                    self.assertIn('"fixture_cases": 234', proc.stdout)
+                    self.assertIn('"fixture_cases": 325', proc.stdout)
                 if "--list" in argv:
-                    self.assertEqual(len(proc.stdout.splitlines()), 7)
+                    self.assertEqual(len(proc.stdout.splitlines()), 13)
                 if code == 2:
                     self.assertNotIn("live-spend-plan", proc.stdout)
+
+    def test_real_cli_projects_actionable_model_errors_before_any_run(self):
+        script = ROOT / "scripts" / "run_evals.py"
+        cases = ((["--cases", "product-acceptance:PA1"], "--model"),
+                 (["--cases", "product-acceptance:PA1", "--model", "gpt-6-luna"], "--model"),
+                 (["--cases", "product-acceptance:PA1", "--model", "openai/gpt-6-luna",
+                   "--judge-model", "gpt-6-luna"], "--judge-model"))
+        for argv, option in cases:
+            with self.subTest(argv=argv), tempfile.TemporaryDirectory() as temp:
+                proc = subprocess.run([sys.executable, "-I", "-B", str(script), *argv],
+                                      cwd=temp, capture_output=True, text=True, timeout=10)
+                self.assertEqual(proc.returncode, 2, proc.stderr)
+                self.assertIn(option, proc.stderr)
+                self.assertIn("provider/model", proc.stderr)
+                self.assertNotIn("gpt-6-luna", proc.stderr)
+                self.assertNotIn("live-spend-plan", proc.stdout)
+                self.assertFalse((Path(temp) / ".skill-evals").exists())
+                self.assertNotIn("Run artifacts:", proc.stderr)
 
     def test_empty_unknown_selectors_and_no_model_fail_before_invocation(self):
         cases = discover(ROOT)
@@ -50,6 +70,34 @@ class CliTests(unittest.TestCase):
             "pairs": 2, "nominal_target_calls": 4, "nominal_judge_calls": 4,
             "maximum_target_calls": 8, "maximum_judge_calls": 8,
         })
+
+    def test_unqualified_target_and_judge_models_fail_with_actionable_error(self):
+        cases = discover(ROOT)
+        for argv, option in ((["--model", "gpt-6-luna"], "--model"),
+                             (["--model", "openai/gpt-6-luna", "--judge-model", "gpt-6-luna"], "--judge-model")):
+            with self.subTest(argv=argv):
+                options = parser().parse_args(["--cases", "product-acceptance:PA1", *argv])
+                with self.assertRaisesRegex(ValueError, option + r".*provider/model"):
+                    validate_live(options, select(cases, options))
+
+    def test_namespaced_provider_model_ids_remain_qualified(self):
+        cases = discover(ROOT)
+        options = parser().parse_args(["--cases", "product-acceptance:PA1", "--model",
+                                       "openrouter/anthropic/claude-sonnet-4", "--judge-model",
+                                       "fixture/fixture/model"])
+        validate_live(options, select(cases, options))
+
+    def test_missing_explicit_or_environment_catalog_has_safe_actionable_error(self):
+        with tempfile.TemporaryDirectory() as temp:
+            missing = str(Path(temp) / "private-missing-catalog.json")
+            cases = ((["--models-catalog", missing], {}),
+                     ([], {"OPENCODE_EVAL_RUNNER_MODELS": missing}))
+            for argv, env in cases:
+                options = parser().parse_args(argv)
+                with self.subTest(argv=argv), patch.dict(os.environ, env, clear=True):
+                    with self.assertRaisesRegex(ValueError, r"model catalog source is unavailable; check --models-catalog or OPENCODE_EVAL_RUNNER_MODELS") as raised:
+                        freeze_environment(options)
+                    self.assertNotIn(missing, str(raised.exception))
 
     def test_native_target_only_cross_judge_explicit_model_reasoning_timeout_bounds(self):
         for argv in (["--judge-transport", "github-copilot-cli"], ["--container-timeout", "240"],

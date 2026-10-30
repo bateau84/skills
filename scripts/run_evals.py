@@ -42,8 +42,8 @@ def parser():
     p.add_argument("--all", action="store_true", help="Explicitly select all cases in selected targets (or entire corpus)")
     p.add_argument("--target-kind", choices=("skill",), default="skill")
     p.add_argument("--target-transport", choices=("opencode",), default="opencode")
-    p.add_argument("--model")
-    p.add_argument("--judge-model")
+    p.add_argument("--model", help="Required live target model ID: provider/model (for example openai/gpt-6.1)")
+    p.add_argument("--judge-model", help="Optional judge model ID: provider/model; defaults to --model unchanged")
     p.add_argument("--judge-transport", choices=("opencode", "github-copilot-cli"), default="opencode")
     for name in ("reasoning", "target-reasoning", "judge-reasoning"):
         p.add_argument("--" + name)
@@ -92,8 +92,16 @@ def select(cases, options):
 
 
 def validate_live(options, selected):
-    if not options.model or not options.model.strip() or options.model != options.model.strip():
-        raise ValueError("live execution requires explicit --model")
+    def validate_model_id(value, option):
+        if not value or not value.strip() or value != value.strip():
+            raise ValueError(f"live execution requires explicit {option} provider/model ID (for example openai/gpt-6.1)")
+        provider, separator, model = value.partition("/")
+        if not separator or not provider or not model or any(c.isspace() for c in value):
+            raise ValueError(f"{option} must be a qualified provider/model ID (for example openai/gpt-6.1); got an unqualified or malformed ID")
+
+    validate_model_id(options.model, "--model")
+    if options.judge_model is not None:
+        validate_model_id(options.judge_model, "--judge-model")
     if not selected:
         raise ValueError("empty live selection")
     for name in ("iterations", "parallel", "timeout_seconds"):
@@ -131,8 +139,15 @@ def freeze_environment(options):
     for attr, env in (("auth", "OPENCODE_EVAL_RUNNER_AUTH"), ("database", "OPENCODE_EVAL_RUNNER_DB"), ("models_catalog", "OPENCODE_EVAL_RUNNER_MODELS")):
         value = getattr(options, attr) or os.environ.get(env)
         if value:
-            path = Path(value).expanduser().resolve(strict=True)
+            try:
+                path = Path(value).expanduser().resolve(strict=True)
+            except (OSError, RuntimeError) as exc:
+                if attr == "models_catalog":
+                    raise ValueError("model catalog source is unavailable; check --models-catalog or OPENCODE_EVAL_RUNNER_MODELS") from None
+                raise
             if not path.is_file():
+                if attr == "models_catalog":
+                    raise ValueError("model catalog source is unavailable; check --models-catalog or OPENCODE_EVAL_RUNNER_MODELS")
                 raise ValueError(f"{attr} seed is not a file")
             setattr(options, attr, path)
     clean = sanitized_environment(dict(os.environ), tuple(options.env))
@@ -259,7 +274,7 @@ def run_plan(root, runner, options, plan, providers, invoker=None, reporter=None
         os.environ, json_sources=[options.auth or runner.cli.default_auth_path(),
                                   *([options.provider_config] if options.provider_config else [])],
         database_sources=[options.database or runner.cli.default_database_path()],
-        model_catalog_sources=[options.models_catalog or runner.cli.default_models_path()])
+        model_catalog_sources=[options.models_catalog] if options.models_catalog else [])
     # report_root is injectable filesystem I/O for provider-free tests, not a CLI
     # option. Normal commands always use the repository root, never the cwd.
     latest_root = Path(report_root or root).resolve(strict=True)
@@ -410,6 +425,7 @@ def run_probe(root, runner, options, case, probe=None):
 def main(argv=None, *, report_root=None):
     options = parser().parse_args(argv)
     reporter = EvalReporter(json_output=options.json, verbose=options.verbose)
+    catalog_lifetime = ExitStack()
     try:
         if not sys.flags.isolated:
             raise ValueError("launch with python3 -I -B (or the Bun aliases); non-isolated imports are not supported")
@@ -442,6 +458,13 @@ def main(argv=None, *, report_root=None):
         provider_doc = strict_json(options.provider_config.read_text()) if options.provider_config else {}
         freeze_environment(options)  # once, before any runner imports or parallel work
         runner = load_runner(root)
+        if not options.probe:
+            try:
+                options.models_catalog = catalog_lifetime.enter_context(
+                    runner.model_catalog.pinned_model_catalog(options.models_catalog)
+                )
+            except Exception:
+                raise ValueError("model catalog acquisition or validation failed") from None
         providers = compile_provider_settings(provider_doc, runner, os.environ, options.env)
         options.engine = runner.cli.resolve_engine(options.engine)
         options.target_image_proof = verify_image(runner, options.engine, options.opencode_image, "opencode")
@@ -488,6 +511,8 @@ def main(argv=None, *, report_root=None):
         # arbitrary dependency exception payloads that might contain secrets.
         print(f"eval orchestration error ({type(exc).__name__}); no complete run proof", file=sys.stderr)
         return 2
+    finally:
+        catalog_lifetime.close()
 
 
 if __name__ == "__main__":

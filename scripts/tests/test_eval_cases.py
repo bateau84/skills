@@ -11,19 +11,22 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class CaseTests(unittest.TestCase):
-    def test_markdown_conversion_preserves_all_reviewed_fields_exactly(self):
-        for skill, count in (("product-acceptance", 9), ("work-decomposition", 7)):
+    def test_markdown_conversion_preserves_reviewed_cases_and_source_metadata(self):
+        versions = {"product-acceptance": "1.0.0", "work-decomposition": "1.1.0"}
+        for skill, count in (("product-acceptance", 9), ("work-decomposition", 9)):
             folder = ROOT / "skills" / skill / "evals"
             actual = json.loads((folder / "evals.json").read_text())
             expected = markdown_document((folder / "cases.md").read_text(), skill)
-            self.assertEqual(actual, expected)
+            self.assertEqual(actual["version"], versions[skill])
+            self.assertEqual(actual["cases"], expected["cases"])
+            self.assertEqual(actual["common_instruction"], expected["common_instruction"])
             self.assertEqual(len(actual["cases"]), count)
-        self.assertEqual(len(discover(ROOT)), 234)
+        self.assertEqual(len(discover(ROOT)), 325)
 
-    def test_existing_corpus_has_218_cases_without_changing_source_ids(self):
+    def test_current_corpus_has_303_other_cases_without_changing_source_ids(self):
         cases = discover(ROOT)
         existing = [c for c in cases if c.skill not in {"product-acceptance", "work-decomposition"}]
-        self.assertEqual(len(existing), 218)
+        self.assertEqual(len(existing), 303)
         numeric = next(c for c in cases if c.id == "SKILL-python-testing-1")
         self.assertEqual(numeric.source_id, 1)
         self.assertEqual(numeric.selectors, (numeric.id, "python-testing:1"))
