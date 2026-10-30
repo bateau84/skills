@@ -66,6 +66,33 @@
         "Body does NOT merely restate the diff ('changed ratelimit.go to use sliding window') — it adds reasoning the diff alone cannot convey",
         "What changed section explains what each file's change contributes to the overall goal and does NOT merely list what was modified"
       ]
+    },
+    {
+      "id": 6,
+      "name": "new-pr-trivial-fix-must-have-conventional-title",
+      "prompt": "I fixed a one-line nil-check bug in utils/parse.go and added a regression test in utils/parse_test.go. `go test ./utils/...` passed. Open a PR using my draft title 'Fix parser crash'. Keep its description short because this is a tiny change.",
+      "expected_output": "The created PR has a Conventional Commit-compliant title such as `fix(parser): prevent panic on empty input` and a short, useful trivial-format body. The draft title must not be preserved as-is. Neither a trivial scope nor the user's request for brevity exempts the title.",
+      "trap": "A model may apply the body's trivial-PR escape hatch to the title, retaining 'Fix parser crash', or discuss a suggested compliant title without actually using it for PR creation.",
+      "expectations": [
+        "The PR creation call or resulting PR record uses a title that matches `<type>[optional scope][!]: <description>` with a non-empty meaningful description",
+        "The non-compliant draft title 'Fix parser crash' is not used as the final PR title",
+        "The title specifically summarizes the parser panic fix instead of copying a generic or unrelated commit",
+        "The body uses the concise trivial format and reports only the provided test evidence"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "update-existing-pr-title-and-educational-body",
+      "prompt": "PR #42 already exists with title '[WIP] user export changes' and an auto-generated commit-log body. Its branch adds CSV export for administrators and tests that passed with `go test ./...`. Please update the PR so it is ready for a cold reviewer.",
+      "expected_output": "The existing PR is updated with a Conventional Commit-compliant title such as `feat(admin): add CSV user export` and a human-readable body explaining the purpose, conceptual change and verified checks. Merely rewriting the body while leaving '[WIP]' in the PR title does not pass.",
+      "trap": "The model may consider this a body-only skill and preserve the existing non-compliant title, or produce a compliant title in prose without actually updating the PR record.",
+      "expectations": [
+        "The PR update call or resulting PR record changes the existing title to valid Conventional Commits syntax",
+        "The updated title accurately reflects the complete CSV export feature, not just a single commit",
+        "No '[WIP]' prefix or alternative non-compliant prefix remains outside the title format",
+        "The updated body explains why administrator CSV export exists and includes actual supplied verification rather than a commit-log dump",
+        "Updating the body alone, without updating the non-compliant title, fails the case"
+      ]
     }
   ]
 }

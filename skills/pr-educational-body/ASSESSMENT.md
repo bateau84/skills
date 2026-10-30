@@ -6,6 +6,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 
 Reviewer reads the PR body as a cold reviewer and verifies it teaches the **actual conceptual delta** without becoming a second commit log:
 
+- PR title follows Conventional Commits syntax with a meaningful type, optional scope, `!` only for a breaking change, and a non-empty description summarizing the whole PR; new, edited, trivial, and draft PRs all comply;
 - “why” describes the prior problem/outcome rather than invented retrospective rationale; commit history plus diff support the narrative;
 - before→after conceptual delta matches the complete branch diff, including removals/behavioral changes not highlighted by commit titles;
 - repository-specific terminology is introduced after the underlying concept so an external reviewer can build the right mental model;
