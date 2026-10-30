@@ -1,6 +1,6 @@
 ---
 name: pr-educational-body
-description: Create GitHub PRs with human-readable, educational PR bodies that explain WHY the work was done. Use when opening or updating a PR, replacing an empty or auto-generated body, or giving reviewers context beyond the diff. Not for commit messages (use git-commit-discipline), merge conflicts (use git-conflicts), code review, or CI/CD configuration.
+description: Create or update GitHub PRs with Conventional Commit-compliant titles and educational bodies that explain WHY the work was done. Use when opening or updating a PR, correcting a non-compliant PR title, replacing an empty or auto-generated body, or giving reviewers context beyond the diff. Not for commit messages (use git-commit-discipline), merge conflicts (use git-conflicts), code review, or CI/CD configuration.
 license: MIT
 metadata:
   author: Bateau
@@ -9,11 +9,36 @@ metadata:
 
 # PR Educational Body
 
-This skill teaches agents to produce GitHub PRs with educational, human-readable PR bodies. Use `git-commit-discipline` for commits and `git-conflicts` for merge conflicts; use relevant assessment companions for code review.
+This skill governs both the PR title and its educational, human-readable body. Use `git-commit-discipline` for commits and `git-conflicts` for merge conflicts; use relevant assessment companions for code review.
 
 > These section names mirror the commit format's teaching order by design — they serve the same purpose (explain WHY before WHAT) at the PR granularity. A PR synthesizes multiple commits into one narrative that stands alone for a cold reader.
 
 **Persona:** You treat the PR body as the primary communication channel between the author and the reviewer — not as metadata to fill after the fact. A reviewer with zero context about the repo, the internal workflow, or the reasoning behind the changes should be able to read the PR body alone and understand _why_ the work was done, _what_ changed, and _how_ it was verified. The body is the map; the commits are the terrain.
+
+## PR titles: required Conventional Commits format
+
+**Every new or updated PR title must comply with Conventional Commits**, including trivial and draft PRs. This is a PR-level requirement; `git-commit-discipline` covers individual commit messages, not PR titles.
+
+Use:
+
+```text
+<type>[optional scope][!]: <short description>
+```
+
+The type is required (`feat`, `fix`, `docs`, `refactor`, `test`, `chore`, etc., following the repository's type conventions). The scope in parentheses is optional. Use `!` before `:` for a breaking change; explain the impact and migration in the PR body. A colon, a space, and a meaningful non-empty description are required.
+
+Examples:
+
+```text
+feat(auth): rotate refresh tokens
+fix: avoid panic on empty input
+docs(skills): require conventional PR titles
+refactor(api)!: remove legacy request format
+```
+
+Titles like `Add refresh-token rotation`, `[WIP] auth changes`, and `fix - update parser` are not compliant. Do not prepend labels or ticket IDs outside the Conventional Commits structure.
+
+Choose a title that summarizes the **whole PR**, not just its most recent commit. Before creating or updating a PR, verify the final title. When editing the body of an existing PR, correct its title too if needed; do not leave a non-compliant title unchanged. The trivial-PR shortcut below affects only body length, not this requirement.
 
 ## 1. The two problems this skill solves
 
