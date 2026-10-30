@@ -24,17 +24,22 @@ The execution dependency is the **clean checkout**, not an arbitrary executable
 found on PATH:
 
 - Runner: [`bateau84/opencode-eval-runner`](https://github.com/bateau84/opencode-eval-runner)
-  at `1262ac8c2eebbd10af572e3e3560318f6113233b`.
+  at `dbbbf2a0740aee7a9e9035cc14a785a9467b8fb1`.
 - Resolution: `--runner-root /path/to/opencode-eval-runner`, then
   `SKILLS_EVAL_RUNNER_ROOT`, then the local sibling `../opencode-eval-runner`
-  relative to this repository (not the current shell directory).
+  relative to this repository (not the current shell directory). In nested
+  worktree layouts, pass `--runner-root` or set `SKILLS_EVAL_RUNNER_ROOT`
+  explicitly; default resolution is intentionally not broadened.
 - The checkout must have no modified, untracked, or ignored files, including
   bytecode. Imports do not write bytecode there. Use a dedicated clean checkout
   rather than a dependency tree carrying unrelated experiments or cache files.
-- Its pinned Containerfile specifies OpenCode **2.0.23** and Copilot **1.0.83** in
+- Its pinned Containerfile specifies OpenCode **2.2.2** and Copilot **1.0.83** in
   separate transport images. Changing only the Python host code is insufficient.
 
-There is **no established current published immutable digest in this project**.
+The approved OpenCode image identity is
+`ghcr.io/bateau84/opencode-eval-runner:opencode-sha-dbbbf2a@sha256:7aba02fa041ad0ea435de5c1a281b805ff600548bf7b52cb931bbeaa4bf3086d`.
+The Copilot image, when required, is
+`ghcr.io/bateau84/opencode-eval-runner:copilot-sha-dbbbf2a@sha256:870839b85031d30a9793c3757e3b65c9e1e63f0a927c341e2eae95d07a13392b`.
 The runner's floating `*-edge` defaults and historical Loom digests are not used
 as substitutes. Every live/probe invocation requires an explicit full local
 image ID (`sha256:` plus 64 hex digits), or `repository@sha256:<64 hex digits>`.
@@ -54,20 +59,33 @@ documented explicit build procedure is, for example:
 ```sh
 # Explicit acquisition/build operations; NOT performed by this harness.
 podman build -f /path/to/opencode-eval-runner/Containerfile \
-  --target opencode -t skills-eval-opencode:1262ac8 \
+  --target opencode -t skills-eval-opencode:dbbbf2a \
   /path/to/opencode-eval-runner
-podman image inspect skills-eval-opencode:1262ac8 --format '{{.Id}}'
+podman image inspect skills-eval-opencode:dbbbf2a --format '{{.Id}}'
 
 # Only if a Copilot judge is intentionally needed:
 podman build -f /path/to/opencode-eval-runner/Containerfile \
-  --target copilot -t skills-eval-copilot:1262ac8 \
+  --target copilot -t skills-eval-copilot:dbbbf2a \
   /path/to/opencode-eval-runner
-podman image inspect skills-eval-copilot:1262ac8 --format '{{.Id}}'
+podman image inspect skills-eval-copilot:dbbbf2a --format '{{.Id}}'
 ```
 
 Keep the full printed IDs. A host OpenCode installation of a different version
 is not a substitute. These commands can acquire base images and CLI binaries;
 they require your explicit operational authorization and network access.
+
+## Model catalog snapshots
+
+Live OpenCode runs resolve one validated, bounded model-catalog snapshot before
+invocation. Precedence is explicit `--models-catalog`,
+`OPENCODE_EVAL_RUNNER_MODELS`, then the runner's public metadata endpoint. The
+same host snapshot is supplied to every phase, side, job, retry, report
+sanitization, and recovery read; the runner makes a private per-invocation copy
+for the container. The shared host snapshot remains until command exit, then is
+removed. Acquisition/validation
+errors are reported without exposing source contents or raw dependency errors.
+The fixture/list/validate/harness/probe modes do not acquire public metadata.
+An explicit source is optional for ordinary qualified `provider/model` runs.
 
 ## Provider-free runtime probe
 
@@ -78,7 +96,8 @@ bun run eval:live -- --probe --engine podman \
   --image "$OPENCODE_IMAGE_ID" --cases product-acceptance:PA3
 ```
 
-The probe checks adapter/version compatibility, then starts isolated stock
+The probe checks adapter/version compatibility using a synthetic empty,
+read-only catalog (never host metadata), then starts isolated stock
 OpenCode servers through the runner's preflight helpers. Its activation prompt
 uses `resume: false`, so no model inference runs. Networking is `none`, and no
 credentials are forwarded. It checks the effective agent system/permission
@@ -103,8 +122,9 @@ Once the probe directory is owned and its manifest exists, launch announces
 `Probe artifacts: <absolute-directory>` on stderr, before probe callbacks run.
 Its final JSON still includes the manifest path; probes do not replace the latest
 paired-evaluation report at the repository root.
-No auth, model-catalogue, credential-database or config-root seeds are mounted,
-and no provider credential variables are forwarded. Copilot runtime proof is
+The deterministic synthetic empty model catalog is mounted read-only; no host
+model catalog, auth, credential-database or config-root seeds are mounted, and
+no provider credential variables are forwarded. Copilot runtime proof is
 separate; `--probe` currently accepts only the OpenCode judge configuration.
 
 ## Live selection and spend controls
@@ -115,7 +135,7 @@ explicit selection and an explicitly chosen model. A small first trial is:
 ```sh
 # Paid/live example: only run after explicitly choosing model and spend.
 bun run eval:live -- \
-  --cases product-acceptance:PA3 --model "$CHOSEN_MODEL" \
+  --cases product-acceptance:PA3 --model openai/gpt-6.1 \
   --engine podman --image "$OPENCODE_IMAGE_ID" \
   --artifact-dir /path/to/new-single-run-directory
 ```
@@ -129,12 +149,20 @@ execution. `--all` is an explicit whole-suite choice (or all cases of selected
 targets); **do not blindly run the entire case corpus**. Merely passing
 `--target-kind skill` does not authorize selecting everything.
 
+Live `--model` and optional `--judge-model` values must be explicit
+`provider/model` identifiers (for example `openai/gpt-6.1` or
+`anthropic/claude-sonnet-4`). The wrapper passes each identifier unchanged to
+the runner; it never supplies or infers a provider. `--judge-model` defaults to
+the exact qualified `--model` value. The `opencode` transport label describes
+the invocation mechanism, not the provider/model identity. List, validate,
+harness-test and provider-free probe behavior is unchanged.
+
 | Control                                   | Default / semantics                                                                                                                                                                                        |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--iterations N`                          | 1 repetition per selected case; positive integer                                                                                                                                                           |
 | `--parallel N`                            | 1 concurrent pair; positive bounded number, not “unlimited”                                                                                                                                                |
-| `--model`                                 | Required; native OpenCode target only                                                                                                                                                                      |
-| `--judge-model`                           | Target model by default for OpenCode; explicit when using a cross-transport judge                                                                                                                          |
+| `--model`                                 | Required live; qualified `provider/model`; native OpenCode transport target                                                                                                                                 |
+| `--judge-model`                           | Optional qualified `provider/model`; exact target ID by default; explicit when using a cross-transport judge                                                                                               |
 | `--judge-transport`                       | `opencode`, or `github-copilot-cli` with explicit model and `--copilot-image`                                                                                                                              |
 | `--reasoning LEVEL`                       | Common target/judge reasoning; omitted means provider default                                                                                                                                              |
 | `--target-reasoning`, `--judge-reasoning` | Phase overrides; target control is identical in baseline and candidate                                                                                                                                     |
@@ -416,8 +444,9 @@ to zero and require authoritative replay safety, and images must be explicit
 immutable local identities. The harness does not port arbitrary Loom `--suite`,
 agent/runtime evaluations, Copilot targets, `--runtime-parallel`, `--keep-temp`,
 automatic dependency/image acquisition, or `eval:system`/`eval:stress` aliases.
-The existing root Bun aliases are unchanged. Model syntax/preflight behavior,
-fixture meaning, grading and historical evidence are not changed by reporting.
+The existing root Bun aliases are unchanged. Fixture meaning, grading and
+historical evidence are not changed by reporting. Live model syntax/preflight
+now requires explicit `provider/model` identifiers as described above.
 
 ## Treatment and config boundaries
 
@@ -445,7 +474,7 @@ frontmatter/tool declarations. The OpenCode transport ignores system-file
 content, so it is not used to inject OpenCode instructions. Copilot uses the
 runner's tool-disabled transport and an explicit judge system message.
 
-Stock OpenCode 2.0.23 registers built-in `opencode` and `report` skills even in an
+Stock OpenCode 2.2.2 registers built-in `opencode` and `report` skills even in an
 empty workspace. The generated config therefore uses the native plugin-remove
 directive `plugins: ["-opencode.skill"]` in every treatment. This disables only
 that built-in content plugin; `opencode.tool.skill` and `opencode.config.skill`
@@ -557,14 +586,17 @@ a skill-loading prerequisite.
 
 ## Corpus, history and source lineage
 
-The original 48 JSON fixture files produced 219 normalized cases. Later
-consolidation merged several skills' fixtures (moving their cases unchanged)
-and removed `report-lifecycle`'s single case, leaving 218. Three Loom-style
-source shapes are accepted: arrays, `{skill, cases}`,
-and `{skill_name, evals}`. Normalized IDs are `SKILL-<skill>-<source-id>`; source
-IDs and expectation text are preserved.
+The current checked-in corpus normalizes to **325 cases across 54 skills**:
+303 cases outside the two Markdown-backed skill directories, 9
+`product-acceptance` cases, and 13 `work-decomposition` cases (9 WD cases plus
+4 context-and-handoff cases). The Markdown-backed JSON metadata versions are
+respectively `1.0.0` and `1.1.0`. Three Loom-style
+source shapes are accepted: arrays, `{skill, cases}`, and `{skill_name, evals}`.
+Normalized IDs are `SKILL-<skill>-<source-id>`; source IDs and expectation text
+are preserved.
 
-The reviewed PA1–PA9 and WD1–WD7 Markdown packets now have runnable JSON copies.
+The reviewed PA1–PA9 and WD1–WD9 Markdown packets have runnable JSON copies;
+the four context-and-handoff cases are in a separate JSON fixture.
 Their prompts, common instruction, observations and IDs match exactly; each
 original evaluator-observation paragraph remains one conjunctive positive rule,
 not an invented breakdown into new criteria. JSON does not claim the scenario's
@@ -580,7 +612,17 @@ or from these provider-free harness tests.
 Normalization, Boolean scoring and 10pp/trap comparison methodology were informed
 by Loom `scripts/run-evals.py` at
 `c16e2c793b8faa8d21cf2ca9833606676e461e79`. No Loom agent/plugin/OCI/observer/storage
-runtime was copied. The external runner's `eval_plan`, `eval_paired`,
+runtime was copied. The external runner's pinned `eval_plan`, `eval_paired`,
 `eval_artifacts`, `eval_execute`, and EvalProfile v1 hooks implement the actual
-execution/judging lifecycle. This source lineage/pin is **not a blanket MIT
-license grant**; existing skill/source attribution and licenses remain intact.
+execution/judging lifecycle. At the refreshed revision, the consumed
+plan/paired/artifact/profile APIs remain compatible; the invocation API adds
+opt-in local-image enforcement, which this wrapper does not enable because it
+has its own preflight and retains the generic transport path. The runner's
+additive observation requirements and built-in skill CLI are deliberately not
+enabled: they would alter conditional evidence/judging behavior or fixture,
+baseline, filtering, transport and scoring semantics. Paired durable lifecycle
+coordination remains locally owned because the public CLI does not provide the
+wrapper's required paired hook, durable completion events, aggregate/recovery
+callbacks. These are known upstream API gaps, not silently replaced runner
+internals. This source lineage/pin is **not a blanket MIT license grant**;
+existing skill/source attribution and licenses remain intact.

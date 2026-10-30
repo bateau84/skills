@@ -1,7 +1,8 @@
-"""Real pinned runner lifecycle/storage with ONLY its invocation I/O substituted.
+"""Real pinned runner lifecycle/storage with invocation I/O substituted.
 
 Synthetic observer events constrain profile assertions; they are not evidence
-that a runtime model loaded a skill. No test calls invoke_once or a provider.
+that a runtime model loaded a skill. The main-path bridge test substitutes only
+the final OCI subprocess boundary; no test calls a provider.
 """
 import copy
 import json
@@ -361,6 +362,35 @@ class PinnedIntegrationTests(unittest.TestCase):
             self.assertIn(f"{spec.config}:/seed/opencode.json:ro", command)
             self.assertNotIn("/loom:/seed/opencode-config:ro", command)
             self.assertEqual(command[-1], self.options.target_image_id)
+
+    def test_qualified_target_and_judge_ids_reach_runner_command_unchanged(self):
+        import argparse
+        from unittest.mock import patch
+        from eval_profile import SkillsProfile
+        from run_evals import freeze_environment
+
+        for target, judge in (("openai/gpt-6.1-luna", "anthropic/claude-sonnet-4"),
+                              ("anthropic/claude-sonnet-4", "openai/gpt-6.1-luna")):
+            with self.subTest(target=target, judge=judge):
+                self.options.model, self.options.judge_model = target, judge
+                baseline = SkillsProfile(ROOT, self.runner, self.options, "baseline", {})
+                with baseline.prepare(self.case, 1) as prepared:
+                    for spec, expected in ((baseline.target_spec(self.case, prepared), target),
+                                           (baseline._spec(prepared["judge"], prepared["configs"]["judge"][0],
+                                                           judge=True, prompt="judge"), judge)):
+                        self.assertEqual(spec.model, expected)
+                        temp = spec.config.parent
+                        args = argparse.Namespace(transport=spec.transport, engine=spec.engine, image=spec.image,
+                                                  network=spec.network, workspace=str(spec.workspace), workspace_mode=spec.workspace_mode,
+                                                  output=str(temp / "result.json"), mount=[], skill=spec.skill, agent=spec.agent,
+                                                  model=spec.model, reasoning=spec.reasoning, expected_plugin=None,
+                                                  auth=None, models_catalog=None, config=str(spec.config), config_root=None,
+                                                  env=[], timeout_seconds=240)
+                        with patch.dict(os.environ, {"PATH": os.defpath}, clear=True):
+                            freeze_environment(self.options)
+                            command, _ = self.runner.cli.build_container_command(
+                                args, temp / "input", temp / "output", host_env={})
+                        self.assertIn(f"EVAL_MODEL={expected}", command)
 
     def test_actual_comparison_material_policy_uses_boolean_fraction_delta(self):
         self.case = next(c for c in self.candidate.discover_cases() if c.id == "SKILL-software-engineering-SoftwareEngineering-01")

@@ -41,7 +41,12 @@ def boundary_error(exc):
         return "durable summary mismatch; no complete run proof"
     literals = {
         "explicit --cases, --target/--skills, or --all required; --target-kind skill is NOT selection",
-        "selection matched no cases", "live execution requires explicit --model", "empty live selection",
+        "selection matched no cases", "live execution requires explicit --model",
+        "live execution requires explicit --model provider/model ID (for example openai/gpt-6.1)",
+        "live execution requires explicit --judge-model provider/model ID (for example openai/gpt-6.1)",
+        "--model must be a qualified provider/model ID (for example openai/gpt-6.1); got an unqualified or malformed ID",
+        "--judge-model must be a qualified provider/model ID (for example openai/gpt-6.1); got an unqualified or malformed ID",
+        "empty live selection",
         "transport-retries must be 0–5", "outer timeout must be >=300 and at least inner timeout +60 seconds",
         "cross-transport judge requires explicit --judge-model", "target model#variant conflicts with explicit reasoning",
         "judge model#variant conflicts with explicit reasoning", "output must not contaminate skill directories or historical evidence",
@@ -58,6 +63,17 @@ def boundary_error(exc):
         "image must be an immutable full local image ID or repository@sha256:digest, not a tag",
         "immutable image is not available locally; acquisition/build is explicit and never automatic",
         "runner checkout must be clean (including untracked/ignored files and bytecode)",
+        "runner checkout root does not exist or cannot be resolved; provide --runner-root for a clean checkout",
+        "cannot start git; install Git and verify --runner-root",
+        "git could not inspect runner checkout; verify --runner-root points to a valid checkout",
+        "runner-root must be the external checkout root; provide --runner-root pointing to the clean repository root",
+        f"runner checkout must be exactly dbbbf2a0740aee7a9e9035cc14a785a9467b8fb1; check out that revision in a dedicated clean checkout",
+        "model catalog acquisition or validation failed",
+        "model catalog source is unavailable; check --models-catalog or OPENCODE_EVAL_RUNNER_MODELS",
+        "pinned runner imports failed; verify the clean checkout and its Python dependencies",
+        "unsupported EvalProfile API; use the pinned runner revision",
+        "credential inventory import resolved outside pinned checkout; remove conflicting Python imports and retry",
+        "no supported container engine found; install podman or docker",
         *(f"{n} must be >=1" for n in ("iterations", "parallel", "timeout_seconds")),
         *(f"{n} must be nonempty without surrounding whitespace" for n in ("reasoning", "target_reasoning", "judge_reasoning", "judge_model")),
         *(f"{n} contains an empty selector" for n in ("--cases", "--target/--skills")),
@@ -69,6 +85,10 @@ def boundary_error(exc):
                    "--env is for provider credentials/settings only, not runtime control:"):
         if message.startswith(prefix):
             return prefix.rstrip(":") + "; supplied values withheld"
+    if message.startswith("container engine not found:"):
+        return "requested container engine is unavailable; install Podman or Docker or select an available --engine"
+    if message.startswith("runner import resolved outside pinned checkout"):
+        return "runner import resolved outside pinned checkout; use the clean runner root and remove conflicting Python imports"
     return "configuration/orchestration diagnostic withheld; no complete run proof"
 
 

@@ -43,11 +43,11 @@ class ReportRepairTests(unittest.TestCase):
                          patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \
                          patch.object(self.context.runner.cli, "default_auth_path", return_value=base / "absent-auth"), \
                          patch.object(self.context.runner.cli, "default_database_path", return_value=base / "absent-db"), \
-                         patch.object(self.context.runner.cli, "default_models_path", return_value=base / "absent-models"), \
                          patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=self.context.invoke), \
                          redirect_stdout(stdout), redirect_stderr(stderr):
                         code = main(["--cases", "product-acceptance:PA3", "--model", "test/model",
-                                     "--runner-root", str(self.context.runner.root), alias, "reports/run", *flags])
+                                      "--runner-root", str(self.context.runner.root), "--models-catalog",
+                                      str(self.context.runner.root / "tests/fixtures/models-catalog.json"), alias, "reports/run", *flags])
                     self.assertEqual(code, 0, stderr.getvalue())
                     self.assertTrue((root / "reports" / "run" / "run.json").is_file())
                     self.assertEqual(list(caller.iterdir()), [])
@@ -121,15 +121,15 @@ class ReportRepairTests(unittest.TestCase):
                  patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \
                  patch.object(self.context.runner.cli, "default_auth_path", return_value=base / "absent-auth"), \
                  patch.object(self.context.runner.cli, "default_database_path", return_value=base / "absent-db"), \
-                 patch.object(self.context.runner.cli, "default_models_path", return_value=base / "absent-models"), \
-                 patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=invoke), \
+                  patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=invoke), \
                  patch.object(self.context.runner.eval_api, "validate_eval_profile", side_effect=profile_validated), \
                  patch("eval_markdown.os.open", side_effect=opened), \
                  patch("eval_markdown.os.fsync", side_effect=synced), \
                  patch("eval_markdown.os.replace", side_effect=replaced), \
                  redirect_stdout(stdout), redirect_stderr(stderr):
                 code = main(["--cases", "product-acceptance:PA3", "--model", "test/model",
-                             "--runner-root", str(self.context.runner.root), "--output", "reports/run", *flags])
+                              "--runner-root", str(self.context.runner.root), "--models-catalog",
+                              str(self.context.runner.root / "tests/fixtures/models-catalog.json"), "--output", "reports/run", *flags])
             self.assertEqual(code, 2)
             self.assertEqual(len(entered), 0 if setup else 1 if partial else 4)
             self.assertNotIn("PRIVATE", stdout.getvalue() + stderr.getvalue())

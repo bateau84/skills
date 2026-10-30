@@ -8,7 +8,9 @@ import re
 import sys
 import tempfile
 import unittest
+import importlib
 from pathlib import Path
+from types import SimpleNamespace
 from contextlib import redirect_stderr, redirect_stdout
 from unittest.mock import patch
 from urllib.parse import unquote
@@ -344,6 +346,128 @@ class MarkdownTests(unittest.TestCase):
             loader.assert_not_called()
             self.assertFalse(destination.exists())
 
+    def test_main_projects_runner_and_engine_preflight_failures_safely(self):
+        for failure in ("git-unavailable", "foreign-import", "missing-engine"):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as temp:
+                stdout, stderr = io.StringIO(), io.StringIO()
+                verify = patch("run_evals.verify_image")
+                invoke = patch.object(self.context.runner.eval_execute, "invoke_once")
+                original_import = importlib.import_module
+                with verify as verify_image, invoke as invoke_once:
+                    if failure == "git-unavailable":
+                        boundary = patch("eval_runner.subprocess.check_output",
+                                         side_effect=FileNotFoundError("PRIVATE_GIT_SECRET"))
+                    elif failure == "foreign-import":
+                        def import_foreign(name, *args, **kwargs):
+                            if name == "runner.eval_plan":
+                                return SimpleNamespace(__file__="/outside/runner/eval_plan.py")
+                            return original_import(name, *args, **kwargs)
+                        boundary = patch("eval_runner.importlib.import_module", side_effect=import_foreign)
+                    else:
+                        boundary = patch.object(self.context.runner.cli.shutil, "which", return_value=None)
+                    with patch.dict(os.environ, {"PATH": os.defpath,
+                                                  "OPENCODE_EVAL_RUNNER_MODELS": str(self.context.runner.root / "tests/fixtures/models-catalog.json"),
+                                                  "SKILLS_EVAL_RUNNER_ROOT": str(self.context.runner.root)}, clear=True), \
+                         boundary, redirect_stdout(stdout), redirect_stderr(stderr):
+                        code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3",
+                                     "--model", "test/model"], report_root=Path(temp))
+
+                self.assertEqual(code, 2, stderr.getvalue())
+                self.assertIn({"git-unavailable": "install Git and verify --runner-root",
+                               "foreign-import": "remove conflicting Python imports",
+                               "missing-engine": "install podman or docker"}[failure], stderr.getvalue())
+                self.assertNotIn("PRIVATE_GIT_SECRET", stderr.getvalue())
+                self.assertNotIn("/outside/runner", stderr.getvalue())
+                verify_image.assert_not_called()
+                invoke_once.assert_not_called()
+
+    def test_main_runs_the_real_runner_invoke_and_oci_builder_bridge(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            seeds = []
+            for name in ("auth.json", "models.json"):
+                path = root / name
+                path.write_text("{}\n")
+                seeds.append(path)
+            artifact_dir = root / "run"
+            commands = []
+            catalog_mounts = []
+            original_run = self.context.runner.cli.subprocess.run
+            def container_boundary(command, **kwargs):
+                if command and command[0] == "git":
+                    return original_run(command, **kwargs)
+                commands.append(command)
+                mount = next(arg for arg in command if ":/seed/models.json:ro" in arg)
+                catalog_path = Path(mount.split(":/seed/models.json:ro", 1)[0])
+                self.assertEqual(catalog_path.read_text(), "{}\n")
+                catalog_mounts.append(catalog_path)
+                if len(commands) == 1:
+                    seeds[1].write_text('{"changed": true}\n')
+                agent = next(part.removeprefix("EVAL_AGENT=") for part in command if part.startswith("EVAL_AGENT="))
+                skill = next(part.removeprefix("EVAL_SKILL=") for part in command if part.startswith("EVAL_SKILL=")) or None
+                expected_model = ("fixture/fixture/model" if agent == "eval-judge"
+                                  else "openrouter/anthropic/claude-sonnet-4")
+                self.assertIn("EVAL_MODEL=" + expected_model, command, repr(command))
+                spec = SimpleNamespace(transport="opencode", model=expected_model, reasoning=None,
+                                       skill=skill, agent=agent)
+                result = self.context.result(spec)
+                return SimpleNamespace(returncode=0, stdout=json.dumps(result), stderr="")
+
+            stdout, stderr = io.StringIO(), io.StringIO()
+            with patch.dict(os.environ, {"PATH": os.defpath, "OPENCODE_EVAL_RUNNER_MODELS": str(self.context.runner.root / "tests/fixtures/models-catalog.json")}, clear=True), \
+                 patch("run_evals.verify_image", return_value={"image_id": "sha256:" + "a" * 64}), \
+                 patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \
+                 patch.object(self.context.runner.cli, "default_database_path", return_value=root / "no-database"), \
+                 patch.object(self.context.runner.cli.subprocess, "run", side_effect=container_boundary), \
+                 redirect_stdout(stdout), redirect_stderr(stderr):
+                code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3",
+                             "--model", "openrouter/anthropic/claude-sonnet-4",
+                             "--judge-model", "fixture/fixture/model", "--engine", "podman", "--network", "none",
+                             "--image", "sha256:" + "a" * 64, "--auth", str(seeds[0]),
+                             "--models-catalog", str(seeds[1]),
+                             "--artifact-dir", str(artifact_dir)], report_root=root)
+
+            pair_files = list((artifact_dir / "pairs").rglob("iteration-1.json"))
+            run_manifest = json.loads((artifact_dir / "run.json").read_text())
+            sides = json.loads(pair_files[0].read_text())["sides"] if pair_files else {}
+            classifications = {name: side.get("classification") for name, side in sides.items()}
+            self.assertEqual(code, 0, stderr.getvalue() + "\n" + repr(classifications))
+            self.assertEqual(len(commands), 4)
+            # The external profile owns one snapshot; invoke_once deliberately
+            # copies it to each per-invocation private temp directory.
+            self.assertEqual(len(set(catalog_mounts)), 4)
+            for command in commands:
+                self.assertEqual(command[1], "run")
+                self.assertIn("--pull=never", command)
+                self.assertIn("--read-only", command)
+                self.assertEqual(command[command.index("--network") + 1], "none")
+                self.assertIn("sha256:" + "a" * 64, command)
+            manifest = json.loads((artifact_dir / "run.json").read_text())
+            self.assertEqual(manifest["summary"]["complete_pairs"], 1)
+            self.assertTrue(manifest["summary"]["all_pass"])
+            self.assertTrue(all(not path.exists() for path in catalog_mounts),
+                            "invocation copies and shared catalog snapshot must be cleaned after report publication")
+
+    def test_catalog_acquisition_failure_is_private_and_precedes_any_run_artifact_or_invocation(self):
+        with tempfile.TemporaryDirectory() as temp:
+            destination = Path(temp) / "run"
+            stdout, stderr = io.StringIO(), io.StringIO()
+            with patch.dict(os.environ, {"PATH": os.defpath,
+                                         "SKILLS_EVAL_RUNNER_ROOT": str(self.context.runner.root)}, clear=True), \
+                 patch.object(self.context.runner.model_catalog.urllib.request, "urlopen",
+                              side_effect=RuntimeError("PRIVATE CATALOG RESPONSE")), \
+                 patch("run_evals.verify_image") as verify, \
+                 patch.object(self.context.runner.eval_execute, "invoke_once") as invoke, \
+                 redirect_stdout(stdout), redirect_stderr(stderr):
+                code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3",
+                             "--model", "test/model", "--artifact-dir", str(destination)], report_root=Path(temp))
+            self.assertEqual(code, 2)
+            self.assertIn("model catalog acquisition or validation failed", stderr.getvalue())
+            self.assertNotIn("PRIVATE", stdout.getvalue() + stderr.getvalue())
+            self.assertFalse(destination.exists())
+            verify.assert_not_called()
+            invoke.assert_not_called()
+
     def test_complete_selected_suite_parallel_cli_report_has_every_case_iteration(self):
         cases = tuple(c for c in self.context.candidate.discover_cases() if c.project_data["skill"] == "product-acceptance")
         by_prompt = {c.project_data["prompt"]: c for c in cases}
@@ -356,12 +480,12 @@ class MarkdownTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             destination = Path(temp) / "run"
             stdout, stderr = io.StringIO(), io.StringIO()
-            with patch.dict(os.environ, {"PATH": os.defpath}, clear=True), \
+            with patch.dict(os.environ, {"PATH": os.defpath, "OPENCODE_EVAL_RUNNER_MODELS": str(self.context.runner.root / "tests/fixtures/models-catalog.json")}, clear=True), \
                  patch("run_evals.verify_image", return_value={"image_id": "sha256:" + "a" * 64}), \
                  patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \
                  patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=invoke), \
                  redirect_stdout(stdout), redirect_stderr(stderr):
-                code = main(["--all", "--target", "product-acceptance", "--iterations", "2", "--parallel", "3",
+                code = main(["--runner-root", str(self.context.runner.root), "--all", "--target", "product-acceptance", "--iterations", "2", "--parallel", "3",
                              "--model", "test/model", "--artifact-dir", str(destination), "--json"], report_root=Path(temp))
             self.assertEqual(code, 0, stderr.getvalue())
             text = (destination / "results.md").read_text()
@@ -389,12 +513,12 @@ class MarkdownTests(unittest.TestCase):
                             text = "{}" if kind == "non-evidence" else json.dumps(integration.grade(self.context.case.project_data, False))
                             return 0, self.context.result(spec, text=text)
                         return self.context.invoke(spec)
-                    with patch.dict(os.environ, {"PATH": os.defpath}, clear=True), \
+                    with patch.dict(os.environ, {"PATH": os.defpath, "OPENCODE_EVAL_RUNNER_MODELS": str(self.context.runner.root / "tests/fixtures/models-catalog.json")}, clear=True), \
                          patch("run_evals.verify_image", return_value={"image_id": "sha256:" + "a" * 64}), \
                          patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \
                          patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=invoke), \
                          redirect_stdout(stdout), redirect_stderr(stderr):
-                        code = main(["--cases", "product-acceptance:PA3", "--model", "test/model", "--artifact-dir", str(destination), *flags], report_root=Path(temp))
+                        code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3", "--model", "test/model", "--artifact-dir", str(destination), *flags], report_root=Path(temp))
                     self.assertEqual(code, expected, stderr.getvalue())
                     self.assertTrue((destination / "results.md").is_file())
                     self.assertNotIn("PRIVATE ORCHESTRATION", (destination / "results.md").read_text())

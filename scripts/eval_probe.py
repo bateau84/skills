@@ -18,7 +18,7 @@ from eval_runner import build_probe_command
 def effective_agent_matches(actual, expected, plugins):
     if not actual or actual.get("system") != expected["system"]:
         return False
-    # Stock 2.0.23 BrowserConnection.make appends this hard deny after config.
+    # The previously pinned 2.0.23 BrowserConnection.make appended this deny.
     # Recognize only that exact source-backed rule, never arbitrary extensions.
     suffix = list(expected["permissions"])
     if "opencode.browser" in plugins:

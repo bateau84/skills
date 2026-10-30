@@ -18,7 +18,7 @@ from types import SimpleNamespace
 
 from eval_cases import digest
 
-RUNNER_REVISION = "1262ac8c2eebbd10af572e3e3560318f6113233b"
+RUNNER_REVISION = "dbbbf2a0740aee7a9e9035cc14a785a9467b8fb1"
 LOOM_METHOD_REVISION = "c16e2c793b8faa8d21cf2ca9833606676e461e79"
 PROFILE_API = "opencode-eval-runner/eval-profile/v1"
 
@@ -26,32 +26,42 @@ PROFILE_API = "opencode-eval-runner/eval-profile/v1"
 def git(root: Path, *args: str) -> str:
     try:
         return subprocess.check_output(["git", "-C", str(root), *args], text=True, stderr=subprocess.DEVNULL).strip()
+    except OSError as exc:
+        raise ValueError("cannot start git; install Git and verify --runner-root") from exc
     except subprocess.CalledProcessError as exc:
-        raise ValueError("cannot inspect pinned runner checkout with git") from exc
+        raise ValueError("git could not inspect runner checkout; verify --runner-root points to a valid checkout") from exc
 
 
 def load_runner(root: Path):
-    root = root.expanduser().resolve(strict=True)
+    try:
+        root = root.expanduser().resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise ValueError("runner checkout root does not exist or cannot be resolved; provide --runner-root for a clean checkout") from exc
     if git(root, "rev-parse", "--show-toplevel") != str(root):
-        raise ValueError("runner-root must be the external checkout root")
+        raise ValueError("runner-root must be the external checkout root; provide --runner-root pointing to the clean repository root")
     if git(root, "rev-parse", "HEAD") != RUNNER_REVISION:
-        raise ValueError(f"runner checkout must be exactly {RUNNER_REVISION}")
+        raise ValueError(f"runner checkout must be exactly {RUNNER_REVISION}; check out that revision in a dedicated clean checkout")
     if git(root, "status", "--porcelain", "--ignored", "--untracked-files=all"):
         raise ValueError("runner checkout must be clean (including untracked/ignored files and bytecode)")
     # Do not write __pycache__ in the read-only dependency, even in test imports.
     sys.dont_write_bytecode = True
     sys.path.insert(0, str(root))
     modules = {}
-    for name in ("eval_api", "eval_plan", "eval_paired", "eval_artifacts", "eval_execute", "eval_evidence", "cli"):
-        mod = importlib.import_module(f"runner.{name}")
-        if Path(mod.__file__).resolve() != root / "runner" / f"{name}.py":
-            raise ValueError(f"runner import resolved outside pinned checkout: {name}")
-        modules[name] = mod
+    try:
+        for name in ("eval_api", "eval_plan", "eval_paired", "eval_artifacts", "eval_execute", "eval_evidence", "model_catalog", "cli"):
+            mod = importlib.import_module(f"runner.{name}")
+            if Path(mod.__file__).resolve() != root / "runner" / f"{name}.py":
+                raise ValueError("runner import resolved outside pinned checkout; use the clean runner root and remove conflicting Python imports")
+            modules[name] = mod
+        safety = importlib.import_module("container.evidence_safety")
+    except ValueError:
+        raise
+    except Exception as exc:
+        raise ValueError("pinned runner imports failed; verify the clean checkout and its Python dependencies") from exc
     if modules["eval_api"].EVAL_PROFILE_API != PROFILE_API:
-        raise ValueError("unsupported EvalProfile API")
-    safety = importlib.import_module("container.evidence_safety")
+        raise ValueError("unsupported EvalProfile API; use the pinned runner revision")
     if Path(safety.__file__).resolve() != root / "container" / "evidence_safety.py":
-        raise ValueError("credential inventory import resolved outside pinned checkout")
+        raise ValueError("credential inventory import resolved outside pinned checkout; remove conflicting Python imports and retry")
     modules["evidence_safety"] = safety
     # The pinned runner's command builder owns every OCI option. This additional
     # fail-closed acquisition guard is the only adjustment: never implicitly pull.
@@ -93,12 +103,12 @@ def build_probe_command(runner, engine, identity, code, workspace, config, root,
     inputs, outputs = root / "input", root / "output"
     inputs.mkdir()
     outputs.mkdir()
-    # Explicit empty placeholders prevent automatic host seed discovery. Their
-    # bind options are removed before execution: even empty auth/catalogue files
-    # are not mounted during provider-free proof.
+    # Explicit placeholders prevent automatic host seed discovery. The probe
+    # receives a deterministic empty catalog, never host metadata or credentials.
     auth, models = root / "empty-auth.json", root / "empty-models.json"
     auth.write_text("{}\n")
     models.write_text("{}\n")
+    models.chmod(0o444)
     args = argparse.Namespace(
         transport=transport, engine=engine, network="none", image=identity,
         workspace=str(workspace), workspace_mode="ro", output=str(outputs / "probe.json"),
@@ -107,12 +117,12 @@ def build_probe_command(runner, engine, identity, code, workspace, config, root,
         env=[], timeout_seconds=45,
     )
     command, _ = runner.cli.build_container_command(args, inputs, outputs, host_env={})
-    for source, target in ((auth, "/seed/auth.json"), (models, "/seed/models.json")):
+    for source, target in ((auth, "/seed/auth.json"),):
         bind = runner.cli.bind_arg(source, target, readonly=True)
         index = next(i for i in range(len(command) - len(bind) + 1) if command[i:i + len(bind)] == bind)
         del command[index:index + len(bind)]
-    if any(marker in part for part in command for marker in ("/seed/auth.json", "/seed/models.json", "/seed/opencode.db", "/seed/opencode-config")):
-        raise ValueError("provider-free probe must not mount auth/catalogue/database/config-root seeds")
+    if any(marker in part for part in command for marker in ("/seed/auth.json", "/seed/opencode.db", "/seed/opencode-config")):
+        raise ValueError("provider-free probe must not mount auth/database/config-root seeds")
     return command[:-1] + ["--entrypoint=python3", command[-1], "-I", "-B", "-c", code]
 
 
@@ -127,7 +137,7 @@ def verify_image(runner, engine: str, image: str, transport: str) -> dict:
     identity = inspected.get("Id", inspected.get("ID"))
     if not isinstance(identity, str) or not re.fullmatch(r"(?:sha256:)?[0-9a-f]{64}", identity):
         raise ValueError("engine did not return a full image ID")
-    binary, expected = ("opencode", "2.0.23") if transport == "opencode" else ("copilot", "1.0.83")
+    binary, expected = ("opencode", "2.2.2") if transport == "opencode" else ("copilot", "1.0.83")
     code = "BINARY = " + repr(binary) + "\n" + IMAGE_PROBE
     with tempfile.TemporaryDirectory(prefix="skills-image-compatibility-") as temp:
         root = Path(temp)

@@ -120,12 +120,12 @@ class ReportingTests(unittest.TestCase):
                 destination = Path(temp) / "run"
                 # Substitute only external image/engine and invocation I/O.
                 # Actual selection, profiles, paired engine, storage and reporting run.
-                with patch.dict(os.environ, {"PATH": os.defpath}, clear=True), \
+                with patch.dict(os.environ, {"PATH": os.defpath, "OPENCODE_EVAL_RUNNER_MODELS": str(self.context.runner.root / "tests/fixtures/models-catalog.json")}, clear=True), \
                      patch("run_evals.verify_image", return_value={"image_id": "sha256:" + "a" * 64}), \
                      patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \
                      patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=self.context.invoke), \
                      redirect_stdout(stdout), redirect_stderr(stderr):
-                    code = main(["--cases", "product-acceptance:PA3", "--model", "test/model", "--network", "host",
+                    code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3", "--model", "test/model", "--network", "host",
                                   "--artifact-dir", str(destination), *flags], report_root=Path(temp))
                 self.assertEqual(code, 0, stderr.getvalue())
                 self.assertIn("weakens isolation", stderr.getvalue())
@@ -439,7 +439,7 @@ class ReportingTests(unittest.TestCase):
                     provider.write_text('{"' + secret + '":1,"' + secret + '":2}')
                     stdout, stderr = io.StringIO(), io.StringIO()
                     with redirect_stdout(stdout), redirect_stderr(stderr), patch("run_evals.load_runner") as loader:
-                        code = main(["--cases", "product-acceptance:PA3", "--model", "test/model", "--provider-config", str(provider),
+                        code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3", "--model", "test/model", "--provider-config", str(provider),
                                      *(["--probe"] if probe else []), *flags])
                     self.assertEqual(code, 2)
                     loader.assert_not_called()

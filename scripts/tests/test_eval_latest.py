@@ -327,7 +327,7 @@ class LatestReportTests(unittest.TestCase):
                         locations.append(artifact_dir)
                     return self.context.invoke(spec)
                 with chdir(caller), patch("run_evals.ROOT", root), \
-                     patch.dict(os.environ, {"PATH": os.defpath}, clear=True), \
+                     patch.dict(os.environ, {"PATH": os.defpath, "OPENCODE_EVAL_RUNNER_MODELS": str(self.context.runner.root / "tests/fixtures/models-catalog.json")}, clear=True), \
                      patch("run_evals.runner_git_head", return_value="offline-fixture-head"), \
                      patch("run_evals.verify_image", return_value={"image_id": "sha256:" + "a" * 64}), \
                      patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \

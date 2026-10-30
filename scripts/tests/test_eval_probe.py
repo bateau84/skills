@@ -66,13 +66,15 @@ class ProbeBoundaryTests(unittest.TestCase):
                 command = build_probe_command(runner, "podman", "sha256:" + "a" * 64,
                                               "print('zero inference')", workspace, config, root)
             joined = " ".join(command)
-            for forbidden in ("/seed/auth.json", "/seed/models.json", "/seed/opencode.db", "/seed/opencode-config",
+            for forbidden in ("/seed/auth.json", "/seed/opencode.db", "/seed/opencode-config",
                               "OPENAI_API_KEY", "GH_TOKEN", "GITHUB_TOKEN"):
                 self.assertNotIn(forbidden, joined)
             self.assertIn("--pull=never", command)
             self.assertEqual(command[command.index("--network") + 1], "none")
             self.assertIn("--read-only", command)
             self.assertIn(f"{config}:/seed/opencode.json:ro", command)
+            self.assertIn(f"{root / 'empty-models.json'}:/seed/models.json:ro", command)
+            self.assertEqual((root / "empty-models.json").read_text(), "{}\n")
             self.assertIn("-I", command)
 
 
