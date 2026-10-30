@@ -1,5 +1,4 @@
 {
-  "purpose": "Synthetic independent-retrieval evaluation; never treat this file as a real user session.",
   "root_session_id": "session_general",
   "sessions": [
     {
@@ -64,6 +63,5 @@
         }
       ]
     }
-  ],
-  "notes": "An edit-tool error does not itself establish an unauthorized write; do not infer a confirmed root cause."
+  ]
 }
