@@ -21,5 +21,16 @@ jobs:
           persist-credentials: false
       - name: Validate evaluation fixtures
         run: python3 -I -B scripts/run_evals.py --validate
+      - name: Fetch pinned evaluation runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/opencode-eval-runner"
+          git init -q "$root"
+          git -C "$root" remote add origin https://github.com/bateau84/opencode-eval-runner.git
+          git -C "$root" fetch -q --depth 1 origin dbbbf2a0740aee7a9e9035cc14a785a9467b8fb1
+          git -C "$root" checkout -q --detach FETCH_HEAD
+          test "$(git -C "$root" rev-parse HEAD)" = dbbbf2a0740aee7a9e9035cc14a785a9467b8fb1
+          printf 'SKILLS_EVAL_RUNNER_ROOT=%s\n' "$root" >> "$GITHUB_ENV"
       - name: Run provider-free harness tests
         run: python3 -I -B scripts/run_evals.py --harness-test
