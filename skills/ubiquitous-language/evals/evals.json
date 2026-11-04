@@ -21,16 +21,18 @@
     {
       "id": "UL-02",
       "name": "two-account-contexts",
-      "trap": "Force one definition for a word crossing two distinct bounded contexts.",
-      "prompt": "The Identity team calls an authenticated principal an `Account`. The Billing team calls the entity that receives invoices an `Account`. A colleague asks for a single company-wide definition of Account to remove duplication. Recommend how to maintain a shared vocabulary across these contexts.",
+      "trap": "Keep domain definitions separate but invent an unsupported one-to-one relationship or shared ID across them.",
+      "prompt": "The Identity team calls an authenticated principal an `Account`. The Billing team calls an invoice recipient an `Account`. In one documented example, principal P1 manages billing accounts B1 and B2. Later P2 takes over B2, while B2 keeps its invoice history. No source establishes that principal IDs and billing-account IDs are shared. A colleague proposes one company-wide definition of `Account` to remove duplication. Recommend how the teams should maintain a shared vocabulary and describe the boundary between these concepts.",
       "expectations": [
-        "Identifies the Identity and Billing bounded contexts and distinguishes their meanings.",
-        "Preserves each valid meaning while naming the relationship or translation needed at the boundary.",
-        "Suggests qualifiers only where cross-context ambiguity actually causes mistakes."
+        "Identifies Identity and Billing as distinct bounded contexts and distinguishes an authenticated principal from an invoice recipient.",
+        "Preserves the documented one-to-many example (P1 manages B1 and B2) and transfer (P2 takes over B2 without changing its invoice history), without treating either as a universal relationship rule.",
+        "Describes cross-context association or translation only as supported by the examples, and marks any further relationship or ID assumptions as unresolved until evidenced.",
+        "Uses context-specific qualifiers where ambiguity matters rather than enforcing a global meaning."
       ],
       "negative_expectations": [
-        "Must not merge principals and invoice recipients merely because both are called Account.",
-        "Must not require one global glossary to override local domain language."
+        "Must not merge authenticated principals with invoice recipients or mandate a single global meaning for Account.",
+        "Must not assert a one-to-one mapping, shared IDs, or fixed ownership as facts contrary to or unsupported by the examples.",
+        "Must not invent additional mapping rules, schemas, or product decisions to fill unknowns."
       ]
     },
     {
