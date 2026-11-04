@@ -1,3 +1,4 @@
+import json
 import sys
 import subprocess
 import tempfile
@@ -17,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class CliTests(unittest.TestCase):
     def test_real_cli_provider_free_alias_modes_and_live_safeguards(self):
         script = ROOT / "scripts" / "run_evals.py"
+        all_cases = discover(ROOT)
         for argv, code in ((["--validate"], 0), (["--list", "--skills", "work-decomposition"], 0),
                            (["--cases", "product-acceptance:PA1"], 2),
                            (["--cases", "unknown", "--model", "test/model"], 2),
@@ -27,7 +29,12 @@ class CliTests(unittest.TestCase):
                                       cwd=temp, capture_output=True, text=True, timeout=10)
                 self.assertEqual(proc.returncode, code, proc.stderr)
                 if argv == ["--validate"]:
-                    self.assertIn('"fixture_cases": 325', proc.stdout)
+                    self.assertEqual(json.loads(proc.stdout), {
+                        "status": "valid",
+                        "fixture_cases": len(all_cases),
+                        "skills": len({c.skill for c in all_cases}),
+                        "provider_calls": 0,
+                    })
                 if "--list" in argv:
                     self.assertEqual(len(proc.stdout.splitlines()), 13)
                 if code == 2:
