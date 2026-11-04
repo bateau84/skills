@@ -35,7 +35,7 @@ class CaseTests(unittest.TestCase):
                 expected.append((f"SKILL-{skill}-{raw.get('id', index)}", source))
         self.assertCountEqual([(c.id, c.source) for c in cases], expected)
         # Guard against an accidental loss of the reviewed corpus, but allow new cases.
-        self.assertGreaterEqual(len(cases), 345)
+        self.assertGreaterEqual(len(cases), 347)
         required = {f"SKILL-code-analysis-CodeAnalysis-{n:02d}" for n in range(1, 21)}
         self.assertTrue(required.issubset({c.id for c in cases}))
         numeric = next(c for c in cases if c.id == "SKILL-python-testing-1")
