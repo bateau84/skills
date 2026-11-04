@@ -1,0 +1,19 @@
+# Code Analysis Adversarial Validation
+
+Challenge a coherent-looking analysis that has already survived ordinary review. Pick the attacks that could change its answer; do not require every attack for every explanation. Any execution or temporary edit still needs the host's permission and suitable isolation.
+
+## Shared blind spots
+
+- **Correlated evidence:** The explanation, graph, and tests may all come from the same stale/generated model. Compare a decisive edge with a separately observed current source or runtime path. Check that all evidence describes the same revision and configuration.
+- **Invisible caller:** Try a plugin registration, reflection-based call, serialized message, feature flag, build target, or external consumer omitted by the index. Does the conclusion survive, or does its scope need narrowing?
+- **Wrong execution order:** A cleanup function can exist without running after partial initialization, cancellation, or an exception. Challenge the sequence and owner, not merely the presence of cleanup code.
+- **False corroboration:** A reproduction may call a helper directly, mock away the disputed dispatch, or inject the expected state. Inspect what path the evidence actually exercises. Where authorized, vary the input or guard that should change the result and check that the observation changes.
+- **Missing counterexample:** Construct the strongest valid caller guarantee or input that would disprove a claimed defect. Conversely, test the weakest allowed precondition behind a "safe" conclusion. Separate impossible states from states the current boundary actually admits.
+- **Environment mismatch:** Challenge a conclusion under another supported runtime, target, feature set, or configuration that the analysis claims to cover. Do not demand support for environments outside the accepted contract.
+- **Green but insensitive:** Challenge an adequacy claim with a realistic wrong implementation of the exact claimed behavior. Would the existing assertion detect it, or do fixture and oracle share the same assumption? Use an isolated, authorized probe when useful; distinguish assertion failures from setup/build failures and equivalent mutants. Do not mutate the working tree merely to complete QA.
+- **Invented gap:** Search a different test level or generated/parameterized suite for the supposedly missing protection. Try the strongest legitimate reason for the existing test's narrow scope. A useful boot check or protocol obligation should not be condemned for lacking a broader claim it never made.
+- **Depth illusion:** Walk a real consumer rather than reading only the public signature. Expose hidden ordering, cleanup, schema, or state obligations. Conversely, remove a criticized thin adapter in a thought experiment: would compatibility knowledge or vendor details spread into callers? Distinguish a conceptual walkthrough from an executed change.
+- **Sample and metric gaming:** Select a materially different in-scope consumer or follow the same policy across a language/process boundary. Does the claimed practice consistency or reuse opportunity survive? Challenge a proposed improvement that shrinks one file, lowers a complexity number, or deduplicates lines while moving coordination and coupling elsewhere.
+- **Refactor that changes meaning:** Try an existing exception or supported failure path against the proposed shared abstraction. Does consolidation silently unify different rules, alter cleanup/error behavior, or force new options onto every caller? Test the claimed preservation of behavior, not whether the proposal looks cleaner.
+
+Report the attempted challenge, observed result, and resulting confidence limit. A paper walkthrough is not executed evidence; a failure to reproduce is not proof of absence. If the answer changes, correct the analysis rather than inventing new product requirements.

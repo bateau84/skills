@@ -21,12 +21,23 @@ class CaseTests(unittest.TestCase):
             self.assertEqual(actual["cases"], expected["cases"])
             self.assertEqual(actual["common_instruction"], expected["common_instruction"])
             self.assertEqual(len(actual["cases"]), count)
-        self.assertEqual(len(discover(ROOT)), 325)
 
-    def test_current_corpus_has_303_other_cases_without_changing_source_ids(self):
+    def test_corpus_matches_fixture_inventory_and_preserves_source_ids(self):
         cases = discover(ROOT)
-        existing = [c for c in cases if c.skill not in {"product-acceptance", "work-decomposition"}]
-        self.assertEqual(len(existing), 303)
+        expected = []
+        for path in sorted((ROOT / "skills").glob("*/evals/*.json")):
+            doc = json.loads(path.read_text())
+            raw_cases = doc if isinstance(doc, list) else doc.get("cases", doc.get("evals"))
+            self.assertIsInstance(raw_cases, list)
+            source = path.relative_to(ROOT).as_posix()
+            skill = path.parent.parent.name
+            for index, raw in enumerate(raw_cases, start=1):
+                expected.append((f"SKILL-{skill}-{raw.get('id', index)}", source))
+        self.assertCountEqual([(c.id, c.source) for c in cases], expected)
+        # Guard against an accidental loss of the reviewed corpus, but allow new cases.
+        self.assertGreaterEqual(len(cases), 352)
+        required = {f"SKILL-code-analysis-CodeAnalysis-{n:02d}" for n in range(1, 21)}
+        self.assertTrue(required.issubset({c.id for c in cases}))
         numeric = next(c for c in cases if c.id == "SKILL-python-testing-1")
         self.assertEqual(numeric.source_id, 1)
         self.assertEqual(numeric.selectors, (numeric.id, "python-testing:1"))

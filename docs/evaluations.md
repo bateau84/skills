@@ -586,11 +586,13 @@ a skill-loading prerequisite.
 
 ## Corpus, history and source lineage
 
-The current checked-in corpus normalizes to **325 cases across 54 skills**:
-303 cases outside the two Markdown-backed skill directories, 9
-`product-acceptance` cases, and 13 `work-decomposition` cases (9 WD cases plus
-4 context-and-handoff cases). The Markdown-backed JSON metadata versions are
-respectively `1.0.0` and `1.1.0`. Three Loom-style
+With `code-analysis` and the merged `ubiquitous-language` skill, the corpus normalizes to
+**352 cases across 56 skills**: 330 cases outside the two Markdown-backed skill
+directories (including 20 `code-analysis` cases), 9 `product-acceptance` cases,
+and 13 `work-decomposition` cases (9 WD cases plus 4 context-and-handoff cases).
+These totals are a snapshot, not a fixed harness contract; fixture discovery
+reports current counts as cases are added. The Markdown-backed JSON metadata
+versions are respectively `1.0.0` and `1.1.0`. Three Loom-style
 source shapes are accepted: arrays, `{skill, cases}`, and `{skill_name, evals}`.
 Normalized IDs are `SKILL-<skill>-<source-id>`; source IDs and expectation text
 are preserved.

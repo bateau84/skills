@@ -1,0 +1,162 @@
+{
+  "skill": "code-analysis",
+  "version": "1.0.0",
+  "shape": 1,
+  "description": "Synthetic reasoning-only scenarios for the user-requested quality-analysis scope. Prompts are target inputs; traps and expectations are evaluator-only. No baseline failure, live tool use, or measured skill improvement is claimed.",
+  "cases": [
+    {
+      "id": "CodeAnalysis-11",
+      "name": "practice-fit-and-sampled-adoption",
+      "trap": "Helper adoption is equated with correctness, a documented exception is treated as a defect, and a partial sample becomes a whole-repository score.",
+      "prompt": "Assess scoped-resource practices and refactoring needs without edits. At revision q1, docs/resources.md:8-12 prefers withLease for request handlers but explicitly permits manual try/finally cleanup for streaming handlers. There are five relevant handlers. You inspected a.ts:10 and b.ts:20, which use withLease, and stream.ts:30-42, which releases exactly once in finally on every settled success/error path; the approved wrapper cannot support that streaming lifecycle. Two handlers are unavailable. A pure parsing helper has no resource to own. Report what is used, whether it fits, and the scope of any count. No execution occurred.",
+      "expectations": [
+        "Reports two withLease users among three inspected relevant handlers, with the streaming implementation as a documented, source-supported exception rather than a defect.",
+        "Marks the other two handlers unknown and the pure parser outside this practice's applicable scope.",
+        "Distinguishes adoption of the named helper from satisfaction of the resource-lifecycle obligation; does not manufacture a refactor when the supplied implementation is adequate."
+      ],
+      "negative_expectations": [
+        "Must not report whole-repository adoption or compliance percentages from the partial sample.",
+        "Must not require the streaming handler or pure parser to use the wrapper merely for uniformity, or claim executed cleanup tests."
+      ]
+    },
+    {
+      "id": "CodeAnalysis-12",
+      "name": "mocking-the-target-is-ceremonial-for-its-claim",
+      "trap": "A test that supplies its own expected output is treated as protection of the real pricing rule because it is green.",
+      "prompt": "Are these tests useful for the pricing contract? Accepted behavior: price(n) charges 100 per item and discounts the total by 10% for integer quantities n >= 10. The current implementation in price.ts:1-4 correctly implements that rule. The complete relevant test inventory and selection config contains only price.test.ts:5-9: spyOn(pricing, 'price').mockReturnValue(900); expect(pricing.price(10)).toBe(900). The test report says green; a repository-wide coverage report says 92%, without per-function details. No tools or other tests are available. Assess the evidence and any justified improvement; do not write tests.",
+      "expectations": [
+        "Shows that the test replaces the very pricing behavior it claims to verify and would still pass if the real price implementation were wrong.",
+        "Identifies lack of actual pricing-rule protection within the complete supplied inventory, not a confirmed implementation bug.",
+        "Proposes strengthening/replacing the existing test to invoke real price and distinguish the documented discount threshold, such as quantities 9 and 10, tying the assertion to the accepted rule.",
+        "Separates the reported historical green result from any execution performed by the analyst."
+      ],
+      "negative_expectations": [
+        "Must not claim the coverage percentage proves the pricing rule or report a mutation/test run.",
+        "Must not invent currencies, refunds, tax, invalid-input semantics, a mandatory end-to-end suite, or unrelated edge cases."
+      ]
+    },
+    {
+      "id": "CodeAnalysis-13",
+      "name": "incomplete-inventory-is-not-a-missing-test",
+      "trap": "Only visible unit tests are inspected and an unseen integration suite is declared absent.",
+      "prompt": "List any justified test gaps for createJob. The accepted endpoint contract is 202 after persistence, or an error if persistence fails. The supplied handler code awaits store.save before returning 202. handler.test.ts supplies a deferred store fake and verifies response timing plus error propagation, correctly exercising handler control flow. CI references tests/storage-contract and an external integration suite, but neither suite's contents nor logs are available. Only handler.test.ts and the handler were inspected. Do not invent tests or unsupported behavior.",
+      "expectations": [
+        "Recognizes the handler tests' real purpose: ordering and error propagation at the handler boundary with a controlled store double.",
+        "States that real persistence/composition coverage is unverified because the referenced suites are unavailable, not demonstrated absent.",
+        "Names inspection of the existing storage/integration evidence as the next check before recommending a new test."
+      ],
+      "negative_expectations": [
+        "Must not declare integration tests missing, condemn the store fake solely for being a mock, or fabricate unseen suite contents/results.",
+        "Must not add speculative multi-region failover, crash-durability guarantees, or a generic edge-case test list."
+      ]
+    },
+    {
+      "id": "CodeAnalysis-14",
+      "name": "deep-modules-include-the-informal-caller-contract",
+      "trap": "Short signatures and large implementations are rewarded while repeated caller-side lifecycle knowledge and a useful thin adapter are misclassified.",
+      "prompt": "Assess modularity and consistent use of deep modules in these complete excerpts. StoreA exposes open(opts), but each of three inspected consumers must then begin, retry eligible conflicts, rollback failures, and close in the correct order; all three duplicate that sequence. StoreB's run(operation) owns the same lifecycle and retry contract internally; its three consumers provide only the operation. StoreA and StoreB serve comparable transaction use cases. A separate four-line VendorAdapter maps the vendor's error codes into the accepted domain errors and is the only place importing that SDK. No timings or change history exist. Should everything be merged or made larger?",
+      "expectations": [
+        "Identifies StoreA's informal caller obligations and duplicated coordination despite its small public signature; contrasts StoreB's encapsulated lifecycle for the comparable use case.",
+        "Reports inconsistent encapsulation in the inspected boundaries and a bounded investigation into moving shared lifecycle knowledge behind StoreA's boundary while preserving behavior.",
+        "Recognizes the thin adapter's vendor-isolation purpose and does not demand merging unrelated responsibilities or increasing file size.",
+        "Keeps depth qualitative and the three-consumer counts scoped to the supplied evidence."
+      ],
+      "negative_expectations": [
+        "Must not infer depth from line count, call-stack depth, or a numerical depth score.",
+        "Must not declare every thin module defective, claim measured maintenance savings, or perform a redesign."
+      ]
+    },
+    {
+      "id": "CodeAnalysis-15",
+      "name": "refactor-baseline-is-not-a-measured-benefit",
+      "trap": "A real duplication opportunity becomes an invented percentage improvement or an unapproved change of retry policy.",
+      "prompt": "Identify measurable refactoring opportunities, without editing. At revision q2, api/retry.ts:5-14, jobs/retry.ts:8-17, and sync/retry.ts:4-13 independently define the same accepted status-to-retry classification. All three callers must follow the same policy; tests separately assert each table's entries. The complete relevant source contains exactly these three policy copies. No latency, allocation, maintenance-time, or before/after data exists. An earlier suggestion said 'extracting this will make requests 30% faster'. Evaluate it and give a bounded candidate.",
+      "expectations": [
+        "Uses three independently maintained copies as the current structural baseline and rejects the unsupported 30% speedup.",
+        "Proposes investigating one shared policy owner with the existing three consumers; labels reduction to one definition as a proposed result, not an implemented or measured after-state.",
+        "Names preservation of classifications and caller behavior, relevant regression protection, and a way to verify consolidation without moving duplication into adapters.",
+        "States coupling/compatibility trade-offs and leaves runtime benefit unmeasured."
+      ],
+      "negative_expectations": [
+        "Must not invent performance or maintenance savings, claim the refactor was applied, or present a source count as a runtime benchmark.",
+        "Must not silently change retry eligibility or require a generalized retry framework."
+      ]
+    },
+    {
+      "id": "CodeAnalysis-16",
+      "name": "coincidental-similarity-is-not-a-reuse-contract",
+      "trap": "Similar source text is treated as proof of a shared domain rule and hypothetical consumers justify a framework.",
+      "prompt": "Assess reuse opportunities. Two small predicates currently have matching control-flow shapes. editorial/canEdit.ts implements the accepted publication policy; billing/canAmend.ts implements the separately owned invoice policy. Their contracts intentionally differ on approved records, and each has tests for its own rule. Each has one current consumer; no shared rule or additional consumer is accepted. A proposed cleanup is one generic policy engine with domain flags 'for future reuse'. No modifications are requested.",
+      "expectations": [
+        "Distinguishes syntactic similarity from shared knowledge and acknowledges the intentionally different domain contracts.",
+        "Rejects the proposed policy-engine extraction on the supplied evidence or identifies its unsupported benefit and added coupling/options.",
+        "Accepts keeping the current small modules and existing meaningful tests without inventing future consumers."
+      ],
+      "negative_expectations": [
+        "Must not merge the policies merely for DRY, erase their behavioral difference, or manufacture reuse demand.",
+        "Must not claim duplicated lines alone prove a defect or measured maintenance waste."
+      ]
+    },
+    {
+      "id": "CodeAnalysis-17",
+      "name": "purposeful-smoke-snapshot-and-interaction-tests",
+      "trap": "A blanket ban on smoke tests, snapshots, or mocks mistakes narrow but meaningful checks for ceremony.",
+      "prompt": "Are these scoped tests ceremonial? Accepted obligations: the packaged CLI boots for --help with exit 0 and stable documented flags; the owned lease wrapper releases its external backend exactly once on settled success or failure. The complete supplied checks launch the real packaged CLI, assert exit 0, and compare only the contract-owned flag list snapshot. Separate tests execute the real lease wrapper with a fake external backend, drive success and rejection, and assert exactly one release per path. The snapshot is a reviewed expected value, not regenerated during the test. No runtime logs are supplied. Assess only these obligations, and recommend additions only where justified.",
+      "expectations": [
+        "Explains the concrete failures detected by boot/exit checks, the stable-flag snapshot, and release-count assertions at the external protocol boundary.",
+        "Recognizes that the behavior under proof remains real despite the external fake and does not classify these tests as ceremonial solely by style.",
+        "Finds no specific additional test justified by the supplied scoped obligations, while distinguishing source-based adequacy reasoning from actual execution and broader product coverage."
+      ],
+      "negative_expectations": [
+        "Must not demand every test be end-to-end, forbid all interaction assertions/snapshots, or invent missing unrelated cases.",
+        "Must not report test execution or whole-product adequacy."
+      ]
+    },
+    {
+      "id": "CodeAnalysis-18",
+      "name": "mutation-evidence-needs-triage",
+      "trap": "Survivors and build failures become an indiscriminate missing-test list or an inflated mutation score.",
+      "prompt": "Assess existing mutation evidence, do not run anything. Contract: discount applies to integer quantities n >= 10. A supplied baseline log collected six relevant tests and passed; their cases include 9 and 11 but no 10. Supplied isolated probe records show: changing >= 10 to > 10 survived with those six tests; changing >= 10 to > 9 also survived; a third change caused a syntax error before collection. These are the only observations. What specific test improvement is justified, and what is not proved?",
+      "expectations": [
+        "Identifies the first survivor as evidence for an uncovered equality boundary and proposes an assertion at n=10 tied to the accepted rule.",
+        "Recognizes >9 and >=10 are equivalent for the stated integer domain, so that survivor does not justify a new requirement or test.",
+        "Classifies the syntax failure as invalid/setup evidence rather than an assertion-based kill and avoids a whole-suite mutation score.",
+        "Attributes execution to supplied logs, not to work performed in this analysis."
+      ],
+      "negative_expectations": [
+        "Must not treat every survivor as a bug, count the syntax error as useful test detection, or invent unsupported fractional-input behavior.",
+        "Must not run or claim additional probes, create a new mandatory testing stage, or claim global test adequacy."
+      ]
+    },
+    {
+      "id": "CodeAnalysis-19",
+      "name": "existing-but-unselected-test-is-not-a-new-test-gap",
+      "trap": "A meaningful existing test that is excluded by discovery is overlooked and duplicated instead of diagnosing selection.",
+      "prompt": "Assess recovery-test adequacy. The accepted contract is that restoring a persisted snapshot recovers its jobs. recovery.integration.ts executes the real save/load path and asserts recovered jobs against independently specified fixture inputs. The entire relevant CI and documented verification configuration selects only **/*.test.ts; it has no alternate integration job or command. The integration file is not imported by another selected test. No logs or execution are available. What is the evidenced gap and the smallest correction to investigate? Do not edit or invent tests.",
+      "expectations": [
+        "Recognizes meaningful recovery protection exists in source but is excluded from the supplied verification path.",
+        "Reports a test-selection/execution gap and recommends checking or correcting the existing discovery/job configuration rather than inventing a duplicate test.",
+        "Separates source proof of exclusion from unobserved test outcomes and avoids asserting that the integration check would pass."
+      ],
+      "negative_expectations": [
+        "Must not say no recovery test exists, count the unselected file as executed coverage, or fabricate logs.",
+        "Must not write another test, run the suite, or change CI under the read-only request."
+      ]
+    },
+    {
+      "id": "CodeAnalysis-20",
+      "name": "source-snapshot-does-not-prove-development-method",
+      "trap": "Well-organized tests and production code are mistaken for evidence that test-first development actually occurred.",
+      "prompt": "Measure whether this component uses TDD and whether a refactor is needed. The supplied final source has a small pure parser and focused tests for its accepted grammar, including real output assertions and documented rejection cases. There is one squashed commit containing both implementation and tests; no prior revisions, failing-test records, or session history are available. The scoped code and tests show no identified defect or duplicated policy. No execution was performed. Assess the stated questions without inventing history or changes.",
+      "expectations": [
+        "Distinguishes observable test quality and current structure from the unverified historical order needed to establish TDD.",
+        "Reports TDD usage as unknown rather than present or absent, with the missing process evidence named.",
+        "Finds no supported refactor from the supplied evidence and preserves the scoped no-change conclusion."
+      ],
+      "negative_expectations": [
+        "Must not infer TDD from test names, organization, or co-committed source, or assert that TDD was not used.",
+        "Must not fabricate red/green runs, demand additional tests per function, or create refactoring work solely to populate a report."
+      ]
+    }
+  ]
+}
