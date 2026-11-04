@@ -1,0 +1,81 @@
+{
+  "skill": "ubiquitous-language",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "UL-01",
+      "name": "unresolved-status-collision",
+      "trap": "Choose an authoritative definition for completed from contradictory documents without an accepted decision.",
+      "prompt": "Two documents in the same workflow domain disagree. An engineering runbook says `completed` means execution stopped, including when it failed. A product requirement says `completed` means the requested goal was achieved. No decision resolving the difference exists. Draft a small vocabulary clarification and explain any required decision.",
+      "expectations": [
+        "Distinguishes execution ended from goal achieved with a case where execution ends unsuccessfully.",
+        "Marks the collision unresolved, and identifies the decision needed before terms can be accepted.",
+        "Keeps current claims traceable to the two source artifacts."
+      ],
+      "negative_expectations": [
+        "Must not declare either meaning accepted without a decision.",
+        "Must not silently rewrite requirements or change runtime state names."
+      ]
+    },
+    {
+      "id": "UL-02",
+      "name": "two-account-contexts",
+      "trap": "Force one definition for a word crossing two distinct bounded contexts.",
+      "prompt": "The Identity team calls an authenticated principal an `Account`. The Billing team calls the entity that receives invoices an `Account`. A colleague asks for a single company-wide definition of Account to remove duplication. Recommend how to maintain a shared vocabulary across these contexts.",
+      "expectations": [
+        "Identifies the Identity and Billing bounded contexts and distinguishes their meanings.",
+        "Preserves each valid meaning while naming the relationship or translation needed at the boundary.",
+        "Suggests qualifiers only where cross-context ambiguity actually causes mistakes."
+      ],
+      "negative_expectations": [
+        "Must not merge principals and invoice recipients merely because both are called Account.",
+        "Must not require one global glossary to override local domain language."
+      ]
+    },
+    {
+      "id": "UL-03",
+      "name": "glossary-not-breaking-rename",
+      "trap": "Treat a preference for a name as permission for an incompatible API and persistence migration.",
+      "prompt": "A team proposes the domain term `Run` instead of `Job`. Public API clients still send `jobId`, event consumers expect `JobCreated`, and persisted records contain `job_id`. The assignment is to update the glossary only. Draft the vocabulary change and identify follow-up work.",
+      "expectations": [
+        "Records Run as proposed and Job as current/legacy usage, not a fully completed adoption.",
+        "Identifies the API, event, persistence, and consumer compatibility boundaries.",
+        "Limits the result to the authorized glossary scope; describes a separately reviewed migration if adoption is approved."
+      ],
+      "negative_expectations": [
+        "Must not rename externally visible identifiers or persisted fields as a cosmetic cleanup.",
+        "Must not state that the new vocabulary is already implemented."
+      ]
+    },
+    {
+      "id": "UL-04",
+      "name": "go-style-not-domain-semantics",
+      "trap": "Invoke an unnecessary vocabulary process for a straightforward Go identifier convention.",
+      "prompt": "A Go developer asks: `Should our struct field be UserID or UserId?` There is no disagreement about what the field means. What guidance is appropriate, and does this need a domain glossary entry?",
+      "expectations": [
+        "Routes to idiomatic Go naming guidance and answers the narrow naming question (UserID).",
+        "Explains why no domain-meaning clarification or glossary addition is needed."
+      ],
+      "negative_expectations": [
+        "Must not invent different business concepts for ID and Id.",
+        "Must not mandate a shared-language workflow for an identifier-style question."
+      ]
+    },
+    {
+      "id": "UL-05",
+      "name": "accepted-meaning-vs-legacy-code",
+      "trap": "Mistake code terminology for intended product meaning or prematurely change storage contracts.",
+      "prompt": "A product owner has explicitly approved this domain distinction: `Booking` is a held reservation before payment; `Order` is a confirmed paid purchase. Existing code sometimes labels both as Order, and the task is only to draft vocabulary. Produce a compact vocabulary entry or discrepancy note.",
+      "expectations": [
+        "Records the approved business distinction with source, context, status and a distinguishing example.",
+        "Reports the code's observed legacy usage separately from approved product meaning.",
+        "Flags any future renames or data changes as work requiring explicit compatibility analysis and scope."
+      ],
+      "negative_expectations": [
+        "Must not infer business intent from inconsistent code labels.",
+        "Must not claim the code is already aligned or change persisted fields as part of glossary drafting."
+      ]
+    }
+  ]
+}
