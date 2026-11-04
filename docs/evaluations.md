@@ -586,8 +586,8 @@ a skill-loading prerequisite.
 
 ## Corpus, history and source lineage
 
-With the addition of `code-analysis`, the checked-in corpus normalizes to
-**347 cases across 55 skills**: 325 cases outside the two Markdown-backed skill
+With `code-analysis` and the merged `ubiquitous-language` skill, the corpus normalizes to
+**352 cases across 56 skills**: 330 cases outside the two Markdown-backed skill
 directories (including 20 `code-analysis` cases), 9 `product-acceptance` cases,
 and 13 `work-decomposition` cases (9 WD cases plus 4 context-and-handoff cases).
 These totals are a snapshot, not a fixed harness contract; fixture discovery
