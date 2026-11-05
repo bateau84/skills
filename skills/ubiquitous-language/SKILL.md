@@ -18,7 +18,7 @@ A shared language makes domain meaning explicit and consistent **within a define
 
 ## Method
 
-1. **Identify the context and decision.** Name the bounded context, affected audience, and why a shared meaning is needed. If a word crosses contexts, identify the boundary explicitly.
+1. **Identify the context and existing vocabulary.** Name the bounded context, affected audience, and why a shared meaning is needed. Search repository instructions, indexes, and affected documents for its existing vocabulary, including definitions embedded in other documents. Reuse that home; do not create a competing dictionary or assume similarly named records govern the same context. If a word crosses contexts, identify the boundary explicitly.
 2. **Collect actual usage.** Look at relevant stakeholder language, domain examples, accepted product artifacts, code and interfaces, and documentation. Record where claims come from and whether they describe intent or observed behavior. Do not assume one artifact overrides another without a known authority rule.
 3. **Find semantic collisions.** Look for:
    - different words for one concept (synonyms);
@@ -27,9 +27,15 @@ A shared language makes domain meaning explicit and consistent **within a define
    - misleading technical names used as business terms;
    - translated labels that imply a different meaning.
 4. **Clarify the distinction.** For every consequential collision, ask what observable example distinguishes the meanings. Propose candidate terms only after the distinction is clear. If the product meaning is unsettled, preserve the question and route it to the appropriate decision owner; do not settle it by editing a glossary.
-5. **Record an appropriately small vocabulary.** For each important term, record its context, definition, nearby exclusions, example, source, and acceptance status. Include aliases/deprecated terms only when they exist and matter. Record relationships between terms when that avoids ambiguity.
+5. **Record an appropriately small vocabulary.** When writing is in scope, update the existing vocabulary. If none exists and consequential terms recur across affected artifacts, create a small, durable vocabulary in the repository's established documentation structure. Link affected documents to it rather than duplicating definitions. Agreement is needed before accepting a meaning, not before recording it: preserve proposed and unresolved entries too. For each important term, record its context, definition, nearby exclusions, example, source, and acceptance status. Include aliases/deprecated terms only when they exist and matter. Record relationships between terms when that avoids ambiguity.
 6. **Apply within authorized scope.** Reuse accepted terms in new requirements, design notes, UI copy, code, APIs, tests, and agent handoffs as applicable. Report inconsistencies in out-of-scope or externally owned artifacts; do not quietly make bulk renames or alter behavioral contracts.
 7. **Check the result.** Verify that a reader can distinguish neighboring terms using examples, the same term means the same thing inside the context, different concepts are not accidentally merged, and unresolved conflicts remain visible rather than becoming false agreements.
+
+## Findings and handoffs
+
+For each material unresolved collision, preserve the conflicting source locations, a distinguishing example, its consequence, and the decision needed. Name the responsible owner when known; otherwise keep ownership unknown. Link the vocabulary entry and the project's existing finding or work record when available. Use accessible artifacts or include the essential evidence in the handoff so the next reader does not need the original conversation.
+
+Before reporting completion, distinguish verified corrections, unresolved decisions, and remaining out-of-scope work. Carry their sources and acceptance status into handoffs; recording or forwarding a finding does not resolve it. A bounded audit may be complete while its findings remain open. Do not claim affected documents or consumers are aligned unless they were checked.
 
 ## Suggested record (adapt to the repository)
 
@@ -46,7 +52,7 @@ Keep the vocabulary near the domain material it governs (for example, `docs/doma
 - Open question: <only if unresolved>
 ```
 
-A useful result may be a single clarified term, a small glossary, or a discrepancy report. Prefer the smallest result that fixes the actual ambiguity.
+A single clarified term may suffice for an isolated ambiguity; trivial naming or copyediting needs no glossary. Recurring consequential terms warrant the reuse or creation described above. For review-only work, report discrepancies and the proposed vocabulary location or edits without writing files. Prefer the smallest result that fixes the actual ambiguity.
 
 ## Example: unresolved lifecycle vocabulary
 

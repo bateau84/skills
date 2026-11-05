@@ -1,6 +1,6 @@
 {
   "skill": "ubiquitous-language",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "shape": 1,
   "cases": [
     {
@@ -77,6 +77,71 @@
       "negative_expectations": [
         "Must not infer business intent from inconsistent code labels.",
         "Must not claim the code is already aligned or change persisted fields as part of glossary drafting."
+      ]
+    },
+    {
+      "id": "UL-06",
+      "name": "missing-vocabulary-with-unresolved-meaning",
+      "trap": "Leave recurring domain distinctions only in chat, or wait for all terms to be agreed before proposing a durable vocabulary.",
+      "prompt": "A documentation refactor is authorized for the local backup domain. The repository guide places domain material under docs/domains/<domain>/ and the supplied complete documentation inventory has no vocabulary. Accepted requirements at docs/domains/backup/requirements.md#br-12 and #br-13 distinguish Finished (execution stopped, possibly unsuccessfully) from Succeeded (the requested backup was verified). docs/domains/backup/guide.md and docs/domains/backup/architecture.md repeatedly call both outcomes Done. Draft docs/domains/backup/cancellation-design.md uses Cancelled for a stop request; draft docs/domains/backup/cancellation-product-note.md uses it for execution actually stopping. No accepted decision settles that word. Describe the concrete documentation edits and supply the resulting small vocabulary content, with its location and source links. Do not claim to have changed files in this text-only task.",
+      "expectations": [
+        "Places a small durable backup vocabulary under the supplied repository structure and links the affected user and architecture documentation to it instead of leaving the result only as a discrepancy report.",
+        "Preserves Finished and Succeeded as accepted meanings sourced to BR-12 and BR-13, including an unsuccessful terminal execution that distinguishes them.",
+        "Records the conflicting Cancelled meanings and their draft sources as unresolved, with the decision still needed; creation does not wait for agreement on that term.",
+        "Limits edits to the authorized documentation scope and describes proposed edits rather than claiming actual file writes."
+      ],
+      "negative_expectations": [
+        "Must not adopt one Cancelled meaning as accepted or introduce a new runtime state.",
+        "Must not replace the project structure with a required global glossary location.",
+        "Must not conflate execution stopping with verified backup success."
+      ]
+    },
+    {
+      "id": "UL-07",
+      "name": "reuse-embedded-domain-vocabulary",
+      "trap": "Create a competing dictionary because the existing vocabulary is embedded in a domain overview rather than a file named glossary.md.",
+      "prompt": "The repository index links docs/reservations/overview.md#terms as the maintained reservation vocabulary. Its accepted definitions say Hold is a temporary reservation before payment and Booking is a confirmed paid reservation, sourced to decision D-7. An unrelated Finance glossary defines Booking as an accounting entry. An authorized edit to docs/reservations/guide.md uses 'booking' for an unpaid Hold. There is no glossary.md file. Describe the smallest correction and any vocabulary edits or links needed. Use only these facts; the request does not authorize changing Finance or product behavior.",
+      "expectations": [
+        "Reuses the Terms section in docs/reservations/overview.md as the reservation vocabulary and preserves its accepted definitions and D-7 provenance.",
+        "Corrects the unpaid reservation usage to Hold in the affected guide and links to the existing Terms section without creating a second dictionary.",
+        "Keeps the Finance meaning in its separate context and does not merge the two meanings of Booking."
+      ],
+      "negative_expectations": [
+        "Must not create a competing glossary merely because no glossary.md file exists.",
+        "Must not move or rewrite the maintained definitions just to match an example path.",
+        "Must not alter Finance terminology or introduce new reservation behavior."
+      ]
+    },
+    {
+      "id": "UL-08",
+      "name": "review-only-missing-vocabulary",
+      "trap": "Treat a conditional glossary-creation rule as authorization to write during a review-only assignment.",
+      "prompt": "Review only: do not edit repository files. A check of the repository index and the affected workflow documents found no vocabulary. The user guide calls every stopped run 'successful'; accepted requirement BR-9 reserves Successful for a confirmed outcome and permits unsuccessful stopped runs. This confusion recurs in two design notes. Produce the review finding and recommend a concrete follow-up. The repository guide places workflow domain notes in docs/workflows/.",
+      "expectations": [
+        "Reports the consequential mismatch with BR-9, the guide and design notes, and an example of a stopped run with an unconfirmed outcome.",
+        "Recommends a small vocabulary at a suitable location under docs/workflows/ and related document corrections as follow-up, without claiming a file was created.",
+        "Keeps review completion separate from resolution of the underlying terminology mismatch."
+      ],
+      "negative_expectations": [
+        "Must not claim repository edits, resolution or implemented alignment from the review report alone.",
+        "Must not weaken BR-9 to match the guide or expand the task into runtime changes."
+      ]
+    },
+    {
+      "id": "UL-09",
+      "name": "unresolved-meaning-survives-handoff",
+      "trap": "Turn a proposed glossary term or a forwarded concern into an accepted decision when the next agent lacks the earlier conversation.",
+      "prompt": "Prepare a standalone handoff for another agent to continue authorized documentation work. docs/workflows/vocabulary.md records Completed as unresolved: draft docs/workflows/design.md uses execution ended, while draft docs/workflows/product-note.md uses goal achieved. Neither definition has been accepted. Concern F-17 records this collision; its decision owner is unknown. A failed execution distinguishes the meanings. An unrelated correction to Retry wording in docs/workflows/guide.md was checked against accepted BR-4. API clients still consume status='completed', and API changes are outside this assignment. The next agent can read repository files and the handoff, but cannot access your chat or concern system. Write the handoff.",
+      "expectations": [
+        "Carries both Completed meanings, their exact source paths, unresolved status, the failed-execution counterexample and the decision still needed into the accessible handoff.",
+        "Keeps ownership unknown and records F-17 as a source identity while including the essential evidence that cannot be retrieved from the concern system.",
+        "Distinguishes the verified BR-4 Retry wording correction from the unresolved Completed decision and out-of-scope API compatibility work.",
+        "Points the recipient to the existing vocabulary and requires affected documents or consumers to be checked before claiming alignment."
+      ],
+      "negative_expectations": [
+        "Must not promote a draft definition to accepted, invent a decision owner, or treat F-17 as resolved because it was forwarded.",
+        "Must not require the previous chat or an inaccessible concern link to understand the conflict.",
+        "Must not authorize an API rename or report existing clients migrated."
       ]
     }
   ]
