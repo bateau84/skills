@@ -53,10 +53,20 @@ the first agent's chat, final answer, or these evaluator checks.
   claim that the work was done. Check for a competing vocabulary or broken links.
 
 Record the skill revision or content hash each participant actually read, the
-input fixture, changed paths, checks performed, and any remaining limits. A
-successful rehearsal demonstrates only these artifacts and tasks. It does not
-prove automatic discovery, the deployed agent prompts, native OpenCode skill
-loading, Loom record/routing behavior, or performance across models.
+input fixture, changed paths, checks performed, and any remaining limits.
+Retain review-accessible copies or diffs of both resulting file trees and the
+handoff (including the second agent's edits); a summary of claimed edits is
+not enough. For every non-resolving relative link, record its source file,
+exact target (including any heading fragment), and whether it is broken,
+outside the checker's supported scope, or not yet investigated. State what
+was checked, how many links resolved, and how many remain unclassified. Do
+not report a successful link audit while any in-scope failure is unresolved,
+or a successful multi-agent rehearsal when the generated files or handoff
+cannot be inspected.
+
+A successful rehearsal demonstrates only these artifacts and tasks. It does
+not prove automatic discovery, the deployed agent prompts, native OpenCode
+skill loading, Loom record/routing behavior, or performance across models.
 
 ## Input project
 
