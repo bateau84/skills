@@ -20,6 +20,8 @@ Start from outcomes and guarantees, not a file list. Inventory mandatory require
 - **Change surface:** inspect current producers, consumers, schemas, configuration, generated sources, tests, and documentation relevant to the outcome. Ground paths and resources in current inspection; mark guesses `[unverified]`. Include shared databases, test ports, caches, and indexes.
 - **Preservation:** what must stay true during rollout and afterward? Check migration, compatibility, safety, and recovery where they matter.
 
+Carry accepted consequence analysis, including `technology-impact` conclusions when present, into mitigation outcomes, owners, dependencies and observable checks. A risk acknowledgement is not mitigation. Newly discovered material consequences go to their existing decision owner; do not invent policy or a separate task for each question.
+
 Read-only discovery can extend beyond likely write paths. A likely change surface is not proof that no other consumer matters, nor permission to edit outside scope. Inspect important neighbors before handing off executable work. Request the smallest needed write scope through the host's normal process. Planning-only work may leave exact paths unresolved when the uncertainty and discovery owner are clear.
 
 ## 2. Group, then test every proposed separation

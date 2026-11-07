@@ -13,6 +13,8 @@ Use when the problem, useful scope, intended users, or expected benefit is mater
 
 This method is advisory unless the current assignment gives it a governed home. It creates no execution permission, product authority, gate, required document, or new agent. Existing role and workflow contracts govern decisions, questions, mutations, and completion.
 
+For material capability or control changes, use `technology-impact` when available to examine beneficiaries, transferred burdens, changed meanings and wider consequences. Reuse applicable conclusions; do not turn a settled bounded request into another discovery cycle.
+
 ## Method
 
 1. **Ground the problem.** Name the affected person or integration, context, desired outcome, and present obstacle. Separate direct observations, user reports, external evidence, inference, and unknowns. Preserve source and limits; an imagined persona or walkthrough is not observed user behavior.

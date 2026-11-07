@@ -4,7 +4,7 @@ description: "Baseline engineering discipline for changing software. Use when au
 license: MIT
 metadata:
   author: Bateau
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Software Engineering
@@ -46,6 +46,8 @@ A short function or small file is not automatically simple. Likewise, a module c
 ## Keep the code easy to change
 
 Strategic programming means making bounded design investments so the code remains easy to change. Use this method when accepted work exposes duplicated rules, repeated caller coordination, hidden dependencies, or recurring workarounds. When the existing design fits the change clearly, implement directly; no refactor or alternatives report is required.
+
+When a change also alters autonomy, permissions, billing, retention, shared meaning or human control, use `technology-impact` to examine its wider consequences if available. Otherwise surface those consequences to their existing decision owners. Routine behavior-preserving preparation does not require this assessment.
 
 1. **Ground the difficulty.** Inspect the affected rule, callers, and constraints. Distinguish a problem in current work, preparation for accepted upcoming work, and an imagined future feature.
 2. **Compare the useful paths.** Consider direct implementation and the smallest preparation that removes the difficulty. Judge complexity across the affected behavior, not only the immediate diff. Include preparation, review, verification, migration risk, and delayed delivery. Direct implementation or deliberate deferral can be sound when accepted guarantees still hold.
