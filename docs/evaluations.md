@@ -586,10 +586,11 @@ a skill-loading prerequisite.
 
 ## Corpus, history and source lineage
 
-With the vocabulary-maintenance cases in `ubiquitous-language`, the corpus normalizes to
-**356 cases across 56 skills**: 334 cases outside the two Markdown-backed skill
+With the strategic-programming cases, the corpus normalizes to
+**367 cases across 56 skills**: 343 cases outside the two Markdown-backed skill
 directories (including 20 `code-analysis` cases), 9 `product-acceptance` cases,
-and 13 `work-decomposition` cases (9 WD cases plus 4 context-and-handoff cases).
+and 15 `work-decomposition` cases (9 WD cases, 4 context-and-handoff cases,
+and 2 preparation cases).
 These totals are a snapshot, not a fixed harness contract; fixture discovery
 reports current counts as cases are added. The Markdown-backed JSON metadata
 versions are respectively `1.0.0` and `1.1.0`. Three Loom-style
@@ -603,6 +604,15 @@ not inspect file changes or a receiving agent. A separate [manual artifact
 exercise](../skills/ubiquitous-language/evals/artifact-workflow.md) describes
 those checks without changing the runner's read-only treatment or claiming
 native OpenCode/Loom integration.
+
+`software-engineering` also includes a separate [successive-change artifact
+exercise](../skills/software-engineering/evals/artifact-workflow.md): an actual
+code change followed by a new feature in a fresh agent session. Its seed project,
+tasks and independent behavior checker do not change the response runner's
+read-only treatment. Provider-free fixture integrity checks are included in the
+harness suite; they do not constitute agent behavior results or a measured
+maintainability improvement. The packet specifies matched comparisons, retained
+outputs and limits on claims about native integration and long-term benefit.
 
 The reviewed PA1–PA9 and WD1–WD9 Markdown packets have runnable JSON copies;
 the four context-and-handoff cases are in a separate JSON fixture.

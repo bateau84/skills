@@ -5,7 +5,7 @@ Review methodology for implementation work produced with `software-engineering`,
 ## Review criteria
 
 1. **Defining behavior is correct.** Reconstruct the smallest set of observable outcomes, failures, edge cases, and compatibility obligations that make the change correct, then verify the implementation and tests cover them.
-2. **The solution is proportionate.** Flag speculative abstractions, future scaffolding, unused extension points, duplicate compatibility paths, feature flags without an accepted need, or broad refactors unrelated to the accepted change.
+2. **The solution is proportionate.** Flag speculative abstractions, future scaffolding, unused extension points, duplicate compatibility paths, feature flags without an accepted need, or broad refactors unrelated to the accepted change. Also examine added copies of shared rules, caller coordination, and workarounds: a smaller diff can leave greater complexity. Tie maintainability findings to concrete consequences; distinguish a focused in-scope remedy from a broader decision needing its owner. Preference for more refactoring is advisory.
 3. **Modules are deep enough.** Judge the full caller contract, not only function signatures or file boundaries. Required ordering, lifecycle/state knowledge, invariants, recovery rules, configuration, and repeated orchestration are interface complexity too. Flag seams where callers reconstruct the same protocol or state machine, as well as needless forwarding layers, wrapper chains, or one behavior scattered across files without a real boundary. Prefer outcome-oriented boundaries when the module can own the coordination without inventing speculative abstraction.
 4. **Replacement actually replaces.** When a new path supersedes an old one, verify obsolete implementation was removed or that a concrete remaining consumer, migration, or compatibility obligation justifies keeping it.
 5. **Failures remain failures.** Meaningful errors must be surfaced with useful context and must not be silently converted into success, duplicate, fallback, or partial-success states contrary to accepted behavior.
@@ -13,6 +13,7 @@ Review methodology for implementation work produced with `software-engineering`,
 7. **Green means real behavior.** Tests must exercise the behavior they claim to prove, cover the defining case and material failure/edge paths, and not become green by bypassing the unit under test, hand-injecting its expected output, skipping the hard case, or weakening the assertion. Tests used as correctness evidence must discriminate the accepted outcome from materially plausible wrong outcomes at the same semantic boundary. Test oracles must be independent enough to expose defects in the implementation path: expected results must not come from the implementation under test, traverse the same decision path as the actual result, or be computed by equivalent logic that could reproduce the same defect.
 8. **The diff is coherent.** Flag unrelated edits, stale comments, dead code, generated-output mistakes, accidental compatibility layers, or mixed concerns that make the change harder to understand or revert.
 9. **Delivery artifacts match the work.** When commits or a PR are part of the task, verify the dedicated Git/PR skill was used and that the artifact accurately explains the change and observed verification rather than overstating proof.
+10. **Preparation earns its cost.** When a refactor is proposed, check the observed difficulty, direct alternative, total preparation/review/verification/migration cost, and claimed simplification across callers. Distinguish current benefit from assumptions about future work. Verify that preparation preserves accepted observable behavior and stops at its enabling purpose. Direct implementation and justified deferral remain valid; recording deferred required work does not complete it.
 
 ## Evidence boundaries
 
@@ -20,6 +21,7 @@ Review methodology for implementation work produced with `software-engineering`,
 - Existing test output supports only the paths it actually exercised.
 - A small diff is not evidence of low risk when it changes a public contract, persistence format, concurrency behavior, security boundary, or failure semantics.
 - A large diff is not automatically wrong; the defect is unnecessary or incoherent mechanism, not line count itself.
+- One implementation can justify a boundary that hides real coordination or owns a cohesive rule. Counts of abstractions, files, or tokens do not establish maintainability.
 
 ## False-confidence patterns
 

@@ -36,7 +36,9 @@ class CliTests(unittest.TestCase):
                         "provider_calls": 0,
                     })
                 if "--list" in argv:
-                    self.assertEqual(len(proc.stdout.splitlines()), 13)
+                    expected_ids = [case.id for case in all_cases if case.skill == "work-decomposition"]
+                    actual_ids = [line.split("\t")[0] for line in proc.stdout.splitlines()]
+                    self.assertCountEqual(actual_ids, expected_ids)
                 if code == 2:
                     self.assertNotIn("live-spend-plan", proc.stdout)
 

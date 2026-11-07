@@ -50,6 +50,12 @@ Do not impose a fixed maximum for files, tokens, steps, tasks, or session resume
 
 If execution reveals more scope, uncertainty or context than planning could know, **split only the remaining work**. Keep completed evidence attached to the result it actually proves. Update dependencies and remaining verification; do not mark the original task complete merely because its unfinished work was handed over.
 
+### Sequence accepted preparation
+
+When the accepted realization includes preparatory refactoring, make its enabling outcome, preserved behavior, and dependent feature visible. Small local preparation, the feature, and their checks can stay in one coherent task. Separate them only when a real decision, ownership, context, migration, or rollout boundary warrants it; neither a refactor nor multiple steps automatically requires an extra planning stage or separate pull request.
+
+For wider preparation, assign the needed compatibility work, migration, caller updates, obsolete-path removal, and verification to actual owners. Order them using the accepted rollout constraints; deletion depends on the remaining consumers and recovery obligations, not just the new path compiling. Stop preparation at its agreed purpose. A structural question discovered while decomposing work goes to its decision owner rather than becoming an invented implementation task. Preserve any agreed deferral's current limitation and useful revisit trigger in existing records; a deferred required outcome remains incomplete.
+
 ### Handoffs that let the next task start fresh
 
 At meaningful task boundaries, identify what the next owner needs without requiring the old conversation. Use one short entry in the existing result store or project notes: goal and revision, decisions or changes, evidence and limits, unresolved work, and next useful step. Link to code, documents and full evidence. No new report file, schema, plugin or approval stage is required.
@@ -92,6 +98,7 @@ Use identifiers and scheduling detail only as requested. Candidate analysis is n
 - [QA.md](QA.md): residual coupling and false-confidence attacks.
 - [Portable evaluation cases](evals/cases.md): bundled prompts and standalone execution instructions.
 - [Context and handoff cases](evals/context-and-handoffs.json): task sizing, preserving work, and useful result references. These are fixtures, not executed results.
+- [Preparation cases](evals/strategic-programming.json): coherent local preparation and accepted migration dependencies; these are decision exercises, not executed results.
 
 **Standalone package:** copy this complete directory, including `references/` and `evals/`. No sibling skill is required. Optional collection-only maintenance resources, when using the full library checkout, are `evaluations/selective-enrichment/README.md` (matched comparison protocol) and `evaluations/selective-enrichment/PROVENANCE.md` (baseline identities/adaptation mapping), relative to the collection root. They are not standalone dependencies; without the preserved comparison materials, run the bundled cases as decision exercises rather than claiming a four-variant comparison.
 

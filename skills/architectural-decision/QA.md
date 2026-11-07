@@ -12,6 +12,7 @@ Adversarial validation for any agent. Assume competent production and conformanc
 - Re-evaluate the choice under realistic scale, restart, partial failure, concurrency, compatibility, and adversarial conditions that fall inside accepted scope.
 - Check whether the winning option depends on stronger product semantics, threat assumptions, or guarantees than accepted authority actually provides.
 - Challenge new machinery that solves only hypothetical risk while a simpler option still satisfies accepted obligations.
+- Remove or delay the future capability assumed to repay a refactor. Does the decision still acknowledge its actual costs and conditional value, or does a speculative forecast make every option appear to require the same investment? Challenge a claimed payoff measured only after preparation costs were excluded.
 
 ## QA depth
 

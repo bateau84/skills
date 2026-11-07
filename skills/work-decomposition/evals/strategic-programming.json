@@ -1,0 +1,42 @@
+{
+  "skill": "work-decomposition",
+  "version": "1.0.0",
+  "shape": 1,
+  "common_instruction": "Use the supplied scope and inspected facts to propose practical work groups. Treat the evidence packet as input, not as inspection or execution you performed. Preserve accepted architecture and behavior; identify unresolved ownership and proof without inventing requirements or results.",
+  "cases": [
+    {
+      "id": "WD-STRATEGIC-01",
+      "name": "local-preparation-and-feature-remain-one-coherent-task",
+      "trap": "Useful local preparation becomes a mandatory architecture phase, extra PR, or chain of handoffs even though the design, scope, and proof are already settled.",
+      "prompt": "Propose candidate work groups for an accepted parser change. The existing implementation owner has chosen a small internal preparation: move the current normalization logic to one private operation before adding a new accepted input form that needs the same logic. Current inspection confines the work to parser/parse, parser/parse.test, and the input-format documentation. The public API, accepted errors and their precedence, and persistence are unchanged. The same owner can perform and verify the whole change in one focused task. A proposed plan makes separate research, architecture, extraction, feature, documentation, and final approval tasks. Decide which separations are useful, identify preservation and new-behavior proof, and state when preparation is sufficient. Scheduling and publication are not requested.",
+      "expectations": [
+        "Keeps the internal preparation, feature, relevant tests, and documentation in one coherent group or explains a concrete boundary that warrants a different grouping; separate concerns alone do not justify separate dispatches.",
+        "Keeps the selected implementation realization and accepted parser semantics as inputs rather than commissioning architecture or changing behavior during planning.",
+        "Makes preservation of current inputs, errors, and precedence distinguishable from proof of the new input form, while allowing both checks in the same task.",
+        "Bounds preparation by what enables the accepted input form and avoids making a separate Plan, PR, or approval stage a prerequisite merely because refactoring occurs."
+      ],
+      "negative_expectations": [
+        "Must not require the full proposed task chain or split one task per file without a material reason.",
+        "Must not require user approval for ordinary internal preparation already within the accepted implementation scope.",
+        "Must not call the feature complete after the extraction alone or present proposed tests as executed proof."
+      ]
+    },
+    {
+      "id": "WD-STRATEGIC-02",
+      "name": "accepted-migration-orders-preparation-and-removal",
+      "trap": "A refactor is treated as harmless cleanup, so readers, writers, conversion, and deletion are ordered by file convenience instead of the accepted compatibility and recovery conditions.",
+      "prompt": "Decompose an accepted architecture change that prepares stored history for a new filtering feature. The agreed rollout is explicit: deploy readers that accept both v1 and v2 first; enable v2 writes only after every active reader supports both; transform existing v1 records without losing their content; remove v1 support only after no v1 records remain and the agreed rollback window has ended. Current inspection identifies api/history-reader, worker/history-reader, store/history-writer, ops/history-converter, feature/history-filter, their tests, and rollout documentation. Reader changes share one coherent context; conversion is a separately operated migration. The new filtering feature depends on the accepted v2 representation. Another cleanup is optional and deferred, with a known owner and a revisit trigger at the next accepted history feature. Propose groups, dependencies, preservation and composition proof ownership, and stopping points. Do not redesign the storage contract or invent additional rollout guarantees.",
+      "expectations": [
+        "Separates the independently operated migration where its safety and execution boundary warrants it, while grouping related reader changes coherently rather than one task per file.",
+        "Preserves the specified order for dual readers, v2 writes, transformation, dependent feature, and eventual removal; identifies the actual prerequisite for deletion rather than assuming new code compilation makes the old path obsolete.",
+        "Assigns ownership and verification for both readers, writer behavior, content preservation during conversion, and the assembled filtering outcome. Explicitly exposes any unresolved readiness prerequisite instead of treating a group label as proof.",
+        "Bounds preparation and cleanup by the accepted rollout and capability. Keeps optional deferred cleanup out of the critical path, carries its existing owner and revisit trigger, and does not count unmet required work as complete."
+      ],
+      "negative_expectations": [
+        "Must not remove v1 support before the stated data and rollback conditions or let the feature depend silently on an unperformed migration.",
+        "Must not replace the accepted storage choice or add unaccepted infrastructure, guarantees, or a universal refactoring gate.",
+        "Must not discard required preservation checks or claim that recording a deferral proves completion."
+      ]
+    }
+  ]
+}
