@@ -11,6 +11,8 @@ Use this skill for one bounded technical choice: library, representation, persis
 
 Accepted behavior and architecture are constraints, not variables to rewrite. Route the question only when the choice would change observable product meaning, weaken a mandatory guarantee, cross a user-reserved decision, or require explicit material-risk acceptance.
 
+When a choice materially changes autonomy, billing, retention, shared meaning, dependence or control, use `technology-impact` when available. Compare who benefits, bears new burdens or gains authority; carry material conclusions into this decision's consequences and verification, without assuming product or risk-acceptance authority.
+
 ## Method
 
 1. **State one decision question.** Name context, accepted obligations, constraints, decision drivers, and what is outside the decision. If several component relationships must be designed together, use `architectural-design`.

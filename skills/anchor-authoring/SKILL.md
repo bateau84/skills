@@ -9,6 +9,8 @@ An Anchor preserves **what the user means and why it matters**, in a form that a
 
 Use for a new capability, a material change in intended behavior, or an ambiguity that will affect independent work. Reuse or amend an existing Anchor for smaller changes instead of creating a new one by default.
 
+For material capability or control changes, use `technology-impact` when available to examine beneficiaries and consequences. Preserve agreed constraints, material trade-offs and unresolved owner decisions in this Anchor, not a duplicate checklist; proposals remain proposals.
+
 ## Method
 
 1. **Discover before drafting.** Read applicable existing product intent, requirements, design, and decisions through the repository's knowledge system. Inspect current behavior when it matters. An implementation is evidence of current reality, not authority to redefine the user's goal.
