@@ -11,6 +11,7 @@ Adversarial validation for any agent. Assume competent production and conformanc
 - Challenge the change-surface evidence with an independent consumer or generated source missed by all groups. Trace an accepted scenario that uses that consumer and see whether the assembled proof would notice.
 - Follow final composition proof back to its prerequisites: are all real implementations present, or does each group assume the other removed a mock/fallback? Look for common local-test assumptions that make every group green while the product is broken.
 - Simulate a task whose investigation reveals a materially larger working set than planned. Does the plan permit preserving the discovery result and re-slicing the remaining work, or does it force the executor to absorb the expansion or restart valid work?
+- Stop execution after a preparatory change or midway through its migration. Can every still-supported caller and recovery path use the resulting state, or did a locally completed task remove an old path before its consumers could move? Use the accepted rollout conditions; do not invent mixed-version support where it is not required.
 
 Tie findings to accepted obligations and concrete counterexamples. Do not introduce new product scope or forbid useful parallel work merely because a hypothetical risk can be named.
 

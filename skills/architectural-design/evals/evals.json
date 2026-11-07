@@ -1,6 +1,6 @@
 {
   "skill": "architectural-design",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "shape": 1,
   "cases": [
     {
@@ -73,6 +73,25 @@
         "No removal or weakening of the crash and duplicate-execution guarantees to make the prose shorter.",
         "No new external queue, distributed coordination system, or automatic-retry guarantee.",
         "No wholesale migration of unrelated architectural documents."
+      ]
+    },
+    {
+      "id": "Design-05",
+      "name": "cohesive-run-boundary-before-another-entry-point",
+      "trap": "A new entry point repeats the same lifecycle protocol, or a refactor centralizes unrelated authentication and presentation policy in a universal workflow engine. Future benefits obscure preservation and transition costs.",
+      "prompt": "Design the structural change needed to add an accepted scheduled entry point for an existing single-host report runner. Current inspection shows that the HTTP and CLI adapters each coordinate the same sequence: validate the run, create its durable started record, launch execution, and persist the terminal outcome. Recent fixes had to update both sequences. The existing run module and local store can be reused. Accepted behavior: execution starts only after the started record is durable; failures are reported with their existing meaning; a restart cannot label unfinished work successful without evidence; automatic retry is not promised. Authentication and presentation belong to their respective adapters. The scheduled entry point must use the same run semantics. Remote workers and a user-defined workflow designer are ideas only. Compare the direct addition with focused structural preparation, choose a sufficient design, and state preservation and proof requirements. Do not prescribe field-level schemas, implement code, or claim tests ran.",
+      "expectations": [
+        "Grounds the structural decision in the repeated lifecycle coordination and accepted scheduled entry point, rather than speculative remote execution or workflow design.",
+        "Compares viable options across the whole affected path, including the direct addition and a cohesive operation within a suitable existing owner; considers preparation, review, verification, transition cost, and maintenance effects.",
+        "Chooses boundaries that reduce repeated lifecycle knowledge while keeping adapter-owned authentication and presentation separate. Different concrete module arrangements may satisfy this; no particular class or framework is required.",
+        "Preserves durable-record-before-execution, existing failure meaning, and truthful restart status, with explicit responsibility and downstream checks through all affected entry points.",
+        "Bounds preparation by the accepted capability and distinguishes immediate expected simplification from conditional future benefit; identifies a representative later change and evidence that could disprove the ease-of-change claim.",
+        "Accounts for replacing the old sequences and their consumers without asserting that fewer files, an architectural diagram, or a green local test proves assembled preservation."
+      ],
+      "negative_expectations": [
+        "Must not introduce a general workflow engine, remote-worker infrastructure, or automatic-retry promise for the unaccepted ideas.",
+        "Must not hide unrelated adapter policy in one god module merely to reduce the number of entry points or files.",
+        "Must not call the preparation complete while required callers still reconstruct incompatible lifecycle rules, or claim verification that was not performed."
       ]
     }
   ]

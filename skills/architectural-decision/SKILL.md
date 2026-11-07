@@ -14,7 +14,7 @@ Accepted behavior and architecture are constraints, not variables to rewrite. Ro
 ## Method
 
 1. **State one decision question.** Name context, accepted obligations, constraints, decision drivers, and what is outside the decision. If several component relationships must be designed together, use `architectural-design`.
-2. **Establish the simplest viable baseline.** Start with reuse or the smallest change that could work. If it loses, name the exact obligation or demonstrated risk it fails.
+2. **Establish the simplest viable baseline.** Start with reuse or the smallest change that could work. If it loses, name the unmet obligation, demonstrated risk, or concrete maintenance cost that makes it worse. For refactoring decisions, inspect the concrete change pressure and compare direct implementation with the smallest useful preparation. Assess the whole affected behavior: a short patch that duplicates policy is not automatically the simpler option.
 3. **Develop alternatives before choosing.** Identify at least two genuinely viable alternatives when they exist. Do not decide first and manufacture rejected options afterward. For every viable option use the same relevant lenses:
    - mechanism;
    - benefits;
@@ -27,8 +27,8 @@ Accepted behavior and architecture are constraints, not variables to rewrite. Ro
    If accepted constraints leave only one viable option, state why rather than inventing straw alternatives.
 4. **Compare on the drivers that actually matter.** Eliminate any option that cannot preserve accepted guarantees. Distinguish evidence, assumptions, and preference.
 5. **Choose the least complex complete option.** State why it wins and why each serious rejected option loses. The decision should be strong enough that downstream implementation does not need to reopen the same question.
-6. **Record the price.** State positive, negative, and neutral consequences where material, including migration, operations, security, maintenance, lock-in, and reversibility.
-7. **Define falsification.** Name concrete confirmation evidence and the condition that would force reconsideration: benchmark, integration proof, compatibility test, runtime observation, security proof, changed premise, or similar.
+6. **Record the price.** State positive, negative, and neutral consequences where material, including migration, operations, security, maintenance, lock-in, and reversibility. When easier evolution drives the choice, separate immediate benefit from benefit conditional on accepted upcoming work or uncertain assumptions. Include preparation, review, verification, migration risk, and delayed delivery; do not promote an imagined feature into a requirement.
+7. **Define falsification.** Name concrete confirmation evidence and the condition that would force reconsideration: benchmark, integration proof, compatibility test, runtime observation, security proof, changed premise, or similar. For an ease-of-change claim, name a representative change, what should become easier, and what observation would contradict that claim. Bound preparation by the accepted enabling outcome; a deferred improvement needs a useful revisit condition, not automatic reopening whenever the code is touched.
 8. Record load-bearing downstream verification requirements in the decision or project's tracking system.
 
 ## Durable decision shape

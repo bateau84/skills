@@ -11,6 +11,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 - The comparison uses accepted constraints and evidence rather than preference or post-hoc justification; options that violate guarantees are rejected explicitly.
 - The selected option is the least complex complete realization, and each serious rejected option has a concrete losing reason.
 - Consequences, migration/operational cost, lock-in, reversibility, and material assumptions are explicit.
+- An evolution-driven choice identifies concrete change pressure, compares useful preparation with the direct path, and includes preparation, review, verification, and migration cost. Immediate benefit is separate from conditional future benefit; preparation has a bounded purpose rather than an open-ended cleanup mandate.
 - Confirmation is falsifiable and states what evidence or changed premise would force reconsideration.
 
 ## Review depth

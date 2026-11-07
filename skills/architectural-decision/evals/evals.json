@@ -1,6 +1,6 @@
 {
   "skill": "architectural-decision",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "shape": 1,
   "cases": [
     {
@@ -38,6 +38,25 @@
         "Must not rely on filesystem watcher delivery alone for correctness.",
         "Must not add a dedicated invalidation daemon merely to avoid a small local query-time check unless a named constraint requires it.",
         "Must not invent weaker eventual-consistency semantics to make an easier option viable."
+      ]
+    },
+    {
+      "id": "Decision-03",
+      "name": "bounded-preparation-for-shared-validation",
+      "trap": "The smallest immediate diff copies policy into another caller, while the opposite overreaction builds a generic rule engine for unaccepted future needs. Neither choice explains the full change cost or tests the claimed benefit.",
+      "prompt": "Choose one technical realization for configuration validation. Current inspection shows that the CLI and HTTP adapter independently implement the same ordered checks and public error codes. Three recent rule changes required editing both copies. A third in-process batch entry point is now accepted and must apply exactly the same validation, including error precedence; all three call the existing configuration domain module for value construction. That module has no shared validation operation yet. A teammate proposes copying the checks into the batch adapter because it is the smallest diff; another proposes a pluggable validation engine for possible future rule packs. No dynamic rules or plugins are accepted requirements. Decide where the common validation belongs and bound any preparatory refactor. Consider genuine alternatives and total cost; do not design the rest of the application or claim checks have run.",
+      "expectations": [
+        "Grounds the decision in the current duplicated rule ownership and accepted batch caller, separating these from the speculative rule-pack idea.",
+        "Compares direct duplication with a small shared operation at an existing appropriate boundary, assessing caller knowledge and repeated changes as well as preparation, review, verification, and delivery cost.",
+        "Treats a useful boundary with one implementation as a viable option. Chooses a cohesive rule owner or another comparably simple realization with a concrete reason; does not require a generic engine or particular type hierarchy.",
+        "Bounds preparation by the accepted shared-validation need and preserves the existing validation meaning, public error codes, and precedence rather than hiding a semantic redesign in the refactor.",
+        "Distinguishes immediate expected benefit from conditional future benefit and specifies confirmation through the real callers plus a representative later rule change or other observation that could contradict the ease-of-change claim.",
+        "Records relevant consequences and a meaningful reconsideration trigger without inventing measured savings, test execution, or mandatory future refactoring."
+      ],
+      "negative_expectations": [
+        "Must not reject a useful existing-owner operation solely because it has one implementation, or call copying policy simpler solely because it changes fewer lines.",
+        "Must not build a plugin framework on the assumption that unaccepted rule packs will arrive.",
+        "Must not change accepted validation behavior or claim observed long-term payoff without evidence."
       ]
     }
   ]

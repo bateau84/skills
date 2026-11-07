@@ -14,6 +14,7 @@ Adversarial validation for work produced with `software-engineering`, usable by 
 8. **Attack convention-following when the convention is wrong here.** Existing repository patterns are evidence of consistency, not proof of correctness. Check whether copying the pattern reproduces a known limitation, security weakness, shallow boundary, or historical workaround.
 9. **Attack delivery confidence.** Compare the PR/commit narrative to the actual diff and evidence. Look for omitted risky changes, verification that proves only a subset of claims, and follow-ups that quietly carry required work.
 10. **Attack cross-skill composition.** Language, framework, security, database, concurrency, observability, and domain skills can impose constraints that conflict with generic simplicity. Verify the generic engineering baseline did not override stronger task-specific obligations.
+11. **Attack claimed future payoff.** A producer and reviewer can share the same speculative forecast. Examine a representative later change, or remove the assumed future feature: does the proposed boundary still hide useful complexity, or merely move coordination and maintenance cost elsewhere? Include preparation and review cost when comparing effort. Fewer lines, files, tokens, or dispatches alone do not prove improvement; a promised payoff remains unproven until the relevant evidence exists.
 
 ## Adversarial probes
 

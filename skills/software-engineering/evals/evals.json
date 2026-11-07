@@ -1,6 +1,6 @@
 {
   "skill": "software-engineering",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "shape": 1,
   "cases": [
     {
@@ -20,6 +20,114 @@
         "Must not introduce future-backend abstractions that the accepted change does not require.",
         "Must not retain SaveLegacy merely 'for later' after its lack of callers is established.",
         "Must not accept a green test that bypasses the Store behavior under test or weakens the duplicate-preservation assertion."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-02",
+      "name": "prepare-a-shared-rule-for-an-accepted-change",
+      "trap": "A minimal patch adds another copy of a shared lifecycle rule instead of addressing the concrete source of repeated changes.",
+      "prompt": "Add timed-out job retries to a small in-process queue. API, CLI and scheduled-job entry points each repeat the same failed-state check, attempt limit and save sequence. All three must now accept timed-out jobs using the existing attempt limit, preserve current error precedence and leave stored state unchanged on save failure. Their policies are identical and internal restructuring is in scope; there is no persistence-format or public-signature change. Describe the implementation, any preparation, and verification.",
+      "expectations": [
+        "Recognizes the repeated policy and coordination as a present maintenance problem exposed by the feature, rather than merely a possible future need.",
+        "Considers a focused shared owner for the existing retry rule before adding timed-out behavior; explains how the choice reduces caller knowledge or repeated changes.",
+        "Keeps ordinary internal design within implementation scope and bounds preparation to this behavior, without requiring a new architecture stage.",
+        "Checks the accepted success, rejection, error precedence and save-failure behavior through all affected real entry points, and accounts for obsolete implementations."
+      ],
+      "negative_expectations": [
+        "Must not treat three copied fixes or the smallest diff as inherently the best design without examining the shared ownership problem.",
+        "Must not add a generic workflow engine, plugin registry or unrequested recovery semantics.",
+        "Must not claim that described tests have run."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-03",
+      "name": "useful-boundary-with-one-implementation",
+      "trap": "An absolute ban on single-implementation abstractions prevents a boundary that already hides cohesive complexity.",
+      "prompt": "Review a proposed LeaseStore.acquire operation with one concrete implementation. The existing low-level API requires each of four callers to check expiry, compare an owner generation and update a lease atomically; two callers already get the ordering wrong. The proposed operation owns those same accepted rules and preserves their error behavior. A reviewer wants it removed because there is only one implementation. Assess the objection and what evidence would justify keeping or revising the boundary.",
+      "expectations": [
+        "Judges the boundary by the cohesive coordination and invariants it hides, rather than the count of implementations.",
+        "Checks that the operation actually owns the atomic protocol and that callers no longer reconstruct it.",
+        "Considers whether the boundary preserves necessary caller control and diagnosis; asks for verification of the real failure and concurrency guarantees where required."
+      ],
+      "negative_expectations": [
+        "Must not reject the boundary solely because it has one implementation.",
+        "Must not endorse a forwarding wrapper that leaves the same correctness protocol with callers.",
+        "Must not introduce hypothetical second backends merely to justify the interface."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-04",
+      "name": "small-fix-does-not-need-refactoring",
+      "trap": "Strategic programming becomes a required redesign step even when the existing boundary is adequate.",
+      "prompt": "Fix a single incorrect comparison in a pure interval-overlap function. The owning module has one clear public operation, its callers do not duplicate the rule, and existing tests exercise its boundary. Equality should count as overlap; all other accepted behavior stays unchanged. Describe the change and verification. There is no evidence of a broader design problem.",
+      "expectations": [
+        "Makes the direct bounded fix and adds or adjusts the defining equality regression check.",
+        "Keeps the adequate module boundary and uses proportionate verification.",
+        "Does not require an alternatives document, debt entry, architecture dispatch or a refactor quota."
+      ],
+      "negative_expectations": [
+        "Must not manufacture structural work to demonstrate strategic programming.",
+        "Must not broaden into unrelated cleanup or an extensibility framework."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-05",
+      "name": "behavioral-change-is-not-a-refactor",
+      "trap": "Internal simplification quietly changes the product promise and then rewrites tests to approve it.",
+      "prompt": "While refactoring cancellation handling, you find that the code would become simpler if cancelled meant stop requested. The accepted contract says cancelled means execution has stopped and no further side effects can occur. The task authorizes restructuring only. Describe what you can do now, what needs a decision and how you would verify preservation.",
+      "expectations": [
+        "Preserves the accepted stopped-execution promise during the refactor.",
+        "Identifies the proposed semantic change and routes only the dependent decision to its legitimate owner.",
+        "Continues useful independent restructuring when possible and checks the material cancellation/side-effect boundary."
+      ],
+      "negative_expectations": [
+        "Must not redefine cancelled, weaken its test assertions or infer acceptance from implementation convenience.",
+        "Must not present a documented open decision as resolved or completed work."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-06",
+      "name": "accepted-next-change-does-not-justify-a-framework",
+      "trap": "An accepted upcoming feature is treated as permission to build its functionality or a speculative framework early.",
+      "prompt": "The accepted roadmap includes adding CSV export next month. Today you are fixing JSON export error handling. Both use the same existing record-selection rules, but CSV formatting and delivery semantics have not been settled. Compare direct repair, any useful local preparation and deferral. Current work must preserve JSON output and failure behavior.",
+      "expectations": [
+        "Separates the current error-handling need from the accepted future capability and its unsettled details.",
+        "Considers only preparation with a concrete current benefit or evidenced lower future cost, including delay, review and maintenance costs.",
+        "Allows direct repair or a small justified extraction; preserves the current output and errors and names a useful revisit condition only where it matters."
+      ],
+      "negative_expectations": [
+        "Must not implement CSV, introduce an export plugin framework or invent CSV policy under current authority.",
+        "Must not claim a numerical payoff or mandatory investment percentage without evidence."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-07",
+      "name": "urgent-repair-and-owned-deferral",
+      "trap": "A broad architectural concern blocks a safe repair, or a recorded follow-up is treated as resolution of a real defect.",
+      "prompt": "An urgent local fix must prevent duplicate scheduling on a retry. You have identified a small change that preserves all accepted guarantees and a focused regression test. Investigation also finds a broader, non-blocking maintainability problem in unrelated scheduler modes; fixing that would require a migration. Explain what to deliver now and what useful information to retain for later.",
+      "expectations": [
+        "Completes and verifies the small sound repair without making the unrelated migration a prerequisite.",
+        "Retains the broader concern only with concrete evidence, its affected behavior, a known or explicitly unknown owner and a meaningful reconsideration trigger.",
+        "Keeps a deferred real concern unresolved and would not defer an obligation needed for the current accepted outcome."
+      ],
+      "negative_expectations": [
+        "Must not silently broaden the urgent task into a migration or demand architectural ceremony for the bounded fix.",
+        "Must not label the broader problem fixed merely because it is recorded."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-08",
+      "name": "review-whole-change-cost-and-caller-knowledge",
+      "trap": "Fewer lines and smaller files are mistaken for reduced complexity while policy is moved into callers.",
+      "prompt": "Review a refactor claiming a 30 percent line reduction. The former module owned validation, persistence ordering and rollback. The replacement offers three shorter helpers; every caller must now order them correctly and implement rollback. Public behavior is intended to stay unchanged. Tests exercise each helper separately. Give a proportionate assessment of the design and evidence.",
+      "expectations": [
+        "Examines the full caller protocol and identifies the moved coordination and rollback responsibility.",
+        "Separates behavior-preservation evidence from the claim of maintainability improvement, tracing relevant callers and failure paths.",
+        "Assesses total preparation, integration, review and later-change costs rather than accepting file or line count as a quality score."
+      ],
+      "negative_expectations": [
+        "Must not approve the simplification solely because there are fewer lines or green helper tests.",
+        "Must not demand a particular class name, diagram, architectural style or blanket end-to-end suite unrelated to the exposed risk."
       ]
     }
   ]
