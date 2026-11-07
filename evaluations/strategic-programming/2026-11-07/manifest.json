@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "comparison": "combined coder role and software-engineering practitioner guidance; one paired two-stage rehearsal",
+  "baseline_sources": {
+    "baseline/coder.md": {
+      "repository": "bateau84/agents",
+      "revision": "372e4ece9af2deabcf05f8225cacd08b08c23215",
+      "path": "agents/coder.md",
+      "sha256": "27533c3a02784419791d2e0bebf98d357be44e5faae901d83f1446c5194c91b5"
+    },
+    "baseline/software-engineering.md": {
+      "repository": "bateau84/skills",
+      "revision": "1ec91b64265026a0c94a92fe1be449a566d9b240",
+      "path": "skills/software-engineering/SKILL.md",
+      "sha256": "06b45a7816e8eee8b5644b2cdf6e61a45bd367793f868438c1c1198acf3670cb"
+    }
+  },
+  "candidate_sources": {
+    "candidate/coder.md": {
+      "repository": "bateau84/agents",
+      "revision": "894214f3e6b6c3e23931f98145c6d9655f8ecf21",
+      "path": "agents/coder.md",
+      "sha256": "cbb5540c87a3601fd0e15b2a0135a7b0fbebb54c20185767b0efef8475361fbf",
+      "published_content_verification": "Exact committed bytes match frozen guidance SHA-256."
+    },
+    "candidate/software-engineering.md": {
+      "repository": "bateau84/skills",
+      "revision": "490d1800298403a40ef8e12dc68dbfe8d2b12435",
+      "path": "skills/software-engineering/SKILL.md",
+      "sha256": "4c5182023fb8937c2ea3fe9658bc7ee896d868105f230b29c8220bcd184bb7b9",
+      "published_content_verification": "Exact committed bytes match frozen guidance SHA-256."
+    }
+  },
+  "candidate_revision_note": "Candidate source commits precede this evidence record. Exact frozen guidance matches the source content identified here.",
+  "packet_paths_relative_to_repository": {
+    "seed": "skills/software-engineering/evals/fixture",
+    "first_task": "skills/software-engineering/evals/stage-1.md",
+    "second_task": "skills/software-engineering/evals/stage-2.md",
+    "checker": "skills/software-engineering/evals/verify_artifacts.py"
+  },
+  "checker_sha256": "5849e3fbf83811fa5ad7d4519f872d4ca543fec70fccf5af719f97e4f6b0c643",
+  "seed_files_sha256": {
+    "README.md": "6ac1cb3f80d6e99ea84620f90298491ec382b9ce9035a212452bc126fbedaa4d",
+    "jobqueue/__init__.py": "290c8790cfbba1b89b406414c52f4f093552249f0c2f3172162754b53791bd46",
+    "jobqueue/api.py": "94007324d36ff8b4028b05c373dbc20f0108137e4ea5324e4a8cde744cbfdf49",
+    "jobqueue/cli.py": "94007324d36ff8b4028b05c373dbc20f0108137e4ea5324e4a8cde744cbfdf49",
+    "jobqueue/model.py": "635ed6f29191301e377254fee74f41dd8de0a1e2b58019bccc85861f36ba0df3",
+    "jobqueue/scheduler.py": "94007324d36ff8b4028b05c373dbc20f0108137e4ea5324e4a8cde744cbfdf49",
+    "tests/test_retry.py": "936839db9a5e75ee5dafdf533ef284ec7e023b5b282b24a25fd83f96007b36a2"
+  },
+  "input_files_sha256": {
+    "baseline/coder.md": "27533c3a02784419791d2e0bebf98d357be44e5faae901d83f1446c5194c91b5",
+    "baseline/software-engineering.md": "06b45a7816e8eee8b5644b2cdf6e61a45bd367793f868438c1c1198acf3670cb",
+    "candidate/coder.md": "cbb5540c87a3601fd0e15b2a0135a7b0fbebb54c20185767b0efef8475361fbf",
+    "candidate/software-engineering.md": "4c5182023fb8937c2ea3fe9658bc7ee896d868105f230b29c8220bcd184bb7b9",
+    "task-first.md": "61404bb9763d6e6f04c6831782e0597ba5e94fd8be3295e79f0f931d8bc177a6",
+    "task-second.md": "fb5bbed4bdfce0dadd7241b4813a3ad9ba16748521cf6e7e7e9ec4b0ce1ec9ff"
+  },
+  "output_files_sha256": {
+    "baseline-first": {
+      "HANDOFF.md": "d957cb48db78bc4f58a2e4565b31691729216222b9d6bea19a7157e331635664",
+      "README.md": "b226b65a938fe189f98835fb185948ad6af53e1ee7cf7864a5c76a668501e87f",
+      "jobqueue/__init__.py": "290c8790cfbba1b89b406414c52f4f093552249f0c2f3172162754b53791bd46",
+      "jobqueue/_retry.py": "d356a0f5e5f6b8c2488a8def63bf1a212a3b1c1521d08e0335f7fb15003b8639",
+      "jobqueue/api.py": "f35e732cc501e5c4bd7aa7c01d99a5d397e69c204c6aa27f43b99b567ed14f24",
+      "jobqueue/cli.py": "f35e732cc501e5c4bd7aa7c01d99a5d397e69c204c6aa27f43b99b567ed14f24",
+      "jobqueue/model.py": "635ed6f29191301e377254fee74f41dd8de0a1e2b58019bccc85861f36ba0df3",
+      "jobqueue/scheduler.py": "f35e732cc501e5c4bd7aa7c01d99a5d397e69c204c6aa27f43b99b567ed14f24",
+      "tests/test_retry.py": "0e58473b5b32aa57a2930b8338eac7bad66a4b7216a366ed7fd36e476e3d754e"
+    },
+    "baseline-second": {
+      "HANDOFF.md": "4acc39ea7c820ff385ecbb9213ddb8d713f02e3dc439c5a62fbce09e18d4b656",
+      "README.md": "494092f606926303859bdd0960d6a2634ace788f191e9c083547f906dfc3a944",
+      "jobqueue/__init__.py": "290c8790cfbba1b89b406414c52f4f093552249f0c2f3172162754b53791bd46",
+      "jobqueue/_retry.py": "e2429c658c854be997913154ed3795841b309af84112982730100e2eca30b8f0",
+      "jobqueue/api.py": "f35e732cc501e5c4bd7aa7c01d99a5d397e69c204c6aa27f43b99b567ed14f24",
+      "jobqueue/cli.py": "f35e732cc501e5c4bd7aa7c01d99a5d397e69c204c6aa27f43b99b567ed14f24",
+      "jobqueue/model.py": "7687b31124a7e8000c1af1d4cf7daf78806d8c0c94e73287e5227fb2d1c4d4f8",
+      "jobqueue/scheduler.py": "f35e732cc501e5c4bd7aa7c01d99a5d397e69c204c6aa27f43b99b567ed14f24",
+      "tests/test_retry.py": "d91ea47c2906cd2d4edd00e268e53c58dfe8ca6d7901c564b612898fae1bb89a"
+    },
+    "candidate-first": {
+      "HANDOFF.md": "2e05b4b777766a86fe052ba632a7f27bb3d47e400000d3d2fbc7e75ca62cced2",
+      "README.md": "64abbce4f40f06a8113987eb744f9776647e18c1ffc4da5470a6f320f16f5747",
+      "jobqueue/__init__.py": "290c8790cfbba1b89b406414c52f4f093552249f0c2f3172162754b53791bd46",
+      "jobqueue/api.py": "20dcdfb28d2980d38d79b2b157ed13f489d11b01fdf8bd4a055000357b867361",
+      "jobqueue/cli.py": "20dcdfb28d2980d38d79b2b157ed13f489d11b01fdf8bd4a055000357b867361",
+      "jobqueue/model.py": "635ed6f29191301e377254fee74f41dd8de0a1e2b58019bccc85861f36ba0df3",
+      "jobqueue/retry.py": "d356a0f5e5f6b8c2488a8def63bf1a212a3b1c1521d08e0335f7fb15003b8639",
+      "jobqueue/scheduler.py": "20dcdfb28d2980d38d79b2b157ed13f489d11b01fdf8bd4a055000357b867361",
+      "tests/test_retry.py": "af687d183de4f133604735bb400d3f62ff5251b3244d025d42dc14b3aea64cc2"
+    },
+    "candidate-second": {
+      "HANDOFF.md": "4f91562483225d6a200f1d897745c8db50a7abb576d82ce87d519ae075260842",
+      "README.md": "b829e36ef7289d2df87584da6a6e5132a77fd9e247c1415e9b66a7bfa2f111b2",
+      "jobqueue/__init__.py": "290c8790cfbba1b89b406414c52f4f093552249f0c2f3172162754b53791bd46",
+      "jobqueue/api.py": "20dcdfb28d2980d38d79b2b157ed13f489d11b01fdf8bd4a055000357b867361",
+      "jobqueue/cli.py": "20dcdfb28d2980d38d79b2b157ed13f489d11b01fdf8bd4a055000357b867361",
+      "jobqueue/model.py": "7687b31124a7e8000c1af1d4cf7daf78806d8c0c94e73287e5227fb2d1c4d4f8",
+      "jobqueue/retry.py": "e2429c658c854be997913154ed3795841b309af84112982730100e2eca30b8f0",
+      "jobqueue/scheduler.py": "20dcdfb28d2980d38d79b2b157ed13f489d11b01fdf8bd4a055000357b867361",
+      "tests/test_retry.py": "ae0e4f617daea0ecf41710e3d08739f1a1395fe914c3c735371fcef7e30d350d"
+    }
+  },
+  "output_patches_sha256": {
+    "outputs/baseline-first.patch": "013dc9a1ccd9342635c7a7e639c76fe892256a245baa4ec54e98e4270fb1d158",
+    "outputs/baseline-second.patch": "4335bb025b55e36cf7f02c4163c502d6177cd996be63166101fb8148a99650a6",
+    "outputs/candidate-first.patch": "76a753dfaba32fa06a2f79c0d679068cfaad58fc04c5b09718a12d645448f141",
+    "outputs/candidate-second.patch": "366b28e5e5b1d097aa47f31cb078a500e2ea683496d04d272742fc44f22e7b2c"
+  },
+  "stage_inputs": {
+    "baseline-first": {
+      "reported_source": "seed",
+      "pre_run_snapshot_retained": false
+    },
+    "candidate-first": {
+      "reported_source": "seed",
+      "pre_run_snapshot_retained": false
+    },
+    "baseline-second": {
+      "reported_source": "baseline-first output copied before dispatch",
+      "pre_run_snapshot_retained": false
+    },
+    "candidate-second": {
+      "reported_source": "candidate-first output copied before dispatch",
+      "pre_run_snapshot_retained": false
+    }
+  },
+  "exclusions": [
+    "__pycache__ directories",
+    "*.pyc files"
+  ],
+  "packet_source": {
+    "repository": "bateau84/skills",
+    "revision": "490d1800298403a40ef8e12dc68dbfe8d2b12435"
+  },
+  "input_source_matches_verified": true
+}

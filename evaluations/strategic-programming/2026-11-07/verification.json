@@ -1,0 +1,263 @@
+{
+  "recorded_at_utc": "2026-11-07T13:12:17.666869+00:00",
+  "environment": {
+    "python_executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "python_version": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "git_version": "git version 2.52.0"
+  },
+  "scope": "Independent post-run provider-free checks of preserved participant outputs and patch reconstruction; not original participant tool traces.",
+  "checker_sha256": "5849e3fbf83811fa5ad7d4519f872d4ca543fec70fccf5af719f97e4f6b0c643",
+  "runs": {
+    "baseline-first": {
+      "project_tests": {
+        "argv": [
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests",
+          "-v"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/experiment/baseline-first",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_eligible_job_is_queued_and_diagnostic_is_cleared (test_retry.RetryTests.test_eligible_job_is_queued_and_diagnostic_is_cleared) ... ok\ntest_failed_save_preserves_the_record (test_retry.RetryTests.test_failed_save_preserves_the_record) ... ok\ntest_rejections_do_not_write (test_retry.RetryTests.test_rejections_do_not_write) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.002s\n\nOK\n"
+      },
+      "contract": {
+        "argv": [
+          "python3",
+          "-I",
+          "-B",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/skills/software-engineering/evals/verify_artifacts.py",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/experiment/baseline-first",
+          "--stage",
+          "first"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/skills",
+        "exit_code": 0,
+        "stdout": "Selected project: /workspace/scratch/67c50d3d8623/aos-strategic/experiment/baseline-first; contract stage: first\n",
+        "stderr": "test_allowed_retries (__main__.main.<locals>.ContractTests.test_allowed_retries) ... ok\ntest_limit_rejections (__main__.main.<locals>.ContractTests.test_limit_rejections) ... ok\ntest_missing_and_ineligible_jobs (__main__.main.<locals>.ContractTests.test_missing_and_ineligible_jobs) ... ok\ntest_save_failure_preserves_state (__main__.main.<locals>.ContractTests.test_save_failure_preserves_state) ... ok\ntest_selects_requested_job_and_preserves_other_records (__main__.main.<locals>.ContractTests.test_selects_requested_job_and_preserves_other_records) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK\n"
+      },
+      "reconstruct": {
+        "argv": [
+          "git",
+          "apply",
+          "--whitespace=error",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/evaluations/strategic-programming/2026-11-07/outputs/baseline-first.patch"
+        ],
+        "cwd": "/tmp/aos-strategic-baseline-first-6pd_uc_f/project",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "reconstruction_files_match": true,
+      "reconstruction_file_count": 9,
+      "reconstructed_contract": {
+        "argv": [
+          "python3",
+          "-I",
+          "-B",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/skills/software-engineering/evals/verify_artifacts.py",
+          "/tmp/aos-strategic-baseline-first-6pd_uc_f/project",
+          "--stage",
+          "first"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/skills",
+        "exit_code": 0,
+        "stdout": "Selected project: /tmp/aos-strategic-baseline-first-6pd_uc_f/project; contract stage: first\n",
+        "stderr": "test_allowed_retries (__main__.main.<locals>.ContractTests.test_allowed_retries) ... ok\ntest_limit_rejections (__main__.main.<locals>.ContractTests.test_limit_rejections) ... ok\ntest_missing_and_ineligible_jobs (__main__.main.<locals>.ContractTests.test_missing_and_ineligible_jobs) ... ok\ntest_save_failure_preserves_state (__main__.main.<locals>.ContractTests.test_save_failure_preserves_state) ... ok\ntest_selects_requested_job_and_preserves_other_records (__main__.main.<locals>.ContractTests.test_selects_requested_job_and_preserves_other_records) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK\n"
+      }
+    },
+    "baseline-second": {
+      "project_tests": {
+        "argv": [
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests",
+          "-v"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/experiment/baseline-second",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_disabled_retry_precedes_limit_and_preserves_record (test_retry.RetryTests.test_disabled_retry_precedes_limit_and_preserves_record) ... ok\ntest_eligible_job_is_queued_and_diagnostic_is_cleared (test_retry.RetryTests.test_eligible_job_is_queued_and_diagnostic_is_cleared) ... ok\ntest_existing_job_construction_allows_retry (test_retry.RetryTests.test_existing_job_construction_allows_retry) ... ok\ntest_failed_save_preserves_the_record (test_retry.RetryTests.test_failed_save_preserves_the_record) ... ok\ntest_rejections_do_not_write (test_retry.RetryTests.test_rejections_do_not_write) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.003s\n\nOK\n"
+      },
+      "contract": {
+        "argv": [
+          "python3",
+          "-I",
+          "-B",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/skills/software-engineering/evals/verify_artifacts.py",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/experiment/baseline-second",
+          "--stage",
+          "second"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/skills",
+        "exit_code": 0,
+        "stdout": "Selected project: /workspace/scratch/67c50d3d8623/aos-strategic/experiment/baseline-second; contract stage: second\n",
+        "stderr": "test_allowed_retries (__main__.main.<locals>.ContractTests.test_allowed_retries) ... ok\ntest_limit_rejections (__main__.main.<locals>.ContractTests.test_limit_rejections) ... ok\ntest_missing_and_ineligible_jobs (__main__.main.<locals>.ContractTests.test_missing_and_ineligible_jobs) ... ok\ntest_permission_and_precedence (__main__.main.<locals>.ContractTests.test_permission_and_precedence) ... ok\ntest_save_failure_preserves_state (__main__.main.<locals>.ContractTests.test_save_failure_preserves_state) ... ok\ntest_selects_requested_job_and_preserves_other_records (__main__.main.<locals>.ContractTests.test_selects_requested_job_and_preserves_other_records) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.001s\n\nOK\n"
+      },
+      "reconstruct": {
+        "argv": [
+          "git",
+          "apply",
+          "--whitespace=error",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/evaluations/strategic-programming/2026-11-07/outputs/baseline-second.patch"
+        ],
+        "cwd": "/tmp/aos-strategic-baseline-second-aqjsi58h/project",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "reconstruction_files_match": true,
+      "reconstruction_file_count": 9,
+      "reconstructed_contract": {
+        "argv": [
+          "python3",
+          "-I",
+          "-B",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/skills/software-engineering/evals/verify_artifacts.py",
+          "/tmp/aos-strategic-baseline-second-aqjsi58h/project",
+          "--stage",
+          "second"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/skills",
+        "exit_code": 0,
+        "stdout": "Selected project: /tmp/aos-strategic-baseline-second-aqjsi58h/project; contract stage: second\n",
+        "stderr": "test_allowed_retries (__main__.main.<locals>.ContractTests.test_allowed_retries) ... ok\ntest_limit_rejections (__main__.main.<locals>.ContractTests.test_limit_rejections) ... ok\ntest_missing_and_ineligible_jobs (__main__.main.<locals>.ContractTests.test_missing_and_ineligible_jobs) ... ok\ntest_permission_and_precedence (__main__.main.<locals>.ContractTests.test_permission_and_precedence) ... ok\ntest_save_failure_preserves_state (__main__.main.<locals>.ContractTests.test_save_failure_preserves_state) ... ok\ntest_selects_requested_job_and_preserves_other_records (__main__.main.<locals>.ContractTests.test_selects_requested_job_and_preserves_other_records) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.002s\n\nOK\n"
+      }
+    },
+    "candidate-first": {
+      "project_tests": {
+        "argv": [
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests",
+          "-v"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/experiment/candidate-first",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_failed_save_preserves_the_record_and_write_count (test_retry.RetryTests.test_failed_save_preserves_the_record_and_write_count) ... ok\ntest_ineligible_state_precedes_limit_and_does_not_write (test_retry.RetryTests.test_ineligible_state_precedes_limit_and_does_not_write) ... ok\ntest_missing_job_does_not_write (test_retry.RetryTests.test_missing_job_does_not_write) ... ok\ntest_retry_limit_does_not_write (test_retry.RetryTests.test_retry_limit_does_not_write) ... ok\ntest_retryable_job_is_queued_and_diagnostic_is_cleared (test_retry.RetryTests.test_retryable_job_is_queued_and_diagnostic_is_cleared) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.002s\n\nOK\n"
+      },
+      "contract": {
+        "argv": [
+          "python3",
+          "-I",
+          "-B",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/skills/software-engineering/evals/verify_artifacts.py",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/experiment/candidate-first",
+          "--stage",
+          "first"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/skills",
+        "exit_code": 0,
+        "stdout": "Selected project: /workspace/scratch/67c50d3d8623/aos-strategic/experiment/candidate-first; contract stage: first\n",
+        "stderr": "test_allowed_retries (__main__.main.<locals>.ContractTests.test_allowed_retries) ... ok\ntest_limit_rejections (__main__.main.<locals>.ContractTests.test_limit_rejections) ... ok\ntest_missing_and_ineligible_jobs (__main__.main.<locals>.ContractTests.test_missing_and_ineligible_jobs) ... ok\ntest_save_failure_preserves_state (__main__.main.<locals>.ContractTests.test_save_failure_preserves_state) ... ok\ntest_selects_requested_job_and_preserves_other_records (__main__.main.<locals>.ContractTests.test_selects_requested_job_and_preserves_other_records) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK\n"
+      },
+      "reconstruct": {
+        "argv": [
+          "git",
+          "apply",
+          "--whitespace=error",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/evaluations/strategic-programming/2026-11-07/outputs/candidate-first.patch"
+        ],
+        "cwd": "/tmp/aos-strategic-candidate-first-1gset6u_/project",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "reconstruction_files_match": true,
+      "reconstruction_file_count": 9,
+      "reconstructed_contract": {
+        "argv": [
+          "python3",
+          "-I",
+          "-B",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/skills/software-engineering/evals/verify_artifacts.py",
+          "/tmp/aos-strategic-candidate-first-1gset6u_/project",
+          "--stage",
+          "first"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/skills",
+        "exit_code": 0,
+        "stdout": "Selected project: /tmp/aos-strategic-candidate-first-1gset6u_/project; contract stage: first\n",
+        "stderr": "test_allowed_retries (__main__.main.<locals>.ContractTests.test_allowed_retries) ... ok\ntest_limit_rejections (__main__.main.<locals>.ContractTests.test_limit_rejections) ... ok\ntest_missing_and_ineligible_jobs (__main__.main.<locals>.ContractTests.test_missing_and_ineligible_jobs) ... ok\ntest_save_failure_preserves_state (__main__.main.<locals>.ContractTests.test_save_failure_preserves_state) ... ok\ntest_selects_requested_job_and_preserves_other_records (__main__.main.<locals>.ContractTests.test_selects_requested_job_and_preserves_other_records) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.002s\n\nOK\n"
+      }
+    },
+    "candidate-second": {
+      "project_tests": {
+        "argv": [
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests",
+          "-v"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/experiment/candidate-second",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_disabled_retry_precedes_limit_and_preserves_the_record (test_retry.RetryTests.test_disabled_retry_precedes_limit_and_preserves_the_record) ... ok\ntest_failed_save_preserves_the_record_and_write_count (test_retry.RetryTests.test_failed_save_preserves_the_record_and_write_count) ... ok\ntest_ineligible_state_precedes_permission_and_limit_without_writing (test_retry.RetryTests.test_ineligible_state_precedes_permission_and_limit_without_writing) ... ok\ntest_job_retry_permission_defaults_to_true (test_retry.RetryTests.test_job_retry_permission_defaults_to_true) ... ok\ntest_missing_job_does_not_write (test_retry.RetryTests.test_missing_job_does_not_write) ... ok\ntest_retry_limit_does_not_write (test_retry.RetryTests.test_retry_limit_does_not_write) ... ok\ntest_retryable_job_is_queued_and_diagnostic_is_cleared (test_retry.RetryTests.test_retryable_job_is_queued_and_diagnostic_is_cleared) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.004s\n\nOK\n"
+      },
+      "contract": {
+        "argv": [
+          "python3",
+          "-I",
+          "-B",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/skills/software-engineering/evals/verify_artifacts.py",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/experiment/candidate-second",
+          "--stage",
+          "second"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/skills",
+        "exit_code": 0,
+        "stdout": "Selected project: /workspace/scratch/67c50d3d8623/aos-strategic/experiment/candidate-second; contract stage: second\n",
+        "stderr": "test_allowed_retries (__main__.main.<locals>.ContractTests.test_allowed_retries) ... ok\ntest_limit_rejections (__main__.main.<locals>.ContractTests.test_limit_rejections) ... ok\ntest_missing_and_ineligible_jobs (__main__.main.<locals>.ContractTests.test_missing_and_ineligible_jobs) ... ok\ntest_permission_and_precedence (__main__.main.<locals>.ContractTests.test_permission_and_precedence) ... ok\ntest_save_failure_preserves_state (__main__.main.<locals>.ContractTests.test_save_failure_preserves_state) ... ok\ntest_selects_requested_job_and_preserves_other_records (__main__.main.<locals>.ContractTests.test_selects_requested_job_and_preserves_other_records) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.002s\n\nOK\n"
+      },
+      "reconstruct": {
+        "argv": [
+          "git",
+          "apply",
+          "--whitespace=error",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/evaluations/strategic-programming/2026-11-07/outputs/candidate-second.patch"
+        ],
+        "cwd": "/tmp/aos-strategic-candidate-second-90ljgl08/project",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "reconstruction_files_match": true,
+      "reconstruction_file_count": 9,
+      "reconstructed_contract": {
+        "argv": [
+          "python3",
+          "-I",
+          "-B",
+          "/workspace/scratch/67c50d3d8623/aos-strategic/skills/skills/software-engineering/evals/verify_artifacts.py",
+          "/tmp/aos-strategic-candidate-second-90ljgl08/project",
+          "--stage",
+          "second"
+        ],
+        "cwd": "/workspace/scratch/67c50d3d8623/aos-strategic/skills",
+        "exit_code": 0,
+        "stdout": "Selected project: /tmp/aos-strategic-candidate-second-90ljgl08/project; contract stage: second\n",
+        "stderr": "test_allowed_retries (__main__.main.<locals>.ContractTests.test_allowed_retries) ... ok\ntest_limit_rejections (__main__.main.<locals>.ContractTests.test_limit_rejections) ... ok\ntest_missing_and_ineligible_jobs (__main__.main.<locals>.ContractTests.test_missing_and_ineligible_jobs) ... ok\ntest_permission_and_precedence (__main__.main.<locals>.ContractTests.test_permission_and_precedence) ... ok\ntest_save_failure_preserves_state (__main__.main.<locals>.ContractTests.test_save_failure_preserves_state) ... ok\ntest_selects_requested_job_and_preserves_other_records (__main__.main.<locals>.ContractTests.test_selects_requested_job_and_preserves_other_records) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.002s\n\nOK\n"
+      }
+    }
+  },
+  "final_reconstruction_recorded_at_utc": "2026-11-07T13:15:03.483541+00:00",
+  "patch_format_note": "Empty context lines omit the leading space to keep stored patch files free of trailing whitespace. Each retained patch was reapplied with git apply and its reconstructed file hashes matched."
+}

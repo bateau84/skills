@@ -613,6 +613,9 @@ read-only treatment. Provider-free fixture integrity checks are included in the
 harness suite; they do not constitute agent behavior results or a measured
 maintainability improvement. The packet specifies matched comparisons, retained
 outputs and limits on claims about native integration and long-term benefit.
+The [2026-11-07 manual rehearsal](../evaluations/strategic-programming/2026-11-07/README.md)
+retains source identities, both stages' outputs and reproducible checks. Both
+arms completed the fixture; it does not establish an improvement over the baseline.
 
 The reviewed PA1–PA9 and WD1–WD9 Markdown packets have runnable JSON copies;
 the four context-and-handoff cases are in a separate JSON fixture.

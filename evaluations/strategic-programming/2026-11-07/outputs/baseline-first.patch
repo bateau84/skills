@@ -1,0 +1,231 @@
+diff --git a/HANDOFF.md b/HANDOFF.md
+new file mode 100644
+--- /dev/null
++++ b/HANDOFF.md
+@@ -0,0 +1,50 @@
++# Timed-out job retry support: DONE
++
++`failed` and `timed_out` jobs now use the same retry policy through all three
++public entry points.
++
++## Changes and decisions
++
++- Added `jobqueue/_retry.py` as the single owner of lookup, eligibility, attempt
++  limit, diagnostic clearing and persistence. The three caller modules re-export
++  its function, preserving their callable signatures without forwarding wrappers.
++- Updated `jobqueue/api.py`, `jobqueue/cli.py` and `jobqueue/scheduler.py` to remove
++  their duplicate policy implementations.
++- Expanded `tests/test_retry.py` to exercise both eligible states at attempts
++  0, 1 and 2; rejection at and above 3; missing and ineligible jobs; exact errors;
++  rejection before saving; failed-save preservation; and a retry after storage
++  recovers. All cases exercise each public entry point with the real Store.
++- Updated README.md accepted behavior. Retained `job is not failed` for ineligible
++  states and preserved lookup, eligibility, limit, then save error precedence.
++- Job and Store were unchanged. No dependencies or telemetry were added to this
++  trusted in-process fixture.
++
++## Evidence
++
++From this project directory:
++
++- `python3 -B -m unittest discover -s tests -v` before changes: `Ran 3 tests in
++  0.001s`, `OK`.
++- The same command after extending tests, before implementation:
++  `FAILED (failures=6, errors=12)`. The failures were the new timed_out cases.
++- The same command after implementation: `Ran 3 tests in 0.003s`, `OK`.
++  Those three methods exercise 75 entry-point/scenario subtests.
++- An inline standard-library Python check compiled all source/test files,
++  checked trailing whitespace and final newlines, and inspected every public
++  retry signature. Actual output: `Syntax and whitespace: 7 Python files OK` and
++  `Public signatures: 3 entry points OK`.
++- `rg -n 'def retry|failed|timed_out|attempts|last_error|save\(' jobqueue tests README.md`
++  confirmed the only policy definition is in jobqueue/_retry.py. Final source,
++  tests and README were read back for review.
++
++## Limits and remaining work
++
++`git diff --check -- .` could not run because this fixture is not a Git
++repository (`warning: Not a git repository`). No separate build or lint command
++is configured. No remaining implementation work was identified for the accepted
++in-process requirements. Nothing was committed or published.
++
++## Skills used
++
++- Supplied baseline Software Engineering guidance.
++- Supplied coder role guidance.
+diff --git a/README.md b/README.md
+--- a/README.md
++++ b/README.md
+@@ -9,8 +9,9 @@
+
+ - `retry(store, job_id)` returns the saved `Job` after success.
+ - A missing job raises `LookupError("job not found")` without a write.
+-- Only `failed` jobs are retryable initially. Other states raise
+-  `ValueError("job is not failed")` without a write. This check precedes the limit.
++- Jobs in `failed` or `timed_out` state are retryable. Other states raise
++  `ValueError("job is not failed")` without a write. The message is retained for
++  compatibility. This check precedes the limit.
+ - Three attempts is the limit. At or above it, raise
+   `ValueError("retry limit reached")` without a write.
+ - Success changes state to `queued`, adds exactly one attempt and clears
+diff --git a/jobqueue/_retry.py b/jobqueue/_retry.py
+new file mode 100644
+--- /dev/null
++++ b/jobqueue/_retry.py
+@@ -0,0 +1,16 @@
++from dataclasses import replace
++
++from .model import Job, Store
++
++
++def retry(store: Store, job_id: str) -> Job:
++    job = store.get(job_id)
++    if job is None:
++        raise LookupError("job not found")
++    if job.state not in ("failed", "timed_out"):
++        raise ValueError("job is not failed")
++    if job.attempts >= 3:
++        raise ValueError("retry limit reached")
++    updated = replace(job, state="queued", attempts=job.attempts + 1, last_error=None)
++    store.save(updated)
++    return updated
+diff --git a/jobqueue/api.py b/jobqueue/api.py
+--- a/jobqueue/api.py
++++ b/jobqueue/api.py
+@@ -1,16 +1 @@
+-from dataclasses import replace
+-
+-from .model import Job, Store
+-
+-
+-def retry(store: Store, job_id: str) -> Job:
+-    job = store.get(job_id)
+-    if job is None:
+-        raise LookupError("job not found")
+-    if job.state != "failed":
+-        raise ValueError("job is not failed")
+-    if job.attempts >= 3:
+-        raise ValueError("retry limit reached")
+-    updated = replace(job, state="queued", attempts=job.attempts + 1, last_error=None)
+-    store.save(updated)
+-    return updated
++from ._retry import retry
+diff --git a/jobqueue/cli.py b/jobqueue/cli.py
+--- a/jobqueue/cli.py
++++ b/jobqueue/cli.py
+@@ -1,16 +1 @@
+-from dataclasses import replace
+-
+-from .model import Job, Store
+-
+-
+-def retry(store: Store, job_id: str) -> Job:
+-    job = store.get(job_id)
+-    if job is None:
+-        raise LookupError("job not found")
+-    if job.state != "failed":
+-        raise ValueError("job is not failed")
+-    if job.attempts >= 3:
+-        raise ValueError("retry limit reached")
+-    updated = replace(job, state="queued", attempts=job.attempts + 1, last_error=None)
+-    store.save(updated)
+-    return updated
++from ._retry import retry
+diff --git a/jobqueue/scheduler.py b/jobqueue/scheduler.py
+--- a/jobqueue/scheduler.py
++++ b/jobqueue/scheduler.py
+@@ -1,16 +1 @@
+-from dataclasses import replace
+-
+-from .model import Job, Store
+-
+-
+-def retry(store: Store, job_id: str) -> Job:
+-    job = store.get(job_id)
+-    if job is None:
+-        raise LookupError("job not found")
+-    if job.state != "failed":
+-        raise ValueError("job is not failed")
+-    if job.attempts >= 3:
+-        raise ValueError("retry limit reached")
+-    updated = replace(job, state="queued", attempts=job.attempts + 1, last_error=None)
+-    store.save(updated)
+-    return updated
++from ._retry import retry
+diff --git a/tests/test_retry.py b/tests/test_retry.py
+--- a/tests/test_retry.py
++++ b/tests/test_retry.py
+@@ -5,24 +5,32 @@
+
+
+ class RetryTests(unittest.TestCase):
+-    def test_failed_job_is_queued_and_diagnostic_is_cleared(self):
++    def test_eligible_job_is_queued_and_diagnostic_is_cleared(self):
+         for entry in (api, cli, scheduler):
+-            with self.subTest(entry=entry.__name__):
+-                store = Store([Job("job", "failed", 1, "timeout")])
+-                result = entry.retry(store, "job")
+-                self.assertEqual(result, Job("job", "queued", 2, None))
+-                self.assertEqual(store.get("job"), result)
+-                self.assertEqual(store.writes, 1)
++            for state in ("failed", "timed_out"):
++                for attempts in (0, 1, 2):
++                    with self.subTest(entry=entry.__name__, state=state, attempts=attempts):
++                        store = Store([Job("job", state, attempts, "timeout")])
++                        result = entry.retry(store, "job")
++                        self.assertEqual(result, Job("job", "queued", attempts + 1, None))
++                        self.assertEqual(store.get("job"), result)
++                        self.assertEqual(store.writes, 1)
+
+     def test_rejections_do_not_write(self):
++        cases = [(None, LookupError, "job not found")]
++        for state in ("queued", "running", "succeeded", "unknown"):
++            for attempts in (0, 3, 4):
++                cases.append((Job("job", state, attempts, "keep"),
++                              ValueError, "job is not failed"))
++        for state in ("failed", "timed_out"):
++            for attempts in (3, 4):
++                cases.append((Job("job", state, attempts, "keep"),
++                              ValueError, "retry limit reached"))
+         for entry in (api, cli, scheduler):
+-            for job, error, message in (
+-                (None, LookupError, "job not found"),
+-                (Job("job", "running", 3, "keep"), ValueError, "job is not failed"),
+-                (Job("job", "failed", 3, "keep"), ValueError, "retry limit reached"),
+-            ):
++            for job, error, message in cases:
+                 with self.subTest(entry=entry.__name__, job=job):
+                     store = Store([] if job is None else [job])
++                    store.fail_saves = True
+                     with self.assertRaises(error) as caught:
+                         entry.retry(store, "job")
+                     self.assertEqual(str(caught.exception), message)
+@@ -31,14 +39,20 @@
+
+     def test_failed_save_preserves_the_record(self):
+         for entry in (api, cli, scheduler):
+-            with self.subTest(entry=entry.__name__):
+-                original = Job("job", "failed", 1, "keep")
+-                store = Store([original])
+-                store.fail_saves = True
+-                with self.assertRaisesRegex(OSError, "^storage unavailable$"):
+-                    entry.retry(store, "job")
+-                self.assertEqual(store.get("job"), original)
+-                self.assertEqual(store.writes, 0)
++            for state in ("failed", "timed_out"):
++                with self.subTest(entry=entry.__name__, state=state):
++                    original = Job("job", state, 2, "keep")
++                    store = Store([original])
++                    store.fail_saves = True
++                    with self.assertRaisesRegex(OSError, "^storage unavailable$"):
++                        entry.retry(store, "job")
++                    self.assertEqual(store.get("job"), original)
++                    self.assertEqual(store.writes, 0)
++                    store.fail_saves = False
++                    result = entry.retry(store, "job")
++                    self.assertEqual(result, Job("job", "queued", 3, None))
++                    self.assertEqual(store.get("job"), result)
++                    self.assertEqual(store.writes, 1)
+
+
+ if __name__ == "__main__":
