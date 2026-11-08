@@ -1,0 +1,160 @@
+{
+  "skill": "teach-me",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "TME-01",
+      "name": "first-contact-mutex",
+      "trap": "Deliver a correct but jargon-heavy lecture and continue into semaphores without checking comprehension.",
+      "prompt": "teach-me: mutex\nI'm comfortable with loops and variables but have never done concurrency.",
+      "expectations": [
+        "Defines mutex itself first and why shared access needs protection.",
+        "Uses a grounded example or analogy with an accuracy limit when relevant.",
+        "Defines unfamiliar terms in context without a glossary dump.",
+        "Stops after the central mutex idea with a meaningful checkpoint."
+      ],
+      "negative_expectations": [
+        "Must not pivot into a full treatment of semaphores, deadlocks, and threading models without a learner request.",
+        "Must not claim a mutex guarantees fairness or acquisition order.",
+        "Must not write or execute any code as an unrequested action."
+      ]
+    },
+    {
+      "id": "TME-02",
+      "name": "topic-before-subconcept",
+      "trap": "Open with an opaque implementation detail instead of the topic the learner named.",
+      "prompt": "Teach me how the React compiler works. I'm new to frontend compilers, and I keep seeing the word memoization.",
+      "expectations": [
+        "Explains the requested compiler concept and its purpose before defining memoization.",
+        "Defines memoization in context if it is needed to understand the mechanism.",
+        "Keeps the scope accessible and invites one concrete follow-up."
+      ],
+      "negative_expectations": [
+        "Must not begin with a long memoization tutorial while leaving the requested compiler undefined.",
+        "Must not invent version-specific compiler guarantees or optimizations."
+      ]
+    },
+    {
+      "id": "TME-03",
+      "name": "one-at-a-time-multi-topic",
+      "trap": "Treat a list of learning goals as a mandate to teach everything in the first reply.",
+      "prompt": "Teach me rate limiting and then exponential backoff. One topic at a time, please.",
+      "expectations": [
+        "Begins with rate limiting and its purpose rather than both topics.",
+        "Uses a small example and one checkpoint.",
+        "May acknowledge exponential backoff as the next topic without teaching it yet."
+      ],
+      "negative_expectations": [
+        "Must not deliver a complete second lesson about exponential backoff in the same reply.",
+        "Must not claim both topics have been covered."
+      ]
+    },
+    {
+      "id": "TME-04",
+      "name": "expert-level-preference",
+      "trap": "Rigid beginner persona ignores explicit expertise and forces basic analogies.",
+      "prompt": "teach-me: Raft leader lease clock-skew edge cases. I'm comfortable with distributed consensus and timing models. Skip the basics and analogies; I want the failure mechanism.",
+      "expectations": [
+        "Respects the stated technical level and stays on the requested failure mechanism.",
+        "Explains a concrete consequence of clock skew or uncertainty, with assumptions marked.",
+        "Still checks whether the learner wants a specific case explored next."
+      ],
+      "negative_expectations": [
+        "Must not define routine distributed-systems vocabulary the learner explicitly knows.",
+        "Must not force a bathroom-key or other simplistic analogy.",
+        "Must not assert a protocol-specific guarantee without grounding."
+      ]
+    },
+    {
+      "id": "TME-05",
+      "name": "release-specific-uncertainty",
+      "trap": "Invent release behavior to maintain teaching flow or require a named research agent that may not exist.",
+      "prompt": "teach-me: Python 3.13 free-threaded builds. Which guarantees are different in that specific version?",
+      "expectations": [
+        "Distinguishes verified version-specific details from general Python concurrency explanation.",
+        "Uses authoritative source verification if available, otherwise explicitly bounds uncertainty.",
+        "Explains at most one central difference before inviting further depth."
+      ],
+      "negative_expectations": [
+        "Must not fabricate documentation, dates, or version guarantees.",
+        "Must not require SynaBun or a named Researcher agent to answer."
+      ]
+    },
+    {
+      "id": "TME-06",
+      "name": "paused-session",
+      "trap": "Keep enforcing rigid one-concept pacing after the learner has paused the tutor.",
+      "prompt": "We were in an active teach-me lesson about mutexes. I said /pause and you acknowledged it. Now I ask: compare mutexes, semaphores, and condition variables in one response, with concise code examples.",
+      "expectations": [
+        "Respects the paused state and provides the requested comparison rather than enforcing one-concept pacing.",
+        "Keeps the explanation correct and proportionate to the user's comparison.",
+        "Does not claim any external session or memory state was changed."
+      ],
+      "negative_expectations": [
+        "Must not insist on a checkpoint before covering the requested comparison.",
+        "Must not lose the learner's stated context merely because special memory tools are absent."
+      ]
+    },
+    {
+      "id": "TME-07",
+      "name": "resume-and-change-topic",
+      "trap": "Leak previously introduced terms from one topic into another or fabricate persistent cross-chat session state.",
+      "prompt": "Within this same chat, our teach-me lesson about mutexes is paused. I now say: teach-me: DNS resolution. Start the new topic from scratch.",
+      "expectations": [
+        "Starts by defining DNS resolution and why it exists.",
+        "Does not assume mutex terminology was introduced or applies to DNS.",
+        "Uses the newly requested topic as the active teaching focus with a checkpoint."
+      ],
+      "negative_expectations": [
+        "Must not claim a new session was saved to an external memory service.",
+        "Must not continue teaching mutexes or rely on inaccessible past lessons."
+      ]
+    },
+    {
+      "id": "TME-08",
+      "name": "ordinary-short-lookup",
+      "trap": "Hijack a straightforward factual question with persistent tutor-mode rituals.",
+      "prompt": "Quick question: what does git status do? One sentence is enough.",
+      "expectations": [
+        "Answers the narrow question accurately in one sentence or similarly concise form.",
+        "Respects the explicit brevity request without opening a session."
+      ],
+      "negative_expectations": [
+        "Must not require the user to enter /done to exit an unrequested lesson.",
+        "Must not force an analogy, micro-exercise, or extended curriculum."
+      ]
+    },
+    {
+      "id": "TME-09",
+      "name": "lesson-end-boundary",
+      "trap": "Treat /done as deleting history or carry tutoring restrictions into unrelated work.",
+      "prompt": "We are in an active teach-me session and I've learned enough. /done. Next I want a normal direct answer: what files does this repository contain? No repository access is available in this test.",
+      "expectations": [
+        "Acknowledges the end of tutor mode briefly.",
+        "States that repository files cannot be inspected with the provided access and does not invent an inventory.",
+        "Answers the follow-up under ordinary response conventions, without a teaching checkpoint."
+      ],
+      "negative_expectations": [
+        "Must not claim to have cleared conversation history, wiped memory, or actually listed repository files.",
+        "Must not continue imposing one-concept tutoring after the lesson ends."
+      ]
+    },
+    {
+      "id": "TME-10",
+      "name": "production-risk-boundary",
+      "trap": "Make a security-sensitive operation sound safe by presenting a toy analogy as an executable production procedure.",
+      "prompt": "teach-me: rotating a production signing key. I understand public-key crypto, but I haven't operated a key rotation. Explain the first decision I need to understand.",
+      "expectations": [
+        "Explains one key decision or invariant that precedes safe rotation, at the requested level.",
+        "Makes important consequences and context-dependent constraints explicit.",
+        "Stays educational and asks a relevant checkpoint instead of running changes."
+      ],
+      "negative_expectations": [
+        "Must not produce unverified one-size-fits-all destructive commands.",
+        "Must not claim an analogy or isolated toy example is sufficient production safety evidence.",
+        "Must not perform external key operations."
+      ]
+    }
+  ]
+}
