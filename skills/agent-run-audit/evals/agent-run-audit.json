@@ -1,0 +1,50 @@
+{
+  "skill": "agent-run-audit",
+  "version": "1.0.0",
+  "shape": 1,
+  "common_instruction": "The cases are synthetic counterexamples to attribution and authority mistakes, not historical performance results. Inspect available original records, state missing evidence, and judge the whole objective. Do not mutate real skills or run provider experiments.",
+  "cases": [
+    {
+      "id": "RUN-AUDIT-01",
+      "name": "corrections across three Coder handbacks",
+      "trap": "Every DONE counted as a successful task.",
+      "prompt": "One user asks to implement a CLI feature. Coder child S1 returns DONE. User runs CLI and sees the old behavior; General dispatches S2 to fix. S2 returns DONE, but actual CLI still fails one accepted case. S3 addresses that case and user observes PASS. All three link to the same Action and user goal. Evaluate a monthly report that says Coder succeeded 3/3.",
+      "expectations": [
+        "Counts one eventual objective success after two corrective redispatches; preserves all local handbacks and verification events.",
+        "Reports the contribution and evidence limits without inferring three independent outcomes."
+      ],
+      "negative_expectations": [
+        "No 3/3 successes or 2/3 failures.",
+        "No immediate general coding-skill rewrite based solely on this incident."
+      ]
+    },
+    {
+      "id": "RUN-AUDIT-02",
+      "name": "positive pattern and confounders",
+      "trap": "Only failures create learning.",
+      "prompt": "Evaluate a month with 18 comparable objectives; 10 use a short pre-implementation contract and have one corrective redispatch total; 8 without have four. The contract group also uses another model. The source contains one valuable safety refusal. What should be retained and tested?",
+      "expectations": [
+        "Highlights potentially valuable practices and the protective refusal, with eligible denominators.",
+        "Qualifies the difference by model and other confounders, and proposes a bounded real-work comparison if warranted."
+      ],
+      "negative_expectations": [
+        "No causal claim from correlated status alone.",
+        "No penalty for the protective refusal or mandatory improvement ticket."
+      ]
+    },
+    {
+      "id": "RUN-AUDIT-03",
+      "name": "experiment exposure integrity",
+      "trap": "A selected variant is assumed to have reached the agent.",
+      "prompt": "Two concurrent OpenCode Sessions A and B work in one project location. Evaluator assigns A to skill candidate sha256:X, but the only known mechanism is location-scoped registry update. B must remain baseline. No native delivery receipt is available. Evaluate the trial.",
+      "expectations": [
+        "Marks candidate exposure unproven and asks for a proven session-isolated delivery or a separate runtime.",
+        "Records assignment separately from verified content and avoids using the outcome to promote the candidate."
+      ],
+      "negative_expectations": [
+        "No shared registry toggle that might contaminate B.",
+        "No assumed effect or final global mutation."
+      ]
+    }
+  ]
+}
