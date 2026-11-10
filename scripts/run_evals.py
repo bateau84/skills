@@ -101,7 +101,7 @@ def validate_live(options, selected):
             raise ValueError(f"{option} must be a qualified provider/model ID (for example openai/gpt-6.1); got an unqualified or malformed ID")
 
     validate_model_id(options.model, "--model")
-    if options.claude_config_dir:
+    if getattr(options, "claude_config_dir", None):
         if not options.model.startswith("claude-agent/"):
             raise ValueError("--claude-config-dir requires a claude-agent/* target")
         if any((options.auth, options.database, options.env, options.provider_config)):
@@ -286,7 +286,7 @@ def run_plan(root, runner, options, plan, providers, invoker=None, reporter=None
                                   "engine": options.engine, "network": options.network or "engine-default-live",
                                   "sampling": "provider-default/uncontrolled"},
                               "budget": call_budget(len({j.case.id for j in plan.jobs}), options),
-                              "claude_agent_profile": bool(options.claude_config_dir)},
+                              "claude_agent_profile": bool(getattr(options, "claude_config_dir", None))},
     }
     sanitizer = runner.evidence_safety.Sanitizer.from_runtime(
         os.environ, json_sources=[options.auth or runner.cli.default_auth_path(),
@@ -485,10 +485,12 @@ def main(argv=None, *, report_root=None):
                 raise ValueError("model catalog acquisition or validation failed") from None
         providers = compile_provider_settings(provider_doc, runner, os.environ, options.env)
         options.engine = runner.cli.resolve_engine(options.engine)
-        options.target_image_proof = verify_image(
-            runner, options.engine, options.opencode_image, "opencode",
-            claude_agent=bool(options.claude_config_dir),
-        )
+        if getattr(options, "claude_config_dir", None):
+            options.target_image_proof = verify_image(
+                runner, options.engine, options.opencode_image, "opencode", claude_agent=True,
+            )
+        else:
+            options.target_image_proof = verify_image(runner, options.engine, options.opencode_image, "opencode")
         options.target_image_id = options.target_image_proof["image_id"]
         if options.judge_transport == "opencode":
             options.judge_image_proof = options.target_image_proof
