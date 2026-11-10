@@ -62,7 +62,7 @@ bun run eval:live -- \
   --iterations 1 --parallel 1 --transport-retries 0 --verbose
 ```
 
-The default judge uses the same model and native subscription. Every pair
+The runner currently requires `--parallel 1` for Claude Agent subscription trials because concurrent native credential refresh is unqualified. Cross-provider/API judges are rejected. The default judge uses the same model and native subscription. Every pair
 nominally invokes two targets and two judges; one invocation can contain
 multiple model turns. Use a small explicit selection, never `--all` initially.
 

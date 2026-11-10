@@ -104,6 +104,12 @@ def validate_live(options, selected):
     if getattr(options, "claude_config_dir", None):
         if not options.model.startswith("claude-agent/"):
             raise ValueError("--claude-config-dir requires a claude-agent/* target")
+        if options.judge_transport != "opencode" or (
+            options.judge_model and not options.judge_model.startswith("claude-agent/")
+        ):
+            raise ValueError("Claude Agent subscription profile requires an OpenCode claude-agent/* judge")
+        if options.parallel != 1:
+            raise ValueError("Claude Agent subscription profile currently requires --parallel 1 (shared native credential refresh is unqualified)")
         if any((options.auth, options.database, options.env, options.provider_config)):
             raise ValueError("Claude Agent subscriptions reject OpenCode auth/database, provider overrides and forwarded environment")
         profile = options.claude_config_dir.expanduser()

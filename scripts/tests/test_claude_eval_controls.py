@@ -21,6 +21,19 @@ class ClaudeEvalControlTests(unittest.TestCase):
             with patch.dict("os.environ", {}, clear=True):
                 validate_live(options, ("case",))
 
+    def test_subscription_mode_rejects_mixed_judges_and_concurrent_profile_use(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            profile = Path(tmp)
+            (profile / ".credentials.json").write_text("{}")
+            with patch.dict("os.environ", {}, clear=True):
+                for extra, match in [
+                    (["--judge-model", "openai/gpt-6"], "OpenCode claude-agent"),
+                    (["--judge-transport", "github-copilot-cli", "--judge-model", "github-copilot/gpt"], "OpenCode claude-agent"),
+                    (["--parallel", "2"], "parallel 1"),
+                ]:
+                    with self.subTest(extra=extra), self.assertRaisesRegex(ValueError, match):
+                        validate_live(self.args("--claude-config-dir", str(profile), *extra), ("case",))
+
     def test_never_falls_back_to_api_or_default_host_login(self):
         with self.assertRaisesRegex(ValueError, "requires --claude-config-dir"):
             validate_live(self.args(), ("case",))
