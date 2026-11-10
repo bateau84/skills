@@ -31,6 +31,6 @@ gitignored operational output, not automatically committed.
 Relative `--artifact-dir`/`--output` paths are repository-rooted, independent of
 the caller's working directory. Report delivery failures remain exit 2 but show
 any independently verified evaluation aggregate and retained manifest location.
-See [evaluation setup, controls, evidence and exit semantics](docs/evaluations.md)
+For an experimental, subscription-backed Claude Agent path, see [Claude Agent evaluation](docs/claude-agent-evals.md). This is an opt-in profile; no real model run is automatically authorized.\nSee [evaluation setup, controls, evidence and exit semantics](docs/evaluations.md)
 and [observed verification/gaps](docs/eval-verification.md). The historical
 four-variant pilot remains a separate record, not a new Boolean-score run.

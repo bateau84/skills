@@ -18,7 +18,7 @@ from types import SimpleNamespace
 
 from eval_cases import digest
 
-RUNNER_REVISION = "dbbbf2a0740aee7a9e9035cc14a785a9467b8fb1"
+RUNNER_REVISION = "4b0c28c1e8922a03dbd69ae0e42d2e5a0f00738d"
 LOOM_METHOD_REVISION = "c16e2c793b8faa8d21cf2ca9833606676e461e79"
 PROFILE_API = "opencode-eval-runner/eval-profile/v1"
 
@@ -126,7 +126,7 @@ def build_probe_command(runner, engine, identity, code, workspace, config, root,
     return command[:-1] + ["--entrypoint=python3", command[-1], "-I", "-B", "-c", code]
 
 
-def verify_image(runner, engine: str, image: str, transport: str) -> dict:
+def verify_image(runner, engine: str, image: str, transport: str, *, claude_agent: bool = False) -> dict:
     """Zero inference, no network/pull/build. Compare image adapter bytes to pin."""
     if not image or not re.fullmatch(r"(?:sha256:)?[0-9a-f]{64}|[^\s]+@sha256:[0-9a-f]{64}", image):
         raise ValueError("image must be an immutable full local image ID or repository@sha256:digest, not a tag")
@@ -137,8 +137,14 @@ def verify_image(runner, engine: str, image: str, transport: str) -> dict:
     identity = inspected.get("Id", inspected.get("ID"))
     if not isinstance(identity, str) or not re.fullmatch(r"(?:sha256:)?[0-9a-f]{64}", identity):
         raise ValueError("engine did not return a full image ID")
-    binary, expected = ("opencode", "2.2.2") if transport == "opencode" else ("copilot", "1.0.83")
+    if claude_agent and transport != "opencode":
+        raise ValueError("Claude Agent image qualification requires OpenCode")
+    binary, expected = ("opencode", "2.2.6" if claude_agent else "2.2.2") if transport == "opencode" else ("copilot", "1.0.83")
     code = "BINARY = " + repr(binary) + "\n" + IMAGE_PROBE
+    if claude_agent:
+        # Zero-inference: require the actual official pinned executable, not only an image label.
+        code += "\nclaude_version = subprocess.check_output(['claude', '--version'], text=True).strip()\n"
+        code += "assert '2.1.318' in claude_version, 'Claude Code must be exactly 2.1.318'\n"
     with tempfile.TemporaryDirectory(prefix="skills-image-compatibility-") as temp:
         root = Path(temp)
         workspace = root / "workspace"
