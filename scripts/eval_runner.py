@@ -18,7 +18,7 @@ from types import SimpleNamespace
 
 from eval_cases import digest
 
-RUNNER_REVISION = "4b0c28c1e8922a03dbd69ae0e42d2e5a0f00738d"
+RUNNER_REVISION = "eb2677680a1838f1b64f4a68e818d8257033a8d8"
 LOOM_METHOD_REVISION = "c16e2c793b8faa8d21cf2ca9833606676e461e79"
 PROFILE_API = "opencode-eval-runner/eval-profile/v1"
 

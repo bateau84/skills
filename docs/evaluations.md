@@ -24,7 +24,7 @@ The execution dependency is the **clean checkout**, not an arbitrary executable
 found on PATH:
 
 - Runner: [`bateau84/opencode-eval-runner`](https://github.com/bateau84/opencode-eval-runner)
-  at `4b0c28c1e8922a03dbd69ae0e42d2e5a0f00738d` (runner PR #91 candidate; pin the reviewed merge revision after integration).
+  at `eb2677680a1838f1b64f4a68e818d8257033a8d8` (runner PR #91 candidate; pin the reviewed merge revision after integration).
 - Resolution: `--runner-root /path/to/opencode-eval-runner`, then
   `SKILLS_EVAL_RUNNER_ROOT`, then the local sibling `../opencode-eval-runner`
   relative to this repository (not the current shell directory). In nested
