@@ -28,7 +28,7 @@ class ImageBoundaryTests(unittest.TestCase):
         from eval_reporting import boundary_error
         from tempfile import TemporaryDirectory
 
-        self.assertEqual(RUNNER_REVISION, "dbbbf2a0740aee7a9e9035cc14a785a9467b8fb1")
+        self.assertEqual(RUNNER_REVISION, "4b0c28c1e8922a03dbd69ae0e42d2e5a0f00738d")
         self.assertEqual(
             boundary_error(ValueError(f"runner checkout must be exactly {RUNNER_REVISION}; check out that revision in a dedicated clean checkout")),
             f"runner checkout must be exactly {RUNNER_REVISION}; check out that revision in a dedicated clean checkout",

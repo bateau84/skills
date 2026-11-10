@@ -46,7 +46,7 @@ Run the provider-free probe first, selecting one existing case:
 ```sh
 bun run eval:live -- \
   --probe --engine podman --image "$CLAUDE_IMAGE_ID" \
-  --cases agent-run-audit:1 --claude-config-dir "$HOME/.claude-eval-profile"
+  --cases agent-run-audit:RUN-AUDIT-01 --claude-config-dir "$HOME/.claude-eval-profile"
 ```
 
 This checks exact image/adapter bytes, OpenCode version and Claude binary version
@@ -55,7 +55,7 @@ after explicit personal authorization**, run one real matched comparison:
 
 ```sh
 bun run eval:live -- \
-  --cases agent-run-audit:1 \
+  --cases agent-run-audit:RUN-AUDIT-01 \
   --model 'claude-agent/<EXACT_AVAILABLE_MODEL_ID>' \
   --claude-config-dir "$HOME/.claude-eval-profile" \
   --engine podman --image "$CLAUDE_IMAGE_ID" \
