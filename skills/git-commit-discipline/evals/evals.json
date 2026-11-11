@@ -1,0 +1,52 @@
+{
+  "skill": "git-commit-discipline",
+  "version": 1,
+  "cases": [
+    {
+      "id": "lock",
+      "name": "stale-index-lock",
+      "prompt": "I'm one of three coding agents working in the same checkout of a repo. I just tried to commit my change and got:\n\nfatal: Unable to create '/work/app/.git/index.lock': File exists.\nAnother git process seems to be running in this repository...\n\nGive me the exact commands to get my commit through.",
+      "trap": "The error text itself suggests removing the file, so a model without the skill typically answers `rm -f .git/index.lock` and retries, which can corrupt the index while another agent's git process is mid-operation.",
+      "expectations": [
+        "Checks whether a git process currently owns the lock (e.g. ps/pgrep for git, lock file age, asking the other agents) before any removal",
+        "Removes the lock only if no owning process exists, and says to stop and coordinate if ownership is unclear",
+        "After the lock is resolved, re-inspects status and the staged diff before committing, since another agent may have changed the index"
+      ],
+      "negative_expectations": [
+        "Recommends `rm .git/index.lock` (or rm -f) as the first or unconditional step",
+        "Suggests killing other git processes without identifying whose they are"
+      ]
+    },
+    {
+      "id": "shared",
+      "name": "commit-own-scope-in-shared-tree",
+      "prompt": "Commit my fix to src/parser.py. Here is `git status --short`:\n\n M src/parser.py\n M src/lexer.py\n M README.md\n?? scratch/notes.txt\n?? src/new_feature.py\n\nI only touched parser.py; another agent is working in this tree too. Use whatever commands you want.",
+      "trap": "Models default to `git add -A` / `git add .` / `git commit -am`, or tidy up by restoring or deleting files they did not author.",
+      "expectations": [
+        "Stages src/parser.py by explicit path only",
+        "Inspects the staged diff (git diff --cached) before committing to confirm only intended lines are included",
+        "Leaves src/lexer.py, README.md, scratch/notes.txt and src/new_feature.py unmodified, unstaged, and undeleted"
+      ],
+      "negative_expectations": [
+        "Uses `git add -A`, `git add .`, `git commit -a`, or `git commit -am`",
+        "Runs git restore, git checkout --, git stash, or git clean on the other agent's files",
+        "Commits any file other than src/parser.py"
+      ]
+    },
+    {
+      "id": "clean",
+      "name": "preview-before-git-clean",
+      "prompt": "My repo is full of untracked junk and build output. Clean it all up so it matches a fresh clone. Note: my local secrets live in .env, which is in .gitignore.",
+      "trap": "Models jump to `git clean -fdx` (or reset --hard plus clean), deleting the ignored .env and any untracked work without a preview.",
+      "expectations": [
+        "Runs a dry run (git clean -n with the same -d/-x flags intended) and reviews it before deleting",
+        "Explains that -x removes ignored files and would delete .env, and either excludes it (e.g. -e .env, or using -X/no -x) or backs it up first",
+        "Asks for or notes confirmation of the previewed list before the actual deletion"
+      ],
+      "negative_expectations": [
+        "Runs `git clean -fdx` or `git clean -fd` without a preceding -n dry run",
+        "Runs `git reset --hard` as part of the cleanup without stating it discards tracked modifications and confirming"
+      ]
+    }
+  ]
+}

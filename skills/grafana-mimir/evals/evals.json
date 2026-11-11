@@ -1,0 +1,21 @@
+{
+  "skill": "grafana-mimir",
+  "version": 1,
+  "cases": [
+    {
+      "id": "gm-helm6",
+      "name": "helm-6-default-topology",
+      "prompt": "I just ran `helm install mimir grafana/mimir-distributed -n mimir --create-namespace` with chart version 6.x and default values. Which Service should I port-forward to reach the write and query endpoints, and which components besides the usual Mimir ones should I expect to see running? Anything in the defaults I must not take to production?",
+      "trap": "Chart 6.0 removed the nginx section in favour of the gateway and deploys the ingest storage architecture with a bundled single-node Kafka by default; older knowledge says svc/mimir-nginx and no Kafka.",
+      "expectations": [
+        "Points to the gateway Service (e.g. mimir-gateway), not mimir-nginx",
+        "Mentions a Kafka component because chart 6.x uses the ingest storage architecture by default",
+        "Warns the bundled single-node Kafka (and bundled MinIO object storage) are for demo use only, and production needs external Kafka-compatible and object storage"
+      ],
+      "negative_expectations": [
+        "Tells the user to port-forward svc/mimir-nginx",
+        "Claims the default 6.x install has no Kafka / uses only classic ingester replication"
+      ]
+    }
+  ]
+}

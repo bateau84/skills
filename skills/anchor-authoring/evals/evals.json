@@ -1,0 +1,22 @@
+{
+  "skill": "anchor-authoring",
+  "version": 1,
+  "cases": [
+    {
+      "id": "aa-03",
+      "name": "parallel-divergence",
+      "prompt": "Here is an Anchor the user accepted last week. Two agents will now work in parallel: one on the sync engine, one on the web UI. Before delegating, check whether the Anchor is safe to rely on and tell me what, if anything, must change.\n\n# Pause syncing for a playlist\n## Intended outcome\nUsers can pause a playlist so the nightly sync stops changing it, and resume it later.\n## Observable success\n- A paused playlist is not modified by the nightly sync.\n- The user can resume a paused playlist.\n## Sources and acceptance\nAccepted by user in chat, 2026-11-04.",
+      "trap": "Declaring the Anchor complete because it has outcome, success and acceptance sections, or inventing technical rules instead of naming the user-owned semantic gap.",
+      "expectations": [
+        "Identifies that behaviour on resume is undefined (e.g. whether videos published during the pause are backfilled or skipped)",
+        "Explains that the two agents could implement incompatible meanings while both following the Anchor",
+        "Frames the gap as a decision for the user (asks or records an open question) rather than silently picking an answer",
+        "Does not treat the existing acceptance record as covering the newly resolved behaviour"
+      ],
+      "negative_expectations": [
+        "States the Anchor is ready for delegation as-is",
+        "Adds a resume/backfill rule to the Anchor and marks it accepted without user confirmation"
+      ]
+    }
+  ]
+}

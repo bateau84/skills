@@ -1,0 +1,23 @@
+{
+  "skill": "opentelemetry",
+  "version": 1,
+  "cases": [
+    {
+      "id": "otel-01",
+      "name": "grafana-cloud-auth-header-ubuntu",
+      "prompt": "On an Ubuntu 24.04 server I want a Python Flask app (started with opentelemetry-instrument) to send traces, metrics and logs straight to Grafana Cloud, no collector. Stack region is prod-eu-west-2, OTLP instance ID is 987654, and the Cloud Access Policy token (starts with glc_, about 160 characters) is already in $GC_TOKEN. Give me the exact shell lines to export the OTEL_* variables, plus one command to check the credentials before I start the app.",
+      "trap": "The common `$(echo -n \"$ID:$TOKEN\" | base64)` idiom wraps at 76 columns with GNU base64; with a ~160-char glc_ token the Authorization header gets embedded newlines and every export fails or 401s. The skill's own examples use this idiom.",
+      "expectations": [
+        "Builds the Basic credential so it has no line breaks, for example base64 -w0 or piping through tr -d '\\n'",
+        "Sets OTEL_EXPORTER_OTLP_ENDPOINT to https://otlp-gateway-prod-eu-west-2.grafana.net/otlp with no /v1/traces suffix",
+        "Sets OTEL_EXPORTER_OTLP_PROTOCOL to http/protobuf, not grpc",
+        "Sets service.name through OTEL_SERVICE_NAME or OTEL_RESOURCE_ATTRIBUTES",
+        "Gives a credential check whose result tells an auth failure (401) apart from a wrong endpoint (404)"
+      ],
+      "negative_expectations": [
+        "Uses a plain `| base64` call with no wrap suppression or newline stripping on the instance-ID:token string",
+        "Points the app at port 4317 or uses gRPC to talk to the Grafana Cloud OTLP gateway"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "skill": "terraform-provider-docs",
+  "version": 1,
+  "cases": [
+    {
+      "id": "tpd-01",
+      "name": "custom-resource-template-placement",
+      "prompt": "My Plugin Framework provider lives in repo terraform-provider-acme and uses tfplugindocs via go generate. For the resource `acme_widget` I want the Registry page to start with a hand-written overview paragraph and a usage example, but still show the generated argument/attribute reference. Tell me exactly which files to create (full repo-relative paths and names), what the template must contain so the schema section still renders, and how the output ends up in the repo.",
+      "trap": "Agents (and the current skill) put the .md.tmpl under docs/, keep the provider prefix in the template file name, or write a template that drops the generated schema block.",
+      "expectations": [
+        "Places the template at templates/resources/widget.md.tmpl (templates/ directory, no acme_ prefix in the file name)",
+        "Template includes the schema placeholder (e.g. {{ .SchemaMarkdown }}) so the generated argument/attribute section still renders",
+        "Places the example at examples/resources/acme_widget/resource.tf (prefix kept for example directories) and pulls it into the template (e.g. via tffile/.HasExample) or relies on the default rendering",
+        "States the rendered output is docs/resources/widget.md produced by tfplugindocs generate and should not be hand-edited"
+      ],
+      "negative_expectations": [
+        "Puts the .md.tmpl file inside docs/",
+        "Names the template acme_widget.md.tmpl",
+        "Copies the argument reference by hand into the template instead of using the generated schema"
+      ]
+    },
+    {
+      "id": "tpd-03",
+      "name": "document-new-action",
+      "prompt": "We just added a Terraform action named `acme_restart_server` to our Plugin Framework provider (repo terraform-provider-acme, docs generated with tfplugindocs). How do we get a Registry doc page for it with an example? Give concrete file paths for the example, any optional template, and the generated output.",
+      "trap": "The skill's template/target list omits actions entirely, so agents shoehorn the action into resources/ or hand-write a page.",
+      "expectations": [
+        "Puts the example at examples/actions/acme_restart_server/action.tf",
+        "Gives the optional template path as templates/actions/restart_server.md.tmpl",
+        "States the generated page is docs/actions/restart_server.md (no provider prefix)",
+        "Notes the tfplugindocs version must be recent enough to support actions and docs must be regenerated"
+      ],
+      "negative_expectations": [
+        "Documents the action under docs/resources/ or templates/resources/",
+        "Instructs hand-writing docs/actions/restart_server.md instead of generating it"
+      ]
+    },
+    {
+      "id": "tpd-04",
+      "name": "list-resource-example-file",
+      "prompt": "Our provider now implements a list resource `acme_server` for terraform query. tfplugindocs generates docs/list-resources/server.md but the page has no example. Where exactly does the example file go and what must it be named?",
+      "trap": "List resource examples use the .tfquery.hcl extension, not .tf; agents default to resource.tf or list-resource.tf.",
+      "expectations": [
+        "Places the example at examples/list-resources/acme_server/list-resource.tfquery.hcl",
+        "Explains the .tfquery.hcl extension is required for list resource examples",
+        "Says to rerun tfplugindocs generate afterwards"
+      ],
+      "negative_expectations": [
+        "Names the example list-resource.tf or resource.tf",
+        "Edits docs/list-resources/server.md by hand to add the example"
+      ]
+    }
+  ]
+}

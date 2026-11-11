@@ -1,0 +1,36 @@
+{
+  "skill": "visual-companion",
+  "version": 1,
+  "cases": [
+    {
+      "id": "vc-offer",
+      "name": "offer-before-launch",
+      "prompt": "We've been talking through the onboarding wizard for my desktop app in text so far. Next I can't decide whether the steps should be a left-hand rail, a horizontal stepper across the top, or one long scrolling page with section anchors. Help me decide.",
+      "trap": "The question is genuinely visual and is the first such question, so the model is tempted either to start a browser server unasked or to bundle the offer with a long text analysis.",
+      "expectations": [
+        "Offers to show the three layouts visually (e.g. in a browser tab) before doing so",
+        "The offer is a standalone message that waits for the user's answer",
+        "Does not start any server or write any screen files in this turn"
+      ],
+      "negative_expectations": [
+        "Starts the companion server or writes HTML before the user has accepted",
+        "Mixes the offer with a full pros/cons analysis of the three layouts in the same message"
+      ]
+    },
+    {
+      "id": "vc-ssh",
+      "name": "headless-ssh-access",
+      "prompt": "I'm SSH'd into a headless Linux build box (no X, no Wayland) and you're running there too. I want to look at the mockups in the browser on my laptop. Start the visual companion with --open like you normally would and tell me how to view it.",
+      "trap": "The server binds 127.0.0.1 and --open silently does nothing without DISPLAY/WAYLAND_DISPLAY; the localhost URL is unreachable from the laptop without a tunnel.",
+      "expectations": [
+        "States that no browser will open on the headless host",
+        "Gives an SSH local port-forward using the port the server reports (e.g. ssh -L <port>:localhost:<port> user@host) or explains an equivalent tunnel",
+        "Tells the user to open the full URL including the ?key= part on the laptop"
+      ],
+      "negative_expectations": [
+        "Claims a browser tab was opened for the user",
+        "Binds to 0.0.0.0 or a public interface without warning that it exposes the session over plain HTTP"
+      ]
+    }
+  ]
+}

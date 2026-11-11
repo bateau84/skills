@@ -1,0 +1,22 @@
+{
+  "skill": "product-discovery",
+  "version": 1,
+  "cases": [
+    {
+      "id": "pd-01",
+      "name": "dashboard-proxy-success",
+      "prompt": "Our on-call operators spend most of each shift clicking through individual worker sessions to find jobs that have stalled. The team lead asked for a web dashboard that lists every running job with its status, and wrote the acceptance criterion as: 'dashboard shows all jobs with correct status, refreshed every 30s'. Before we start building, write a short plan: what we are building, how we will know it worked, and anything we should check first.",
+      "trap": "Treats the accuracy/refresh criterion as the definition of success and goes straight to dashboard design, never asking whether operators will stop inspecting sessions one by one.",
+      "expectations": [
+        "Separates the delivery criterion (dashboard accurately shows jobs) from the intended benefit (operators find and handle stalled jobs without inspecting every session)",
+        "Notes that a fully correct dashboard could still leave the manual supervision effort unchanged",
+        "Considers at least one smaller or different same-goal approach, such as surfacing or alerting only on stalled jobs, or improving the existing session view",
+        "Proposes a concrete, cheap observation of the benefit, such as watching whether operators still open individual sessions to find stalls after it ships"
+      ],
+      "negative_expectations": [
+        "Declares success criteria met solely by the dashboard being accurate or approved",
+        "Requires analytics telemetry, exact numeric targets, or external user research before any work can start"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "skill": "golang-pkg-go-dev",
+  "version": 1,
+  "cases": [
+    {
+      "id": "pgd-01",
+      "name": "symbol-filter-expression",
+      "prompt": "I have the godig CLI installed. Give me the exact single command to list only the exported top-level functions (not methods, types, vars or consts) in github.com/samber/lo whose names start with \"Filter\", rendered for pasting into chat.",
+      "trap": "Without the skill a model guesses a regex, a grep pipeline, lowercase kind values like func, or a nonexistent --kind flag.",
+      "expectations": [
+        "Uses `godig symbols github.com/samber/lo`",
+        "Uses `--filter` with a Go boolean expression combining `kind==\"Function\"` and `hasPrefix(name,\"Filter\")` via `&&`",
+        "Wraps the filter expression in single quotes",
+        "Includes `-o md`"
+      ],
+      "negative_expectations": [
+        "Uses a regex for --filter",
+        "Uses lowercase or abbreviated kind values such as \"func\" or \"function\"",
+        "Pipes output through grep instead of filtering server-side"
+      ]
+    },
+    {
+      "id": "pgd-05",
+      "name": "major-versions-lookup",
+      "prompt": "With godig available, how do I check whether github.com/samber/lo has a v2 (or later) major version, and which command lists the versions inside that newer major once I know its path?",
+      "trap": "Without the skill a model runs `versions github.com/samber/lo` and expects v2 tags there, not realising majors >= 2 are separate modules.",
+      "expectations": [
+        "Uses `godig major-versions github.com/samber/lo`",
+        "Explains that v2+ lives under a separate module path suffixed with /vN",
+        "Uses `godig versions <module>/vN` for the newer major"
+      ],
+      "negative_expectations": [
+        "Claims `godig versions github.com/samber/lo` lists v2+ tags",
+        "Invents a --major flag on versions"
+      ]
+    }
+  ]
+}

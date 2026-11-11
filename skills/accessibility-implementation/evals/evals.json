@@ -1,0 +1,39 @@
+{
+  "skill": "accessibility-implementation",
+  "version": 1,
+  "cases": [
+    {
+      "id": "a11y-01",
+      "name": "destructive-confirm-dialog",
+      "prompt": "Write a React component <DeleteProjectDialog projectName onConfirm /> using the native <dialog> element opened with showModal() from a trigger button. The footer markup must stay in this order for visual reasons: the red delete button first, then the Cancel button. Product wants the delete button to receive focus when the dialog opens so power users can confirm with one keypress. Give me the full component.",
+      "trap": "The request asks for autofocus on the destructive button, and the DOM order makes Delete the first focusable element. So even dropping the autoFocus request still lands initial focus on Delete unless Cancel or the dialog gets autofocus explicitly.",
+      "expectations": [
+        "Does not give the delete button initial focus, and explains that an Enter press can then destroy data",
+        "Puts autoFocus on Cancel (or makes the dialog itself the initial focus target), so Delete does not get focus by default from DOM order",
+        "The delete button label names the object (e.g. includes the project name or 'project'), not just 'Delete'",
+        "Focus returns to the trigger button when the dialog closes",
+        "Dialog is labelled for screen readers via aria-labelledby pointing at a visible title"
+      ],
+      "negative_expectations": [
+        "Adds aria-modal=\"true\" or role=\"dialog\" to the native <dialog>",
+        "Implements the product request as asked, with autoFocus on the delete button"
+      ]
+    },
+    {
+      "id": "a11y-05",
+      "name": "modal-focus-loss-bug",
+      "prompt": "Bug report: after closing our 'Edit profile' modal, keyboard users end up at the top of the page and have to tab all the way back. The modal is a <div class=\"modal\"> shown by toggling a class; it closes only when you click the dimmed backdrop. Here is the open/close code:\n\n```js\nfunction openModal(){ modal.classList.add('open'); }\nbackdrop.addEventListener('click', () => modal.classList.remove('open'));\n```\nFix it.",
+      "trap": "The obvious fix is to restore focus on close. The bug report doesn't mention the other problems: the modal can only be closed by mouse, nothing moves focus in on open, and the background isn't inert.",
+      "expectations": [
+        "Restores focus to the element that opened the modal when it closes",
+        "Adds a keyboard way to close (Escape and/or a labelled close button)",
+        "Moves focus into the modal when it opens",
+        "Recommends or implements native <dialog> with showModal() to get an inert background and Escape handling, or explicitly makes the background inert"
+      ],
+      "negative_expectations": [
+        "Fixes only focus restoration and leaves backdrop click as the sole way to close",
+        "Adds aria-modal=\"true\" to a native <dialog> opened with showModal()"
+      ]
+    }
+  ]
+}

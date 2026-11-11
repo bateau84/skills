@@ -1,0 +1,22 @@
+{
+  "skill": "github-action",
+  "version": 1,
+  "cases": [
+    {
+      "id": "composite-inject",
+      "name": "composite-action-review",
+      "prompt": "Review this composite action and return a corrected action.yml.\n\nname: notify\ninputs:\n  title:\n    required: true\n  channel:\n    default: general\nruns:\n  using: composite\n  steps:\n    - uses: some-org/setup-notifier@main\n    - run: echo \"Posting ${{ inputs.title }} to ${{ inputs.channel }}\"\n    - run: ./scripts/post.sh \"${{ inputs.title }}\" ${{ inputs.channel }}\n      shell: bash\n\nIt is called from pull_request workflows where title is the PR title.",
+      "trap": "Fixing only the missing shell, or quoting the ${{ }} expressions, which still splices attacker-controlled text into shell source; relative script path resolves against the caller's cwd.",
+      "expectations": [
+        "Moves inputs into env: (e.g. TITLE: ${{ inputs.title }}) and references them as quoted shell variables instead of interpolating ${{ inputs.* }} into run",
+        "Adds shell: to the run step that lacks it",
+        "Resolves the script via $GITHUB_ACTION_PATH (or github.action_path) rather than ./scripts relative to the caller workspace",
+        "Pins some-org/setup-notifier to a full commit SHA instead of @main"
+      ],
+      "negative_expectations": [
+        "Leaves ${{ inputs.title }} inside any run: script body, even if wrapped in quotes",
+        "Claims the composite action isolates or sandboxes the caller's token or environment"
+      ]
+    }
+  ]
+}

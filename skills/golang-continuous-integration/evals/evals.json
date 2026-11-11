@@ -1,0 +1,26 @@
+{
+  "skill": "golang-continuous-integration",
+  "version": 1,
+  "cases": [
+    {
+      "id": "ci-01",
+      "name": "improve-test-workflow-from-gomod",
+      "prompt": "Here is our Go service's CI. go.mod starts with `module github.com/acme/billing` and `go 1.25`. Please improve the test job so it gives us trustworthy signal, and show the updated YAML.\n\n```yaml\nname: ci\non: [push, pull_request]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@master\n      - uses: actions/setup-go@v5\n        with:\n          go-version: '1.22'\n      - run: go test ./...\n```",
+      "trap": "Without guidance a model tends to bump to a single Go version, keep @master, and leave out race detection, shuffle, tidy drift checks and fail-fast handling.",
+      "expectations": [
+        "Go versions tested are no older than the go.mod directive (1.25) and include newer/stable versions, via a matrix",
+        "Matrix sets fail-fast: false",
+        "go test runs with -race",
+        "go test runs with -shuffle=on",
+        "Adds a go mod tidy step followed by git diff --exit-code (or equivalent) to fail on module drift",
+        "Replaces actions/checkout@master with a pinned reference",
+        "Adds a permissions block limited to contents: read"
+      ],
+      "negative_expectations": [
+        "Keeps Go 1.22 in the tested versions",
+        "Leaves any action referenced by a branch such as @master or @main",
+        "Grants write permissions to the test job"
+      ]
+    }
+  ]
+}

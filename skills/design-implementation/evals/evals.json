@@ -1,0 +1,37 @@
+{
+  "skill": "design-implementation",
+  "version": 1,
+  "cases": [
+    {
+      "id": "di-01",
+      "name": "optimistic-delete-rollback",
+      "prompt": "In our React + TanStack Query app, the design for the Saved Reports list says: 'Deleting a report should feel instant.' Each row has a Delete button that calls DELETE /api/reports/:id. Deleted reports cannot be recovered server-side. Implement the Delete behaviour for the row component and the list.",
+      "trap": "Without the skill, a model typically removes the row optimistically and shows a 'Deleted' toast immediately, with no rollback on failure, no duplicate-click guard, and focus dropped to <body> when the row disappears; it also ignores that the action is irreversible.",
+      "expectations": [
+        "Handles request failure by restoring the row (or never removing it) and showing an error that says what failed and how to retry",
+        "Prevents duplicate delete requests while one is pending for the same row",
+        "Addresses the irreversibility, e.g. a confirmation step, an undo window before the request is sent, or waiting for server confirmation before claiming success",
+        "Moves keyboard focus to a sensible remaining element (next row, previous row, or list heading) after the row is removed"
+      ],
+      "negative_expectations": [
+        "Shows a success message before the server has confirmed deletion while providing no rollback path",
+        "Leaves focus on a removed element or lets it fall to the document body"
+      ]
+    },
+    {
+      "id": "di-04",
+      "name": "hover-revealed-row-actions",
+      "prompt": "The design for our file browser table says: 'Row actions (Rename, Share, Delete) appear on the right when the user hovers a row; otherwise they are hidden to keep the table clean.' Implement this with React and CSS modules.",
+      "trap": "The literal implementation uses only :hover with display:none or visibility:hidden, making the actions unreachable for keyboard users and invisible on touch devices.",
+      "expectations": [
+        "Reveals the actions when focus is inside the row (e.g. :focus-within) so keyboard users can reach and see them",
+        "Provides a touch/no-hover fallback, e.g. actions visible by default under @media (hover: none), or an always-visible overflow menu",
+        "Gives the action buttons accessible names that identify the row's file (or otherwise distinguishable labels)"
+      ],
+      "negative_expectations": [
+        "Actions are revealed only by :hover with no keyboard or touch path",
+        "Hides actions with display:none in a way that removes them from the tab order with no alternative"
+      ]
+    }
+  ]
+}
