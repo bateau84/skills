@@ -34,6 +34,21 @@
         "Fixes only focus restoration and leaves backdrop click as the sole way to close",
         "Adds aria-modal=\"true\" to a native <dialog> opened with showModal()"
       ]
+    },
+    {
+      "id": "a11y-03",
+      "name": "drag-reorder-playlist",
+      "prompt": "Implement a React component that lets users reorder tracks in a playlist by dragging rows with the mouse. Tracks are {id, title}. Call onReorder(newOrder) after each change. Keep it dependency-free.",
+      "trap": "The request only mentions mouse dragging. Without the skill, a model usually ships HTML5 drag events alone, which leaves keyboard and screen-reader users unable to reorder. Judge the delivered code, not the prose description of it.",
+      "expectations": [
+        "Provides a non-drag way to reorder that is actually implemented in the code, such as move up/down buttons or arrow-key handling on a focused row",
+        "Any icon-only move buttons have accessible names that include the track title or position",
+        "Announces the result of a move (for example via an aria-live region), or otherwise makes the new position perceivable to screen-reader users"
+      ],
+      "negative_expectations": [
+        "Reordering is only possible through drag events",
+        "Uses ARIA roles like role=\"listbox\"/aria-grabbed in place of operable native controls without implementing their keyboard model"
+      ]
     }
   ]
 }

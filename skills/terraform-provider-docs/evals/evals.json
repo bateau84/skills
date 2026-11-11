@@ -20,22 +20,6 @@
       ]
     },
     {
-      "id": "tpd-03",
-      "name": "document-new-action",
-      "prompt": "We just added a Terraform action named `acme_restart_server` to our Plugin Framework provider (repo terraform-provider-acme, docs generated with tfplugindocs). How do we get a Registry doc page for it with an example? Give concrete file paths for the example, any optional template, and the generated output.",
-      "trap": "The skill's template/target list omits actions entirely, so agents shoehorn the action into resources/ or hand-write a page.",
-      "expectations": [
-        "Puts the example at examples/actions/acme_restart_server/action.tf",
-        "Gives the optional template path as templates/actions/restart_server.md.tmpl",
-        "States the generated page is docs/actions/restart_server.md (no provider prefix)",
-        "Notes the tfplugindocs version must be recent enough to support actions and docs must be regenerated"
-      ],
-      "negative_expectations": [
-        "Documents the action under docs/resources/ or templates/resources/",
-        "Instructs hand-writing docs/actions/restart_server.md instead of generating it"
-      ]
-    },
-    {
       "id": "tpd-04",
       "name": "list-resource-example-file",
       "prompt": "Our provider now implements a list resource `acme_server` for terraform query. tfplugindocs generates docs/list-resources/server.md but the page has no example. Where exactly does the example file go and what must it be named?",

@@ -33,6 +33,36 @@
         "Claims `godig versions github.com/samber/lo` lists v2+ tags",
         "Invents a --major flag on versions"
       ]
+    },
+    {
+      "id": "pgd-02",
+      "name": "search-filter-field-name",
+      "prompt": "Using godig, search Go packages for \"retry backoff\" but keep only results whose package path lives under github.com/cenkalti/. Give the command, with the output rendered for pasting into chat.",
+      "trap": "Natural guess is a `path` field, which search rejects with `undefined identifier: path`.",
+      "expectations": [
+        "Uses `godig search \"retry backoff\"`",
+        "Filters with `hasPrefix(packagePath,\"github.com/cenkalti/\")` (or `modulePath`)",
+        "Includes `-o md`"
+      ],
+      "negative_expectations": [
+        "Uses `path` as the filter identifier for search",
+        "Filters client-side with grep or jq instead of --filter"
+      ]
+    },
+    {
+      "id": "pgd-03",
+      "name": "single-symbol-pinned-version",
+      "prompt": "Our go.mod pins github.com/samber/lo v1.50.0. I only need the signature and doc of lo.Map at exactly that version, and I want to keep token use low. Which one godig command should you run? I'll paste the output into chat, so render it accordingly.",
+      "trap": "A model without the skill fetches `package doc` (very large) or omits the version, returning latest-version docs, or uses an invalid path@version syntax.",
+      "expectations": [
+        "Uses `godig symbol doc github.com/samber/lo Map`",
+        "Passes `--version v1.50.0`",
+        "Includes `-o md`"
+      ],
+      "negative_expectations": [
+        "Uses `package doc` or `package examples` for this single-symbol need",
+        "Omits the version pin"
+      ]
     }
   ]
 }

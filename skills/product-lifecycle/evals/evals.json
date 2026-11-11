@@ -1,0 +1,23 @@
+{
+  "skill": "product-lifecycle",
+  "version": 1,
+  "cases": [
+    {
+      "id": "pl-01",
+      "name": "seeded-fixture-hides-first-use",
+      "prompt": "We're about to tag 1.0 of our self-hosted inventory app (Flask + PostgreSQL, distributed as a Docker image; small businesses run it themselves on their own server). Our end-to-end suite is green: CI runs `docker compose up`, the compose file mounts `tests/fixtures/dump.sql` into Postgres' init directory, and Playwright logs in as admin@example.com and creates, edits and deletes items. The README says: pull the image, set DATABASE_URL, run it. Is the setup/first-use path for 1.0 adequately covered? If not, what exactly is missing and how would you prove it?",
+      "trap": "Green E2E tests look like full coverage, but the dump pre-creates the schema and the admin account, so nothing proves a customer starting from an empty database can initialize it and log in.",
+      "expectations": [
+        "States that the SQL dump fixture supplies schema and/or the admin account that a real customer installation would not have, so the passing suite does not demonstrate first use",
+        "Identifies at least one concrete missing first-use step a fresh install needs: schema creation/migration on an empty database, or creation of the first admin user/credentials",
+        "Proposes a check that starts from an empty PostgreSQL database and uses the documented entry point (the published image plus DATABASE_URL, per the README) through to a first useful action such as logging in and creating an item",
+        "Explicitly distinguishes the necessary gap (schema initialization and first-admin creation on an empty database) from other lifecycle topics such as restart persistence, backup/restore or upgrades, labeling the latter as optional, out of scope for 1.0, or contingent on what 1.0 promises, rather than as part of the first-use gap"
+      ],
+      "negative_expectations": [
+        "Concludes the first-use path is adequately covered because the E2E suite passes",
+        "Treats Kubernetes, multi-region deployment, centralized telemetry or a zero-downtime release process as required for this 1.0",
+        "Presents upgrade or backup/restore as a blocker for tagging 1.0"
+      ]
+    }
+  ]
+}

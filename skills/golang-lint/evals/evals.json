@@ -16,6 +16,22 @@
         "Recommends adding //nolint to every existing finding as the main strategy",
         "Recommends disabling gosec or errcheck to make CI pass"
       ]
+    },
+    {
+      "id": "nolint-cleanup",
+      "name": "blanket-nolint-cleanup",
+      "prompt": "Review this Go snippet from our worker package and tell me what to change about the lint suppression. Our config enables gosec and nolintlint with default settings.\n\n```go\n// jitter spreads retries; not security sensitive\nfunc jitter(d time.Duration) time.Duration {\n\treturn time.Duration(rand.Int63n(int64(d))) //nolint\n}\n```",
+      "trap": "Models often leave the bare //nolint or just append a reason; they also assume nolintlint already rejects bare/unexplained directives, which it does not unless configured.",
+      "expectations": [
+        "Replaces the bare //nolint with one naming the specific linter (gosec) and rule context",
+        "Adds a justification after // on the directive, e.g. non-cryptographic jitter",
+        "Notes that nolintlint only flags missing linter names or explanations when require-specific / require-explanation are enabled in linters.settings.nolintlint"
+      ],
+      "negative_expectations": [
+        "Keeps a bare //nolint",
+        "Claims nolintlint with default settings already rejects this directive",
+        "Says nolintlint flags bare //nolint without mentioning require-specific/require-explanation"
+      ]
     }
   ]
 }

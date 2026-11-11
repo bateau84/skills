@@ -23,10 +23,12 @@ description: Create, update, and review Terraform provider documentation for Ter
   - `templates/resources/<name>.md.tmpl`
   - `templates/ephemeral-resources/<name>.md.tmpl`
   - `templates/list-resources/<name>.md.tmpl`
+  - `templates/actions.md.tmpl` (generic) and `templates/actions/<action type name>.md.tmpl` (per action)
   - `templates/functions/<name>.md.tmpl`
   - `templates/guides/<name>.md.tmpl`
 - Omit the provider prefix from `<name>` (`templates/resources/widget.md.tmpl` for `acme_widget`). Render the generated schema with `{{ .SchemaMarkdown | trimspace }}`.
 - Keep templates focused on overview and examples; rely on generated sections for field-by-field details.
+- Example directories for resources and data sources include the provider prefix: `examples/resources/acme_widget/resource.tf`, `examples/data-sources/acme_widget/data-source.tf`; actions use `examples/actions/<action_type>/action.tf`. Template file names omit the prefix.
 - Examples for list resources use the `.tfquery.hcl` extension (`examples/list-resources/<name>/list-resource.tfquery.hcl`).
 - Migrating hand-written docs from `website/docs/r` or `docs/resources`: run `tfplugindocs migrate` instead of deleting and recreating them.
 
@@ -48,13 +50,13 @@ go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --pr
 
 6. Apply Registry publication rules before release.
 - Use semantic version tags prefixed with `v` (for example `v1.2.3`).
-- Create release tags from the default branch.
+- Publish the version as a GitHub release (the Registry ingests it through a webhook), and make sure no branch has the same name as the tag (for example a branch named `v1.2.3`).
 - Keep `terraform-registry-manifest.json` in the repository root.
 - Expect docs to be versioned in Registry and switchable with the version selector.
 
 7. Preview or troubleshoot publication when needed.
 - Use the HashiCorp preview process to inspect rendered docs before release when accuracy risk is high.
-- If docs are missing in Registry, check tag format, tag source branch, manifest file presence, and provider publication status.
+- If docs are missing in Registry, check tag format, whether a branch shares the tag's name, that the Registry webhook exists (remove duplicate webhooks, then use Resync on the provider settings page), manifest file presence, and provider publication status.
 
 ## Enforce Quality Bar
 

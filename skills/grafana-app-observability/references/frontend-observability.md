@@ -395,27 +395,26 @@ initializeFaro({
 
 ## Session Replay
 
-Session Replay records DOM mutations using rrweb, allowing visual playback of user sessions.
+Session Replay records DOM mutations (rrweb) so you can play back a user session. It is in public preview and is enabled per Grafana Cloud stack. It needs Faro Web SDK 2.8.2 or later and does not support Canvas or WebGL.
 
-Setup steps:
-1. In Grafana Cloud > Connections > Frontend Observability > Web SDK Configuration
-2. Enable "Session Replay" toggle to get a replay-enabled collector URL
-3. Install the SDK - the collector key controls what's recorded server-side
+Install the replay package and pass `ReplayInstrumentation` when you initialize Faro:
 
-The basic `initializeFaro` setup works - session replay is controlled by the collector URL/key:
+```bash
+npm install @grafana/faro-instrumentation-replay
+```
 
 ```javascript
+import { getWebInstrumentations, initializeFaro } from '@grafana/faro-web-sdk';
+import { ReplayInstrumentation } from '@grafana/faro-instrumentation-replay';
+
 initializeFaro({
-  // Use the replay-enabled collector URL from Grafana Cloud UI
-  url: 'https://faro-collector-prod-<region>.grafana.net/collect/<replay-enabled-key>',
+  url: 'https://faro-collector-prod-<region>.grafana.net/collect/<app-key>',
   app: { name: 'my-app', version: '1.0.0' },
-  instrumentations: [...getWebInstrumentations()],
-  sessionTracking: {
-    persistent: true,
-    samplingRate: 0.1, // Record 10% of sessions for replay (cost control)
-  },
+  instrumentations: [...getWebInstrumentations(), new ReplayInstrumentation()],
 });
 ```
+
+Review Grafana's "Data privacy in Session Replay" page before recording production traffic: Faro does not show a consent banner for you. Sampling has two independent layers (frontend session sampling and a replay sub-sample); see the Session Replay "Instrument" page for the current options.
 
 In Grafana Cloud Frontend Observability:
 - Sessions panel shows timeline of user actions

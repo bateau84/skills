@@ -49,6 +49,23 @@
         "Uses a thresholds list of {metric: NsPerOp, max: 1.15} ratio entries",
         "Passes raw `go test -bench` text output as the single argument to checks eval"
       ]
+    },
+    {
+      "id": "bloop-125",
+      "name": "bloop-conversion-confound",
+      "prompt": "Go 1.25 project. In one commit I (a) converted BenchmarkDecode from `for i := 0; i < b.N; i++ { sink = Decode(buf) }` to `for b.Loop() { Decode(buf) }` and (b) replaced a map lookup in Decode with a switch. benchstat old vs new shows allocs/op went from 0 to 1 and sec/op +6% (p=0.000 n=10). Did my switch change make Decode slower? What should I do before concluding?",
+      "trap": "On Go 1.24/1.25 only, B.Loop prevented inlining of calls in the loop body, which can introduce an allocation and slowdown unrelated to the code change (fixed in Go 1.26). The harness change and the code change are confounded.",
+      "expectations": [
+        "States the comparison is confounded because the benchmark harness changed in the same before/after",
+        "Explicitly scopes the b.Loop inlining limitation to Go 1.24-1.25 (not a general claim about b.Loop) and says it can cause an extra allocation and slowdown in the loop-body call",
+        "States that the limitation was fixed in Go 1.26, so re-measuring on 1.26+ is one way to remove the confound",
+        "Recommends re-measuring with the same benchmark form on both sides (or on Go 1.26+) before attributing the change to the switch",
+        "Suggests a concrete check such as -gcflags=-m or a memprofile to confirm where the new allocation comes from"
+      ],
+      "negative_expectations": [
+        "Concludes the switch change caused the regression based on this benchstat output",
+        "Says b.Loop has no behavioral differences from b.N loops on Go 1.25"
+      ]
     }
   ]
 }

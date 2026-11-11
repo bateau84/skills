@@ -17,6 +17,24 @@
         "Produces a full spec, architecture or task breakdown before the intent is clarified",
         "Asks five or more separate questions in the same turn"
       ]
+    },
+    {
+      "id": "ig-03",
+      "name": "answer-from-evidence-first",
+      "prompt": "We're adding automatic purging of old audit-log entries. Clarify my intent before we write it up. Relevant repo excerpt, docs/decisions/0007-audit-retention.md (status: accepted by product owner, 2026-03-02): 'Audit entries are retained for 400 days. Entries under legal hold are retained until the hold is lifted.' README: 'Audit logs are visible to org admins only.'",
+      "trap": "A model without the skill re-asks the retention period, legal-hold handling or visibility even though an accepted decision already answers them, fires a multi-question list, or asks about implementation choices such as scheduler, delete mechanism or backups.",
+      "expectations": [
+        "Uses the 400-day retention and legal-hold rule from the accepted decision rather than asking the user for them",
+        "Asks one consequential question about something the excerpts leave open (e.g. whether purge must be recoverable, whether admins are notified or can see what was purged, whether existing over-age entries are purged immediately)",
+        "Gives a recommended answer for that question and names at least one meaningful alternative"
+      ],
+      "negative_expectations": [
+        "Asks the user how long audit entries should be kept",
+        "Asks whether entries under legal hold should be purged",
+        "Proposes a different retention period as if it were undecided",
+        "Asks five or more separate questions in the same turn",
+        "Asks about scheduler, delete mechanism, backups or other implementation choices"
+      ]
     }
   ]
 }

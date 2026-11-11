@@ -107,8 +107,13 @@ spec:
   java:
     image: us-docker.pkg.dev/grafanalabs-global/docker-grafana-opentelemetry-java-prod/grafana-opentelemetry-java:2.3.0-beta.1
   nodejs: {}
-  python: {}
+  python:
+    env:
+      # Operator Python injection defaults to http/protobuf, so 4317 (gRPC) fails
+      - { name: OTEL_EXPORTER_OTLP_ENDPOINT, value: http://otelcol:4318 }
 ```
+
+Python (and .NET, Go) auto-instrumentation from the Operator sends OTLP over `http/protobuf`: point it at port 4318.
 
 Then annotate pods:
 

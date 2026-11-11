@@ -1,0 +1,21 @@
+{
+  "skill": "golang-common-practice",
+  "version": 1,
+  "cases": [
+    {
+      "id": "gcp-05",
+      "name": "scoped-fix-amid-lint-noise",
+      "prompt": "Bug: pagination.Next() in internal/page/page.go returns the last page twice when total is an exact multiple of pageSize. Fix it. FYI `golangci-lint run ./...` currently reports 37 warnings across 14 other files (errcheck, revive), all present on main before my branch. Tell me exactly what you changed and what you ran (or, if you cannot execute commands, what you would run).",
+      "trap": "Models often 'clean up' unrelated lint warnings or run golangci-lint --fix repo-wide, fix the arithmetic without first reproducing the bug in a test, and verify with repo-wide commands instead of checks scoped to the changed package.",
+      "expectations": [
+        "Writes or runs a failing test for total being an exact multiple of pageSize before the fix (or alongside it, with the failing case identified first)",
+        "Limits code changes to the pagination fix and its test",
+        "States (as a plan or as executed) verification commands scoped to internal/page, such as go test ./internal/page/... and optionally go vet on that package, and says the 37 pre-existing lint warnings are left untouched"
+      ],
+      "negative_expectations": [
+        "Runs golangci-lint --fix or edits the 14 unrelated files",
+        "Claims full-suite or lint-clean validation without having run it"
+      ]
+    }
+  ]
+}

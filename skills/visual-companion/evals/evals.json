@@ -31,6 +31,21 @@
         "Claims a browser tab was opened for the user",
         "Binds to 0.0.0.0 or a public interface without warning that it exposes the session over plain HTTP"
       ]
+    },
+    {
+      "id": "vc-stop",
+      "name": "stop-with-session-dir",
+      "prompt": "We're done with visuals for today; shut the companion down. The start output was:\n{\"type\":\"server-started\",\"port\":50111,\"url\":\"http://localhost:50111/?key=9f...\",\"screen_dir\":\"/srv/proj/.brainstorm/777-1794400000/content\",\"state_dir\":\"/srv/proj/.brainstorm/777-1794400000/state\"}\nThe stop script's usage line is: stop-server.sh <session_dir>, and it looks for <session_dir>/state/server.pid. /srv/proj is a git repo. After stopping, tell me what is left on disk from this session.",
+      "trap": "The start output has no session_dir; passing state_dir or screen_dir makes the stop script look in the wrong place and report not_running while the server keeps running.",
+      "expectations": [
+        "Calls stop-server.sh with /srv/proj/.brainstorm/777-1794400000",
+        "Reports the script's returned status rather than assuming the server stopped",
+        "Says the session files remain under /srv/proj/.brainstorm/ (project-dir sessions persist; only /tmp sessions are deleted on stop) and suggests gitignoring or removing it, without deleting it unasked"
+      ],
+      "negative_expectations": [
+        "Passes the state_dir or screen_dir path to stop-server.sh",
+        "Deletes /srv/proj/.brainstorm without asking"
+      ]
     }
   ]
 }
