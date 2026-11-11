@@ -1,0 +1,53 @@
+{
+  "skill": "experience-design",
+  "version": 1,
+  "cases": [
+    {
+      "id": "ed-02",
+      "name": "experience-goals-not-requirements",
+      "prompt": "We're adding an 'Export to CSV' option to our finance reconciliation web app. Accountants use it at month-end close to hand figures to auditors, often over a flaky VPN and under deadline. Write the experience goals for this feature, nothing else.",
+      "trap": "Producing a functional requirements list (supports CSV, includes all columns, has a button) instead of qualitative goals tied to user context.",
+      "expectations": [
+        "Produces between 2 and 4 goals",
+        "Each goal states a qualitative quality the experience must have (e.g. confidence, trust) and ties it to the accountant's context or concern such as auditor handoff, deadline or unreliable network",
+        "At least one goal addresses trusting that the exported file is complete/correct before it is handed on, given the flaky connection"
+      ],
+      "negative_expectations": [
+        "Lists capability statements such as 'User can export to CSV' or 'Export includes all columns' as goals",
+        "Specifies UI components, buttons, or layout",
+        "Produces more than 4 goals"
+      ]
+    },
+    {
+      "id": "ed-03",
+      "name": "wizard-premature-framing",
+      "prompt": "Brief from the PM: 'Design a 5-step wizard modal that onboards new data analysts by walking them through connecting our app to their Snowflake warehouse.' Analysts usually get credentials from a platform team, and many have done this in dbt or Looker before. Do the upstream framing work before any interaction design starts.",
+      "trap": "Taking 'wizard modal' and '5 steps' as given and jumping into step design.",
+      "expectations": [
+        "Explicitly identifies 'wizard', 'modal' and the fixed step count as interface decisions made before the need was established, and sets them aside for evaluation",
+        "Considers what analysts already expect from analogous tools they have used (e.g. dbt profiles, Looker connections) and how that shapes a coherent design",
+        "Includes a scenario with an edge condition such as the analyst lacking credentials or permissions mid-setup and having to wait on the platform team",
+        "States the human need without component vocabulary"
+      ],
+      "negative_expectations": [
+        "Produces the contents of the five wizard steps as the main output",
+        "Asserts analyst behaviour as established fact without flagging it as an assumption"
+      ]
+    },
+    {
+      "id": "ed-04",
+      "name": "tui-ack-interruption-scenario",
+      "prompt": "We're building a terminal tool for on-call engineers to acknowledge and silence pages during incidents. Write two scenarios we can use to evaluate any future design. Don't design the UI.",
+      "trap": "Writing happy-path scenarios where the engineer acknowledges and moves on, which do not expose where the design can fail.",
+      "expectations": [
+        "Each scenario names a specific person and context, a goal, a task sequence and an outcome",
+        "Each scenario contains a failure, interruption, or edge condition (e.g. switching away mid-action and being unsure whether the ack registered, ack failing on a degraded network, acknowledging the wrong page)",
+        "Scenarios state outcomes that make a design consequence visible, such as duplicate actions or a page left unacknowledged"
+      ],
+      "negative_expectations": [
+        "Specifies key bindings, layout or screens",
+        "Either scenario ends with straightforward success and no complication"
+      ]
+    }
+  ]
+}

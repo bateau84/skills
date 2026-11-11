@@ -1,0 +1,21 @@
+{
+  "skill": "golang-stretchr-testify",
+  "version": 1,
+  "cases": [
+    {
+      "id": "async-poll",
+      "name": "eventual-status-with-diagnostics",
+      "prompt": "Write a Go test using testify for a background job runner. `r.Submit(job)` returns an ID immediately; `r.Status(id) (Status, error)` returns the current state, which becomes `StatusDone` within a few seconds. The test must fail if Status ever keeps returning an error or the job is not done within 5s, and when it fails, the output should show what the last error/status actually was. Do not use time.Sleep loops.",
+      "trap": "Using assert.Eventually with a bool closure loses the last observed status/error in the failure message; using require.*(t, ...) or t.FailNow inside the polling closure calls FailNow off the test goroutine.",
+      "expectations": [
+        "Uses EventuallyWithT with a func(c *assert.CollectT) callback",
+        "Inside the callback, asserts on c (e.g. assert.NoError(c, err) and assert.Equal(c, StatusDone, st)) rather than on t",
+        "Passes a 5-second waitFor and a shorter tick interval"
+      ],
+      "negative_expectations": [
+        "Calls require.* or t.Fatal/t.FailNow with the outer t inside the polling closure",
+        "Uses time.Sleep in a manual retry loop"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "skill": "intent-grilling",
+  "version": 1,
+  "cases": [
+    {
+      "id": "ig-01",
+      "name": "no-stack-questions-one-at-a-time",
+      "prompt": "I want a small internal tool that archives our team's Slack channels somewhere so we can still search old conversations after Slack's free-plan history limit kicks in. Before anyone writes a spec or code, help me pin down what I actually want. We'll continue this conversation turn by turn.",
+      "trap": "Without guidance a model fires a long questionnaire in one turn and asks the user to pick language, database, storage backend or hosting, which are ordinary expert decisions.",
+      "expectations": [
+        "Asks a single consequential question in this turn (or a tightly coupled pair), not a numbered questionnaire",
+        "The question concerns a user-owned outcome, scope or trade-off, e.g. which channels or message types must be preserved, who must be able to search, whether private channels/DMs are in scope, or how long archives must be kept",
+        "Offers a recommended answer with a short reason and names at least one meaningful alternative"
+      ],
+      "negative_expectations": [
+        "Asks the user to choose a programming language, database, search engine, cloud storage provider or library",
+        "Produces a full spec, architecture or task breakdown before the intent is clarified",
+        "Asks five or more separate questions in the same turn"
+      ]
+    }
+  ]
+}

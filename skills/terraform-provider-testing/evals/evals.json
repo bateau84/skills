@@ -1,0 +1,23 @@
+{
+  "skill": "terraform-provider-testing",
+  "version": 1,
+  "cases": [
+    {
+      "id": "eph-echo",
+      "name": "ephemeral-resource-value-assertions",
+      "prompt": "Our Plugin Framework provider (protocol v5, factory New()) has a new ephemeral resource `examplecloud_token` with input `scope` and computed attributes `token` and `expires_in`. Write a Go acceptance test that asserts `expires_in` equals 3600 for scope \"read\", then in a second step asserts it equals 900 for scope \"admin\". CI runs Terraform 1.8 and 1.11.",
+      "trap": "Ephemeral values never reach state or plan, so ConfigStateChecks/TestCheckResourceAttr on ephemeral.examplecloud_token.* or an output cannot work; reusing one echo resource across steps keeps the stale first value.",
+      "expectations": [
+        "Uses the terraform-plugin-testing echoprovider (registered as a protocol v6 factory alongside the v5 provider) and passes the ephemeral data via the echo provider's `data` argument",
+        "Asserts on the managed `echo` resource's `data` attribute (e.g. tfjsonpath.New(\"data\").AtMapKey(\"expires_in\")) with statecheck",
+        "Gates the test with tfversion.SkipBelow(tfversion.Version1_10_0) or equivalent so Terraform 1.8 skips",
+        "Uses a differently named echo resource in the second step (or otherwise forces a new instance) because an existing echo resource keeps its prior state"
+      ],
+      "negative_expectations": [
+        "Asserts directly on an `ephemeral.examplecloud_token...` address in state checks or TestCheckResourceAttr",
+        "Routes the token through a Terraform output and asserts on the output value",
+        "Reuses the same echo resource name in both steps and expects the value to change"
+      ]
+    }
+  ]
+}

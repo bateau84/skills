@@ -1,0 +1,21 @@
+{
+  "skill": "golang-error-handling",
+  "version": 1,
+  "cases": [
+    {
+      "id": "eh-01",
+      "name": "astype-mixed-targets",
+      "prompt": "Our module's go.mod says `go 1.26`. Modernize this function's error inspection to the newest idiomatic stdlib API and show the final code:\n\n```go\nfunc classify(err error) string {\n    var pe *fs.PathError\n    if errors.As(err, &pe) {\n        return \"path:\" + pe.Op\n    }\n    var te interface{ Timeout() bool }\n    if errors.As(err, &te) && te.Timeout() {\n        return \"timeout\"\n    }\n    return \"other\"\n}\n```",
+      "trap": "errors.AsType is constrained to E error, so the anonymous Timeout() interface cannot be passed to it; converting both branches mechanically does not compile.",
+      "expectations": [
+        "Rewrites the *fs.PathError branch as `pe, ok := errors.AsType[*fs.PathError](err)` (or equivalent)",
+        "Keeps errors.As (or otherwise a compiling approach) for the `interface{ Timeout() bool }` target, explaining that AsType requires a type that implements error",
+        "Final code compiles under Go 1.26"
+      ],
+      "negative_expectations": [
+        "Calls errors.AsType[interface{ Timeout() bool }](err)",
+        "Replaces either branch with a bare type assertion like err.(*fs.PathError)"
+      ]
+    }
+  ]
+}

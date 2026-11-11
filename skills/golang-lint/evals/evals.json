@@ -1,0 +1,21 @@
+{
+  "skill": "golang-lint",
+  "version": 1,
+  "cases": [
+    {
+      "id": "legacy-adopt",
+      "name": "legacy-repo-incremental-adoption",
+      "prompt": "We turned on golangci-lint (v2, default standard linters plus gosec and errcheck) on a 6-year-old Go monorepo and got about 4,000 issues. Management wants the linter blocking in CI next week without freezing feature work. How do we roll it out?",
+      "trap": "Common bad answers: disable most linters, sprinkle //nolint everywhere, or set a huge max-issues; the targeted approach is linting only new code and cleaning up by category.",
+      "expectations": [
+        "Recommends issues.new-from-rev (or new-from-merge-base / new-from-patch) so CI only fails on new or changed code",
+        "Proposes cleaning up existing findings incrementally, prioritising correctness/security categories such as gosec and errcheck",
+        "Advises against mass //nolint suppression of existing findings"
+      ],
+      "negative_expectations": [
+        "Recommends adding //nolint to every existing finding as the main strategy",
+        "Recommends disabling gosec or errcheck to make CI pass"
+      ]
+    }
+  ]
+}

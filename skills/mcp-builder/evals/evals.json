@@ -1,0 +1,22 @@
+{
+  "skill": "mcp-builder",
+  "version": 1,
+  "cases": [
+    {
+      "id": "eval-qs",
+      "name": "stable-verifiable-eval-questions",
+      "prompt": "I've built a read-only MCP server for our company Slack (tools: search messages, list channels, get thread, get user). Write 4 evaluation questions with answers for an automated harness that grades by exact string match, so I can measure how well an LLM agent uses these tools. Assume a workspace with years of history. Use placeholder answers in angle brackets where you can't know the real value, and explain your design choices briefly.",
+      "trap": "Asking about live, changing counts (members, reactions, replies) or questions whose answers can be phrased several ways, so string-match grading fails.",
+      "expectations": [
+        "Each question has a single answer and states the answer format exactly (e.g. 'Respond with the channel name only', 'YYYY-MM-DD')",
+        "Questions use closed historical data (a fixed past date range or archived threads), not current state",
+        "Questions need several chained tool calls (e.g. find a thread, then resolve the user, then fetch details), not one keyword search",
+        "Questions only need read-only operations"
+      ],
+      "negative_expectations": [
+        "Includes a question whose answer is a live count, e.g. current channel members, reactions on a post, or replies in an active thread",
+        "Includes a question whose answer is a free-form summary that string matching cannot grade"
+      ]
+    }
+  ]
+}

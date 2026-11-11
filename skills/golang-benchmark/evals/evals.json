@@ -1,0 +1,54 @@
+{
+  "skill": "golang-benchmark",
+  "version": 1,
+  "cases": [
+    {
+      "id": "cob-thr",
+      "name": "cob-threshold-units",
+      "prompt": "Our Go repo already runs `go test -bench` in GitHub Actions. I want to add knqyf263/cob as a gate that fails the job when ns/op or allocs/op get more than 10% worse than the previous commit. Give me the exact workflow step(s), including the cob invocation.",
+      "trap": "cob's --threshold is a ratio (default 0.2), not a percentage; writing 10 makes the gate effectively never fire. cob also runs git reset and needs history for HEAD~1.",
+      "expectations": [
+        "Passes the threshold as a fraction, e.g. --threshold 0.1 (not 10)",
+        "Selects allocs/op explicitly via --compare (e.g. \"ns/op,allocs/op\") because the default compares ns/op and B/op",
+        "Ensures the checkout has at least the previous commit available (e.g. fetch-depth: 0 or >= 2)",
+        "Notes that cob compares single runs without statistical testing, so the gate is noise-prone"
+      ],
+      "negative_expectations": [
+        "Uses --threshold 10 or any value that treats the threshold as a percentage",
+        "Recommends running cob on a developer machine with uncommitted changes"
+      ]
+    },
+    {
+      "id": "bd-ci",
+      "name": "benchdiff-pr-base-ref",
+      "prompt": "I want a GitHub Actions job on pull requests that runs filippo.io/mostly-harmless/benchdiff and posts the benchstat comparison between the PR and the target branch. Write the job. Benchmarks live in ./internal/codec and are noisy.",
+      "trap": "benchdiff defaults to comparing HEAD against the worktree; in a clean CI checkout that compares the PR to itself. The base ref must be set to the target branch and its history fetched.",
+      "expectations": [
+        "Sets -base-ref to the PR target branch (e.g. origin/${{ github.base_ref }} or equivalent)",
+        "Fetches enough git history for the base ref to resolve (e.g. fetch-depth: 0 or an explicit git fetch of the base branch)",
+        "Passes go test flags after `--`, including a -count of roughly 10 or more and -run='^$' or a -bench filter",
+        "Runs base and head in the same job on the same runner rather than comparing to stored historical numbers"
+      ],
+      "negative_expectations": [
+        "Runs plain `benchdiff` with no base ref in CI and presents the output as a PR-vs-main comparison",
+        "Claims a regression can be read from a single run without benchstat statistics"
+      ]
+    },
+    {
+      "id": "gbd-chk",
+      "name": "gobenchdata-regression-check",
+      "prompt": "Using bobheadxi/gobenchdata, write the checks config file and the CLI command to fail a PR if any benchmark in ./pkg/parser gets more than 15% slower in ns/op than the main-branch results stored in base.json. Current results are in current.json.",
+      "trap": "gobenchdata checks use a `diff` expression over current/base fields plus thresholds.max, and `checks eval` takes base and current JSON files; an invented per-metric ratio list is not the real format.",
+      "expectations": [
+        "Checks config defines a `diff` expression computing percent change from base to current NsPerOp (e.g. (current.NsPerOp - base.NsPerOp) / base.NsPerOp * 100)",
+        "Sets thresholds with max: 15 (matching the units of the diff expression)",
+        "Runs `gobenchdata checks eval base.json current.json` with base first and current second",
+        "Scopes the check to the parser package via the `package` field"
+      ],
+      "negative_expectations": [
+        "Uses a thresholds list of {metric: NsPerOp, max: 1.15} ratio entries",
+        "Passes raw `go test -bench` text output as the single argument to checks eval"
+      ]
+    }
+  ]
+}
