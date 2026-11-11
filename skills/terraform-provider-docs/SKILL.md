@@ -15,17 +15,20 @@ description: Create, update, and review Terraform provider documentation for Ter
 - Add precise user-facing descriptions to schema fields so generated docs stay aligned with behavior.
 - Keep wording specific to argument purpose, constraints, defaults, and computed behavior.
 
-3. Add or update template files in `docs/`.
+3. Add or update template files in `templates/`.
 - Create only files that map to implemented provider objects.
 - Use HashiCorp-recommended template paths:
-  - `docs/index.md.tmpl`
-  - `docs/data-sources/<name>.md.tmpl`
-  - `docs/resources/<name>.md.tmpl`
-  - `docs/ephemeral-resources/<name>.md.tmpl`
-  - `docs/list-resources/<name>.md.tmpl`
-  - `docs/functions/<name>.md.tmpl`
-  - `docs/guides/<name>.md.tmpl`
+  - `templates/index.md.tmpl`
+  - `templates/data-sources/<name>.md.tmpl`
+  - `templates/resources/<name>.md.tmpl`
+  - `templates/ephemeral-resources/<name>.md.tmpl`
+  - `templates/list-resources/<name>.md.tmpl`
+  - `templates/functions/<name>.md.tmpl`
+  - `templates/guides/<name>.md.tmpl`
+- Omit the provider prefix from `<name>` (`templates/resources/widget.md.tmpl` for `acme_widget`). Render the generated schema with `{{ .SchemaMarkdown | trimspace }}`.
 - Keep templates focused on overview and examples; rely on generated sections for field-by-field details.
+- Examples for list resources use the `.tfquery.hcl` extension (`examples/list-resources/<name>/list-resource.tfquery.hcl`).
+- Migrating hand-written docs from `website/docs/r` or `docs/resources`: run `tfplugindocs migrate` instead of deleting and recreating them.
 
 4. Generate documentation with `tfplugindocs`.
 - Prefer repository defaults when configured:

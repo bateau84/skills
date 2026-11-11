@@ -50,8 +50,8 @@ go install github.com/knqyf263/cob@latest
 # Run with default 20% threshold — compares HEAD vs HEAD~1
 cob
 
-# Stricter threshold for critical paths (10% regression = failure)
-cob -threshold 10
+# Stricter threshold for critical paths (the value is a ratio: 0.1 = 10% regression fails)
+cob -threshold 0.1
 
 # Compare against a specific base commit
 cob -base main
@@ -140,29 +140,32 @@ jobs:
 
 ### Regression gating on PRs
 
+`checks eval` compares two benchmark JSON files, so produce one for the base commit and one for HEAD first.
+
 ```yaml
 - name: Check for regressions
-  run: gobenchdata checks eval bench.txt --checks-config .gobenchdata-checks.yml
+  run: gobenchdata checks eval base.json current.json --checks.pretty
 ```
 
 ```yaml
-# .gobenchdata-checks.yml
+# gobenchdata-checks.yml (generate a starter with `gobenchdata checks generate`)
 checks:
   - name: "No major regressions"
-    package: ./...
-    benchmarks: [".*"]
+    description: ns/op change in percent
+    package: .
+    benchmarks: []
+    diff: (current.NsPerOp - base.NsPerOp) / base.NsPerOp * 100
     thresholds:
-      - metric: NsPerOp
-        max: 1.2 # fail if >20% slower
-      - metric: AllocedBytesPerOp
-        max: 1.3 # fail if >30% more allocations
+      max: 20 # fail if >20% slower
   - name: "Critical path stability"
     package: ./pkg/parser
     benchmarks: ["BenchmarkParse.*"]
+    diff: (current.NsPerOp - base.NsPerOp) / base.NsPerOp * 100
     thresholds:
-      - metric: NsPerOp
-        max: 1.1 # stricter: fail if >10% slower
+      max: 10 # stricter: fail if >10% slower
 ```
+
+`diff` is an expression over `base` and `current`; it should return a negative value for an improvement and a positive value for a regression. `package` and `benchmarks` are regular expressions.
 
 ### Dashboard configuration
 
