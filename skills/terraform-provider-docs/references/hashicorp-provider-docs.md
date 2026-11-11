@@ -7,20 +7,20 @@ Source of truth for this skill:
 
 - Publish provider docs through Terraform Registry using `tfplugindocs`.
 - Generate provider docs from schema descriptions and markdown templates.
-- Store templates under the repository `docs/` directory with expected naming conventions.
+- Store templates under the repository `templates/` directory with expected naming conventions; generated output goes to `docs/`.
 - Keep release tags and manifest metadata valid so Registry can render and display docs.
 
 ## Template Paths
 
 Use these template paths when the corresponding provider objects exist:
 
-- `docs/index.md.tmpl`
-- `docs/data-sources/<name>.md.tmpl`
-- `docs/resources/<name>.md.tmpl`
-- `docs/ephemeral-resources/<name>.md.tmpl`
-- `docs/list-resources/<name>.md.tmpl`
-- `docs/functions/<name>.md.tmpl`
-- `docs/guides/<name>.md.tmpl`
+- `templates/index.md.tmpl`
+- `templates/data-sources/<name>.md.tmpl`
+- `templates/resources/<name>.md.tmpl`
+- `templates/ephemeral-resources/<name>.md.tmpl`
+- `templates/list-resources/<name>.md.tmpl`
+- `templates/functions/<name>.md.tmpl`
+- `templates/guides/<name>.md.tmpl`
 
 ## Generation Workflow
 
