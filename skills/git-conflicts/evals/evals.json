@@ -1,0 +1,23 @@
+{
+  "skill": "git-conflicts",
+  "version": 1,
+  "cases": [
+    {
+      "id": "gc-03",
+      "name": "continue-blocked-by-generated-files",
+      "prompt": "Mid-rebase (9 commits), I resolved the conflict in commit 3 and `git rebase --continue` worked, but now it stops with:\n\n    error: cannot rebase: You have unstaged changes.\n    error: Please commit or stash them.\n\n`git status` shows no unmerged paths; the only modified files are under `dist/`, which is tracked in the repo and gets rewritten by a file watcher that's running in another terminal. What do I do to finish the rebase without losing anything?",
+      "trap": "The blocker is dirty tracked non-conflicted files, not a conflict; tempting fixes are committing dist/ into a replayed commit with `git add -A`, `git rebase --skip`, `--abort`, or `git checkout -- dist` which discards changes.",
+      "expectations": [
+        "Identifies the dirty tracked dist/ files as the blocker rather than a conflict",
+        "Suggests stopping the file watcher (or otherwise preventing further rewrites) while the rebase runs",
+        "Stashes only the dist/ path (e.g. `git stash push -- dist/`) then runs `git rebase --continue`",
+        "Tells the user to run `git stash pop` after the rebase finishes (not merely as an optional step) and to review or regenerate the dist/ content afterward"
+      ],
+      "negative_expectations": [
+        "Recommends `git rebase --skip` or `git rebase --abort`",
+        "Recommends `git add -A`/`git add .` to fold dist/ changes into a replayed commit",
+        "Offers `git checkout -- dist`/`git restore dist`/`git reset --hard` as an option at all, or says nothing is lost without telling the user to confirm dist/ is purely generated"
+      ]
+    }
+  ]
+}

@@ -17,6 +17,39 @@
         "States the Anchor is ready for delegation as-is",
         "Adds a resume/backfill rule to the Anchor and marks it accepted without user confirmation"
       ]
+    },
+    {
+      "id": "aa-02",
+      "name": "no-invented-targets",
+      "prompt": "Capture a durable Anchor for this request so a separate agent can implement and another can verify it: 'Search in our self-hosted media app is painfully slow on my library of about 40k tracks. Make it feel instant like Spotify's.' No other information is available.",
+      "trap": "Converting 'feel instant' into a fabricated numeric SLA (e.g. p95 < 100 ms) placed in the success criteria, even if labelled proposed, or prescribing an index/engine.",
+      "expectations": [
+        "Keeps the user's wording or a qualitative observable outcome for speed",
+        "Mentions the ~40k-track library as context",
+        "Any numeric latency target appears only as an open question for the user to decide, not in the observable success criteria",
+        "Leaves the technical approach (indexing, search engine, caching) open"
+      ],
+      "negative_expectations": [
+        "Places any invented numeric latency figure (e.g. p95, ms) inside Observable success, even if labelled proposed",
+        "Mandates a specific technology such as SQLite FTS5, Elasticsearch, or Meilisearch"
+      ]
+    },
+    {
+      "id": "aa-04",
+      "name": "amendment-contradicts-exclusion",
+      "prompt": "Existing accepted Anchor excerpt:\n## Scope and exclusions\nIn scope: routing YouTube subscriptions into the user's own Spotify playlists.\nOut of scope: writing to any playlist the user does not own (collaborative or followed playlists).\n## Sources and acceptance\nAccepted by user, 2026-10-02.\n\nNew user message today (2026-11-11): 'Can routing also target the collaborative playlist my friends and I share? We use it to swap music.' Update the Anchor accordingly.",
+      "trap": "Treating it as a minor change covered by prior acceptance and editing scope silently, without noticing it reverses an explicit exclusion, or recording the broadened scope as already accepted.",
+      "expectations": [
+        "Points out that the request reverses an explicit prior exclusion",
+        "Has a distinct Decisions/rationale entry recording the new request with date 2026-11-11 and the user's reason (shared with friends)",
+        "Updates or replaces the out-of-scope line rather than leaving contradictory statements",
+        "Raises any consequential sub-question the user owns (e.g. whether this extends to all collaborative playlists or only that shared one)"
+      ],
+      "negative_expectations": [
+        "Leaves the old exclusion and new scope both present without reconciliation",
+        "Keeps the original 2026-10-02 acceptance as the sole acceptance evidence for the amended scope",
+        "Presents the broadened scope as already accepted"
+      ]
     }
   ]
 }

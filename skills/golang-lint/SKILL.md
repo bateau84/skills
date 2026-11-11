@@ -74,7 +74,7 @@ Rules:
 
 1. **//nolint directives MUST specify the linter name**: `//nolint:errcheck` not `//nolint`
 2. **//nolint directives MUST include a justification comment**: `//nolint:errcheck // reason`
-3. **The `nolintlint` linter enforces both rules above** — it flags bare `//nolint` and missing reasons
+3. **`nolintlint` enforces both rules only when configured** — set `require-specific: true` and `require-explanation: true` under `linters.settings.nolintlint`; both default to false, so default settings accept bare `//nolint`
 4. **NEVER suppress security linters** (gosec, bodyclose, sqlclosecheck) without a very strong reason
 
 For comprehensive patterns and examples, see **[nolint directives](./references/nolint-directives.md)** — when to suppress, how to write justifications, patterns for per-line vs per-function suppression, and anti-patterns.

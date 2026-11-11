@@ -18,6 +18,38 @@
         "Uses a plain `| base64` call with no wrap suppression or newline stripping on the instance-ID:token string",
         "Points the app at port 4317 or uses gRPC to talk to the Grafana Cloud OTLP gateway"
       ]
+    },
+    {
+      "id": "otel-02",
+      "name": "operator-python-java-instrumentation-cr",
+      "prompt": "Fresh EKS cluster, nothing installed yet. I want the OpenTelemetry Operator to auto-instrument a Java 21 Spring Boot deployment and a Python FastAPI deployment in namespace shop. Both should export to an existing collector Service named otel-gw in namespace obs, which listens on 4317 (OTLP gRPC) and 4318 (OTLP HTTP). Give me the install steps, the Instrumentation resource, and the pod annotations.",
+      "trap": "The operator's Python auto-instrumentation only supports OTLP over http/protobuf (gRPC is unsupported), so a single exporter endpoint on :4317 does not work for it. The Java agent also needs its protocol and port to match; a single :4317 endpoint for every language is wrong. Installing the operator manifest without cert-manager fails on the webhook certificate.",
+      "expectations": [
+        "Installs cert-manager (or uses the Helm chart's self-signed certificate option) before the operator",
+        "Python telemetry goes to otel-gw.obs on port 4318 over http/protobuf, for example through a python-specific endpoint override or env",
+        "Java telemetry either goes to port 4318 with http/protobuf, or explicitly sets OTEL_EXPORTER_OTLP_PROTOCOL=grpc when it uses 4317",
+        "Uses instrumentation.opentelemetry.io/inject-java and inject-python annotations on the pod template, not the Deployment metadata only"
+      ],
+      "negative_expectations": [
+        "Sets OTEL_EXPORTER_OTLP_PROTOCOL=grpc for the Python instrumentation",
+        "Uses a single http://otel-gw.obs:4317 endpoint for all languages without any protocol or port adjustment"
+      ]
+    },
+    {
+      "id": "otel-03",
+      "name": "tail-sampling-preserve-red-metrics",
+      "prompt": "About 40 services send 100% of traces through one Grafana Alloy instance to Grafana Cloud. Our Application Observability RED dashboards and service map are what on-call uses, but the traces bill is too high. I want to keep every error trace and every trace slower than 1s, and only 5% of the rest. Write the Alloy config for the traces path and tell me anything that will change on our dashboards.",
+      "trap": "Grafana Cloud Application Observability derives RED metrics and service graphs from received traces by default; placing tail sampling in front of that makes request rates and service-map edges drop to the sampled fraction. Metrics must be generated in Alloy (spanmetrics/servicegraph) from 100% of traces before the tail_sampling processor and sent as metrics.",
+      "expectations": [
+        "Uses otelcol.processor.tail_sampling with a status_code ERROR policy, a latency policy at 1000 ms, and a 5% probabilistic policy",
+        "Feeds unsampled traces into span-metrics and service-graph generation (otelcol.connector.spanmetrics and otelcol.connector.servicegraph, or equivalent) before the tail sampler",
+        "States that RED metrics and service-graph data computed from already-sampled traces would be undercounted",
+        "States that the metrics must be generated in Alloy and sent as metrics, not derived Cloud-side from the sampled traces"
+      ],
+      "negative_expectations": [
+        "Proposes OTEL_TRACES_SAMPLER=parentbased_traceidratio head sampling as the way to keep all errors",
+        "Sends only the sampled output into metric generation"
+      ]
     }
   ]
 }

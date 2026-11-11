@@ -1,0 +1,23 @@
+{
+  "skill": "golang-project-layout",
+  "version": 1,
+  "cases": [
+    {
+      "id": "tiny-cli",
+      "name": "right-size-tiny-cli",
+      "prompt": "Create a Go command-line tool, module github.com/jdoe/csvsum, that reads CSV from stdin and prints the sum of each numeric column. Expected size is about 150 lines. Give me every file with its path.",
+      "trap": "Strong models tend to over-architect: handler/service/repository layers, interfaces for a single implementation, DI containers, pkg/ or cmd/ + internal/ directories, Makefiles for a trivial tool.",
+      "expectations": [
+        "All Go code is in package main at the module root (main.go plus main_test.go, optionally one extra root file); no cmd/ or internal/ directories.",
+        "go.mod declares module github.com/jdoe/csvsum",
+        "Includes a co-located _test.go file for the summing logic"
+      ],
+      "negative_expectations": [
+        "Creates cmd/ or internal/ for a ~150-line tool",
+        "Introduces separate handler/service/repository (or similar layered) packages",
+        "Uses a DI framework such as wire, fx or dig",
+        "Creates a pkg/ directory or a go.work file"
+      ]
+    }
+  ]
+}

@@ -30,7 +30,7 @@ mock_provider "aws" {
 }
 
 run "test_with_mocks" {
-  command = plan  # Mocks only work with plan mode
+  command = plan  # Mocks work with plan or apply; computed values are known-after-apply in plan unless override_during = plan
 
   assert {
     condition     = aws_instance.example.id == "i-1234567890abcdef0"
@@ -165,7 +165,7 @@ mock_provider "aws" {
 
 ## Limitations
 
-- **Plan mode only** — mocks don't work with `command = apply`
+- **Plan vs apply** — mocks work with both `command = plan` and `command = apply`. By default Terraform generates mock values during apply and shows computed attributes as known-after-apply during plan; set `override_during = plan` on `mock_provider`, `mock_resource`, `mock_data` or an override block when a plan-only assertion needs the value (one third-party source says this needs Terraform 1.11+; check your version)
 - Mock defaults may not reflect real computed attribute values
 - Mocks need manual updates when provider schemas change
 - Can't test real resource dependencies or timing

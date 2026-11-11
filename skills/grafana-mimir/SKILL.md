@@ -109,10 +109,14 @@ helm install mimir grafana/mimir-distributed --version 6.0.6 -f values.yaml
 kubectl get pods -n mimir
 #   distributor, ingester, querier, query-frontend, store-gateway, compactor, ruler
 
-# 3. Verify the gateway is ready
-kubectl port-forward -n mimir svc/mimir-nginx 9009:80 &
+# 3. Verify the gateway is ready (chart 6.0 removed the `nginx` values section and the
+#    mimir-nginx Service; use the unified gateway Service)
+kubectl get svc -n mimir | grep gateway
+kubectl port-forward -n mimir svc/<gateway-service> 9009:80 &
 curl -sf http://localhost:9009/ready
 ```
+
+Chart 6.0 deploys the ingest storage architecture by default: writes go through Kafka (or a Kafka-compatible backend) instead of directly to ingesters. The chart bundles a single-node Kafka for demos only; for production, point Mimir at an external Kafka-compatible cluster. To keep the classic architecture, disable ingest storage before upgrading (see the 5.x to 6.0 migration guide). Move any `nginx:` values to `gateway:` first.
 
 ## Multi-tenancy
 
