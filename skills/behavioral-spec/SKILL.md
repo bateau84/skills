@@ -115,7 +115,7 @@ Choose the artifact whose semantic role is primary:
 - **Quality Scenario:** a quality must hold measurably under a meaningful condition/stimulus. Make the QS normative when the obligation exists specifically under a condition, load, degradation, threat, or recovery situation. Add a BR only for a distinct baseline behavior meaningful independently of that scenario.
 - **Obligation Contract:** independently realized parties must share semantic agreement at a correctness-sensitive seam. Make the OC normative for that shared meaning. Add a BR only for a distinct system-level outcome outside the seam contract.
 
-Give each guarantee one normative home. Cross-reference related artifacts instead of making BR/QS/OC copies for symmetry or completeness. State what must be observed to prove or falsify the obligation, not implementation-specific test mechanics unless the verification surface is itself authoritative. Keep its basis, applicability, dependencies, and verification intent clear within the existing artifact formats.
+BR, QS, and OC have **equal normative standing when applicable** but cover different dimensions: baseline behavior, quality under meaningful conditions, and shared semantics at independent boundaries. Artifact type is not a precedence rule. Give each guarantee one normative home. Cross-reference related artifacts instead of making BR/QS/OC copies for symmetry or completeness. State what must be observed to prove or falsify the obligation, not implementation-specific test mechanics unless the verification surface is itself authoritative. Keep its basis, applicability, dependencies, and verification intent clear within the existing artifact formats.
 
 ### 7. Challenge the set in both directions
 
@@ -123,7 +123,7 @@ Before handoff, apply three bounded counterexample checks:
 
 - **Omission:** could a plausible system satisfy every written obligation yet violate an accepted anchor commitment? Add missing meaning or expose the unresolved gap.
 - **Invention:** could a system satisfy the accepted authority while violating a supposedly derived obligation? It is not necessary as claimed; establish it as a legitimate specified choice, route a material decision to its owner, or remove it.
-- **Composition:** can all applicable obligations hold together in the same execution? Check consequential intersections such as cancellation during completion, retry after partial success, or authority changing during execution.
+- **Composition:** can all applicable BRs, QSs, and OCs hold together in the same execution? For material overlaps, follow one concrete event sequence across baseline behavior, the QS operating condition/response, and OC participant semantics—particularly cancellation versus recovery, or authorization versus a new execution attempt. If they conflict, repair the unsupported or ordinarily specified clause within the authoring authority; when accepted sources genuinely conflict or a reserved policy is missing, identify the decision owner and keep only affected work open. Never resolve it by assuming one artifact type outranks another.
 
 These are practitioner self-checks, not an assertion of independent review or a new approval gate. Correct the affected meaning and repeat the affected checks; do not restart unrelated specification work.
 

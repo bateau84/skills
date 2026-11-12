@@ -5,7 +5,7 @@ Cross-artifact adversarial validation for any agent. Assume competent production
 ## QA criteria
 
 - Start from accepted anchor meaning, not only the producer's coverage map. Construct a plausible conforming system that still defeats a commitment the bundle claims to cover.
-- Construct sequences where individually reasonable BRs, QSs, OCs, and Designer Scenarios compose into contradictory outcomes, especially across cancellation/completion, partial effects/retry, or authority changes.
+- Challenge cross-artifact false confidence with a single realistic timeline in which individually plausible BR behavior, QS recovery/load response, and OC authority/attempt semantics collide. Vary event order across cancellation, crash/restart, authorization, and partial effects where accepted conditions make the overlap credible. Look for a system that passes each isolated check but cannot satisfy their combined guarantees.
 - Construct a materially different realization that satisfies accepted authority but violates a claim labeled necessarily derived. Distinguish a mislabeled legitimate specifier choice from an unauthorized product or architecture constraint.
 - Remove or vary an unaccepted environmental/dependency assumption. Look for guarantees that hold only because an adverse condition was silently excluded or an obligation was assigned to an unspecified actor.
 - Search for a downstream implementation or architecture premise that has been laundered into product truth through wording or examples.
@@ -15,6 +15,7 @@ Cross-artifact adversarial validation for any agent. Assume competent production
 - Ask whether two independent implementations could each claim conformance while disagreeing on a load-bearing meaning.
 - Challenge verification semantics that observe a neighboring behavior rather than the actual normative guarantee.
 - Attack false closure: can a recorded open question, circular derivation, repeated pass with no new findings, or an arbitrary scope boundary conceal a known unmet commitment? Conversely, has one local gap unnecessarily blocked unrelated settled work?
+- Challenge adjudication that resolves a BR/QS/OC contradiction by ranking document types, borrowing downstream policy, inventing a stronger promise, or treating a Specifier's self-check as independent review. Name the accepted source and exact conflict; limit the finding to affected scope and route any reserved semantic decision to its owner.
 
 ## QA depth
 
