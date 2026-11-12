@@ -254,6 +254,37 @@
         "No deletion or weakening of existing crash/failure coverage or accepted provenance.",
         "No wholesale rewrite of unrelated documentation."
       ]
+    },
+    {
+      "id": "QS-03",
+      "name": "quality-coverage-index-and-downstream-handoff",
+      "trap": "The specifier writes a quality claim but hides it in an index, duplicates the same guarantee in a BR, or leaves an invented recovery deadline for architecture to inherit.",
+      "prompt": "Produce the smallest normative obligation bundle and its index for this accepted scheduler behavior. BR-001 already says an accepted job has a durable identity. If its worker crashes after acceptance, the job must remain identifiable, must not be falsely reported completed, and must remain eligible for execution when an authorized worker becomes available again. There is no accepted recovery deadline, automatic retry count, or storage technology. Include verification semantics and any consequential quality-coverage navigation. Do not design implementation.",
+      "expectations": [
+        "Defines the worker-crash condition and truthful response in a Quality Scenario with a falsifiable qualitative boundary; retains the accepted BR's separate baseline job identity meaning without duplicating the conditioned promise.",
+        "The bundle index links the relevant QS and existing BR, makes the quality coverage discoverable, and is not a second normative contract.",
+        "Preserves crash, post-acceptance state, later authorized-worker condition, and the verification observations that would distinguish success from merely reporting a healthy worker.",
+        "Keeps source and ownership clear, without turning the unknown recovery deadline into an accepted requirement."
+      ],
+      "negative_expectations": [
+        "No invented seconds, retry count, queue implementation, database selection, or automatic recovery policy.",
+        "No mandatory QS file for every neighboring requirement, separate sign-off gate, or duplicated BR/QS recovery guarantee."
+      ]
+    },
+    {
+      "id": "QS-04",
+      "name": "no-quality-document-for-ordinary-local-fix",
+      "trap": "A quality-awareness improvement becomes a universal QS creation rule and unnecessarily routes a bounded fix through new design stages.",
+      "prompt": "The only agreed change is that a local CLI command with invalid JSON must return a nonzero exit code and an informative error; the behavior for valid JSON stays the same. No stressed-load, degraded-operation, timing, compatibility or other independent quality promise is stated. Produce the smallest appropriate obligation specification for the fix and explain any needed downstream handoff. Do not implement code.",
+      "expectations": [
+        "States the invalid-input behavior and preservation of valid-input behavior as a compact falsifiable requirement or cites an already sufficient baseline.",
+        "Does not create a Quality Scenario merely because invalid input is an error case; the conditioned quality semantics do not add an independent accepted promise.",
+        "Keeps verification focused on invalid/valid CLI outcomes and avoids unrelated architecture or recovery assumptions."
+      ],
+      "negative_expectations": [
+        "No ceremonial QS, OC, architecture decision, new user approval, or invented numeric target.",
+        "No loss of the regression proof for the accepted CLI error behavior."
+      ]
     }
   ]
 }
