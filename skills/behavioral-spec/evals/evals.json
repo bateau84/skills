@@ -318,6 +318,22 @@
         "No artificial hierarchy that treats QS or OC as optional when the accepted conditions genuinely require both.",
         "No duplicate normative promises, new failover timing targets, technology choices, invented approval gate or fabricated incompatibility."
       ]
+    },
+    {
+      "id": "BehavioralSpec-11",
+      "name": "accepted-designer-scenario-in-adversarial-composition",
+      "trap": "BR, QS and OC pass in isolation, so QA overlooks an accepted Designer Scenario showing that outage recovery contradicts the human-facing cancellation outcome.",
+      "prompt": "Adversarially assess this specification and design packet without implementing it. Accepted product direction allows a user to cancel a queued upload before transfer begins; the post-outage outcome must be reconciled with accepted human-facing design. Accepted Designer Scenario SC-004: while offline, a user cancels a queued upload, sees 'Cancelled', and on reconnection that canceled upload does not start. Draft BR-001: a successful upload must preserve the selected content. Draft OC-001: the uploader and storage writer agree on the upload identity, and a failed write cannot be reported as success. Draft QS-001: whenever connectivity returns, every previously queued upload resumes and transfers, including uploads marked 'Cancelled' by the interface. All three individually pass their supplied checks; BR and OC say nothing about cancellation. Find the consequential omission or contradiction, give a bounded adjudication and verification implication, and name the proper correction or decision owner.",
+      "expectations": [
+        "Constructs the outage, queued cancellation, UI 'Cancelled', connectivity restoration, and unwanted upload timeline; sees that the accepted Designer Scenario conflicts with the proposed QS and exposed behavior even when BR/QS/OC checks appear individually green.",
+        "Traces the accepted scenario and product direction rather than treating the QS's recovery language as a higher-priority product promise; identifies missing normative cancellation coverage or an unresolved consequential interpretation with its authority.",
+        "Differentiates Designer's human-facing scenario authority from Specifier's normative semantic authority; proposes correction through the owning roles without independently rewriting product promises or architectural mechanisms.",
+        "Explains a combined verification scenario that observes both UI cancellation and absence of the later transfer after network restoration; preserves unaffected successful-upload and handoff guarantees."
+      ],
+      "negative_expectations": [
+        "No omission of the accepted Designer Scenario merely because BR/QS/OC are internally consistent; no claim that local tests alone prove the composition.",
+        "No invented timeout, reconnect policy, storage mechanism, artifact hierarchy, or mandatory new approval/review stage."
+      ]
     }
   ]
 }
