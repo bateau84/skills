@@ -142,13 +142,13 @@ var internalCmd = &cobra.Command{
 }
 
 var oldCmd = &cobra.Command{
-    Deprecated: "use `newcmd` instead",  // shown in help, prints warning on use
+    Deprecated: "use `newcmd` instead",  // hidden from normal help; prints a deprecation warning on use
 }
 ```
 
 ## cobra.CheckErr
 
-`cobra.CheckErr(err)` is a convenience function: if `err != nil`, it prints the error to `cmd.ErrOrStderr()` and calls `os.Exit(1)`. Use it only in `main()` where you want a hard exit — not inside `RunE` where returning the error is preferred.
+`cobra.CheckErr(err)` is a convenience function: if `err != nil`, it prints directly to `os.Stderr` with an Error: prefix and calls `os.Exit(1)`. Use it only in `main()` where you want a hard exit — not inside `RunE` where returning the error is preferred.
 
 ```go
 func main() {

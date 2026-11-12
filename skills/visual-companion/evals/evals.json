@@ -46,6 +46,32 @@
         "Passes the state_dir or screen_dir path to stop-server.sh",
         "Deletes /srv/proj/.brainstorm without asking"
       ]
+    },
+    {
+      "id": "VC-RESTART-01",
+      "name": "Restart replaces session paths",
+      "prompt": "A visual companion session stopped. You run start-server.sh again with the same --project-dir. A prior notes file contains old screen_dir and state_dir. What should be done before writing the next screen or reading browser events?",
+      "trap": "Reuses stopped session directories because the port/token may be reused.",
+      "expectations": [
+        "Treats new session as having new screen_dir and state_dir and reads them from the fresh start output.",
+        "Re-pushes current screen through the new session and does not rely on stale event files."
+      ],
+      "must_not": [
+        "Does not claim reuse of port/token implies reuse of the session filesystem paths."
+      ]
+    },
+    {
+      "id": "VC-MULTI-01",
+      "name": "Multi-select click is not final state",
+      "prompt": "A browser companion shows a multi-select group. Event log contains click 'a', click 'b', click 'a'. The user didn't send any text confirmation. What final selections can be claimed from this log, and what should the agent do next?",
+      "trap": "Treats last clicked event as final selected set even though toggle-off events look identical.",
+      "expectations": [
+        "States that click logs do not prove the final selected set and toggling off is possible.",
+        "Confirms via an authoritative current state observation or user clarification rather than asserting a final selection."
+      ],
+      "must_not": [
+        "Does not report 'a' is definitely selected just because it was clicked last."
+      ]
     }
   ]
 }

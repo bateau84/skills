@@ -81,7 +81,9 @@ sum(rate(errors_total[5m]))
 
 ```promql
 absent(up{job="api"})                  # metric disappeared
-changes(up{job="api"}[5m]) == 0        # value not changing → stale exporter
+up{job="api"} == 0                    # observed scrape failure
+absent_over_time(up{job="api"}[5m])    # no matching series in the window
+# changes(up[5m]) == 0 also matches continuously healthy targets; it is not a staleness test.
 count_over_time(up{job="api"}[5m]) > 0 # at least one sample in window
 ```
 

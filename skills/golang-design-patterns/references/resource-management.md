@@ -63,7 +63,7 @@ func NewResource() *Resource {
 
 ## Resource Pools
 
-Resource pools SHOULD use channels with a fixed capacity for bounded allocation. Use channel-based pools or `sync.Pool` to manage limited resources between consumers. Always set a maximum size:
+Resource pools SHOULD use channels with a fixed capacity for bounded allocation. Use an owned bounded pool for scarce resources. `sync.Pool` caches temporary objects: it is not a capacity limit and entries may disappear without cleanup, so it is unsuitable for scarce connection ownership. Set a maximum size and close partial allocations on initialization failure:
 
 ```go
 type ConnPool struct {
@@ -78,6 +78,8 @@ func NewConnPool(maxSize int, factory func() (*Conn, error)) (*ConnPool, error) 
     for range maxSize {
         conn, err := factory()
         if err != nil {
+            close(pool.conns)
+            for opened := range pool.conns { opened.Close() }
             return nil, fmt.Errorf("creating connection: %w", err)
         }
         pool.conns <- conn
@@ -116,17 +118,24 @@ func main() {
 
     srv := &http.Server{Addr: ":8080", Handler: router}
 
-    // Start server in background
+    // A buffered result also handles listener/bind failure before any signal.
+    serveErr := make(chan error, 1)
     go func() {
-        if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-            slog.Error("server error", "error", err)
-        }
+        serveErr <- srv.ListenAndServe()
     }()
 
-    slog.Info("server started", "addr", ":8080")
+    slog.Info("starting server", "addr", ":8080")
 
-    // Wait for interrupt signal
-    <-ctx.Done()
+    // Wait for either termination or an unexpected server exit.
+    select {
+    case err := <-serveErr:
+        if !errors.Is(err, http.ErrServerClosed) {
+            slog.Error("server failed", "error", err)
+        }
+        db.Close()
+        return
+    case <-ctx.Done():
+    }
     slog.Info("shutting down...")
 
     // Give outstanding requests time to complete
@@ -135,7 +144,9 @@ func main() {
 
     if err := srv.Shutdown(shutdownCtx); err != nil {
         slog.Error("shutdown error", "error", err)
+        _ = srv.Close() // bounded shutdown exhausted; unblock serving
     }
+    <-serveErr // join the server goroutine
 
     // Close other resources: database connections, message queues, etc.
     db.Close()
@@ -147,7 +158,7 @@ This pattern applies to any long-running service — gRPC servers, message consu
 
 1. Capture OS signals with `signal.NotifyContext`
 2. Start the server in a goroutine
-3. Block on context cancellation
+3. Observe both context cancellation and listener failure
 4. Shut down with a timeout to drain in-flight requests
 5. Close all remaining resources in order
 

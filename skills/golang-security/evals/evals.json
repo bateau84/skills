@@ -1,0 +1,20 @@
+{
+  "skill": "golang-security",
+  "version": "1.0.0",
+  "common_instruction": "Use the stated context; explain concrete behavior and do not claim tests were run without evidence.",
+  "cases": [
+    {
+      "id": "GSEC-XSS-01",
+      "name": "HTML template boundary",
+      "prompt": "A Go HTTP handler renders user-controlled fields into HTML. Someone proposes text/template as an XSS defense because it supports templates. Which template package actually provides contextual HTML escaping and what else matters?",
+      "trap": "Conflates text/template with html/template, encouraging unescaped HTML output.",
+      "expectations": [
+        "Uses html/template for contextual HTML escaping.",
+        "Warns against bypassing escaping with template.HTML or rendering untrusted HTML as trusted."
+      ],
+      "must_not": [
+        "Does not present text/template as XSS protection."
+      ]
+    }
+  ]
+}

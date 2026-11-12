@@ -23,7 +23,7 @@ metadata:
 
 This skill helps you continuously modernize Go codebases by replacing outdated patterns with their modern equivalents.
 
-**Scope**: This skill covers the last 3 years of Go modernization (Go 1.21 through Go 1.26, released 2023-2026). While this skill can be used for projects targeting Go 1.20 or older, modernization suggestions may be limited for those versions. For best results, consider upgrading the Go version first. Some older modernizations (e.g., `any` instead of `interface{}`, `errors.Is`/`errors.As`, `strings.Cut`) are included because they are still commonly missed, but many pre-1.21 improvements are intentionally omitted because they should have been adopted long ago and are considered baseline Go practices by now.
+**Scope**: This skill covers the last 3 years of Go modernization (initially Go 1.21 through Go 1.26, with newer releases checked against current official notes). While this skill can be used for projects targeting Go 1.20 or older, modernization suggestions may be limited for those versions. For best results, consider upgrading the Go version first. Some older modernizations (e.g., `any` instead of `interface{}`, `errors.Is`/`errors.As`, `strings.Cut`) are included because they are still commonly missed, but many pre-1.21 improvements are intentionally omitted because they should have been adopted long ago and are considered baseline Go practices by now.
 
 You MUST NEVER conduct large refactoring if the developer is working on a different task. But TRY TO CONVINCE your human it would improve the code quality.
 
@@ -34,7 +34,7 @@ You MUST NEVER conduct large refactoring if the developer is working on a differ
 When invoked:
 
 1. **Check the project's `go.mod` or `go.work`** to determine the current Go version (`go` directive)
-2. **Check the latest Go version** using the Go Version Changelogs table below and suggest upgrading if the project's `go.mod` is behind
+2. **Check supported/current Go versions** from [go.dev/dl](https://go.dev/dl/) and [release history](https://go.dev/doc/devel/release), not from this illustrative table. Suggest upgrades only after testing project/toolchain/dependency compatibility.
 3. **Read `.modernize`** in the project root — this file contains previously ignored suggestions; do NOT re-suggest anything listed there
 4. **Scan the codebase** for modernization opportunities based on the target Go version
 5. **Run `golangci-lint`** with the `modernize` linter if available
@@ -67,7 +67,7 @@ Reference the relevant changelog when suggesting a modernization:
 | Go 1.25 | August 2025   | <https://go.dev/doc/go1.25> |
 | Go 1.26 | February 2026 | <https://go.dev/doc/go1.26> |
 
-For versions newer than Go 1.26, consult the official Go release notes.
+Go 1.27 was released in August 2026; consult the official release history for up-to-date stable/security releases. Never assume a table in this skill is current.
 
 When the project's `go.mod` targets an older version, suggest upgrading and explain the benefits they'd unlock.
 
@@ -87,12 +87,12 @@ For CI tooling, govulncheck, PGO, golangci-lint v2, and AI-powered modernization
 
 | Deprecated | Replacement | Since |
 | --- | --- | --- |
-| `math/rand` | `math/rand/v2` | Go 1.22 |
+| `math/rand` (not deprecated) | `math/rand/v2` (optional semantics-changing modernization; check deterministic sequences) | Go 1.22 |
 | `crypto/elliptic` (most functions) | `crypto/ecdh` | Go 1.21 |
 | `reflect.SliceHeader`, `StringHeader` | `unsafe.Slice`, `unsafe.String` | Go 1.21 |
 | `reflect.PtrTo` | `reflect.PointerTo` | Go 1.22 |
 | `runtime.GOROOT()` | `go env GOROOT` | Go 1.24 |
-| `runtime.SetFinalizer` | `runtime.AddCleanup` | Go 1.24 |
+| `runtime.SetFinalizer` (not deprecated) | `runtime.AddCleanup` (often preferable, but different semantics) | Go 1.24 |
 | `crypto/cipher.NewOFB`, `NewCFB*` | AEAD modes or `NewCTR` | Go 1.24 |
 | `golang.org/x/crypto/sha3` | `crypto/sha3` | Go 1.24 |
 | `golang.org/x/crypto/hkdf` | `crypto/hkdf` | Go 1.24 |
@@ -108,7 +108,7 @@ When modernizing a codebase, prioritize changes by impact:
 ### High priority (safety and correctness)
 
 1. Remove loop variable shadow copies _(Go 1.22+)_ — prevents subtle bugs
-2. Replace `math/rand` with `math/rand/v2` _(Go 1.22+)_ — remove `rand.Seed` calls
+2. Consider `math/rand/v2` where semantics allow _(Go 1.22+)_ — do not change reproducible seeded sequences or non-cryptographic behavior silently; `math/rand` itself is not deprecated.
 3. Use `os.Root` for user-supplied file paths _(Go 1.24+)_ — prevents path traversal
 4. Run `govulncheck` _(Go 1.22+)_ — catch known vulnerabilities
 5. Use `errors.Is`/`errors.As` instead of direct comparison _(Go 1.13+)_

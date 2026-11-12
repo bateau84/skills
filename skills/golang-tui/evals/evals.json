@@ -1,0 +1,33 @@
+{
+  "skill": "golang-tui",
+  "version": "1.0.0",
+  "common_instruction": "Use the stated context; explain concrete behavior and do not claim tests were run without evidence.",
+  "cases": [
+    {
+      "id": "GTUI-FOCUS-01",
+      "name": "Focus bounds",
+      "prompt": "A three-panel Bubble Tea TUI uses prevFocus() { focus=min(focus-1,0) } and nextFocus(){ focus=max(focus+1,2) }. Starting at focus 1, describe the focus transitions and correct the bounds.",
+      "trap": "min/max are inverted and yield negative or too-large indices.",
+      "expectations": [
+        "Corrects previous clamp with max(focus-1,0) and next clamp with min(focus+1,2), or provides justified wraparound.",
+        "Covers boundary states 0 and 2 and prevents invalid focus index."
+      ],
+      "must_not": [
+        "Does not leave inverted min/max."
+      ]
+    },
+    {
+      "id": "GTUI-CONFIG-01",
+      "name": "Error path does not compile",
+      "prompt": "A Bubble Tea config helper uses panic(fmt.Printf(\"unable to get user config dir: %v\", err)) when os.UserConfigDir fails. The package won't compile. Explain the error and choose a sane error-return or panic pattern.",
+      "trap": "fmt.Printf returns (int,error), neither suitable as a single panic argument.",
+      "expectations": [
+        "Explains that fmt.Printf returns two values, causing a compile failure in panic.",
+        "Uses fmt.Errorf or returns an error at the API boundary, with useful context."
+      ],
+      "must_not": [
+        "Does not keep panic(fmt.Printf(...)) as valid Go."
+      ]
+    }
+  ]
+}

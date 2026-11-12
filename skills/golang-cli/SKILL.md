@@ -41,7 +41,7 @@ For trivial single-purpose tools with no subcommands and few flags, stdlib `flag
 
 ## Project Structure
 
-Organize CLI commands in `cmd/myapp/` with one file per command. Keep `main.go` minimal — it only calls `Execute()`.
+For a multi-command application, `cmd/myapp/` with one file per command is a useful convention; a small single command may have a root main package. Keep `main.go` minimal — it only calls `Execute()`.
 
 ```
 myapp/
@@ -66,8 +66,8 @@ Key points:
 
 - `SilenceUsage: true` MUST be set — prevents printing the full usage text on every error
 - `SilenceErrors: true` MUST be set — lets you control error output format yourself
-- `PersistentPreRunE` runs before every subcommand, so config is always initialized
-- Logs go to stderr, output goes to stdout
+- Persistent hooks have inheritance/override rules; a child hook can override an ancestor. Explicitly wire required configuration initialization and check the pinned Cobra `EnableTraverseRunHooks` behavior rather than assuming every hook always executes.
+- Logs go to stderr, output goes to stdout. With `SilenceErrors: true`, `main` must print the returned error once before exiting nonzero; do not silently discard Execute() errors.
 
 ## Subcommands
 
@@ -90,7 +90,7 @@ Use `MarkFlagRequired`, `MarkFlagsMutuallyExclusive`, and `MarkFlagsOneRequired`
 
 Provide completion suggestions for flag values.
 
-### Always Bind Flags to Viper
+### Bind relevant flags before configuration reads
 
 This ensures `viper.GetInt("port")` returns the flag value, env var `MYAPP_PORT`, or config file value — whichever has highest precedence.
 

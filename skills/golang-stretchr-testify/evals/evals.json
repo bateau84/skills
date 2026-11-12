@@ -16,6 +16,19 @@
         "Calls require.* or t.Fatal/t.FailNow with the outer t inside the polling closure",
         "Uses time.Sleep in a manual retry loop"
       ]
+    },
+    {
+      "id": "TESTIFY-ID-01",
+      "name": "Assert pointer identity",
+      "prompt": "Two separately allocated *Config values have equal exported and private fields. A test should pass only if a cache returns the original pointer, not a distinct copy. Which testify assertion should be used?",
+      "trap": "Equates deep value equality with pointer identity.",
+      "expectations": [
+        "Uses assert.Same or require.Same (or equivalent), with expected and actual pointers.",
+        "Explains Equal compares pointees/deep values and can pass for distinct addresses."
+      ],
+      "must_not": [
+        "Does not say Equal compares only addresses."
+      ]
     }
   ]
 }

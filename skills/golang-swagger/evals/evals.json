@@ -16,14 +16,13 @@
     {
       "id": 2,
       "prompt": "Our GET /settings endpoint returns a dynamic set of feature flags as a map: `map[string]bool`. Document this endpoint for Swagger so the response schema is visible in the UI.",
-      "expected_output": "Defines a named struct for the response or uses swaggertype annotation — swag cannot generate a schema for map[string]bool directly. The trap is using `{object} map[string]bool` in @Success which fails generation.",
+      "expected_output": "Documents the dynamic boolean flag map without inventing fixed keys; a supported raw or named map @Success annotation plus @Router [get] and @Produce json describes the intended response. Generator output verification is a separate test, not evidence that can be claimed from this prompt alone.",
       "expectations": [
-        "Does NOT use `{object} map[string]bool` directly in @Success",
-        "Defines a named struct for the response OR acknowledges a swaggertype workaround is needed",
-        "@Success annotation uses a named type (not a raw map literal)",
-        "@Router annotation is present with [get] method",
-        "@Produce annotation specifies json"
-      ]
+        "Preserves dynamic feature-flag keys with boolean-valued additionalProperties or an equivalent accurate representation, rather than inventing fixed fields.",
+        "Provides an appropriate @Success annotation using a raw or named map declaration without categorically rejecting map[string]bool.",
+        "Includes @Router [get] and @Produce json."
+      ],
+      "trap": "Assumes a dynamic map cannot be represented by Swagger and replaces arbitrary boolean flags with invented fixed fields, losing the actual response contract."
     },
     {
       "id": 3,

@@ -146,3 +146,14 @@ At minimum:
 8. test reusable workflows from realistic callers.
 
 Use GitHub's current workflow/security documentation for version-sensitive behavior.
+
+## Concrete boundary checks
+
+- Set checkout `persist-credentials: false` when later steps do not need authenticated Git, especially around untrusted build/test commands. It is not a substitute for least-privilege token permissions.
+- Treat writes to `GITHUB_ENV`, `GITHUB_OUTPUT` and generated workflow commands as another injection boundary: validate values, use a robust multiline delimiter or structured serialization, and never concatenate arbitrary text into command syntax.
+- A cache key is not an authority label. Review producer branch/event and restore fallback scope before a privileged job consumes cached executable content.
+- When individual `permissions` are specified, unspecified permissions become none (apart from metadata read); inspect the effective job permissions and reusable workflow intersection, not only the repository default.
+
+## Optional review perspectives
+
+[conformance review](ASSESSMENT.md), [residual-confidence challenges](QA.md). Load for the corresponding review activity; these are not extra producer permissions or mandatory context.

@@ -32,6 +32,19 @@
         "Claims nolintlint with default settings already rejects this directive",
         "Says nolintlint flags bare //nolint without mentioning require-specific/require-explanation"
       ]
+    },
+    {
+      "id": "GOLINT-V2-01",
+      "name": "Major-version install mismatch",
+      "prompt": "A project requires golangci-lint v2 config and its fmt subcommand. An onboarding script runs go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest, then fails. Give a version-consistent installation plan.",
+      "trap": "Fetches v1 module when the tool/config assumes v2.",
+      "expectations": [
+        "Recommends a version-pinned prebuilt v2 binary or the github.com/golangci/golangci-lint/v2/cmd/golangci-lint module path.",
+        "Checks tool version/config compatibility before CI and avoids mixing v1/v2 semantics."
+      ],
+      "must_not": [
+        "Does not keep the old v1 module import as the v2 install command."
+      ]
     }
   ]
 }

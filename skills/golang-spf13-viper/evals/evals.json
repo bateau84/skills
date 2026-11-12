@@ -1,0 +1,34 @@
+{
+  "skill": "golang-spf13-viper",
+  "version": "1.0.0",
+  "common_instruction": "Answer as an engineer using the stated project and tool constraints; do not claim to have executed any checks.",
+  "cases": [
+    {
+      "id": "VPR-NOTFOUND-01",
+      "name": "Optional config lookup",
+      "prompt": "A Go service uses spf13/viper v1.20. It searches default config paths and should work with environment variables alone when no file exists. Show error handling for ReadInConfig that distinguishes an optional missing search result from a malformed file.",
+      "trap": "An errors.As pointer-to-pointer target misses a value-typed ConfigFileNotFoundError and aborts startup.",
+      "expectations": [
+        "Uses value-type ConfigFileNotFoundError with errors.As or an equivalent correct match.",
+        "Propagates actual read/parse errors and distinguishes an explicitly named missing path when necessary."
+      ],
+      "must_not": [
+        "Does not swallow every ReadInConfig error or declare the file mandatory."
+      ]
+    },
+    {
+      "id": "VPR-ENV-01",
+      "name": "Unmarshal env-only keys",
+      "prompt": "A viper service sets SetEnvPrefix(\"APP\"), AutomaticEnv and a dot-to-underscore replacer. APP_DATABASE_HOST is present, but Unmarshal into Config.Database.Host yields empty when no file/default defines that key. Diagnose and propose a bounded fix.",
+      "trap": "AutomaticEnv Get works while Unmarshal enumerates registered AllKeys and drops env-only values.",
+      "expectations": [
+        "Explains why direct Get and Unmarshal can differ for unregistered keys.",
+        "Registers the expected keys via BindEnv or SetDefault, while retaining prefix/replacer semantics.",
+        "Proposes a real env-only regression check."
+      ],
+      "must_not": [
+        "Does not claim AutomaticEnv automatically adds arbitrary environment keys to Unmarshal."
+      ]
+    }
+  ]
+}

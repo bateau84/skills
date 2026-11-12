@@ -53,16 +53,16 @@
         "Identifies the interface nil gotcha: a typed nil *ValidationError wrapped in an error interface is NOT a nil interface",
         "Explains that the interface has a non-nil type descriptor even when the pointer value is nil",
         "Recommends returning nil explicitly (return nil) instead of returning the typed nil variable",
-        "Does NOT suggest adding an if verr == nil check before return as the primary fix — the correct fix is to return nil explicitly when there's no error",
-        "Shows or describes the correct fix: check verr != nil before return, and return nil in the else branch"
+        "Does not return a typed-nil *ValidationError as a non-nil error; the no-error path returns a true nil interface.",
+        "Shows a correct fix, such as returning the pointer only when non-nil and returning nil explicitly on the no-error path; a guard is acceptable when it enforces that invariant."
       ]
     },
     {
       "id": 5,
       "name": "variable-shadowing-err",
       "description": "Tests the variable shadowing with := from common-go-bugs: inner err shadows outer err",
-      "prompt": "My Go function always returns nil error even when someFunc() fails. I verified that someFunc() does return errors in certain cases. What's wrong?\n\n```go\nfunc processData() error {\n    var err error\n    if needsProcessing {\n        result, err := someFunc()\n        if err != nil {\n            return err\n        }\n        use(result)\n    }\n    return err\n}\n```",
-      "trap": "Model focuses on the early return path working correctly and misses that the outer err is always nil because := created a new variable",
+      "prompt": "My Go function always returns nil error even when someFunc() fails. I verified that someFunc() does return errors in certain cases. What's wrong?\n\n```go\nfunc processData() error {\n    var err error\n    if needsProcessing {\n        result, err := someFunc()\n        if err == nil {\n            use(result)\n        }\n    }\n    return err\n}\n```",
+      "trap": "The inner err is scoped to the if block; the failure is silently ignored and the outer err returned at the end stays nil. A fix must propagate the actual error rather than merely noting a shadow.",
       "expectations": [
         "Identifies that := inside the if block creates a NEW err variable that shadows the outer one",
         "Explains that the outer err remains nil because the inner := never assigned to it",
@@ -300,13 +300,13 @@
       "name": "godebug-gc-tracing-interpretation",
       "description": "Tests GODEBUG gctrace interpretation from diagnostic-tools reference",
       "prompt": "My Go service is experiencing periodic latency spikes. I enabled GC tracing with GODEBUG=gctrace=1 and see this output:\n```\ngc 456 @120.5s 18%: 2.1+45+1.2 ms clock, 16+12/45/8 ms cpu, 1024->900->500 MB\n```\nWhat does this tell me and is there a problem?",
-      "trap": "Model focuses only on the heap sizes and misses the 18% GC CPU overhead as the key signal",
+      "trap": "Treats the concurrent 45 ms as a stop-the-world pause, cumulative GC percentage as instantaneous CPU usage, or one trace line as proof of the latency cause.",
       "expectations": [
-        "Identifies that 18% GC CPU overhead is significantly high (threshold is >10%)",
-        "Explains the heap size breakdown as heap at GC start, heap at GC end, and live heap",
-        "Identifies the large pause times (45ms) as a likely cause of the latency spikes",
-        "Suggests the application is over-allocating and recommends investigating allocation patterns",
-        "Recommends using pprof heap/alloc profiling to find hot allocation sites"
+        "Identifies 18% as the cumulative percentage of time spent in GC since program start, not instantaneous CPU usage or a universal failure threshold.",
+        "Interprets 1024->900->500 MB as heap at GC start, heap at GC end and live heap.",
+        "Correctly separates stop-the-world phases (about 2.1 and 1.2 ms) from the 45 ms concurrent GC phase; does not call 45 ms an application-wide pause.",
+        "Treats allocation pressure or GC assist as hypotheses for the observed latency spikes, not as proven causes from one trace line.",
+        "Proposes correlating latency/GC timing and collecting pprof alloc/heap (and CPU when relevant) evidence before a tuning change."
       ]
     },
     {
@@ -347,7 +347,6 @@
       "expectations": [
         "States that filepath.Clean plus strings.HasPrefix is not robust confinement",
         "Recommends adding a test that specifically verifies the path traversal is blocked",
-        "Suggests adding logging or metrics to detect future traversal attempts (observability)",
         "Considers multiple validation layers — not just one check",
         "Recommends os.Root for Go 1.24+ or a filepath.IsLocal/filepath.Rel fallback for older targets"
       ]
@@ -508,16 +507,16 @@
     },
     {
       "id": 37,
-      "name": "time-after-in-loop-allocation-churn",
-      "description": "Tests the repeated time.After in loop allocation-churn pattern from code-review-flags and concurrency-debug",
-      "prompt": "My Go worker processes messages from a channel with a timeout. Memory usage grows over time even though messages are processed correctly. Here's the code:\n\n```go\nfor {\n    select {\n    case msg := <-incoming:\n        process(msg)\n    case <-time.After(30 * time.Second):\n        log.Println(\"idle timeout\")\n        return\n    }\n}\n```",
-      "trap": "Model suggests the message processing is leaking memory, without identifying repeated time.After allocation churn and reset semantics as the likely issue",
+      "name": "time-after-gc-version-and-memory-diagnosis",
+      "description": "Tests diagnosis of timer allocations versus retained memory under version-dependent Go timer GC semantics, without presuming a leak.",
+      "prompt": "My Go worker processes messages from a channel with a timeout. Memory usage grows over time even though messages are processed correctly. Here's the code:\n\n```go\nfor {\n    select {\n    case msg := <-incoming:\n        process(msg)\n    case <-time.After(30 * time.Second):\n        log.Println(\"idle timeout\")\n        return\n    }\n}\n```\n\nThe module targets Go 1.26 with default timer behavior. Diagnose the memory-growth report and recommend an appropriate next step.",
+      "trap": "Treats time.After as an unconditional leak under Go 1.26 and mandates timer rewriting without evidence or correct timeout semantics.",
       "expectations": [
-        "Identifies that time.After creates a new timer on every loop iteration",
-        "Explains this causes allocation churn and was a leak-like pattern on older Go versions before Go 1.23 timer GC improvements",
-        "Recommends using time.NewTimer with Reset() or time.NewTicker instead",
-        "Shows the correct pattern with a reusable timer and defer timer.Stop()",
-        "Does NOT suggest heap profiling as the first diagnostic step for this known pattern"
+        "States that time.After allocates a timer each iteration but Go 1.23+ can collect unreferenced timers; this is not by itself proof of a memory leak on the stated Go version.",
+        "Distinguishes allocation churn from retained-memory growth and does not attribute the observed growth solely to this snippet.",
+        "Proposes a focused alloc/heap profile and version/runtime check before claiming a fix for the reported growth.",
+        "Allows a reusable time.NewTimer when profiling supports the allocation cost and its reset/stop behavior preserves the requested inactivity timeout, rather than mandating it.",
+        "Does not propose a periodic time.NewTicker as equivalent to an inactivity timeout."
       ]
     }
   ]

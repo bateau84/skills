@@ -1,0 +1,20 @@
+{
+  "skill": "accessibility-design",
+  "version": "1.0.0",
+  "common_instruction": "Answer as an engineer using the stated project and tool constraints; do not claim to have executed any checks.",
+  "cases": [
+    {
+      "id": "A11Y-TARGET-01",
+      "name": "Small action targets",
+      "prompt": "A compact web toolbar has several 18×18 CSS-pixel icon buttons. Designers propose a 4px gap between them. Assess WCAG 2.2 AA SC 2.5.8 compliance without assuming the UI is invalid solely because the controls are under 24px.",
+      "trap": "Treats a fixed 4px gap as the normative alternative to a 24px target.",
+      "expectations": [
+        "Uses the actual 24×24 target criterion or correct 24px-diameter spacing-circle test for undersized targets.",
+        "Checks actual rendered target positions/overlap and mentions applicable exceptions."
+      ],
+      "must_not": [
+        "Does not declare any fixed 4px separation universally sufficient or insufficient without the circle/target geometry."
+      ]
+    }
+  ]
+}

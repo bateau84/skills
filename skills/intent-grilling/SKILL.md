@@ -28,3 +28,9 @@ Do not offload ordinary expert decisions (language, database, library, packages,
 This skill does not publish, accept, or authorize an Anchor, require any control-plane tool, dictate its path, or start execution. The consuming repository and `anchor-authoring` determine how the durable result is recorded and how genuine acceptance is evidenced.
 
 Do not create `first-principles.md` during intent elicitation. Broad first principles may only emerge later from accumulated project evidence.
+
+## Optional review perspectives
+
+[conformance review](ASSESSMENT.md), [residual-confidence challenges](QA.md). Load for the corresponding review activity; these are not extra producer permissions or mandatory context.
+
+Before handing off, play back the agreed goal, exclusions and unresolved assumptions. Distinguish user-confirmed decisions from your inferences; only seek clarification for a consequential unresolved choice, not as a new universal approval ceremony.

@@ -1,3 +1,6 @@
+# Modified from Anthropic's mcp-builder (Apache-2.0) by bateau84/skills.
+# Original licence: ../LICENSE.txt; provenance: ../../../LICENSING.md.
+
 """MCP Server Evaluation Harness
 
 This script evaluates MCP servers by running test questions against them using Claude.
@@ -9,12 +12,11 @@ import json
 import re
 import sys
 import time
-import traceback
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
-from anthropic import Anthropic
+from anthropic import AsyncAnthropic
 
 from connections import create_connection
 
@@ -83,59 +85,50 @@ def extract_xml_content(text: str, tag: str) -> str | None:
     return matches[-1].strip() if matches else None
 
 
+
+def _mcp_tool_response(result: Any) -> tuple[str, bool]:
+    """Convert a complete MCP CallToolResult into a text-only model result.
+
+    Prefer textual content; use structuredContent only when no nonempty text is
+    available. Unsupported modalities get an explicit placeholder, without
+    changing the server's isError flag or claiming their bytes were evaluated.
+    """
+    def field(value, key, default=None):
+        return value.get(key, default) if isinstance(value, dict) else getattr(value, key, default)
+
+    blocks = field(result, "content")
+    if blocks is None:
+        raise ValueError("expected a complete MCP CallToolResult with content")
+    items = []
+    has_text = False
+    is_error = bool(field(result, "isError", False))
+    for block in blocks:
+        kind = field(block, "type")
+        text = field(block, "text")
+        if kind == "text" and isinstance(text, str):
+            items.append(text)
+            has_text = has_text or bool(text)
+        else:
+            items.append(f"[unsupported MCP content type: {kind}]")
+    structured = field(result, "structuredContent")
+    if structured is not None and not has_text:
+        # Protocol structuredContent is JSON data, never an arbitrary object repr.
+        items.append(json.dumps(structured, ensure_ascii=False, allow_nan=False))
+    return "\n".join(items) or "[empty tool result]", is_error
+
+
 async def agent_loop(
-    client: Anthropic,
+    client: AsyncAnthropic,
     model: str,
     question: str,
     tools: list[dict[str, Any]],
     connection: Any,
 ) -> tuple[str, dict[str, Any]]:
-    """Run the agent loop with MCP tools."""
+    """Run the agent loop; acknowledge every tool_use before the next model turn."""
     messages = [{"role": "user", "content": question}]
-
-    response = await asyncio.to_thread(
-        client.messages.create,
-        model=model,
-        max_tokens=4096,
-        system=EVALUATION_PROMPT,
-        messages=messages,
-        tools=tools,
-    )
-
-    messages.append({"role": "assistant", "content": response.content})
-
     tool_metrics = {}
-
-    while response.stop_reason == "tool_use":
-        tool_use = next(block for block in response.content if block.type == "tool_use")
-        tool_name = tool_use.name
-        tool_input = tool_use.input
-
-        tool_start_ts = time.time()
-        try:
-            tool_result = await connection.call_tool(tool_name, tool_input)
-            tool_response = json.dumps(tool_result) if isinstance(tool_result, (dict, list)) else str(tool_result)
-        except Exception as e:
-            tool_response = f"Error executing tool {tool_name}: {str(e)}\n"
-            tool_response += traceback.format_exc()
-        tool_duration = time.time() - tool_start_ts
-
-        if tool_name not in tool_metrics:
-            tool_metrics[tool_name] = {"count": 0, "durations": []}
-        tool_metrics[tool_name]["count"] += 1
-        tool_metrics[tool_name]["durations"].append(tool_duration)
-
-        messages.append({
-            "role": "user",
-            "content": [{
-                "type": "tool_result",
-                "tool_use_id": tool_use.id,
-                "content": tool_response,
-            }]
-        })
-
-        response = await asyncio.to_thread(
-            client.messages.create,
+    while True:
+        response = await client.messages.create(
             model=model,
             max_tokens=4096,
             system=EVALUATION_PROMPT,
@@ -143,16 +136,33 @@ async def agent_loop(
             tools=tools,
         )
         messages.append({"role": "assistant", "content": response.content})
+        if response.stop_reason != "tool_use":
+            return "".join(block.text for block in response.content if getattr(block, "type", None) == "text"), tool_metrics
 
-    response_text = next(
-        (block.text for block in response.content if hasattr(block, "text")),
-        None,
-    )
-    return response_text, tool_metrics
+        tool_results = []
+        for use in (b for b in response.content if getattr(b, "type", None) == "tool_use"):
+            started = time.time()
+            try:
+                result = await connection.call_tool(use.name, use.input)
+                content, is_error = _mcp_tool_response(result)
+            except Exception as exc:
+                content, is_error = f"Tool call failed: {type(exc).__name__}: {exc}", True
+            metrics = tool_metrics.setdefault(use.name, {"count": 0, "durations": []})
+            metrics["count"] += 1
+            metrics["durations"].append(time.time() - started)
+            tool_results.append({
+                "type": "tool_result",
+                "tool_use_id": use.id,
+                "content": content,
+                "is_error": is_error,
+            })
+        if not tool_results:
+            raise RuntimeError("model reported tool_use without any tool_use blocks")
+        messages.append({"role": "user", "content": tool_results})
 
 
 async def evaluate_single_task(
-    client: Anthropic,
+    client: AsyncAnthropic,
     model: str,
     qa_pair: dict[str, Any],
     tools: list[dict[str, Any]],
@@ -220,24 +230,23 @@ TASK_TEMPLATE = """
 async def run_evaluation(
     eval_path: Path,
     connection: Any,
-    model: str = "claude-3-7-sonnet-20250219",
+    model: str,
 ) -> str:
     """Run evaluation with MCP server tools."""
     print("🚀 Starting Evaluation")
 
-    client = Anthropic()
+    async with AsyncAnthropic() as client:
+        tools = await connection.list_tools()
+        print(f"📋 Loaded {len(tools)} tools from MCP server")
 
-    tools = await connection.list_tools()
-    print(f"📋 Loaded {len(tools)} tools from MCP server")
+        qa_pairs = parse_evaluation_file(eval_path)
+        print(f"📋 Loaded {len(qa_pairs)} evaluation tasks")
 
-    qa_pairs = parse_evaluation_file(eval_path)
-    print(f"📋 Loaded {len(qa_pairs)} evaluation tasks")
-
-    results = []
-    for i, qa_pair in enumerate(qa_pairs):
-        print(f"Processing task {i + 1}/{len(qa_pairs)}")
-        result = await evaluate_single_task(client, model, qa_pair, tools, connection, i)
-        results.append(result)
+        results = []
+        for i, qa_pair in enumerate(qa_pairs):
+            print(f"Processing task {i + 1}/{len(qa_pairs)}")
+            result = await evaluate_single_task(client, model, qa_pair, tools, connection, i)
+            results.append(result)
 
     correct = sum(r["score"] for r in results)
     accuracy = (correct / len(results)) * 100 if results else 0
@@ -296,45 +305,49 @@ def parse_env_vars(env_list: list[str]) -> dict[str, str]:
     for env_var in env_list:
         if "=" in env_var:
             key, value = env_var.split("=", 1)
-            env[key.strip()] = value.strip()
+            env[key.strip()] = value  # preserve intentional whitespace and embedded equals
         else:
             print(f"Warning: Ignoring malformed environment variable: {env_var}")
     return env
 
 
-async def main():
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Evaluate MCP servers using test questions",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   # Evaluate a local stdio MCP server
-  python evaluation.py -t stdio -c python -a my_server.py eval.xml
+  python evaluation.py -m "$ANTHROPIC_MODEL_ID" -t stdio -c python -a my_server.py eval.xml
 
   # Evaluate an SSE MCP server
-  python evaluation.py -t sse -u https://example.com/mcp -H "Authorization: Bearer token" eval.xml
+  python evaluation.py -m "$ANTHROPIC_MODEL_ID" -t sse -u https://example.com/mcp -H "Authorization: Bearer token" eval.xml
 
   # Evaluate an HTTP MCP server with custom model
-  python evaluation.py -t http -u https://example.com/mcp -m claude-3-5-sonnet-20241022 eval.xml
+  python evaluation.py -t http -u https://example.com/mcp -m $ANTHROPIC_MODEL_ID eval.xml
         """,
     )
 
     parser.add_argument("eval_file", type=Path, help="Path to evaluation XML file")
     parser.add_argument("-t", "--transport", choices=["stdio", "sse", "http"], default="stdio", help="Transport type (default: stdio)")
-    parser.add_argument("-m", "--model", default="claude-3-7-sonnet-20250219", help="Claude model to use (default: claude-3-7-sonnet-20250219)")
+    parser.add_argument("-m", "--model", required=True, help="Explicit currently available Anthropic API model ID")
 
     stdio_group = parser.add_argument_group("stdio options")
     stdio_group.add_argument("-c", "--command", help="Command to run MCP server (stdio only)")
-    stdio_group.add_argument("-a", "--args", nargs="+", help="Arguments for the command (stdio only)")
-    stdio_group.add_argument("-e", "--env", nargs="+", help="Environment variables in KEY=VALUE format (stdio only)")
+    stdio_group.add_argument("-a", "--args", action="append", help="One server argument; repeat -a. For dash-leading values use -a=--flag or -a=-y (not -a --flag)")
+    stdio_group.add_argument("-e", "--env", action="append", help="One KEY=VALUE entry; repeat -e for more")
 
     remote_group = parser.add_argument_group("sse/http options")
     remote_group.add_argument("-u", "--url", help="MCP server URL (sse/http only)")
-    remote_group.add_argument("-H", "--header", nargs="+", dest="headers", help="HTTP headers in 'Key: Value' format (sse/http only)")
+    remote_group.add_argument("-H", "--header", action="append", dest="headers", help="One 'Key: Value' HTTP header; repeat -H for more")
 
     parser.add_argument("-o", "--output", type=Path, help="Output file for evaluation report (default: stdout)")
 
-    args = parser.parse_args()
+    return parser
+
+
+async def main():
+    args = build_parser().parse_args()
 
     if not args.eval_file.exists():
         print(f"Error: Evaluation file not found: {args.eval_file}")

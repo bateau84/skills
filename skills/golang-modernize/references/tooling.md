@@ -44,7 +44,7 @@ PGO is generally available since Go 1.21, providing 2-14% performance improvemen
 
 ```bash
 # 1. Build and run with CPU profiling
-go test -cpuprofile=default.pgo -bench=. ./...
+go test -cpuprofile=default.pgo -bench=. ./path/to/one/package # CPU profile requires a single test binary
 
 # 2. Place default.pgo in the main package directory
 # 3. Rebuild — PGO is applied automatically
@@ -58,3 +58,5 @@ Go 1.22+ expanded PGO to devirtualize more interface calls. Go 1.23+ reduced PGO
 If AI-assisted review is useful to the project, provide relevant guidance such as `golang-security`, `golang-concurrency`, or `golang-error-handling` by file reads or a supported loader. No skill plugin or AI review service is required. Such review may surface issues beyond static analysis, but loading guidance does not establish senior-reviewer expertise or guarantee detection; validate findings and preserve required independent review.
 
 See `golang-continuous-integration` for optional review-integration guidance and `github-workflow` for workflow implementation. Use the chosen integration's documented configuration rather than assuming bundled Actions assets exist.
+
+For PGO, prefer a representative production/workload CPU profile; a microbenchmark profile may train the compiler on an unrepresentative hot path.

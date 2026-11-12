@@ -30,7 +30,7 @@ mock_provider "aws" {
 }
 
 run "test_with_mocks" {
-  command = plan  # Mocks work with plan or apply; computed values are known-after-apply in plan unless override_during = plan
+  command = apply  # mock-only apply materializes computed IDs; no cloud operations
 
   assert {
     condition     = aws_instance.example.id == "i-1234567890abcdef0"
@@ -54,10 +54,10 @@ mock_provider "aws" {
 }
 
 run "test_with_aliased_mock" {
-  command = plan
+  command = apply  # mock-only apply materializes computed IDs; no cloud operations
 
   providers = {
-    aws = provider.aws.mocked
+    aws = aws.mocked
   }
 
   assert {

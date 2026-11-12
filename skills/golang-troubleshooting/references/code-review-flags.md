@@ -1,13 +1,13 @@
 # Code Review Red Flags
 
-If you see these in code review, flag them:
+Treat these as investigation prompts, not automatic defects. Confirm caller invariants, supported Go version and observed effects before assigning severity:
 
 | Pattern | Why It's Bad |
 | --- | --- |
 | `result, _ := doSomething()` | Silent error — mystery bugs later |
 | `go func() { }()` without context | Can't cancel, leaks goroutine |
 | Channel without close | Goroutine leak when sender exits |
-| `time.After` in hot loop | Repeated timer allocation/churn; use a reusable timer when reset semantics matter |
+| `time.After` in hot loop | Each iteration allocates a timer, but Go 1.23+ can collect unused timers; not a guaranteed leak. If allocation churn is material, profile and consider a correctly reset reusable timer; older timer semantics differ. |
 | Global map without mutex | Data race |
 | `defer` inside hot loop | Deferred calls pile up until return |
 | `json.Marshal` in hot path | Expensive, causes GC pressure |

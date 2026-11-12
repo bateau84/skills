@@ -223,19 +223,22 @@ mux.Handle("/users/{id}",
 ```bash
 # Against local Alloy
 OTEL_RESOURCE_ATTRIBUTES="service.name=myapp,service.namespace=myteam,deployment.environment=prod" \
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 \
-OTEL_EXPORTER_OTLP_PROTOCOL=grpc \
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 \
+OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf \
 go run .
 
 # Direct to Grafana Cloud
 OTEL_RESOURCE_ATTRIBUTES="service.name=myapp,service.namespace=myteam,deployment.environment=prod" \
 OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp \
 OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf \
-OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(echo -n '123456:glc_eyJ...' | base64)" \
+OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(printf '%s' '123456:glc_eyJ...' | base64 | tr -d '\n')" \
 go run .
 ```
 
 ---
+
+
+The Go examples construct HTTP exporters explicitly; setting PROTOCOL=grpc cannot change those constructors. Switch the actual exporter package/constructor to use gRPC. Generic exporter-selection environment variables only work with a component that implements that selection.
 
 ## Java (Grafana Distribution)
 
@@ -251,7 +254,7 @@ No code changes required - the agent auto-instruments popular frameworks (Spring
 OTEL_RESOURCE_ATTRIBUTES="service.name=shoppingcart,service.namespace=ecommerce,deployment.environment=production" \
 OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp \
 OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf" \
-OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(echo -n '123456:glc_eyJ...' | base64)" \
+OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(printf '%s' '123456:glc_eyJ...' | base64 | tr -d '\n')" \
 java -javaagent:/opt/grafana-opentelemetry-java.jar -jar myapp.jar
 ```
 
@@ -328,7 +331,7 @@ OTEL_LOGS_EXPORTER="otlp" \
 OTEL_NODE_RESOURCE_DETECTORS="env,host,os" \
 OTEL_RESOURCE_ATTRIBUTES="service.name=myapp,service.namespace=myteam,deployment.environment=prod" \
 OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp \
-OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(echo -n '123456:glc_eyJ...' | base64)" \
+OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(printf '%s' '123456:glc_eyJ...' | base64 | tr -d '\n')" \
 NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register" \
 node app.js
 ```
@@ -352,12 +355,12 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 
 const sdk = new NodeSDK({
-  resource: new Resource({
+  resource: resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'myapp',
     [ATTR_SERVICE_VERSION]: '1.0.0',
   }),
@@ -432,7 +435,7 @@ opentelemetry-bootstrap -a install   # installs framework-specific instrumentors
 OTEL_RESOURCE_ATTRIBUTES="service.name=myapp,service.namespace=myteam,deployment.environment=prod" \
 OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp \
 OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf" \
-OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(echo -n '123456:glc_eyJ...' | base64)" \
+OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(printf '%s' '123456:glc_eyJ...' | base64 | tr -d '\n')" \
 opentelemetry-instrument python app.py
 ```
 
@@ -513,18 +516,9 @@ def process_order(order_id: str):
             raise
 ```
 
-### Gunicorn Post-Fork Hook (multi-process)
+### Gunicorn worker lifecycle
 
-```python
-# gunicorn.conf.py
-from opentelemetry.instrumentation.gunicorn import GunicornInstrumentor
-
-def post_fork(server, worker):
-    GunicornInstrumentor().instrument_app(worker.app.wsgi())
-    # Or manually reinitialize providers here
-```
-
----
+Create tracer/meter providers and exporter workers **after** the process fork in the Gunicorn `post_fork(server, worker)` hook; shut them down in the worker's exit hook. Do not import a fictional `opentelemetry.instrumentation.gunicorn.GunicornInstrumentor`. Use the framework instrumentation actually installed (for example Flask), and a project-owned idempotent setup function; do not instrument twice through both launcher and hooks. Verify export from each worker, not just the master process.
 
 ## .NET (Grafana Distribution)
 
@@ -663,7 +657,7 @@ public class OrderService
 OTEL_RESOURCE_ATTRIBUTES="service.name=myapp,service.namespace=myteam,deployment.environment=prod" \
 OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp \
 OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf" \
-OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(echo -n '123456:glc_eyJ...' | base64)" \
+OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(printf '%s' '123456:glc_eyJ...' | base64 | tr -d '\n')" \
 dotnet run
 ```
 
@@ -701,7 +695,7 @@ Globals::registerInitializer(function (Configurator $configurator) use ($tracerP
 OTEL_PHP_AUTOLOAD_ENABLED=true \
 OTEL_SERVICE_NAME=myapp \
 OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp \
-OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(echo -n '123456:glc_eyJ...' | base64)" \
+OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(printf '%s' '123456:glc_eyJ...' | base64 | tr -d '\n')" \
 php app.php
 ```
 
@@ -777,7 +771,7 @@ curl http://localhost:9090/metrics | grep beyla_build_info
 
 ```bash
 # Bash
-echo -n "INSTANCE_ID:API_TOKEN" | base64
+printf '%s' "INSTANCE_ID:API_TOKEN" | base64 | tr -d '\n'
 
 # Result example: MTIzNDU2OmdsY19leUo...
 ```

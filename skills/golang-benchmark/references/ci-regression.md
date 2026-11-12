@@ -40,6 +40,8 @@ Best for: quick PR-to-base comparisons in git-based workflows. Leverages `benchs
 
 ## cob
 
+**Workspace safety:** cob may checkout/reset revisions as part of its comparison. Use a disposable clean checkout with an explicit base, not an active worktree containing uncommitted work. A branch name alone is not evidence that a benchmark used the intended base/current commits.
+
 Compares benchmarks between HEAD and HEAD~1, failing the CI job if performance degrades beyond a configurable threshold (default 20%).
 
 ```bash
@@ -50,7 +52,7 @@ go install github.com/knqyf263/cob@latest
 # Run with default 20% threshold — compares HEAD vs HEAD~1
 cob
 
-# Stricter threshold for critical paths (the value is a ratio: 0.1 = 10% regression fails)
+# Stricter threshold for critical paths (10% regression = failure)
 cob -threshold 0.1
 
 # Compare against a specific base commit
@@ -77,118 +79,32 @@ Best for: simple post-commit regression gating in CI where statistical rigor is 
 
 ## gobenchdata
 
-GitHub Action + CLI that collects benchmark results, publishes to gh-pages as JSON, and visualizes with an interactive web dashboard. Shows performance trends over time.
+[Upstream gobenchdata](https://github.com/bobheadxi/gobenchdata) parses Go benchmarks into JSON, supports historical trend visualization, and can compare two JSON datasets. The GitHub Action **runs its own benchmarks**; its `BENCHMARKS_OUT` input names the JSON output path, not a file of captured raw `go test` text.
 
 ```bash
 go install go.bobheadxi.dev/gobenchdata@latest
+go test -run '^$' -bench=. -benchmem -count=5 ./... | gobenchdata --json current.json
+
+# Compare normalized JSON files from a fixed base/current environment:
+gobenchdata checks generate
+gobenchdata checks eval base.json current.json
 ```
 
-### CLI commands
-
-```bash
-# Parse go test -bench output to JSON
-go test -bench=. -benchmem -count=5 ./... | gobenchdata --json bench.json
-
-# Parse from a file
-gobenchdata --json bench.json < bench.txt
-
-# Add a tag to the benchmark run (e.g., git commit)
-gobenchdata --json bench.json --tag "$(git rev-parse --short HEAD)" < bench.txt
-
-# Evaluate regression checks against a checks config
-gobenchdata checks eval bench.txt --checks-config .gobenchdata-checks.yml
-
-# Generate the web dashboard app (static Vue.js site)
-gobenchdata web generate ./dashboard-app
-
-# Serve the dashboard locally for preview
-gobenchdata web serve ./dashboard-app
-
-# Merge multiple benchmark JSON files
-gobenchdata merge old-bench.json new-bench.json > combined.json
-
-# Prune old entries (keep last 30 runs)
-gobenchdata prune --count 30 bench.json
-```
-
-### GitHub Action setup
+A valid `gobenchdata-checks.yml` uses a **diff expression** and a numeric threshold on that expression, not per-metric `thresholds: [{metric,max}]` entries:
 
 ```yaml
-# .github/workflows/benchmark.yml
-name: Benchmark
-on: [push]
-jobs:
-  benchmark:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: stable
-      - name: Run benchmarks
-        run: go test -bench=. -benchmem -count=5 ./... | tee bench.txt
-      - uses: bobheadxi/gobenchdata@v1
-        with:
-          PRUNE_COUNT: 30
-          GO_TEST_PKGS: ./...
-          BENCHMARKS_OUT: bench.txt
-          PUBLISH: true
-          PUBLISH_BRANCH: gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
-
-### Regression gating on PRs
-
-`checks eval` compares two benchmark JSON files, so produce one for the base commit and one for HEAD first.
-
-```yaml
-- name: Check for regressions
-  run: gobenchdata checks eval base.json current.json --checks.pretty
-```
-
-```yaml
-# gobenchdata-checks.yml (generate a starter with `gobenchdata checks generate`)
 checks:
-  - name: "No major regressions"
-    description: ns/op change in percent
+  - name: No slowdown above ten percent
     package: .
-    benchmarks: []
+    benchmarks: [".*"]
     diff: (current.NsPerOp - base.NsPerOp) / base.NsPerOp * 100
     thresholds:
-      max: 20 # fail if >20% slower
-  - name: "Critical path stability"
-    package: ./pkg/parser
-    benchmarks: ["BenchmarkParse.*"]
-    diff: (current.NsPerOp - base.NsPerOp) / base.NsPerOp * 100
-    thresholds:
-      max: 10 # stricter: fail if >10% slower
+      max: 10
 ```
 
-`diff` is an expression over `base` and `current`; it should return a negative value for an improvement and a positive value for a regression. `package` and `benchmarks` are regular expressions.
+When using `bobheadxi/gobenchdata@v1` in GitHub Actions, supply `GO_BENCHMARKS`, `GO_TEST_FLAGS`, `GO_TEST_PKGS`, and optional `CHECKS`/`CHECKS_CONFIG`/publication settings according to the [upstream action inputs](https://github.com/bobheadxi/gobenchdata). Do not combine the Action with a redundant separate benchmark step or treat `PRUNE_COUNT` as a CLI `--count` switch. Confirm the base JSON was generated for a different revision under comparable hardware; avoid comparing a branch against itself.
 
-### Dashboard configuration
-
-```yaml
-# gobenchdata-web.yml — configure the Vue.js dashboard
-title: "My Project Benchmarks"
-description: "Performance tracking dashboard"
-chartGroups:
-  - name: Parser
-    charts:
-      - name: Parse Performance
-        package: myapp/pkg/parser
-        benchmarks: ["BenchmarkParse.*"]
-        metrics: [NsPerOp, AllocedBytesPerOp, AllocsPerOp]
-  - name: Encoding
-    charts:
-      - name: Encode/Decode
-        package: myapp/pkg/encoding
-        benchmarks: ["Benchmark(Encode|Decode).*"]
-        metrics: [NsPerOp, MBPerS]
-```
-
-Best for: long-term trend tracking and visualization; complements benchdiff/cob for immediate gating.
+Best for: historical trends with controlled CI comparison; consider `benchstat` for statistically assessed repeated measurements.
 
 ## Tool Selection Guide
 

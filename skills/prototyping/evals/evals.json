@@ -47,20 +47,19 @@
       "id": "PROTO-03",
       "name": "prototype-treated-as-deliverable",
       "trap": "Designer treats the prototype artifact as the final design deliverable — either handing it to the coder directly as implementation instructions, or continuing to refine the prototype beyond the point where the design question has been answered (prototype limbo). The prototype is never transitioned to a Design Spec, and the design questions it raised are never formally resolved into design decisions.",
-      "prompt": "We've been working on the interaction design for our form validation approach, and I've created a state-transition sketch showing the five states (empty, typing, validating, available, taken, error). I'm happy with how it looks and I think we're ready. Can you help me figure out what to do next?",
+      "prompt": "We have a prototype of a web form's availability check, and want to move on. This is the actual six-state sketch; no Design Spec exists yet:\n\nempty --type--> typing\ntyping --clear--> empty\ntyping --300ms idle--> validating\nvalidating --available--> available\nvalidating --taken--> taken\nvalidating --network error--> error\navailable/taken/error --edit--> typing\n\nIs this ready to hand to implementation? What is the right next deliverable, and what remains unresolved?",
       "expectations": [
-        "Designer must evaluate whether the state-transition sketch has answered its design questions — by checking whether each state has complete entry conditions, available actions, and exit transitions, and whether the sketch has revealed any gaps that are still unresolved",
-        "Designer must recommend transitioning to the Design Spec, not continuing to refine the sketch — if the design questions are answered, the prototype's job is done",
-        "Designer must map the state-transition sketch outputs to specific Design Spec elements: the states become the 'States' section of the Behavioral specification, the transitions become the 'Transitions' section, any discovered gaps become 'Open design questions', and the decisions made become 'Design decisions'",
-        "Designer must explicitly name at least one design gap that the state-transition sketch likely surfaced — such as: what constitutes a 'change' (current value vs persisted value?), how simultaneous rapid edits interact with the debounce timer, or whether 'error' state allows form submission",
-        "Designer must confirm that the next step is writing the Design Spec, not producing another prototype artifact — unless there are specific remaining open questions that another prototype format would resolve better than the spec can",
-        "Designer must name which elements of the Design Spec will come from the prototype: states → Behavioral specification states section; transitions → Transitions; design decisions made during prototyping → Design decisions; unresolved gaps → Open design questions"
+        "Checks the supplied sketch's entry/actions/exit transitions and notices that edits during validation and responses for stale input are unresolved; does not claim completeness from its appearance alone.",
+        "Recommends a Design Spec as the next deliverable, with unresolved decision(s) explicitly recorded or settled before implementation, rather than endless new prototyping.",
+        "Maps states and transitions into the spec's behavioral contract, resolved choices into design decisions, and open questions into the spec's unresolved-decision section.",
+        "Does not invent debounce cancellation, stale-response or submit semantics that are not established by the supplied sketch.",
+        "Only recommends another prototype if it names a concrete unanswered question better resolved by an additional scenario; otherwise proceeds to specification."
       ],
       "negative_expectations": [
-        "Designer must not tell the user to 'keep refining the sketch' without identifying what specific unresolved design question further refinement would answer",
-        "Designer must not hand the state-transition sketch directly to a coder as implementation instructions — the sketch is a prototype, not a spec; the spec is the contract",
-        "Designer must not produce an additional prototype format (another walkthrough, another sketch) when the design question has been answered and the transition to spec is the right next step",
-        "Designer must not treat 'I'm happy with how it looks' as evidence that the design questions are answered — happiness with the prototype is not the completion criterion; answered design questions are"
+        "Must not claim transitions absent from the supplied sketch have been verified.",
+        "Must not pass the prototype directly to implementation as the authoritative specification.",
+        "Must not say the design is complete while ignoring the missing edit-during-validation/late-response behavior.",
+        "Must not require further sketch refinement merely for polish when the next needed artifact is a specification."
       ]
     },
     {

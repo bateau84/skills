@@ -62,7 +62,7 @@ var rootCmd = &cobra.Command{
 }
 ```
 
-Use `AddGroup` to label subcommands in help output — register groups **before** the `AddCommand` calls that reference them; cobra does not retroactively assign groups.
+Use `AddGroup` to label subcommands in help output — ensure every referenced GroupID exists before command execution/help validation. Registration order relative to AddCommand is not the fundamental constraint; GroupID selects the group.
 
 ## The Run\* family
 

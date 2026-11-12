@@ -168,6 +168,8 @@ $ echo $?
 # [Next scenario or error path]
 ```
 
+**For partial-effect or batch CLI workflows**, render the requested success, no-op/impossible-operation, interruption or mid-batch failure, and non-interactive/piped scenarios as *actual transcripts* rather than listing them as future work. Show command, relevant stdout/stderr, exit status, and resulting persisted state (or explicitly unknown state) for each. When a rollback or retry guarantee has not been accepted, show the design question instead of inventing its result. This is a risk-driven coverage rule, not a mandatory exhaustive matrix for every simple CLI.
+
 **Example — package installation tool (primary flow + error paths):**
 
 ```
@@ -315,6 +317,8 @@ The state-transition sketch makes all states explicit — as text — with the t
 └────────────────────────────────────────────────────────────────┘
 [Focus: confirmation dialog, 'No' default; Esc returns to detail-view]
 ```
+
+**Artifact completeness:** Draw every state that the prototyping request explicitly asks to compare; do not replace a requested screen with "the other state would look similar." Label active region, focus, key bindings, entry/exit transitions, and changes to populated/empty panels. A key binding map must cover requested recovery and clearing actions (for example, clearing a namespace filter) as well as navigation; mark undecided behavior as a concrete design gap.
 
 **What the state sketch reveals:**
 - Whether all key states are accounted for (what happens when the process list is empty? When filtering returns no results?)
@@ -601,6 +605,8 @@ The gap between "what walkthroughs surface" and "what they miss" is the limit of
 ## Prototype-to-spec transition
 
 A prototype is "done" when it has answered the design questions it was created to answer — not when it is complete, detailed, or polished.
+
+**Readiness check:** For each relevant state, check entry condition, available actions, exit transitions, and unresolved decisions. Prefer moving answered questions into the Design Spec over creating another prototype; only repeat prototyping for a named unresolved decision that a new scenario can settle.
 
 **When to transition:**
 - The design approach has been selected (comparative scenario analysis is complete)

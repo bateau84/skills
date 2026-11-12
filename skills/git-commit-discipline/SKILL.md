@@ -75,7 +75,8 @@ Clarify the intended outcome when "undo" is ambiguous. Choose the narrowest oper
 
 | Intended outcome | Typical operation | Important boundary |
 | --- | --- | --- |
-| Discard specified uncommitted files | `git restore -- <paths>` | Destroys those edits; confirm scope and ownership. |
+| Discard selected unstaged worktree edits | `git restore -- <paths>` | Restores from the **index**; staged edits remain. Confirm paths and ownership. |
+| Discard selected staged and unstaged edits | `git restore --source=HEAD --staged --worktree -- <paths>` | Destructive to both index and worktree for named paths; require explicit authorization. |
 | Preserve edits before changing context | `git stash push` | Include untracked files only intentionally; inspect before dropping. |
 | Undo a shared commit | `git revert <sha>` | Adds an inverse commit without rewriting shared history. |
 | Undo a local commit while keeping edits | `git reset --soft <sha>` or `--mixed` | Moves history; requires authorization for that outcome. |

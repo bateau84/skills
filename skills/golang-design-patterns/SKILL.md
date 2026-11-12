@@ -23,7 +23,7 @@ Idiomatic Go patterns for production-ready code. For error handling details see 
 
 ## Best Practices Summary
 
-1. Constructors SHOULD use **functional options** — they scale better as APIs evolve (one function per option, no breaking changes)
+1. Choose a simple constructor/options struct or **functional options** according to the actual API; adding indirection is not inherently an improvement.
 2. Functional options MUST **return an error** if validation can fail — catch bad config at construction, not at runtime
 3. **Avoid `init()`** — runs implicitly, cannot return errors, makes testing unpredictable. Use explicit constructors
 4. Enums SHOULD **start at 1** (or Unknown sentinel at 0) — Go's zero value silently passes as the first enum member
@@ -50,49 +50,27 @@ Idiomatic Go patterns for production-ready code. For error handling details see 
 ### Functional Options (Preferred)
 
 ```go
-type Server struct {
-    addr         string
-    readTimeout  time.Duration
-    writeTimeout time.Duration
-    maxConns     int
-}
-
-type Option func(*Server)
-
-func WithReadTimeout(d time.Duration) Option {
-    return func(s *Server) { s.readTimeout = d }
-}
-
-func WithWriteTimeout(d time.Duration) Option {
-    return func(s *Server) { s.writeTimeout = d }
-}
+type Server struct { addr string; maxConns int }
+type Option func(*Server) error
 
 func WithMaxConns(n int) Option {
-    return func(s *Server) { s.maxConns = n }
-}
-
-func NewServer(addr string, opts ...Option) *Server {
-    // Default options
-    s := &Server{
-        addr:         addr,
-        readTimeout:  5 * time.Second,
-        writeTimeout: 10 * time.Second,
-        maxConns:     100,
+    return func(s *Server) error {
+        if n <= 0 { return fmt.Errorf("max connections must be positive") }
+        s.maxConns = n
+        return nil
     }
+}
+func NewServer(addr string, opts ...Option) (*Server, error) {
+    if addr == "" { return nil, fmt.Errorf("server address is required") }
+    s := &Server{addr: addr, maxConns: 100}
     for _, opt := range opts {
-        opt(s)
+        if err := opt(s); err != nil { return nil, err }
     }
-    return s
+    return s, nil
 }
-
-// Usage
-srv := NewServer(":8080",
-    WithReadTimeout(30*time.Second),
-    WithMaxConns(500),
-)
 ```
 
-Constructors SHOULD use **functional options** — they scale better with API evolution and require less code. Use builder pattern only if you need complex validation between configuration steps.
+Functional options are useful when they improve this API; a small fixed constructor or options struct can be clearer. The example needs `fmt`; the signature propagates validation errors rather than silently accepting invalid limits.
 
 ## Constructors & Initialization
 

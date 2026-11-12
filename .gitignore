@@ -4,3 +4,7 @@
 /EVAL-RESULTS.md
 /.EVAL-RESULTS.lock
 /.EVAL-RESULTS-*.tmp
+
+# Executable reference examples: generated dependencies and build output.
+/skills/mcp-builder/examples/typescript/node_modules/
+/skills/mcp-builder/examples/typescript/dist/

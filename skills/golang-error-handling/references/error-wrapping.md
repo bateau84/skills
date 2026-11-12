@@ -58,12 +58,12 @@ if ve, ok := err.(*ValidationError); ok {
 // ✓ Good — traverses the entire error chain
 var ve *ValidationError
 if errors.As(err, &ve) {
-    log.Printf("validation failed on field %s: %s", ve.Field, ve.Msg)
+    log.Printf("validation failed on field %s: %s", ve.Field, ve.Message)
 }
 
 // ✓ Better (Go 1.26+) — same behavior, simpler syntax
 if ve, ok := errors.AsType[*ValidationError](err); ok {
-    log.Printf("validation failed on field %s: %s", ve.Field, ve.Msg)
+    log.Printf("validation failed on field %s: %s", ve.Field, ve.Message)
 }
 ```
 
@@ -110,3 +110,5 @@ err := errors.Join(ErrNotFound, ErrUnauthorized)
 errors.Is(err, ErrNotFound)    // true
 errors.Is(err, ErrUnauthorized) // true
 ```
+
+Use `%v` at a boundary only for an intentionally hidden implementation cause. Keep the package's own documented sentinel/type visible (for example wrap that sentinel with `%w` and render an internal cause separately); hiding every error defeats the public errors.Is/errors.As contract.

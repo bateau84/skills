@@ -26,6 +26,8 @@ This skill covers the full measurement workflow: write a benchmark, run it, prof
 
 ### `b.Loop()` (Go 1.24+) — preferred
 
+On Go 1.24–1.25, calls inside `b.Loop` were prevented from inlining; Go 1.26 removed that limitation. Keep the benchmark form/toolchain unchanged in before/after comparisons so a harness conversion does not masquerade as a code regression.
+
 For Go 1.24+, prefer `b.Loop()` for new benchmarks. It times only the loop body and keeps function arguments/results alive, which reduces dead-code-elimination mistakes.
 
 ```go
@@ -55,7 +57,7 @@ func BenchmarkAlloc(b *testing.B) {
 `b.ReportMetric()` adds custom metrics (e.g., throughput):
 
 ```go
-b.ReportMetric(float64(totalBytes)/b.Elapsed().Seconds(), "bytes/s") // b.Elapsed() is only valid inside b.Loop()
+b.ReportMetric(float64(totalBytes)/b.Elapsed().Seconds(), "bytes/s") // b.Elapsed() returns the time measured by StartTimer/StopTimer/ResetTimer; valid after b.N or b.Loop
 ```
 
 ### Sub-benchmarks and table-driven
@@ -168,4 +170,4 @@ For full pprof CLI reference (all commands, non-interactive mode, profile interp
 - → See `golang-troubleshooting` skill for pprof setup on running services (enable, secure, capture), Delve diagnostic, GODEBUG flags, root cause methodology
 - → See `golang-observability` skill for everyday always-on monitoring, continuous profiling (Pyroscope), distributed tracing (OpenTelemetry)
 - → See `golang-testing` skill for general testing practices
-- → See `promql-cli` skill for querying Prometheus runtime metrics in production to validate benchmark findings
+- → See `promql` skill for querying Prometheus runtime metrics in production to validate benchmark findings

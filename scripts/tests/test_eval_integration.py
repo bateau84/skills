@@ -49,6 +49,12 @@ class PinnedIntegrationTests(unittest.TestCase):
         self.job = self.runner.eval_plan.expand_jobs((self.case,), iterations=1)[0]
         self.calls = []
 
+    def test_missing_oci_engine_remains_a_production_error(self):
+        from unittest.mock import patch
+        with patch.object(self.runner.cli.shutil, "which", return_value=None):
+            with self.assertRaises(self.runner.cli.RunnerError):
+                self.runner.cli.resolve_engine("podman")
+
     def evidence(self, tool=None, input_value=None, *, ended=True, result_state="available", input_state="available", actor="eval-target"):
         available = lambda value: {"state": "available", "value": value}
         records = []
@@ -353,7 +359,9 @@ class PinnedIntegrationTests(unittest.TestCase):
                                       auth=str(auth), models_catalog=str(models), config=str(spec.config),
                                       config_root=None, env=[], timeout_seconds=240)
             with patch.dict(os.environ, {"PATH": os.defpath, "OPENCODE_EVAL_RUNNER_CONFIG_ROOT": "/loom",
-                                         "OPENCODE_EVAL_RUNNER_CONFIG": "/bad", "OPENCODE_EVAL_RUNNER_IMAGE": "float"}, clear=True):
+                                         "OPENCODE_EVAL_RUNNER_CONFIG": "/bad", "OPENCODE_EVAL_RUNNER_IMAGE": "float"}, clear=True), \
+                 patch.object(self.runner.cli.shutil, "which", return_value="/test/bin/podman"):
+                # This test builds argv; executable discovery is the external host boundary.
                 freeze_environment(self.options)
                 command, _ = self.runner.cli.build_container_command(args, temp / "input", temp / "output", host_env={})
             self.assertIn("--pull=never", command)
@@ -386,7 +394,9 @@ class PinnedIntegrationTests(unittest.TestCase):
                                                   model=spec.model, reasoning=spec.reasoning, expected_plugin=None,
                                                   auth=None, models_catalog=None, config=str(spec.config), config_root=None,
                                                   env=[], timeout_seconds=240)
-                        with patch.dict(os.environ, {"PATH": os.defpath}, clear=True):
+                        with patch.dict(os.environ, {"PATH": os.defpath}, clear=True), \
+                             patch.object(self.runner.cli.shutil, "which", return_value="/test/bin/podman"):
+                            # No OCI process is launched: only command construction is under test.
                             freeze_environment(self.options)
                             command, _ = self.runner.cli.build_container_command(
                                 args, temp / "input", temp / "output", host_env={})

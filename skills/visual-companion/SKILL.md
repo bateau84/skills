@@ -40,7 +40,8 @@ This offer MUST be its own message — no other content. Wait for the user's res
 ## Starting a Session
 
 ```bash
-SCRIPTS="$HOME/.config/opencode/skills/visual-companion/scripts"
+SKILL_DIR="/absolute/path/to/installed/visual-companion"  # resolve from the actual loaded SKILL.md location
+SCRIPTS="$SKILL_DIR/scripts"
 $SCRIPTS/start-server.sh --project-dir /path/to/project --open
 ```
 
@@ -49,7 +50,7 @@ Share the full URL (includes session key) with the user as a fallback.
 
 ## The Loop
 
-1. **Check server is alive** — verify `$STATE_DIR/server-info` exists and `$STATE_DIR/server-stopped` does not. If stopped, restart with same `--project-dir` (reuses port, browser tab auto-reconnects).
+1. **Check server is alive** — verify `$STATE_DIR/server-info` exists and `$STATE_DIR/server-stopped` does not. If stopped, restarting with the same `--project-dir` may reuse the port/token, **but it creates a new session directory**. Parse the restart command's JSON output and replace the saved `screen_dir`, `state_dir` and URL; write/push the current screen again into the *new* directory. Never continue writing to paths from the stopped session.
 
 2. **Write HTML** to a new file in `screen_dir`:
    - Use semantic filenames: `layout.html`, `architecture.html`, `comparison.html`
@@ -71,7 +72,7 @@ Share the full URL (includes session key) with the user as a fallback.
 
 6. **Unload when returning to text** — when the next point doesn't need the browser, push a waiting screen:
    ```html
-   <!-- filename: waiting.html -->
+   <!-- filename: waiting-unique-step-id.html -->
    <div
      style="display:flex;align-items:center;justify-content:center;min-height:60vh"
    >
@@ -190,12 +191,12 @@ Multi-select: Add `data-multiselect` to the container.
 ## Browser Events Format
 
 ```jsonl
-{"type":"click","choice":"a","text":"Option A - Simple Layout","timestamp":1706000101}
-{"type":"click","choice":"b","text":"Option B - Hybrid","timestamp":1706000115}
+{"type":"click","choice":"a","text":"Option A - Simple Layout","timestamp":1706000101000}
+{"type":"click","choice":"b","text":"Option B - Hybrid","timestamp":1706000115000}
 ```
 
-Last `choice` event is typically the final selection. The click pattern reveals hesitation.
-If `$STATE_DIR/events` doesn't exist, user didn't interact with the browser.
+For **single-select**, the latest event can indicate the most recent clicked choice. For **multi-select**, a click can toggle an option *off*; the event does not record the resulting selected set. Confirm the active selection from the UI or with the user; do not treat the last clicked value as the final multi-selection.
+Event timestamps are milliseconds since the Unix epoch (`Date.now()`), not seconds. A missing events file is missing evidence, not proof of no interaction: a new screen filename resets it. `text` is the clicked option's full text content, not a separately supplied label.
 
 ## Design Tips
 
@@ -208,7 +209,10 @@ If `$STATE_DIR/events` doesn't exist, user didn't interact with the browser.
 ## Cleaning Up
 
 ```bash
-$SCRIPTS/stop-server.sh $SESSION_DIR
+SESSION_DIR="$(dirname "$STATE_DIR")"  # stop-server expects the parent of state_dir, not state_dir itself
+"$SCRIPTS/stop-server.sh" "$SESSION_DIR"
 ```
 
 Project-dir sessions persist in `.brainstorm/` for reference. `/tmp` sessions are deleted on stop.
+
+After stopping, the project may retain `.brainstorm/.last-token` for reconnection. Treat it as session-sensitive data and remove it only within authorized cleanup scope after confirming no session still needs it. Node and a reachable browser are prerequisites; on SSH/headless hosts expose loopback through an approved tunnel, never silently bind publicly or claim `--open` displayed a browser.
