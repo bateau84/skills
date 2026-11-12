@@ -32,7 +32,7 @@ viper.AddConfigPath(".")                 // search path 3 (lowest priority)
 
 // viper searches paths in order, stops at the first match
 if err := viper.ReadInConfig(); err != nil {
-    var notFound *viper.ConfigFileNotFoundError
+    var notFound viper.ConfigFileNotFoundError
     if !errors.As(err, &notFound) {
         return err  // real error (permission denied, malformed YAML, etc.)
     }
@@ -70,9 +70,11 @@ viper.SetConfigFile(fmt.Sprintf("config.%s.yaml", env))
 viper.ReadInConfig()
 ```
 
+In Viper v1.20+, non-core formats (HCL, INI and Java properties) need an explicit codec registration from [go-viper/encoding](https://github.com/go-viper/encoding); do not assume extension support implies decoding support.
+
 ## Remote KV stores (etcd, Consul)
 
-Viper supports remote KV stores via the `viper/remote` sub-package. This keeps remote config behind an opt-in import:
+Viper v1.20+ distributes remote KV support as a separate `github.com/spf13/viper/remote` module. Add that dependency explicitly only if remote configuration is necessary; a blank import alone does not install it:
 
 ```go
 import _ "github.com/spf13/viper/remote"

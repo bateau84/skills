@@ -24,7 +24,7 @@ Built-in and standard library data structures: internals, correct usage, and sel
 4. **Use `container/heap`** for priority queues, **`container/list`** only when frequent middle insertions are needed, **`container/ring`** for fixed-size circular buffers
 5. **`strings.Builder`** MUST be preferred for building strings; **`bytes.Buffer`** MUST be preferred for bidirectional I/O (implements both `io.Reader` and `io.Writer`)
 6. Generic data structures SHOULD use the **tightest constraint** possible — `comparable` for keys, custom interfaces for ordering
-7. **`unsafe.Pointer`** MUST only follow the 6 valid conversion patterns from the Go spec — NEVER store in a `uintptr` variable across statements
+7. **`unsafe.Pointer`** MUST only follow the documented conversion patterns from `unsafe.Pointer` (https://pkg.go.dev/unsafe#Pointer) — NEVER store in a `uintptr` variable across statements
 8. **`weak.Pointer[T]`** (Go 1.24+) SHOULD be used for caches and canonicalization maps to allow GC to reclaim entries
 
 ## Slice Internals
@@ -58,7 +58,7 @@ Key functions: `Sort`/`SortFunc`, `BinarySearch`, `Contains`, `Compact`, `Grow`.
 
 ## Map Internals
 
-Maps are hash tables with 8-entry buckets and overflow chains. They are reference types — assigning a map copies the pointer, not the data.
+Go 1.24+ maps use Swiss Table-style groups and table splitting rather than the pre-1.24 bucket/overflow layout. A map assignment shares its underlying map data; it is not a deep copy. See [Go 1.24 map implementation](https://go.dev/blog/swisstable).
 
 ### Preallocation
 
@@ -125,7 +125,7 @@ func (s Set[T]) Contains(v T) bool { _, ok := s[v]; return ok }
 | --- | --- | --- |
 | `*T` | Normal indirection, mutation, optional values | `nil` |
 | `unsafe.Pointer` | FFI, low-level memory layout (6 spec patterns only) | `nil` |
-| `weak.Pointer[T]` (1.24+) | Caches, canonicalization, weak references | N/A |
+| `weak.Pointer[T]` (1.24+) | Optional weak references where lifetime/reclamation is intentional | Valid nil weak pointer |
 
 **[Pointer Types Deep Dive](./references/pointers.md)** — Normal pointers, `unsafe.Pointer` (the 6 valid spec patterns), and `weak.Pointer[T]` for GC-safe caches that don't prevent cleanup.
 
@@ -134,7 +134,7 @@ func (s Set[T]) Contains(v T) bool { _, ok := s[v]; return ok }
 | Type | Copy Behavior | Independence |
 | --- | --- | --- |
 | `int`, `float`, `bool`, `string` | Value (deep copy) | Fully independent |
-| `array`, `struct` | Value (deep copy) | Fully independent |
+| `array`, `struct` | Shallow element/field-by-field value copy | Pointer, slice, map and channel fields or array elements still refer to shared underlying objects |
 | `slice` | Header copied, backing array shared | Use `slices.Clone` |
 | `map` | Reference copied | Use `maps.Clone` |
 | `channel` | Reference copied | Same channel |

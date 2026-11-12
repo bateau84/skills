@@ -57,3 +57,7 @@ Use specific action labels and self-contained link text. Errors should state wha
 ## Verify the implemented experience
 
 Exercise the real interaction path, keyboard navigation, focus transitions, error/recovery states, and relevant responsive conditions. Use available browser, terminal, or desktop tools; record actual observations and unverified limits. Compare the result with the design, not just a screenshot. Use `design-validation` for a fuller experience check.
+
+## Boundary and verification
+
+Not for deciding a new interaction design or independently defining accessibility conformance. Implement the accepted design; use `accessibility-implementation` for concrete keyboard, focus, announcement, reflow and target-size checks under the selected WCAG level. Verify the actual rendered states rather than declaring a checklist completed from source alone.

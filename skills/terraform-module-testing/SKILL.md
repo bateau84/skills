@@ -407,31 +407,30 @@ assert {
 
 ## Cleanup
 
-Resources are destroyed in **reverse run block order** after test completion. This matters for dependencies (e.g., S3 objects before bucket). Use `terraform test -no-cleanup` to skip cleanup for debugging.
+Resources are destroyed in **reverse run block order** after test completion. This matters for dependencies (e.g., S3 objects before bucket). Inspect cleanup diagnostics and state; do not use an undocumented `-no-cleanup` option.
 
 ## Running Tests
 
 ```bash
 terraform test                                        # all tests
-terraform test tests/defaults.tftest.hcl             # specific file
-terraform test -filter=test_vpc_configuration        # by run block name
+terraform test -filter=tests/defaults.tftest.hcl     # specific file
+terraform test -filter=tests/vpc_module_mock_test.tftest.hcl # selects file, not run name
 terraform test -test-directory=integration-tests     # custom directory
 terraform test -verbose                              # detailed output
-terraform test -no-cleanup                           # skip resource cleanup
 ```
 
 ## Best Practices
 
 1. **Naming**: `*_unit_test.tftest.hcl` for plan mode, `*_integration_test.tftest.hcl` for apply mode
 2. **Test naming**: Use descriptive run block names that explain the scenario being tested
-3. **Default to plan**: Use `command = plan` unless you need to test real resource behavior
+3. **Choose plan or apply from the assertion:** use `plan` for known configuration/invariants; mocked computed attributes are normally generated at `apply` (which stays mock-only) unless `override_during = plan` is explicitly configured.
 4. **Use mocks** for external dependencies — faster and no credentials needed (see `references/MOCK_PROVIDERS.md`)
 5. **Error messages**: Make them specific enough to diagnose failures without running the test again
 6. **Negative tests**: Use `expect_failures` to verify validation rules reject bad inputs
 7. **Variable coverage**: Test different variable combinations to validate all code paths — test variables have the highest precedence and override all other sources
 8. **Module sources**: Test files only support local paths and registry modules — not git or HTTP URLs
 9. **Parallel execution**: Use `parallel = true` for independent tests with different state files
-10. **Cleanup**: Integration tests destroy resources in reverse run block order automatically; use `-no-cleanup` for debugging
+10. **Cleanup**: Integration tests destroy resources in reverse run block order automatically; inspect the actual cleanup diagnostics and supported test flags instead of inventing a no-cleanup mode
 11. **CI/CD**: Run unit tests on every PR, integration tests on merge (see `references/CI_CD.md`)
 
 ## Troubleshooting

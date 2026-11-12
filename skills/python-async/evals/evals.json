@@ -28,13 +28,12 @@
     {
       "id": 3,
       "name": "asyncio-run-inside-loop",
-      "prompt": "A FastAPI app uses this service. The method `process_webhook` is a plain Python function that receives events and needs to call the async `fetch` method. It crashes in production.\n\n```python\nclass DataService:\n    async def fetch(self, id: str) -> dict:\n        async with httpx.AsyncClient() as c:\n            return (await c.get(f\"/data/{id}\")).json()\n\n    def process_webhook(self, payload: dict) -> dict:\n        data = asyncio.run(self.fetch(payload[\"id\"]))  # crashes in production\n        return {\"status\": \"ok\", \"data\": data}\n```\n\nWhy does it crash? Fix it.",
-      "trap": "asyncio.run() creates a NEW event loop. Inside FastAPI the loop is already running, so asyncio.run() raises RuntimeError: 'This event loop is already running'. The fix is asyncio.to_thread (offload the blocking call or make the caller async).",
+      "prompt": "A FastAPI app uses this service. The method `process_webhook` is a plain Python function that receives events and needs to call the async `fetch` method. It crashes in production.\n\n```python\nclass DataService:\n    async def fetch(self, id: str) -> dict:\n        async with httpx.AsyncClient() as c:\n            return (await c.get(f\"/data/{id}\")).json()\n\n    def process_webhook(self, payload: dict) -> dict:\n        data = asyncio.run(self.fetch(payload[\"id\"]))  # crashes in production\n        return {\"status\": \"ok\", \"data\": data}\n```\n\nThe FastAPI route is `async def` and calls `service.process_webhook(payload)` directly. Why does it crash? Fix the call path.",
+      "trap": "asyncio.run() cannot be called from a running event loop in the same thread (the actual RuntimeError). A synchronous FastAPI route may run on a worker thread instead. asyncio.to_thread offloads synchronous work; it is not the way to await an async method from this async route.",
       "expectations": [
-        "Identifies asyncio.run() fails when called inside an already-running event loop",
-        "Fixes by using asyncio.to_thread, or by making process_webhook async",
-        "Explains why the crash occurs (loop already running / nested event loop)",
-        "Does NOT leave asyncio.run() in place as the solution"
+        "Explains that asyncio.run() raises RuntimeError when another event loop is already running in the same thread; does not claim all synchronous FastAPI functions run on the event-loop thread.",
+        "Fixes the async call chain by making process_webhook async, awaiting self.fetch, and awaiting process_webhook from the async route (or gives an equally correct, explicitly justified bridge).",
+        "Does not use asyncio.to_thread(self.fetch, ...) as a substitute for awaiting an async function, or retain asyncio.run() on the active event-loop thread."
       ]
     }
   ]

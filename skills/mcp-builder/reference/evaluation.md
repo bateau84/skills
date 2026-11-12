@@ -381,6 +381,9 @@ After creating your evaluation file, you can use the provided evaluation harness
 
 ## Setup
 
+The bundled evaluator targets Python MCP SDK v1 (`mcp>=1.28,<2`) and uses the **billed Anthropic API**, not an automatic Claude subscription. Supply `-m $ANTHROPIC_MODEL_ID` explicitly; no retired default model is selected. For server arguments/env/header values, repeat `-a`, `-e` or `-H` for each value, keeping the positional eval XML file separate. A server argument beginning with a dash must use the equals form: `-a=--stdio` or `-a=-y`, not `-a --stdio`. For example: `-c npx -a=-y -a package-name eval.xml` (also supply `-m`).
+
+
 1. **Install Dependencies**
 
    ```bash
@@ -389,7 +392,7 @@ After creating your evaluation file, you can use the provided evaluation harness
 
    Or install manually:
    ```bash
-   pip install anthropic mcp
+   pip install -r scripts/requirements.txt
    ```
 
 2. **Set API Key**
@@ -397,6 +400,12 @@ After creating your evaluation file, you can use the provided evaluation harness
    ```bash
    export ANTHROPIC_API_KEY=your_api_key_here
    ```
+
+### Result coverage and cancellation
+
+The evaluator is text-only. It forwards text blocks once, falling back to `structuredContent` only when no nonempty text is present. Image/audio/resource blocks receive explicit unsupported-content placeholders; their bytes are not evaluated. The server's `isError` remains authoritative: a successful call is not relabelled as failed merely because this harness cannot inspect one modality. Do not use this harness to score tasks whose answer depends on omitted modalities.
+
+Provider calls use `AsyncAnthropic` and are awaited directly. Local cancellation unwinds the in-flight HTTP await and closes the client; it does **not** prove that a remote provider stopped processing or reversed billing. CLI environment values retain intentional whitespace after `=`.
 
 ## Evaluation File Format
 
@@ -428,7 +437,7 @@ The evaluation script (`scripts/evaluation.py`) supports three transport types:
 For locally-run MCP servers (script launches the server automatically):
 
 ```bash
-python scripts/evaluation.py \
+python scripts/evaluation.py -m "$ANTHROPIC_MODEL_ID" \
   -t stdio \
   -c python \
   -a my_mcp_server.py \
@@ -437,7 +446,7 @@ python scripts/evaluation.py \
 
 With environment variables:
 ```bash
-python scripts/evaluation.py \
+python scripts/evaluation.py -m "$ANTHROPIC_MODEL_ID" \
   -t stdio \
   -c python \
   -a my_mcp_server.py \
@@ -451,7 +460,7 @@ python scripts/evaluation.py \
 For SSE-based MCP servers (you must start the server first):
 
 ```bash
-python scripts/evaluation.py \
+python scripts/evaluation.py -m "$ANTHROPIC_MODEL_ID" \
   -t sse \
   -u https://example.com/mcp \
   -H "Authorization: Bearer token123" \
@@ -464,7 +473,7 @@ python scripts/evaluation.py \
 For HTTP-based MCP servers (you must start the server first):
 
 ```bash
-python scripts/evaluation.py \
+python scripts/evaluation.py -m "$ANTHROPIC_MODEL_ID" \
   -t http \
   -u https://example.com/mcp \
   -H "Authorization: Bearer token123" \
@@ -474,9 +483,9 @@ python scripts/evaluation.py \
 ## Command-Line Options
 
 ```
-usage: evaluation.py [-h] [-t {stdio,sse,http}] [-m MODEL] [-c COMMAND]
-                     [-a ARGS [ARGS ...]] [-e ENV [ENV ...]] [-u URL]
-                     [-H HEADERS [HEADERS ...]] [-o OUTPUT]
+usage: evaluation.py [-h] [-t {stdio,sse,http}] -m MODEL [-c COMMAND]
+                     [-a ARG] [-e KEY=VALUE] [-u URL]
+                     [-H HEADER] [-o OUTPUT]
                      eval_file
 
 positional arguments:
@@ -485,7 +494,7 @@ positional arguments:
 optional arguments:
   -h, --help            Show help message
   -t, --transport       Transport type: stdio, sse, or http (default: stdio)
-  -m, --model           Claude model to use (default: claude-3-7-sonnet-20250219)
+  -m, --model           Explicit available Anthropic API model ID (required)
   -o, --output          Output file for report (default: print to stdout)
 
 stdio options:
@@ -519,7 +528,7 @@ The evaluation script generates a detailed report including:
 ### Save Report to File
 
 ```bash
-python scripts/evaluation.py \
+python scripts/evaluation.py -m "$ANTHROPIC_MODEL_ID" \
   -t stdio \
   -c python \
   -a my_server.py \
@@ -560,7 +569,7 @@ export ANTHROPIC_API_KEY=your_api_key
 3. **Run evaluation**:
 
 ```bash
-python scripts/evaluation.py \
+python scripts/evaluation.py -m "$ANTHROPIC_MODEL_ID" \
   -t stdio \
   -c python \
   -a github_mcp_server.py \
@@ -596,7 +605,7 @@ If many evaluations fail:
 ### Timeout Issues
 
 If tasks are timing out:
-- Use a more capable model (e.g., `claude-3-7-sonnet-20250219`)
+- Use a more capable model (e.g., `$ANTHROPIC_MODEL_ID`)
 - Check if tools are returning too much data
 - Verify pagination is working correctly
 - Consider simplifying complex questions

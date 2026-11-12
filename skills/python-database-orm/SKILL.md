@@ -287,7 +287,7 @@ async def create_user(data: UserCreate, db: AsyncSession = Depends(get_session))
     return user
 ```
 
-**Why `try/except/rollback` instead of `try/finally`:** SQLAlchemy's `AsyncSession` already rolls back on `__aexit__` with an exception, but the explicit rollback makes the intent clear and avoids a subtle edge case where a `ProgrammingError` bypasses the automatic path. If the session is used with `session.begin()`, the context manager handles commit/rollback automatically and the explicit rollback is redundant. `expire_on_commit=False` is critical — without it, accessing any attribute after `commit()` triggers a lazy reload that fails in async context.
+**Why `try/except/rollback` instead of `try/finally`:** SQLAlchemy's `AsyncSession` already rolls back on `__aexit__` with an exception, but the explicit rollback makes the intent clear ; it is not a workaround for a claimed special ProgrammingError bypass. If the session is used with `session.begin()`, the context manager handles commit/rollback automatically and the explicit rollback is redundant. `expire_on_commit=False` is critical — without it, accessing any attribute after `commit()` triggers a lazy reload that fails in async context.
 
 ## Real-DB testing
 
@@ -316,11 +316,17 @@ async def engine(postgres):
 
 @pytest.fixture
 async def session(engine):
-    async_session = async_sessionmaker(engine, expire_on_commit=False)
-    async with async_session() as sess:
-        async with sess.begin():
-            yield sess
-            await sess.rollback()
+    async with engine.connect() as connection:
+        outer = await connection.begin()
+        factory = async_sessionmaker(
+            bind=connection, expire_on_commit=False,
+            join_transaction_mode="create_savepoint",
+        )
+        try:
+            async with factory() as sess:
+                yield sess
+        finally:
+            await outer.rollback()
 ```
 
-**Transactional rollback per test:** the `session` fixture wraps each test in a transaction and rolls back at the end. This gives each test a clean database state without re-creating tables or re-inserting fixtures. The `scope="session"` on `engine` and `postgres` ensures the container and schema are shared — only the transaction is per-test.
+**Commit-safe isolation:** the connection owns an outer transaction; each Session transaction uses a savepoint. A `session.commit()` inside the code under test does not commit that outer transaction. This requires proper backend/driver savepoint support; test a real commit followed by teardown and a fresh read. Connections opened independently by application code bypass this fixture. Configure pytest-asyncio fixtures/loop scope to match the engine lifetime. See [SQLAlchemy external transactions](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites).

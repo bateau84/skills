@@ -204,16 +204,20 @@ initializeFaro({
     ...getWebInstrumentations(),
     new TracingInstrumentation({
       // Propagate trace context to these URLs (supports regex)
-      propagateTraceHeaderCorsUrls: [
-        /https:\/\/api\.myapp\.com\/.*/,
-        'https://internal.service.com',
-      ],
+      instrumentationOptions: {
+        propagateTraceHeaderCorsUrls: [
+          /https:\/\/api\.myapp\.com\/.*/,
+          'https://internal.service.com',
+        ],
+      },
       // Custom sampling rate for traces (0-1)
       // samplingRate: 0.5,
     }),
   ],
 });
 ```
+
+For cross-origin APIs, the backend must allow the actual browser origin and `traceparent` (plus any emitted `tracestate`/`baggage`) in its CORS response. Do not propagate these headers to arbitrary third-party destinations. Verify one browser request and matching backend trace before claiming correlation.
 
 When enabled:
 - `traceparent` and `tracestate` headers are injected into all matching fetch/XHR requests

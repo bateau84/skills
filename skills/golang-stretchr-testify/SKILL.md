@@ -183,7 +183,7 @@ Suite methods like `s.Equal()` behave like `assert`. For require: `s.Require().N
 - **Swapped argument order** — testify assumes `(expected, actual)`. Swapping produces backwards diffs
 - **`assert` for guards** — test continues after failure and panics on nil dereference. Use `require`
 - **Missing `suite.Run()`** — without the launcher function, zero tests execute silently
-- **Comparing pointers** — `is.Equal(ptr1, ptr2)` compares addresses. Dereference or use `EqualExportedValues`
+- **Comparing pointer identity** — `is.Equal(ptr1, ptr2)` compares pointed-to values via deep equality; use `is.Same(ptr1, ptr2)` to assert the same address. `EqualExportedValues` deliberately ignores unexported fields, so use it only when that is the intended comparison.
 
 ## Linters
 

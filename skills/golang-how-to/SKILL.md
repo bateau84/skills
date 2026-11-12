@@ -51,12 +51,16 @@ For each task, start with the relevant primary skill; load secondary skills only
 | Review formatting and style | `golang-code-style` | `golang-naming`, `golang-lint` |
 | Configure golangci-lint | `golang-lint` | `golang-code-style` |
 | Write godoc / README / CHANGELOG | `golang-documentation` | `golang-naming` |
-| Set up a new project structure | `golang-design-patterns` | `golang-dependency-injection`, `golang-lint`, `golang-continuous-integration` |
+| Set up a new project structure | `golang-project-layout` | `golang-dependency-management` for actual multi-module needs |
 | Set up CI/CD pipeline | `golang-continuous-integration` | `golang-lint`, `golang-security` |
 | Manage `go.mod` / dependencies | `golang-dependency-management` | `golang-modernize` |
 | Adopt new Go language features | `golang-modernize` | `golang-lint` |
 | Use dependency injection | `golang-dependency-injection` | `golang-design-patterns` |
-| Adopt new Go language features | `golang-modernize` |  |
+| Implement gRPC services/interceptors | `golang-grpc` | `golang-error-handling`, `golang-context` |
+| Use testify assertions/mocks/suites | `golang-stretchr-testify` | `golang-testing` |
+| Implement an interactive Charm TUI | `golang-tui` | `tui-design` for the user-facing contract |
+| Compare libraries | `golang-popular-libraries` | `golang-pkg-go-dev` for current APIs/status |
+| Look up an API or version-specific behavior | `golang-pkg-go-dev` | `golang-modernize` only for authorized upgrades |
 
 **API contracts and version-specific behavior:** for API contracts and version-specific library behavior, load `golang-pkg-go-dev` and look up live, do not answer from pre-training memory.
 
@@ -68,9 +72,9 @@ For each task, start with the relevant primary skill; load secondary skills only
 | Code Quality | `golang-code-style` `golang-documentation` `golang-error-handling` `golang-lint` `golang-naming` `golang-safety` `golang-security` `golang-structs-interfaces` |
 | Architecture & Design | `golang-concurrency` `golang-context` `golang-data-structures` `golang-database` `golang-dependency-injection` `golang-design-patterns` `golang-modernize` |
 | QA & Performance | `golang-benchmark` `golang-observability` `golang-performance` `golang-testing` `golang-troubleshooting` |
-| Project Setup | `golang-cli` `golang-continuous-integration` `golang-dependency-management` `golang-modernize` |
-| APIs | `golang-swagger` |
-| Frameworks | `golang-spf13-cobra` `golang-spf13-viper` |
+| Project Setup | `golang-project-layout` `golang-cli` `golang-continuous-integration` `golang-dependency-management` `golang-popular-libraries` |
+| APIs | `golang-swagger`, `golang-grpc`, `golang-pkg-go-dev` |
+| Frameworks | `golang-spf13-cobra` `golang-spf13-viper` `golang-stretchr-testify` `golang-tui` |
 
 ## Competing clusters — boundary lines
 
@@ -87,40 +91,12 @@ Pick the owner; load neighbors only when the task spans the boundary.
 
 
 
-## Staying Updated with Go
+## Configure mode
 
-Proactively check for new Go versions, language features, and standard library updates as part of Go how-to guidance. The Go ecosystem evolves rapidly — agents should be aware of recent releases and adopt new features when appropriate.
+Only when the user authorizes repository guidance edits, inspect existing `AGENTS.md` instructions and update one `## Required Go skills` section without duplicating or overriding higher-priority rules. List `golang-common-practice` plus specialist skills that genuinely apply to that repository; do not make the entire Go family mandatory. State how the host locates installed skills; do not invent an absolute installation directory.
 
-### Key Resources
+## Version-specific guidance
 
-| Resource | URL |
-| --- | --- |
-| **Go Blog** (official) | <https://go.dev/blog> |
-| **Go Releases** | <https://go.dev/dl/> |
-| **Go Wiki** | <https://go.dev/wiki/> |
-| **pkg.go.dev** | <https://pkg.go.dev> |
-| **Golang Weekly** | <https://golangweekly.com/> |
+Look up current API signatures and supported toolchains only where they matter to the task. Use `golang-pkg-go-dev` and [official release notes](https://go.dev/doc/devel/release). Do not add upgrades, social subscriptions, documentation blocks or new tooling to an unrelated bounded change.
 
-### Communities
-
-- **r/golang** — <https://www.reddit.com/r/golang> (300K+ members)
-- **Go Slack** — <https://invite.slack.golangbridge.org>
-- **Go Forum** — <https://forum.golangbridge.org>
-- **Discuss Go** — <https://groups.google.com/g/golang-nuts>
-
-### Influential Go Developers
-
-Core team: Rob Pike, Ken Thompson, Russ Cox (@\_rsc), Brad Fitzpatrick, Andrew Gerrand, Robert Griesemer, Dmitry Vyukov. Tooling: Sam Boyer, Daniel Theophanes, Jaana Dogan. Authors/educators: Mat Ryer, Dave Cheney, Bill Kennedy (Ardan Labs). Library authors: Steve Francia (spf13), Samuel Berthe (samber), Mitchell Hashimoto.
-
-### Quick Tips
-
-1. **Subscribe to 1-2 newsletters** (Golang Weekly, Awesome Go) — don't overload
-2. **Follow 10-20 key people** on X/Bluesky who post about Go regularly
-3. **Check go.dev/blog weekly** for official announcements
-4. **Join Go Slack** for real-time discussions
-5. **Bookmark pkg.go.dev** to discover new libraries — see `golang-pkg-go-dev` skill
-6. **Attend a GopherCon** (virtual or in-person) yearly
-
----
-
-This skill is not exhaustive. Refer to individual skill files and the official Go documentation for detailed guidance.
+General GitHub workflow security belongs to `github-workflow`; Go-specific build steps belong to `golang-continuous-integration`. General CLI design belongs to `cli-design`, and observability pipeline design to `opentelemetry`/`prometheus`; load Go implementation guidance only for the corresponding code.

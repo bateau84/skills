@@ -20,7 +20,7 @@ proto/
 
 ```protobuf
 syntax = "proto3";
-package mycompany.user.v1;
+package user.v1; // matches user/v1 under the proto module root
 option go_package = "github.com/mycompany/myservice/gen/user/v1;userv1";
 
 service UserService {
@@ -60,12 +60,12 @@ message ListUsersResponse {
 
 ```bash
 # Basic generation
-protoc --go_out=gen --go_opt=paths=source_relative \
+protoc -I proto --go_out=gen --go_opt=paths=source_relative \
        --go-grpc_out=gen --go-grpc_opt=paths=source_relative \
        proto/user/v1/*.proto
 
-# With validation (using buf-validate)
-protoc --go_out=gen --go_opt=paths=source_relative \
+# Legacy protoc-gen-validate (PGV), only for projects already using its generated validators; not Buf Protovalidate
+protoc -I proto --go_out=gen --go_opt=paths=source_relative \
        --go-grpc_out=gen --go-grpc_opt=paths=source_relative \
        --validate_out="lang=go:gen" \
        proto/user/v1/*.proto
@@ -86,6 +86,8 @@ protoc -I proto -I third_party \
 | `--go_opt=paths=source_relative` | Place output relative to proto source   |
 | `-I DIR`                         | Add import path for proto dependencies  |
 | `--descriptor_set_out=FILE`      | Emit binary descriptor (for reflection) |
+
+For new Protovalidate use, use the Buf validation annotations and the supported runtime validator; `--validate_out` belongs to legacy PGV, which is in maintenance mode. Generate/import validation dependencies through the actual Buf module configuration.
 
 ## Code Generation with `buf`
 

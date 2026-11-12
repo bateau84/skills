@@ -19,7 +19,7 @@ Key metric names:
 
 | Source | Metric |
 |--------|--------|
-| Tempo metrics-generator | `traces_spanmetrics_calls_total`, `traces_spanmetrics_duration_seconds` |
+| Tempo metrics-generator | `traces_spanmetrics_calls_total`, `traces_spanmetrics_latency_bucket` / `_sum` / `_count` |
 | OTel Collector connector | `traces_span_metrics_calls_total`, `traces_span_metrics_duration_seconds` |
 | Service Graph | `traces_service_graph_request_total`, `traces_service_graph_request_failed_total` |
 
@@ -27,7 +27,7 @@ Key metric names:
 
 | Attribute | Grafana label | Purpose |
 |---|---|---|
-| `service.name` | `service_name` / part of `job` | service identifier |
+| `service.name` | `job` (or namespace/name) | required service identifier; `service_name` may exist on selected exporters but is not the primary App O11y key |
 | `service.namespace` | part of `job` | groups services; `job = namespace/service.name` |
 | `deployment.environment` | `deployment_environment` | env filter |
 
@@ -56,7 +56,7 @@ otelcol.receiver.otlp "default" {
 }
 
 otelcol.processor.resourcedetection "default" {
-  detectors = ["env", "system", "gcp", "aws", "azure"]
+  detectors = ["env", "system", "gcp", "ec2", "azure"]
   output {
     metrics = [otelcol.processor.batch.default.input]
     logs    = [otelcol.processor.batch.default.input]

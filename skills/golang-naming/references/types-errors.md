@@ -143,7 +143,7 @@ type SyntaxError struct {
 
 ### Error Strings
 
-Error strings MUST be **fully lowercase — including acronyms** — and MUST NOT **end with punctuation**, because they are often printed following other context (`fmt.Errorf("parsing config: %w", err)`). Acronyms that would normally be capitalized in identifiers (`ID`, `URL`, `HTTP`) become lowercase in error strings.
+Error strings normally begin with a lowercase word and omit trailing punctuation when wrapped in other context. Preserve acronyms and proper names (`invalid message ID`); this is not a rule to lowercase every character.
 
 ```go
 // Good — lowercase including acronyms, no punctuation

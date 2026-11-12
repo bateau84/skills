@@ -79,6 +79,7 @@ func ExampleMap() {
 }
 
 // ExampleMap_strings demonstrates mapping with string transformation.
+// Requires: import "strings" alongside any example package imports.
 func ExampleMap_strings() {
     result := mypackage.Map([]string{"hello", "world"}, strings.ToUpper)
     fmt.Println(result)

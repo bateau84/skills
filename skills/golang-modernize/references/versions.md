@@ -168,7 +168,7 @@ for _, v := range items {
 }
 ```
 
-### `math/rand` MUST be replaced with `math/rand/v2` _(Go 1.22+)_
+### Consider `math/rand/v2` where its changed random sequences are acceptable _(Go 1.22+)_
 
 ```go
 // Before
@@ -180,6 +180,8 @@ n := rand.Intn(100)
 import "math/rand/v2"
 n := rand.IntN(100) // IntN, not Intn
 ```
+
+`math/rand` itself is not deprecated. Seeded sequences and generator algorithms change on migration: preserve reproducibility contracts or explicitly approve that change.
 
 Key `math/rand/v2` changes:
 
@@ -288,7 +290,7 @@ func AllUsers(db *sql.DB) iter.Seq2[User, error] {
 
 ```go
 // Sorted keys via iterator
-for k := range slices.Sorted(maps.Keys(m)) {
+for _, k := range slices.Sorted(maps.Keys(m)) {
     fmt.Println(k, m[k])
 }
 
@@ -409,7 +411,7 @@ func BenchmarkFoo(b *testing.B) {
 }
 ```
 
-### Use `runtime.AddCleanup` instead of `runtime.SetFinalizer` _(Go 1.24+)_
+### Consider `runtime.AddCleanup` instead of `runtime.SetFinalizer` when its lifecycle semantics fit _(Go 1.24+)_
 
 ```go
 // Before
@@ -452,9 +454,9 @@ Use `tool` directives instead of `tools.go` blank imports.
 
 ```bash
 go get -tool golang.org/x/tools/cmd/stringer@latest
-go get -tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+# Install golangci-lint from a pinned supported binary; do not add its dependency graph to the application module.
 go tool stringer -type=Kind
-go tool golangci-lint run ./...
+golangci-lint run ./...
 ```
 
 `go.mod` shape for a module targeting Go 1.26 or newer. This is an example target, not a cap; keep the project's actual `go` directive and do not change it just to add tools.
@@ -466,7 +468,6 @@ go 1.26
 
 tool (
     golang.org/x/tools/cmd/stringer
-    github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 )
 ```
 
@@ -579,7 +580,7 @@ Major JSON revision. **Experimental** — evaluate for new code, don't migrate p
 - `testing/synctest.Test` and `synctest.Wait`: stable deterministic concurrent/time tests. Do not use the Go 1.24 experimental `synctest.Run` in Go 1.25+.
 - `net/http.CrossOriginProtection`: stdlib helper for cross-origin / CSRF-style protection in HTTP servers.
 - `reflect.TypeAssert[T](v)`: prefer over `v.Interface().(T)` in reflection code.
-- `os.Root.FS` and additional `os.Root` methods: use for confined filesystem APIs.
+- Additional `os.Root` methods extend confined filesystem operations in Go 1.25; `Root.FS` already exists in Go 1.24.
 - New vet checks: `waitgroup` misuse and manual host:port formatting; prefer `net.JoinHostPort`.
 
 ---
@@ -626,7 +627,7 @@ For new encryption use, avoid `crypto/rsa.EncryptPKCS1v15`. Prefer RSA-OAEP (`rs
 
 ### Green Tea GC enabled by default _(Go 1.26+)_
 
-Re-evaluate GC and allocation tuning under Go 1.26 Green Tea GC using profiles and benchmarks. Remove legacy tuning only when data supports it. Keep `GOMEMLIMIT` when it represents a real container or service memory ceiling. Remove third-party `automaxprocs` workarounds unless the project has a measured reason, because Go 1.25+ makes `GOMAXPROCS` container-aware by default.
+Re-evaluate GC and allocation tuning under Go 1.26 Green Tea GC using profiles and benchmarks. Remove legacy tuning only when data supports it. Keep `GOMEMLIMIT` when it represents a real container or service memory ceiling. Before removing `automaxprocs`, inspect the module go directive and GODEBUG containermaxprocs/updatemaxprocs settings. Running a newer toolchain alone does not enable the new defaults for every older module; verify the actual CPU limit and GOMAXPROCS in the deployed container.
 
 ### Go 1.26+ test artifacts
 

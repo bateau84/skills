@@ -13,21 +13,21 @@ Verified live: 2026-09-02.
 | Code | Meaning | Authority |
 |---|---|---|
 | `0` | Success — the utility ran successfully | POSIX normative |
-| `1` | General error — the utility encountered an error | POSIX normative |
-| `2` | Misuse — the utility was invoked incorrectly (invalid options, missing required arguments) | POSIX normative |
+| `1` | Often general failure, but utility-specific (grep uses it for no match) | Convention, not universal POSIX assignment |
+| `2` | Often usage/error status; consult the utility contract | Convention, not universal POSIX assignment |
 
-POSIX does not define exit codes above 2 for application use. Codes 3–125 are available for application-defined meanings.
+POSIX does not universally assign 1 or 2 to those meanings. Utilities define statuses in the nonreserved range; shells specify 126/127 and signal-related values greater than 128.
 
 ---
 
 ## Shell-reserved conventional codes (non-normative)
 
-These are established shell conventions, not POSIX normative. They should be avoided for application-defined meanings to prevent confusion:
+POSIX specifies 126 and 127; 128+N is a common shell encoding of its greater-than-128 signal requirement. They should be avoided for application-defined meanings to prevent confusion:
 
 | Code | Conventional meaning | Source |
 |---|---|---|
-| `126` | Command found but not executable | Shell convention |
-| `127` | Command not found | Shell convention |
+| `126` | Command found but not executable | POSIX shell requirement |
+| `127` | Command not found | POSIX shell requirement |
 | `128` | Invalid argument to `exit` (some shells) | Shell convention |
 | `128+N` | Process terminated by signal N | Shell convention (e.g., 130 = terminated by SIGINT/Ctrl-C) |
 | `130` | Script terminated by Ctrl-C (SIGINT = signal 2, 128+2=130) | Shell convention |
@@ -74,6 +74,6 @@ When designing a CLI's exit code taxonomy:
 
 3. **Document the table as a contract.** Once exit codes are published, changing them breaks every script that depends on them. Treat the exit code table as a stable API.
 
-4. **Reserve 2 for usage errors.** A user who passes an invalid flag should get exit 2, not exit 1. This enables scripts to distinguish "ran successfully but operation failed" from "was called incorrectly."
+4. **Consider 2 for usage errors when consistent with the existing CLI contract.** A user who passes an invalid flag should get exit 2, not exit 1. This enables scripts to distinguish "ran successfully but operation failed" from "was called incorrectly."
 
 5. **Test the table explicitly.** Exit code behavior is easy to get wrong under partial success conditions. The implementation must match the table — verify it.

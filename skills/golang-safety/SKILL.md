@@ -274,3 +274,7 @@ if s, ok := reflect.TypeAssert[string](v); ok {
 ## Cross-References
 
 - → See `golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines
+
+## Optional review perspectives
+
+[conformance review](ASSESSMENT.md), [residual-confidence challenges](QA.md). Load for the corresponding review activity; these are not extra producer permissions or mandatory context.

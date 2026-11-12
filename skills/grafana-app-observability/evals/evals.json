@@ -1,0 +1,33 @@
+{
+  "skill": "grafana-app-observability",
+  "version": "1.0.0",
+  "common_instruction": "State what is observed versus proposed; use source-appropriate versions and avoid inventing execution results.",
+  "cases": [
+    {
+      "id": "APM-METRICS-01",
+      "name": "RED histogram absent",
+      "prompt": "Grafana Cloud Application Observability receives traces from Tempo, but a p95 query using traces_spanmetrics_duration_seconds_bucket returns no series. Service resource attributes include service.name='checkout' and service.namespace='store'. Which metric and labels should the query use?",
+      "trap": "Invents a Tempo histogram series and filters only on service_name instead of job.",
+      "expectations": [
+        "Uses traces_spanmetrics_latency_bucket for classic Tempo histogram (with job='store/checkout' as service key), or correctly selects the collector-specific naming.",
+        "Explains metric names differ by generator and does not assume service.namespace must exist for inventory."
+      ],
+      "must_not": [
+        "Does not retain traces_spanmetrics_duration_seconds_bucket as a Tempo generator metric."
+      ]
+    },
+    {
+      "id": "APM-REPLAY-01",
+      "name": "Replay does not record",
+      "prompt": "A React app initializes Faro with getWebInstrumentations and a collector URL. The team enabled session replay in a dashboard but no recordings appear. Outline the required browser integration and first privacy checks.",
+      "trap": "Assumes a collector URL toggle is enough without ReplayInstrumentation.",
+      "expectations": [
+        "Uses @grafana/faro-instrumentation-replay and new ReplayInstrumentation with supported Faro SDK.",
+        "Notes masking defaults, URL data, consent and actual replay verification rather than claiming recordings exist."
+      ],
+      "must_not": [
+        "Does not claim a replay-enabled collector token alone activates browser recording."
+      ]
+    }
+  ]
+}

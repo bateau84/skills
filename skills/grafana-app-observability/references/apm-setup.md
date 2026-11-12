@@ -75,11 +75,11 @@ npm install @opentelemetry/sdk-node \
 const { NodeSDK } = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
-const { Resource } = require('@opentelemetry/resources');
+const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { SEMRESATTRS_SERVICE_NAME, SEMRESATTRS_SERVICE_NAMESPACE } = require('@opentelemetry/semantic-conventions');
 
 const sdk = new NodeSDK({
-  resource: new Resource({
+  resource: resourceFromAttributes({
     [SEMRESATTRS_SERVICE_NAME]: 'my-node-api',
     [SEMRESATTRS_SERVICE_NAMESPACE]: 'my-team',
     'deployment.environment': 'production',
@@ -343,7 +343,7 @@ OTEL_RESOURCE_ATTRIBUTES=service.namespace=myteam,deployment.environment=product
 
 Get the base64 value:
 ```bash
-echo -n "123456:glc_eyJ..." | base64
+printf '%s' '123456:glc_eyJ...' | base64 | tr -d '\n'
 ```
 
 ## Step 4: Span Metrics (How RED Metrics Are Generated)
@@ -356,7 +356,7 @@ Grafana Cloud Tempo automatically runs the metrics-generator. No configuration n
 
 Generated metrics:
 - `traces_spanmetrics_calls_total` - request rate (labeled by `span_name`, `status_code`, `service_name`)
-- `traces_spanmetrics_duration_seconds` - latency histogram
+- `traces_spanmetrics_latency_bucket` (with `_sum` and `_count`)  - latency histogram
 - `traces_service_graph_request_total` - for service map
 - `traces_service_graph_request_failed_total` - error count for service map
 
@@ -494,9 +494,10 @@ For service map edges to form correctly, your spans need:
 
 Manual `peer.service` annotation (when automatic detection fails):
 ```python
-with tracer.start_as_current_span("call-payment-service") as span:
+from opentelemetry.trace import SpanKind
+
+with tracer.start_as_current_span("call-payment-service", kind=SpanKind.CLIENT) as span:
     span.set_attribute("peer.service", "payment-api")
-    span.set_attribute("span.kind", "CLIENT")
     # ... make the call
 ```
 
@@ -533,15 +534,15 @@ Create custom PromQL alerts against span metrics:
 ```promql
 # Error rate > 5% for any service
 (
-  sum by (service_name) (rate(traces_spanmetrics_calls_total{status_code="STATUS_CODE_ERROR"}[5m]))
+  sum by (job) (rate(traces_spanmetrics_calls_total{status_code="STATUS_CODE_ERROR"}[5m]))
   /
-  sum by (service_name) (rate(traces_spanmetrics_calls_total[5m]))
+  sum by (job) (rate(traces_spanmetrics_calls_total[5m]))
 ) > 0.05
 
 # p95 latency > 500ms
 histogram_quantile(0.95,
-  sum by (le, service_name) (
-    rate(traces_spanmetrics_duration_seconds_bucket[5m])
+  sum by (le, job) (
+    rate(traces_spanmetrics_latency_bucket[5m])
   )
 ) > 0.5
 ```
@@ -568,11 +569,25 @@ App -> Alloy (receive all traces) -> Span Metrics (computed here) -> Tail Sample
                                    Grafana Mimir (all RED metrics, not just sampled)
 ```
 
-In Alloy config:
+This fragment replaces the trace receiver fan-out and sampling components; it uses the authenticated `otelcol.exporter.otlphttp.grafana_cloud` defined in the complete collector setup above. Configure Grafana Application Observability to read the collector-generated metric source; names differ from Tempo metrics.
+
 ```river
+// Both consumers see the same unsampled input; the sampler is not upstream of metrics.
+otelcol.receiver.otlp "sampling_input" {
+  grpc { endpoint = "127.0.0.1:4317" }
+  http { endpoint = "127.0.0.1:4318" }
+  output {
+    traces = [otelcol.connector.spanmetrics.default.input, otelcol.processor.tail_sampling.default.input]
+  }
+}
+
 // Generate metrics from ALL traces before sampling
 otelcol.connector.spanmetrics "default" {
-  // dimensions...
+  histogram {
+    explicit {
+      buckets = ["5ms", "10ms", "50ms", "100ms", "500ms", "1s", "5s"]
+    }
+  }
   output {
     metrics = [otelcol.exporter.otlphttp.grafana_cloud.input]
   }
@@ -581,11 +596,16 @@ otelcol.connector.spanmetrics "default" {
 // Then apply tail sampling for trace storage cost control
 otelcol.processor.tail_sampling "default" {
   decision_wait = "10s"
-  policies = [
-    { name = "errors", type = "status_code", status_code = { status_codes = ["ERROR"] } },
-    { name = "slow",   type = "latency",     latency     = { threshold_ms = 500 } },
-    { name = "sample", type = "probabilistic", probabilistic = { sampling_percentage = 10 } },
-  ]
+  policy {
+    name = "errors"
+    type = "status_code"
+    status_code { status_codes = ["ERROR"] }
+  }
+  policy {
+    name = "baseline"
+    type = "probabilistic"
+    probabilistic { sampling_percentage = 10 }
+  }
   output {
     traces = [otelcol.exporter.otlphttp.grafana_cloud.input]
   }
@@ -594,9 +614,9 @@ otelcol.processor.tail_sampling "default" {
 
 ## Kubernetes Deployment
 
-### Alloy as DaemonSet (recommended)
+### Node-local Alloy and a separate sampling gateway
 
-Running Alloy on every node enables host-level resource detection:
+Node-local Alloy supports host-level collection. Do not distribute spans for one trace randomly across node-local tail samplers: use a gateway with trace-ID-affine routing for complete traces, and account for its availability/memory limits. The DaemonSet fragment below is only the node-local transport, not a complete sampling topology or RBAC configuration:
 
 ```yaml
 # alloy-daemonset.yaml
@@ -705,7 +725,7 @@ Alloy can then extract these fields for Loki:
 loki.process "extract_trace" {
   stage.json {
     expressions = {
-      traceId = "traceId",
+      // traceId stays structured metadata/content, not a Loki stream label.
       spanId  = "spanId",
     }
   }
@@ -755,8 +775,8 @@ Check:
 | Metric | Source | Description |
 |---|---|---|
 | `traces_spanmetrics_calls_total` | Tempo | Request count by service/operation |
-| `traces_spanmetrics_duration_seconds` | Tempo | Latency histogram |
-| `traces_spanmetrics_duration_seconds_bucket` | Tempo | Latency histogram buckets |
+| `traces_spanmetrics_latency_bucket` (with `_sum` and `_count`)  | Tempo | Latency histogram |
+| `traces_spanmetrics_latency_bucket` | Tempo | Latency histogram buckets |
 | `traces_service_graph_request_total` | Tempo | Service-to-service calls |
 | `traces_service_graph_request_failed_total` | Tempo | Failed service-to-service calls |
 | `traces_service_graph_request_server_seconds` | Tempo | Server-side latency for service graph |
@@ -779,3 +799,5 @@ Common labels on span metrics:
 - Alloy for OTel: https://grafana.com/docs/opentelemetry/collector/grafana-alloy/
 - OTel semantic conventions: https://opentelemetry.io/docs/specs/semconv/
 - Span metrics processor: https://grafana.com/docs/tempo/latest/metrics-from-traces/span-metrics/
+
+If tail sampling reduces exported traces, generate RED/service-graph metrics from the unsampled stream before sampling (and configure the App O11y metric source accordingly). Distributed tail samplers need trace-ID-aware routing so all spans of a trace reach the same sampler; a DaemonSet alone does not establish that.

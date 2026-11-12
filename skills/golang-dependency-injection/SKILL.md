@@ -28,12 +28,12 @@ For interface-based design foundations (accept interfaces, return structs), see 
 ## Best Practices Summary
 
 1. Dependencies MUST be injected via constructors — NEVER use global variables or `init()` for service setup
-2. Small projects (< 10 services) SHOULD use manual constructor injection — no library needed
+2. Prefer manual constructor injection when the actual dependency graph and lifecycle are manageable; there is no universal service-count cutoff.
 3. Interfaces MUST be defined where consumed, not where implemented — accept interfaces, return structs
 4. NEVER use global registries or package-level service locators
 5. The DI container MUST only exist at the composition root (`main()` or app startup) — NEVER pass the container as a dependency; agents navigating by lexical search cannot trace an implicit registration chain, so explicit wiring at the root is the only reliably visible path
-6. **Prefer lazy initialization** — only create services when first requested
-7. **Use singletons for stateful services** (DB connections, caches) and transients for stateless ones
+6. **Match initialization to readiness:** eagerly construct and validate critical dependencies; laziness is an optional lifecycle policy, not a default that may hide startup failures.
+7. **Choose lifetime explicitly:** shared pools/caches usually have an owned process lifetime; stateless services do not inherently require transient containers.
 8. **Mock at the interface boundary** — DI makes this trivial
 9. **Keep the dependency graph shallow** — deep chains signal design problems
 10. **Choose the right DI library** for your project size and team — see the decision table below
@@ -93,7 +93,7 @@ func NewUserService() *UserService {
 
 Manual DI breaks down when:
 
-- You have 15+ services with cross-dependencies (at this scale, prefer compile-time or generics-based DI for agent-maintained codebases — see decision table below)
+- The actual graph has substantial cross-dependencies and a container demonstrably simplifies composition, not merely because it crossed a service-count threshold
 - You need lifecycle management (health checks, graceful shutdown)
 - You want lazy initialization or scoped containers
 - Wiring order becomes fragile and hard to maintain
@@ -106,77 +106,13 @@ Go has three main approaches to DI libraries:
 - [uber-go/dig + fx examples](./references/uber-dig-fx.md) — Reflection-based framework
 - [samber/do examples](./references/samber-do.md) — Generics-based, no code generation
 
-> **Agent navigability note:** `uber-go/dig` and `fx` resolve dependencies via reflection — wiring is implicit and not visible at the call site. An agent navigating by keyword search cannot trace which constructor provides a given type; `fx.Provide(NewFoo)` registers `Foo` without any call-site reference. Compile-time alternatives (`google/wire`, manual) or generics-based alternatives (`samber/do`) keep the dependency graph explicit and grep-traceable. Prefer these for agent-maintained codebases.
+### Choose by lifecycle and maintainability
 
-### Decision Table
+Manual wiring is statically visible. Wire generates wiring but **google/wire is no longer maintained**; do not recommend it as the default for new projects. Existing Wire projects can retain a maintained fork when deliberately supported. `dig`/`fx` resolve constructors at runtime and ordinarily reuse one instance per container; a transient factory must be designed explicitly. `samber/do/v2` type-checks provider signatures, but missing providers and dependency cycles still fail at runtime. Generics do not prove a complete graph or make it inherently easier to trace than other containers.
 
-| Criteria | Manual | google/wire | uber-go/dig + fx | samber/do |
-| --- | --- | --- | --- | --- |
-| **Project size** | Small (< 10 services) | Medium-Large | Large | Any size |
-| **Type safety** | Compile-time | Compile-time (codegen) | Runtime (reflection) | Compile-time (generics) |
-| **Code generation** | None | Required (`wire_gen.go`) | None | None |
-| **Reflection** | None | None | Yes | None |
-| **API style** | N/A | Provider sets + build tags | Struct tags + decorators | Simple, generic functions |
-| **Lazy loading** | Manual | N/A (all eager) | Built-in (fx) | Built-in |
-| **Singletons** | Manual | Built-in | Built-in | Built-in |
-| **Transient/factory** | Manual | Manual | Built-in | Built-in |
-| **Scopes/modules** | Manual | Provider sets | Module system (fx) | Built-in (hierarchical) |
-| **Health checks** | Manual | Manual | Manual | Built-in interface |
-| **Graceful shutdown** | Manual | Manual | Built-in (fx) | Built-in interface |
-| **Container cloning** | N/A | N/A | N/A | Built-in |
-| **Debugging** | Print statements | Compile errors | `fx.Visualize()` | `ExplainInjector()`, web interface |
-| **Go version** | Any | Any | Any | 1.18+ (generics) |
-| **Learning curve** | None | Medium | High | Low |
+For `fx`, register every constructor including the final API, then use lifecycle hooks. A blocking `api.Run()` in `fx.Invoke` prevents startup from reaching `app.Run()`; use an `OnStart` that starts bounded owned work and an `OnStop` that cancels and joins it. Startup must report configuration/bind errors before readiness.
 
-### Quick Comparison: Same App, Four Ways
-
-The dependency graph: `Config -> Database -> UserStore -> UserService -> API`
-
-**Manual**:
-
-```go
-cfg := NewConfig()
-db := NewDatabase(cfg)
-store := NewUserStore(db)
-svc := NewUserService(store)
-api := NewAPI(svc)
-api.Run()
-// No automatic shutdown, health checks, or lazy loading
-```
-
-**google/wire**:
-
-```go
-// wire.go — then run: wire ./...
-func InitializeAPI() (*API, error) {
-    wire.Build(NewConfig, NewDatabase, NewUserStore, NewUserService, NewAPI)
-    return nil, nil
-}
-// No lifecycle hooks (OnStart/OnStop) or health checks; cleanup via returned func() from providers
-```
-
-**uber-go/fx**:
-
-```go
-app := fx.New(
-    fx.Provide(NewConfig, NewDatabase, NewUserStore, NewUserService),
-    fx.Invoke(func(api *API) { api.Run() }),
-)
-app.Run() // lifecycle managed; wiring is reflection-based (not grep-traceable)
-```
-
-**samber/do**:
-
-```go
-i := do.New()
-do.Provide(i, NewConfig)
-do.Provide(i, NewDatabase)    // auto shutdown + health check
-do.Provide(i, NewUserStore)
-do.Provide(i, NewUserService)
-api := do.MustInvoke[*API](i)
-api.Run()
-// defer i.Shutdown() — handles all cleanup automatically
-```
+For `do/v2`, a provider has signature `func(do.Injector) (T, error)`, not `func(*do.Injector)`. Plain constructors need adapters; every dependency and the final API must be registered. See the [compiling v2 example and isolation test](../../examples/reference-go/di.go), which constructs a real graph, clones it, and overrides a value before invoking it. Avoid mixing v1 and v2 APIs.
 
 ## Testing with DI
 
@@ -215,38 +151,24 @@ func TestUserService_GetUser(t *testing.T) {
 
 ### Testing with samber/do — Clone and Override
 
-Container cloning creates an isolated copy where you override only the services you need to mock:
+Register the complete graph once, clone the injector, then override dependencies **before** resolving the service in that clone. An empty `do.New()` has no magically available providers. Cloning an injector does not imply every already-created external object is deeply copied; test the actual lifetimes.
 
 ```go
-func TestUserService_WithDo(t *testing.T) {
-    // Create a test injector with mock implementation
-    testInjector := do.New()
-
-    // Provide the mock UserStore interface
-    do.OverrideValue[UserStore](testInjector, &MockUserStore{
-        users: map[string]*User{"1": {ID: "1", Name: "Alice"}},
-    })
-
-    // Provide other real services as needed
-    do.Provide[*slog.Logger](testInjector, func(i *do.Injector) (*slog.Logger, error) {
-        return slog.Default(), nil
-    })
-
-    svc := do.MustInvoke[*UserService](testInjector)
-    user, err := svc.GetUser(context.Background(), "1")
-    // ... assertions
-}
+original := NewServices() // defines Config and *Service providers; see linked example
+isolated := original.Clone()
+do.OverrideValue(isolated, Config{Name: "test"})
+service := do.MustInvoke[*Service](isolated)
 ```
 
-Useful for integration tests where most services are real but one boundary (database, external API, mailer) needs mocking.
+The [pinned test](../../examples/reference-go/reference_test.go) verifies both clone isolation and a missing-provider error, using actual do/v2, not a copied fake container.
 
 ## When to Adopt a DI Library
 
 | Signal | Action |
 | --- | --- |
 | < 10 services, simple dependencies | Stay with manual constructor injection |
-| 10-20 services, some cross-cutting concerns | Consider a DI library — prefer compile-time (`google/wire`) or generics-based (`samber/do`) for agent-maintained codebases |
-| 20+ services, lifecycle management needed | Strongly recommended — at this scale explicit traceability is more valuable, not less; prefer `samber/do` or `google/wire` over reflection-based `dig/fx` for agent-maintained codebases |
+| Repeated wiring/lifecycle friction | Compare manual wiring with a maintained DI library against actual change and ownership costs; count alone is not a decision rule |
+| Significant lifecycle coordination | Consider supported lifecycle tooling such as Fx or an explicit owner; do not prefer unmaintained Wire for new work or claim generics prove a complete graph |
 | Need health checks, graceful shutdown | Use a library with built-in lifecycle support |
 | Team unfamiliar with DI concepts | Start manual, migrate incrementally |
 
@@ -273,3 +195,5 @@ Useful for integration tests where most services are real but one boundary (data
 - [google/wire user guide](https://github.com/google/wire/blob/main/docs/guide.md)
 - [uber-go/fx documentation](https://uber-go.github.io/fx/)
 - [uber-go/dig](https://github.com/uber-go/dig)
+
+Maintenance source: [Wire status](https://github.com/google/wire), [do/v2 API](https://pkg.go.dev/github.com/samber/do/v2), [Fx lifecycle](https://uber-go.github.io/fx/lifecycle.html).

@@ -18,6 +18,19 @@
         "Recommends `git add -A`/`git add .` to fold dist/ changes into a replayed commit",
         "Offers `git checkout -- dist`/`git restore dist`/`git reset --hard` as an option at all, or says nothing is lost without telling the user to confirm dist/ is purely generated"
       ]
+    },
+    {
+      "id": "GC-CONFIG-01",
+      "name": "Conflict marker display",
+      "prompt": "I'm midway through a rebase. I want Git to show the common ancestor as well as both sides in conflict markers. Give the configuration command and tell me how to verify it before continuing.",
+      "trap": "Accidentally configures a nonexistent merge.conflictStyle value, breaking later conflicts.",
+      "expectations": [
+        "Uses git config merge.conflictStyle zdiff3 on supported Git versions or diff3 on older ones.",
+        "Shows a read-back of the configured value and does not alter unrelated conflict state."
+      ],
+      "must_not": [
+        "Never configures znew, znew diff3, or an unrelated value."
+      ]
     }
   ]
 }

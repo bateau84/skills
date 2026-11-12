@@ -72,3 +72,9 @@ Do not turn the synthesis into an unapproved new product constraint. When a prop
 - An Anchor defines product/change direction; Behavioral Requirements, Scenarios, and other specialist artifacts refine its meaning when useful.
 - Neither this skill nor document formatting grants permission to implement, approve, or change user-owned intent.
 - Different control planes may route or persist Anchors differently; their commands, states, and roles are not requirements of this skill.
+
+## Optional review perspectives
+
+[conformance review](ASSESSMENT.md), [residual-confidence challenges](QA.md). Load for the corresponding review activity; these are not extra producer permissions or mandatory context.
+
+An `okf-authoring` reference denotes an optional host integration, not a skill guaranteed to exist in this library. Discover its availability before loading it; when absent, preserve the same content/provenance in the authorized repository document without claiming an OKF write occurred.

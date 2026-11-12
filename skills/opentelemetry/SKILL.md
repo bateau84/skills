@@ -23,7 +23,7 @@ Vendor-neutral instrumentation pipeline. Apps speak OTLP → Alloy (or direct) �
 
 - Grafana Cloud stack OR self-hosted Mimir / Loki / Tempo
 - Cloud OTLP endpoint: `https://otlp-gateway-<region>.grafana.net/otlp`
-- Basic-auth credentials: numeric instance ID + API token with `MetricsPublisher` + `LogsPublisher` + `TracesPublisher`
+- Basic-auth credentials: numeric instance ID + current Grafana Cloud Access Policy token with the required `metrics:write`, `logs:write` and `traces:write` scopes
 - An app to instrument
 
 ## Common Workflows
@@ -36,13 +36,13 @@ INSTANCE_ID=123456
 API_KEY="glc_eyJ..."
 export OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-0.grafana.net/otlp
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(echo -n "${INSTANCE_ID}:${API_KEY}" | base64)"
+export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(printf '%s' "${INSTANCE_ID}:${API_KEY}" | base64 | tr -d '\n')"
 export OTEL_RESOURCE_ATTRIBUTES="service.name=myapp,service.namespace=myteam,deployment.environment=prod"
 
 # 2. Smoke-test creds with a curl POST against the OTLP traces endpoint (empty body)
 curl -s -o /dev/null -w "%{http_code}\n" \
   -X POST -H "Content-Type: application/x-protobuf" \
-  -H "Authorization: Basic $(echo -n "${INSTANCE_ID}:${API_KEY}" | base64)" \
+  -H "Authorization: Basic $(printf '%s' "${INSTANCE_ID}:${API_KEY}" | base64 | tr -d '\n')" \
   "$OTEL_EXPORTER_OTLP_ENDPOINT/v1/traces" --data-binary '\n'
 # Expect 400 (malformed payload) — NOT 401 (auth) or 404 (wrong endpoint).
 ```
@@ -59,7 +59,8 @@ java -javaagent:./grafana-opentelemetry-java.jar -jar myapp.jar
 # 3. Generate traffic, then verify in Grafana → Explore → Tempo:
 #    TraceQL: { resource.service.name = "myapp" }
 #    Expect spans within ~30s. Also verify metrics:
-#    PromQL: count by (service_name)({service_name="myapp"})
+#    PromQL: traces_spanmetrics_calls_total{job="myteam/myapp"}
+#    (if spans-to-metrics is enabled; job may be service.name without namespace)
 ```
 
 ### 3. Auto-instrument a Python app

@@ -20,7 +20,7 @@ metadata:
 
 **Dependencies:**
 
-- golangci-lint: `go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest`
+- golangci-lint v2: install a pinned upstream [binary release](https://golangci-lint.run/docs/welcome/install/local/) when possible; if source installation is required, use `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@<pinned-v2-tag>` from a suitable Go toolchain. The old module path builds v1, and upstream warns source and `go tool` installs can affect dependency consistency.
 
 # Go Linting
 

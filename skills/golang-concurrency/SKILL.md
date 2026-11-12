@@ -26,7 +26,7 @@ Go's concurrency model is built on goroutines and channels. Goroutines are cheap
 
 1. **Every goroutine must have a clear exit** — without a shutdown mechanism (context, done channel, WaitGroup), they leak and accumulate until the process crashes
 2. **Share memory by communicating** — channels transfer ownership explicitly; mutexes protect shared state but make ownership implicit
-3. **Send copies, not pointers** on channels — sending pointers creates invisible shared memory, defeating the purpose of channels
+3. **Define ownership across channels** — pointers are valid when ownership transfers or shared access is synchronized; copying a struct does not deep-copy maps/slices inside it.
 4. **Only the sender closes a channel** — closing from the receiver side panics if the sender writes after close
 5. **Specify channel direction** (`chan<-`, `<-chan`) — the compiler prevents misuse at build time
 6. **Default to unbuffered channels** — larger buffers mask backpressure; use them only with measured justification
@@ -44,7 +44,7 @@ For detailed channel/select code examples, see [Channels and Select Patterns](re
 | Coordinating goroutine lifecycle | Channel + context | Clean shutdown with select |
 | Protecting shared struct fields | `sync.Mutex` / `sync.RWMutex` | Simple critical sections |
 | Simple counters, flags | `sync/atomic` | Lock-free, lower overhead |
-| Many readers, few writers on a map | `sync.Map` | Optimized for read-heavy workloads. **Concurrent map read/write causes a hard crash** |
+| Write-once/read-many or disjoint-key concurrent access | Consider `sync.Map` | Otherwise start with a typed map plus a mutex; compare real access patterns |
 | Caching expensive computations | `sync.Once` / `singleflight` | Execute once or deduplicate |
 
 ## WaitGroup vs errgroup
@@ -63,7 +63,7 @@ For detailed channel/select code examples, see [Channels and Select Patterns](re
 | `sync.Mutex` | Protect shared state | Keep critical sections short; never hold across I/O |
 | `sync.RWMutex` | Many readers, few writers | Never upgrade RLock to Lock (deadlock) |
 | `sync/atomic` | Simple counters, flags | Prefer typed atomics (Go 1.19+): `atomic.Int64`, `atomic.Bool` |
-| `sync.Map` | Concurrent map, read-heavy | No explicit locking; use `RWMutex`+map when writes dominate |
+| `sync.Map` | Specialized concurrent map | Particularly write-once/read-many or disjoint-key access; no universal read/write ratio rule |
 | `sync.Pool` | Reuse temporary objects | Always `Reset()` before `Put()`; reduces GC pressure |
 | `sync.Once` | One-time initialization | Go 1.21+: `OnceFunc`, `OnceValue`, `OnceValues` |
 | `sync.WaitGroup` | Waiting for simple goroutines | Go 1.25+: prefer `wg.Go(func(){ ... })` for fire-and-wait tasks that do not panic and do not need error propagation. For Go <1.25 use `Add`/`Done`. For errors/cancellation/limits, use `errgroup` with context. |
@@ -141,3 +141,5 @@ Keep existing tools:
 
 - [Go Concurrency Patterns: Pipelines](https://go.dev/blog/pipelines)
 - [Effective Go: Concurrency](https://go.dev/doc/effective_go#concurrency)
+
+Timer behavior depends on the toolchain **and module go directive/GODEBUG settings**. Modern timer GC does not remove allocation costs, but a repeated time.After is not automatically a leak. See `golang-troubleshooting` for version-specific diagnosis.

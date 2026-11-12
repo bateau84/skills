@@ -296,7 +296,7 @@ delta(process_open_fds[1h])
 process_open_fds / process_max_fds
 ```
 
-→ See `promql-cli` skill for executing these queries directly against your Prometheus instance from the CLI.
+→ See `promql` skill for executing these queries directly against your Prometheus instance from the CLI.
 
 ## References
 

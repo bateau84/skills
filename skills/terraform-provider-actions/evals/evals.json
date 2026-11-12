@@ -1,0 +1,20 @@
+{
+  "skill": "terraform-provider-actions",
+  "version": 1,
+  "cases": [
+    {
+      "id": "ACTION-SCHEMA-01",
+      "name": "deploy-action-inputs-and-server-result",
+      "prompt": "A provider pinned to terraform-plugin-framework v1.19.0 needs a Terraform action that deploys an application. Users provide an application ID; the remote API returns a deployment ticket and progress updates. Show the action schema and registration, and explain how to report progress and the returned ticket. The provider targets Terraform 1.14 or newer.",
+      "trap": "Models may reuse managed-resource schema fields (Computed/Default) for actions, or forget ProviderWithActions registration and the action progress API.",
+      "expectations": [
+        "Uses action/schema with supported configurable inputs, not Computed or Default fields for a server-produced ticket.",
+        "Registers the action through provider.ProviderWithActions/Actions and uses the public action Invoke/progress API.",
+        "Reports the API result/progress without inventing persisted managed-resource state for an action."
+      ],
+      "must_not": [
+        "Must not present managed-resource Computed attributes as valid action schema."
+      ]
+    }
+  ]
+}

@@ -183,12 +183,12 @@ const (
 )
 
 func (m *Model) prevFocus() tea.Cmd {
-    m.focus = min(m.focus - 1, 0)
+    m.focus = max(m.focus - 1, 0)
     return m.applyFocus()
 }
 
 func (m *Model) nextFocus() tea.Cmd {
-    m.focus = max(m.focus + 1, 2)
+    m.focus = min(m.focus + 1, 2)
     return m.applyFocus()
 }
 

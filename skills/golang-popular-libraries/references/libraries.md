@@ -2,6 +2,8 @@
 
 ## Web Frameworks
 
+Go 1.22+ `net/http.ServeMux` supports methods and path wildcards. Start there when it satisfies the routing contract; do not add a router solely because an older tutorial needed one.
+
 **Gin** (<https://github.com/gin-gonic/gin>) High-performance HTTP web framework with minimalist API. Up to 40x faster than some alternatives. Great for building REST APIs and microservices.
 
 **Echo** (<https://github.com/labstack/echo>) Minimalist, extensible web framework. Clean middleware system, excellent performance. Good for both REST APIs and traditional web apps.
@@ -30,7 +32,7 @@
 
 **go-sql-driver/mysql** (<https://github.com/go-sql-driver/mysql>) MySQL driver for Go's database/sql package. Maintained by the Go team, reliable and performant.
 
-**lib/pq** (<https://github.com/lib/pq>) Pure Go PostgreSQL driver. The gold standard for PostgreSQL in Go.
+**lib/pq** (<https://github.com/lib/pq>) Pure Go PostgreSQL driver. The legacy/established option; verify maintenance and compare pgx before new adoption for PostgreSQL in Go.
 
 **pgx** (<https://github.com/jackc/pgx>) PostgreSQL driver with advanced features. Faster than lib/pq, supports all PostgreSQL types.
 

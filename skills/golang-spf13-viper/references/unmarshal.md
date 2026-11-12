@@ -61,12 +61,10 @@ Prefer `UnmarshalKey` over `viper.Sub` + `Unmarshal` — fewer nil checks and le
 
 ## time.Duration
 
-Viper's `GetDuration` parses duration strings (`"1h30m"`, `"500ms"`) from config files and env vars. When using `Unmarshal`, mapstructure does not know how to decode a duration string into `time.Duration` by default.
-
-Register a decode hook:
+Viper's `GetDuration` and default `Unmarshal` decoder already handle duration strings (`"1h30m"`, `"500ms"`) in supported versions; Viper v1.20+ uses `github.com/go-viper/mapstructure/v2`. **Do not add duration or weak-decoding hooks just to restore default behavior.** Add a decode hook only for a custom target type or a deliberate override, and compose it with the existing `dc.DecodeHook`.
 
 ```go
-import "github.com/mitchellh/mapstructure"
+import "github.com/go-viper/mapstructure/v2"
 
 var cfg Config
 err := viper.Unmarshal(&cfg, func(dc *mapstructure.DecoderConfig) {
@@ -83,7 +81,7 @@ err := viper.Unmarshal(&cfg, func(dc *mapstructure.DecoderConfig) {
 ## net.IP and custom types
 
 ```go
-import "github.com/mitchellh/mapstructure"
+import "github.com/go-viper/mapstructure/v2"
 
 func stringToIPHookFunc() mapstructure.DecodeHookFunc {
     return func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
@@ -128,7 +126,7 @@ Extra keys from the config file are collected in `Remain` instead of being silen
 
 ## Weak decoding
 
-Enable weak type decoding (e.g., string `"true"` → bool `true`) when working with env vars that are always strings:
+Viper's default Unmarshal decoder already enables weak type decoding (for example string `"true"` → bool `true`). The following makes that policy explicit; it is **not needed** to restore the default. Validate security-sensitive fields more strictly when coercion could hide mistakes:
 
 ```go
 var cfg Config

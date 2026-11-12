@@ -58,18 +58,20 @@ my-monorepo/
 1. **Initialize the workspace:**
 
 ```bash
-go work init
+go work init ./pkg/auth ./pkg/user ./cmd/api ./tools/cli
 ```
 
-This creates `go.work`:
+The `go work init` command without paths only writes the Go version line; provide real module paths from this repository before expecting `use` entries.
+
+This creates a `go.work` with these use entries (the `go` line reflects the initializing toolchain):
 
 ```go
 go 1.21
 
 use (
-    ./services/auth
-    ./services/user
-    ./shared/libs
+    ./pkg/auth
+    ./pkg/user
+    ./cmd/api
     ./tools/cli
 )
 ```
@@ -77,9 +79,9 @@ use (
 2. **Add modules to workspace:**
 
 ```bash
-go work use ./services/auth
-go work use ./services/user
-go work use ./shared/libs
+go work use ./pkg/auth
+go work use ./pkg/user
+go work use ./cmd/api
 ```
 
 3. **Use modules without replace directives:**
@@ -101,6 +103,6 @@ The workspace automatically resolves `shared/libs` to the local directory.
 ```bash
 go work init              # Initialize new workspace
 go work use ./path/to/mod # Add module to workspace
-go work use -rm ./path    # Remove module from workspace
+go work edit -dropuse ./path  # Remove module from workspace
 go work sync              # Sync workspace with module changes
 ```

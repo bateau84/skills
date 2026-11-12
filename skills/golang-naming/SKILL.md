@@ -35,16 +35,16 @@ To ignore a rule, just add a comment to the code.
 | Error variable | `Err` prefix | `ErrNotFound`, `ErrTimeout` |
 | Error type | `Error` suffix | `PathError`, `SyntaxError` |
 | Constructor | `New` (single type) or `NewTypeName` (multi-type) | `ring.New`, `http.NewRequest` |
-| Boolean field | `is`, `has`, `can` prefix on **fields** and methods | `isReady`, `IsConnected()` |
+| Boolean field | Meaningful predicate or adjective; no mandatory prefix | `isReady`, `IsConnected()` |
 | Test function | `Test` + function name | `TestParseToken` |
 | Acronym | all caps or all lower | `URL`, `HTTPServer`, `xmlParser` |
-| Variant: context | `WithContext` suffix | `FetchWithContext`, `QueryContext` |
-| Variant: in-place | `In` suffix | `SortIn()`, `ReverseIn()` |
+| Variant: context | `Context` suffix when distinguishing a context-taking variant | `QueryContext`, `ExecContext` |
+| Variant: in-place | Document mutation; no standard `In` suffix | `slices.Sort`, `slices.Reverse` |
 | Variant: error | `Must` prefix | `MustParse()`, `MustLoadConfig()` |
 | Option func | `With` + field name | `WithPort()`, `WithLogger()` |
 | Enum (iota) | type name prefix, zero-value = unknown | `StatusUnknown` at 0, `StatusReady` |
 | Named return | descriptive, for docs only | `(n int, err error)` |
-| Error string | lowercase (incl. acronyms), no punctuation | `"image: unknown format"`, `"invalid id"` |
+| Error string | lowercase opening unless a proper name/acronym; normally no trailing punctuation | `"image: unknown format"`, `"invalid id"` |
 | Import alias | short, only on collision | `mrand "math/rand"`, `pb "app/proto"` |
 | Format func | `f` suffix | `Errorf`, `Wrapf`, `Logf` |
 | Test table fields | `got`/`expected` prefixes | `input string`, `expected int` |
@@ -92,9 +92,9 @@ These conventions are correct but non-obvious — they are the most common sourc
 
 **Constructor naming:** When a package exports a single primary type, the constructor is `New()`, not `NewTypeName()`. This avoids stuttering — callers write `apiclient.New()` not `apiclient.NewClient()`. Use `NewTypeName()` only when a package has multiple constructible types (like `http.NewRequest`, `http.NewServeMux`).
 
-**Boolean struct fields:** Unexported boolean fields MUST use `is`/`has`/`can` prefix — `isConnected`, `hasPermission`, not bare `connected` or `permission`. The exported getter keeps the prefix: `IsConnected() bool`. This reads naturally as a question and distinguishes booleans from other types.
+**Boolean struct fields:** Use a clear predicate or adjective (`connected`, `ready`, `hasPermission`). Go does not require an `is`/`has`/`can` prefix on every boolean field or method; follow the package's consistent vocabulary.
 
-**Error strings are fully lowercase — including acronyms.** Write `"invalid message id"` not `"invalid message ID"`, because error strings are often concatenated with other context (`fmt.Errorf("parsing token: %w", err)`) and mixed case looks wrong mid-sentence. Sentinel errors should include the package name as prefix: `errors.New("apiclient: not found")`.
+**Error strings:** Normally begin with a lowercase word and omit trailing punctuation, but preserve acronyms and proper names (`invalid message ID`). Do not mechanically lowercase domain identifiers. Add package/operation context where it is useful, not to satisfy a universal sentinel-prefix rule.
 
 **Enum zero values:** Always place an explicit `Unknown`/`Invalid` sentinel at iota position 0. A `var s Status` silently becomes 0 — if that maps to a real state like `StatusReady`, code can behave as if a status was deliberately chosen when it wasn't.
 
@@ -127,8 +127,8 @@ For complete rules, examples, and rationale, see:
 | `util`, `helper` packages | These names say nothing about content — use specific names that describe the abstraction |
 | `http.HTTPClient` stuttering | Package name is always present at call site — `http.Client` avoids reading "HTTP" twice |
 | `user.NewUser()` constructor | Single primary type uses `New()` — `user.New()` avoids repeating the type name |
-| `connected bool` field | Bare adjective is ambiguous — use `isConnected` so the field reads as a true/false question |
-| `"invalid message ID"` error | Error strings must be fully lowercase including acronyms — `"invalid message id"` |
+| `connected bool` field | Valid idiomatic adjective; choose names that communicate the invariant |
+| `"invalid message ID"` error | Valid: retain established acronym spelling |
 | `StatusReady` at iota 0 | Zero value should be a sentinel — `StatusUnknown` at 0 catches uninitialized values |
 | `"not found"` error string | Sentinel errors should include the package name — `"mypackage: not found"` identifies the origin |
 | `userSlice` type-in-name | Types encode implementation detail — `users` describes what it holds, not how |
@@ -136,8 +136,8 @@ For complete rules, examples, and rationale, see:
 | `snake_case` identifiers | Underscores conflict with Go's MixedCaps convention and tooling expectations — use `mixedCaps` |
 | Long names for short scopes | Name length should match scope — `i` is fine for a 3-line loop, `userIndex` is noise. **This applies to local variables;** exported functions, methods, and types should reveal intent at the call site without stuttering |
 | Naming constants by value | Values change, roles don't — `DefaultPort` survives a port change, `Port8080` doesn't |
-| `FetchCtx()` context variant | `WithContext` is the standard Go suffix — `FetchWithContext()` is instantly recognizable |
-| `sort()` in-place but no `In` | Readers assume functions return new values. `SortIn()` signals mutation |
+| Context-aware variants | Prefer established APIs such as `QueryContext`; avoid inventing a universal suffix policy |
+| In-place operation | State mutation in the contract; `Sort` and `Reverse` need no `In` suffix |
 | `parse()` panicking on error | `MustParse()` warns callers that failure panics — surprises belong in the name |
 | Mixing `With*`, `Set*`, `Use*` | Consistency across the codebase — `With*` is the Go convention for functional options |
 | Plural package names | Go convention is singular (`net/url` not `net/urls`) — keeps import paths consistent |

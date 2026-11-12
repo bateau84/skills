@@ -18,13 +18,19 @@
       "id": 2,
       "name": "log-categories-and-levels",
       "prompt": "We need to record authentication and authorization decisions for a compliance audit, and separately log normal request handling. A colleague is also logging every HTTP 400 (bad input) as an Error. How should I structure this logging?",
-      "expected_output": "The response separates audit logs from operational logs, gives audit its own immutable/access-controlled/synchronously-durable stream that answers the six questions, and applies the correct level discipline — treating a clean 4xx on bad input as Info/Debug, not Error.",
-      "trap": "Without the skill, the model lumps audit and operational logs into one stream and logs every user error (HTTP 400) as an Error.",
+      "expected_output": "Separates required audit from operational logging, identifies the actual audit guarantees that must be agreed, protects selected audit records with appropriate integrity/access/retention and reliable delivery, preserves who/action/resource/outcome/time/source fields, and treats expected HTTP 4xx input errors as Info/Debug rather than system failures.",
+      "trap": "Conflates audit and operational logs, treats ordinary client 400s as system errors, silently drops required audit events, or invents compulsory WORM/synchronous-storage guarantees without an accepted contract.",
       "expectations": [
-        "Separates audit logs from operational logs onto a dedicated, access-controlled, immutable stream",
-        "Audit records answer the six questions: who, did what, to what, outcome, when, from where",
-        "Applies level discipline: Error for system failures, Info for normal business events; a clean 4xx from bad input is Info/Debug, not Error",
-        "Notes audit logs are never sampled or dropped and require synchronous durability"
+        "Separates required audit records from ordinary operational logging and identifies which authorization decisions are in audit scope.",
+        "Describes protected audit records with who, action, resource, outcome, UTC timestamp and relevant origin/source, without leaking secrets.",
+        "Distinguishes clean client 4xx responses (Info/Debug) from genuine system failures (Error).",
+        "Requires the accepted audit completeness, retention, integrity and access-control guarantees to be met; if completeness is required, records cannot be silently sampled or lost, but synchronous writes/WORM are not universal without an explicit contract.",
+        "States any unverified audit-loss or durability guarantee as a gap rather than asserting a stronger mechanism was implemented."
+      ],
+      "negative_expectations": [
+        "Must not treat a clean 400 response as a server Error solely because it was rejected.",
+        "Must not conflate debug/request logs with required audit records or silently sample mandatory audit events.",
+        "Must not prescribe WORM, hash chains, or synchronous writes as universal requirements without contract evidence."
       ]
     },
     {

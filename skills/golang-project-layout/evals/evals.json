@@ -18,6 +18,20 @@
         "Uses a DI framework such as wire, fx or dig",
         "Creates a pkg/ directory or a go.work file"
       ]
+    },
+    {
+      "id": "GLAYOUT-01",
+      "name": "Small root command and library",
+      "prompt": "A new Go module is a small single-binary utility with 2 files, plus a public reusable Go library module in another repository. A teammate says both must have cmd/ and pkg/ directories and a go.work. Assess the minimal valid layouts.",
+      "trap": "Elevates optional layout conventions to mandatory module requirements.",
+      "expectations": [
+        "Allows root package main for a simple command and public package at module root for the library.",
+        "Uses cmd/ for suitable larger/multiple binaries and internal/ for private packages, not mandatory pkg/ and go.work.",
+        "Avoids adding multi-module workspaces without an actual need."
+      ],
+      "must_not": [
+        "Does not claim all main packages or libraries must be under cmd/ or pkg/."
+      ]
     }
   ]
 }

@@ -16,6 +16,19 @@
         "Tells the user to port-forward svc/mimir-nginx",
         "Claims the default 6.x install has no Kafka / uses only classic ingester replication"
       ]
+    },
+    {
+      "id": "MIMIR-PATH-01",
+      "name": "Query vs ingestion paths",
+      "prompt": "A locally deployed Grafana Mimir listens on port 9009 with its default API prefix. Prometheus remote_write succeeds at /api/v1/push, but a dashboard request to /api/v1/query returns 404. Which exact endpoints should the query client use, and which write URL stays the same?",
+      "trap": "Assumes Prometheus query APIs live at the same root prefix as push.",
+      "expectations": [
+        "Uses /prometheus/api/v1/query (and labels equivalent) for Prometheus-compatible reads.",
+        "Keeps /api/v1/push for writes and notes the prefix is configurable."
+      ],
+      "must_not": [
+        "Does not blindly add /prometheus to the push route."
+      ]
     }
   ]
 }

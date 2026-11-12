@@ -125,7 +125,7 @@ A boolean flag is present or absent — it takes no value:
 ### Value flags
 
 Flags that accept a value must support both `=` and space-separated forms:
-- `--count=5` (POSIX convention, unambiguous in parsing)
+- `--count=5` (common long-option convention, not POSIX)
 - `--count 5` (more natural to type; what most users try first)
 
 Supporting only one form breaks muscle memory for users of the other convention. A CLI that accepts only `--count=5` will generate constant user error when people type `--count 5`. Design the parsing to accept both.
@@ -140,7 +140,7 @@ Do NOT accept secrets (passwords, API keys, tokens) via flags. Flag values appea
 Instead, accept secrets via:
 - `--password-file <path>` (reads from file)
 - `--token-file <path>` (reads from file)
-- Environment variables (appropriate for session-scoped secrets)
+- An existing, explicitly accepted environment-variable mechanism **only** when its inherited-process and operational disclosure risks are understood; do not make environment variables the default secret channel.
 - stdin (when the caller can pipe the secret)
 
 This is a design constraint, not just implementation hygiene. The spec must define which mechanism is used.
@@ -233,9 +233,9 @@ A CLI with no quiet mode pollutes pipelines. Scripts that call a CLI to get a si
 
 Exit codes are the machine-readable signal of success or failure. They are not optional decoration — they are the primary interface between a CLI and the scripts that orchestrate it. A script uses exit codes to branch, to decide whether to continue, to report failure to its caller. Every meaningful failure mode that a script might need to distinguish requires a distinct exit code.
 
-### POSIX exit code conventions (normative)
+### Shell and utility exit-code conventions
 
-From IEEE Std 1003.1-2017 §2.8.2 Exit Status for Commands:
+POSIX specifies zero for successful command execution and defines shell statuses 126 (found but not executable), 127 (not found), and greater than 128 for signal termination. It **does not** assign universal meanings to status 1 or 2; each utility defines its own taxonomy. Treat the following as common CLI conventions, not normative POSIX requirements:
 
 | Code | Meaning |
 |---|---|
@@ -243,7 +243,7 @@ From IEEE Std 1003.1-2017 §2.8.2 Exit Status for Commands:
 | `1` | General error — something went wrong |
 | `2` | Misuse / usage error — the user invoked the command incorrectly (wrong flags, missing required arguments, invalid values) |
 
-Beyond 2, POSIX leaves codes undefined. By de facto convention (not normative):
+Shell-reserved and conventional statuses include:
 
 | Code | Meaning |
 |---|---|
@@ -539,7 +539,7 @@ This is the conventional precedence order used by most professional CLIs. Each l
 
 **Flags:** Invocation-specific, transient, explicit. Use for: options that change per invocation (`--output`, `--count`, `--branch`). Scripts are auditable — anyone reading the script can see exactly what was passed. Flags are always the override mechanism — every config-file or env-var setting must be overridable by a flag.
 
-**Environment variables:** Session-scoped, implicit, inherited. Use for: credentials (`MYAPP_TOKEN`, `MYAPP_API_KEY`), context settings (`MYAPP_REGION`, `MYAPP_PROFILE`), CI/CD integration (`MYAPP_NO_COLOR`, `MYAPP_DEBUG`). The pattern: prefix all env vars with the tool's name (`MYAPP_*`) to avoid collisions.
+**Environment variables:** Session-scoped, implicit, inherited. Use for: context settings (`MYAPP_REGION`, `MYAPP_PROFILE`), CI/CD integration (`MYAPP_NO_COLOR`, `MYAPP_DEBUG`). The pattern: prefix all env vars with the tool's name (`MYAPP_*`) to avoid collisions.
 
 **Config files:** Persistent, project-specific or user-specific. Use for: defaults the user never wants to type again, project-level configuration. Support two levels:
 - User-level: `~/.myapprc`, `~/.config/myapp/config.yaml` (XDG Base Directory on Linux)

@@ -48,7 +48,7 @@ export OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 
 # 4. Verify spans landed in Tempo + spanmetrics generated
 #    Tempo (TraceQL):  { resource.service.name = "my-api" }
-#    Mimir (PromQL):   sum by (job) (rate(traces_spanmetrics_calls_total{service_name="my-api"}[5m]))
+#    Mimir (PromQL):   sum by (job) (rate(traces_spanmetrics_calls_total{job="myteam/my-api"}[5m]))
 #    Expect > 0 within ~1 minute.
 
 # 5. Verify it's wired to App Observability
@@ -100,7 +100,7 @@ openlit.init(application_name="my-ai-app", environment="production")
 # Env (same OTLP endpoint as APM)
 export OTEL_SERVICE_NAME="my-ai-app"
 export OTEL_EXPORTER_OTLP_ENDPOINT="https://otlp-gateway-<region>.grafana.net/otlp"
-export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(echo -n $ID:$KEY | base64)"
+export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(printf '%s' "$ID:$KEY" | base64 | tr -d '\n')"
 
 # Verify after a few LLM calls:
 #   PromQL: sum by (gen_ai_request_model) (rate(gen_ai_usage_input_tokens_total[5m]))
@@ -124,7 +124,7 @@ Correlation keys: `service.name` joins all signals; trace exemplars embed trace 
 
 ## Troubleshooting
 
-- Service missing from Service Inventory → missing `service.namespace` (job label) or `deployment.environment` resource attribute
+- Service missing from Service Inventory → check that a `traces_target_info` series has a `job` label (`namespace/service.name` if namespace exists, otherwise `service.name`); `deployment.environment` is useful for filters, not mandatory for a service to appear
 - Service Map edges missing → `span.kind` not set on outbound calls (must be CLIENT) or inbound (SERVER)
 - Faro `/collect` returns 401 → wrong app key; 404 → region in URL doesn't match the Faro app
 - No GenAI metrics → confirm OpenLIT version matches OTel semantic-conv version expected by Cloud; verify auth with curl as in workflow #3

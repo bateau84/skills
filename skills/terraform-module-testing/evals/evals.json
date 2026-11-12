@@ -1,0 +1,33 @@
+{
+  "skill": "terraform-module-testing",
+  "version": "1.0.0",
+  "common_instruction": "Use the stated context; explain concrete behavior and do not claim tests were run without evidence.",
+  "cases": [
+    {
+      "id": "TFTEST-MOCK-01",
+      "name": "Mock computed ID at plan",
+      "prompt": "A terraform test uses mock_provider for AWS. It asserts a mocked resource's generated id equals a literal, but the run is command = plan and the assertion is unknown. How should it test that computed ID while avoiding real cloud changes?",
+      "trap": "Assumes mock-generated computed IDs are known during plan or that mocked apply creates real infrastructure.",
+      "expectations": [
+        "Uses mocked command = apply or an explicitly supported plan-time override, with the correct version constraint.",
+        "Explains unknown computed values in plan and preserves no-real-provider behavior."
+      ],
+      "must_not": [
+        "Does not claim mocked apply necessarily provisions real cloud infrastructure."
+      ]
+    },
+    {
+      "id": "TFTEST-FILTER-01",
+      "name": "Test selection in CI",
+      "prompt": "A repo has tests/defaults_unit_test.tftest.hcl and tests/integration_test.tftest.hcl. CI runs terraform test -filter=unit_test to select all run blocks with 'unit' in their name. Why is selection broken and how should CI run the file?",
+      "trap": "Treats -filter as a run-name or substring filter.",
+      "expectations": [
+        "Uses a concrete test file path with -filter, or a documented test directory.",
+        "Explains it selects test files, not run names or substring patterns."
+      ],
+      "must_not": [
+        "Does not claim -filter=unit_test finds matching run blocks."
+      ]
+    }
+  ]
+}

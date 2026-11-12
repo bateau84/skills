@@ -41,3 +41,9 @@ For README, user/admin/developer instructions, migrations, releases and API usag
 ## Boundary
 
 Substantive Anchors, requirements, user journeys, architectural designs and decisions belong to their specialized skills. This skill describes verified reality and usage, not new requirements.
+
+## Optional review perspectives
+
+[conformance review](ASSESSMENT.md), [residual-confidence challenges](QA.md). Load for the corresponding review activity; these are not extra producer permissions or mandatory context.
+
+An `okf-authoring` reference denotes an optional host integration, not a skill guaranteed to exist in this library. Discover its availability before loading it; when absent, preserve the same content/provenance in the authorized repository document without claiming an OKF write occurred.

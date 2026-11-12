@@ -1,0 +1,4 @@
+# Direct SDK versions exercised by the reference CI job.
+# Runtime requirements remain major-bounded; upgrade these pins deliberately.
+anthropic==2.8.0
+mcp==1.30.0

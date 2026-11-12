@@ -1,6 +1,6 @@
 # Directory Layouts
 
-## Universal Layout (Most Projects)
+## Example Layout for a Larger Multi-Binary Application (Not Universal)
 
 ```
 project/
@@ -40,7 +40,7 @@ project/
 
 ## Small Projects (Single Binary)
 
-For simple tools, keep it minimal:
+For simple tools a root `main.go` is sufficient; the following optional `cmd/` layout is useful if additional commands are expected:
 
 ```
 my-tool/
@@ -85,14 +85,14 @@ my-library/
 
 ## The cmd/ Directory Convention
 
-**CRITICAL**: All `main` packages must reside in `cmd/`. `cmd/` MUST contain only `main.go` with minimal logic — parse flags, wire dependencies, call `Run()`. NEVER put business logic in `cmd/` — it belongs in `internal/` or `pkg/`.
+`cmd/` is a conventional home for multiple entry points or mixed repositories, not a Go language requirement. A small standalone command can live in the module root. Keep initialization and wiring readable; supporting Go files in a command package are valid. Place reusable private implementation under `internal/` when it adds useful boundaries; public libraries need not live in `pkg/`.
 
 ### Single Application
 
 ```
 cmd/
 └── myapp/
-    └── main.go    // package main
+    └── main.go    // package main; additional source files are allowed
 ```
 
 ### Multiple Applications
@@ -115,12 +115,12 @@ Each `main.go`:
 
 - Declares `package main`
 - Has its own `func main()`
-- Can be built independently: `go build ./cmd/...`
+- Can be built independently: `go build -o ./bin/ ./cmd/...`
 
 **Building all binaries:**
 
 ```bash
-go build ./cmd/...        # Build all main packages
+go build -o ./bin/ ./cmd/...        # Build all main packages
 go build ./cmd/server     # Build specific binary
 ```
 

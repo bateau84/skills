@@ -135,16 +135,16 @@ sum(count_over_time({env="prod"} |= "error" [5m]))
 
 ```logql
 # Average request duration from logfmt
-avg_over_time({app="api"} | logfmt | unwrap duration [5m])
+avg_over_time({app="api"} | logfmt | unwrap duration_seconds(duration) | __error__="" [5m])
 
 # 95th percentile latency
-quantile_over_time(0.95, {app="api"} | logfmt | unwrap duration [5m]) by (app)
+quantile_over_time(0.95, {app="api"} | logfmt | unwrap duration_seconds(duration) | __error__="" [5m]) by (app)
 
 # Sum of bytes from JSON logs
-sum_over_time({app="api"} | json | unwrap bytes [5m])
+sum_over_time({app="api"} | json | unwrap bytes | __error__="" [5m])
 
 # With conversion (duration string → seconds)
-avg_over_time({app="api"} | logfmt | unwrap duration | duration_seconds [5m])
+avg_over_time({app="api"} | logfmt | unwrap duration_seconds(duration) | __error__="" [5m])
 ```
 
 ### Offset Modifier
@@ -186,6 +186,7 @@ sum(rate({env="prod"}[5m])) by (service)
 ```alloy
 loki.source.file "app" {
   targets    = [{__path__ = "/var/log/app/*.log", job = "app"}]
+  file_match { enabled = true } // enables glob discovery; disabled by default
   forward_to = [loki.process.parse.receiver]
 }
 

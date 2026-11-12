@@ -65,11 +65,13 @@ docker run --rm -p 9009:9009 -v $(pwd)/demo.yaml:/etc/mimir/demo.yaml \
 curl -sf http://localhost:9009/ready
 
 # 3. Verify it's serving the API
-curl -s http://localhost:9009/api/v1/labels | jq '.status'   # → "success"
+curl -s http://localhost:9009/prometheus/api/v1/labels | jq '.status'   # → "success"
 
 # 4. Verify self-metrics scrape
 curl -s http://localhost:9009/metrics | grep -E '^mimir_(distributor|ingester)_' | head
 ```
+
+The Prometheus-compatible **read** endpoints use Mimir's default `/prometheus` prefix (configurable with `api.prometheus_http_prefix`). The **write** endpoint remains `/api/v1/push`. See [Mimir HTTP API](https://grafana.com/docs/mimir/latest/references/http-api/).
 
 ### 2. Send metrics — Prometheus remote_write
 
@@ -83,7 +85,7 @@ remote_write:
 ```bash
 # Verify samples are landing
 curl -s -H 'X-Scope-OrgID: tenant1' \
-  'http://localhost:9009/api/v1/query?query=up' | jq '.data.result | length'
+  'http://localhost:9009/prometheus/api/v1/query?query=up' | jq '.data.result | length'
 # Expect > 0 within ~30s of Prometheus scraping
 ```
 

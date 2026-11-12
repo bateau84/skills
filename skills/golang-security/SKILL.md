@@ -72,7 +72,7 @@ For the full methodology with Go examples, DFD trust boundaries, DREAD scoring, 
 | --- | --- | --- | --- |
 | Critical | SQL Injection | Parameterized queries separate data from code | `database/sql` with `?` placeholders |
 | Critical | Command Injection | Pass args separately, never via shell concatenation | `exec.Command` with separate args |
-| High | XSS | Auto-escaping renders user data as text, not HTML/JS | `html/template`, `text/template` |
+| High | XSS | Auto-escaping renders user data as text, not HTML/JS | `html/template` for HTML; **not** `text/template` (no contextual escaping) |
 | High | Path Traversal | Scope untrusted file access to an allowed root | Go 1.24+: use `os.Root`. Pre-Go 1.24: use `filepath.IsLocal` + `filepath.Rel` + separator-aware checks; never rely on `filepath.Clean` + `strings.HasPrefix` alone. |
 | Medium | Timing Attacks | Constant-time comparison avoids byte-by-byte leaks | `crypto/subtle.ConstantTimeCompare` |
 | High | Crypto Issues | Use vetted algorithms; never roll your own | `crypto/aes`, `crypto/rand` |

@@ -17,6 +17,32 @@
         "Includes a question whose answer is a live count, e.g. current channel members, reactions on a post, or replies in an active thread",
         "Includes a question whose answer is a free-form summary that string matching cannot grade"
       ]
+    },
+    {
+      "id": "MCP-VERSION-01",
+      "name": "Python SDK major mismatch",
+      "prompt": "An internal MCP evaluation script imports mcp.server.fastmcp.FastMCP and mcp.client.streamable_http.streamablehttp_client while requirements.txt contains mcp>=1.1.0. A fresh install succeeds but imports fail. Choose a minimal safe correction and explain a longer-term migration.",
+      "trap": "Unbounded dependency resolves SDK v2 despite v1-only imports.",
+      "expectations": [
+        "Pins a compatible maintained 1.x version with <2 until full v2 migration, or migrates every affected import and call correctly.",
+        "States that mixed v1/v2 snippets are invalid and cites the version boundary."
+      ],
+      "must_not": [
+        "Does not claim unbounded mcp>=1.1.0 reliably preserves v1 APIs."
+      ]
+    },
+    {
+      "id": "MCP-CREDS-01",
+      "name": "MCP credential elicitation",
+      "prompt": "A remote MCP tool needs an API key. Someone proposes ctx.elicit(prompt='API key', input_type='password') so the chat user can enter it into an elicitation form. Assess protocol safety and propose the right channel.",
+      "trap": "Collects secrets using form elicitation, which MCP disallows.",
+      "expectations": [
+        "Rejects MCP form elicitation for API keys/passwords.",
+        "Uses an authorized OAuth or secrets-management mechanism instead, with scope appropriate to the transport."
+      ],
+      "must_not": [
+        "Does not request a secret through MCP form elicitation."
+      ]
     }
   ]
 }

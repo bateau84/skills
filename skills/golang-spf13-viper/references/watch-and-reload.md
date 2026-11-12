@@ -3,30 +3,20 @@
 ## Basic setup
 
 ```go
-viper.WatchConfig()
 viper.OnConfigChange(func(e fsnotify.Event) {
     log.Printf("config changed: %s (op: %s)", e.Name, e.Op)
     // re-read affected values and apply them
 })
+viper.WatchConfig()
 ```
 
 `WatchConfig` starts a background goroutine that watches the config file using fsnotify. Call it after `ReadInConfig`.
 
 ## The atomic-rename trap
 
-Most editors (vim, neovim, many CI tools) write config files by creating a new file and then renaming it over the old one. This replaces the inode that fsnotify is watching — the watch may not fire, or may fire with `Op: RENAME` instead of `Op: WRITE`, or may fire twice.
+Editors often replace files via atomic rename. Viper watches the parent directory and filters events for the configured filename; a rename into the watched path can therefore produce a reload. Event ordering, duplicate notifications and transient malformed writes still need testing on the deployed filesystem. Do not assume Viper watches only the original file inode.
 
-**Test hot reload with direct file writes, not editor saves:**
-
-```go
-// reliable in tests:
-os.WriteFile("config.yaml", newContent, 0644)
-
-// unreliable for testing:
-// opening vim and :w — may trigger RENAME instead of WRITE
-```
-
-In production, this is less of an issue if your config management tool (Kubernetes ConfigMap volume mount, Consul Template, etc.) is aware of inode behavior.
+**Test the real write patterns:** cover a direct write and a temp-file-plus-rename replacement, including a rejected malformed candidate. Event counts are not stable across platforms; assert the resulting validated configuration, not exactly one fsnotify event. Register the callback before starting the watcher, and retain an owned immutable/synchronized application snapshot.
 
 ## Race-safe reload pattern
 
@@ -57,7 +47,7 @@ viper.OnConfigChange(func(e fsnotify.Event) {
 })
 ```
 
-Reads use `appCfg.mu.RLock()`. Never read directly from viper in hot paths during reload — the window between `OnConfigChange` firing and viper updating its internal state is non-deterministic.
+Reads use `cfg.mu.RLock()` around the snapshot fields. Do not concurrently read or mutate the Viper instance itself during reload: Viper is not a synchronization primitive. Decode and validate in the watcher path, then publish the application snapshot under its lock.
 
 ## Debouncing rapid changes
 
@@ -100,4 +90,4 @@ viper.OnConfigChange(func(e fsnotify.Event) {
 
 ## Stopping the watcher
 
-There is no documented way to stop `WatchConfig` once started. Design your application so that the watcher's lifetime matches the process lifetime. For testing, create a new `viper.New()` instance per test — the watcher is per-instance and is garbage-collected with the instance.
+There is no documented way to stop `WatchConfig` once started. Design your application so that the watcher's lifetime matches the process lifetime. For testing, create a new `viper.New()` instance per test — the watcher goroutine may retain the Viper instance, so do **not** assume instance garbage collection stops it. Treat process-lifetime watches as deliberate and avoid starting uncontrolled watches in short-lived tests.

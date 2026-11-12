@@ -25,8 +25,8 @@ The `ShellCompDirective` controls shell behavior after your completion function 
 | `ShellCompDirectiveDefault` | Fall back to file completion after your results |
 | `ShellCompDirectiveNoFileComp` | Disable file completion fallback |
 | `ShellCompDirectiveNoSpace` | Don't add a space after the completion |
-| `ShellCompDirectiveFilterFileExt(exts)` | Only show files with given extensions |
-| `ShellCompDirectiveFilterDirs(dirs)` | Only show directories |
+| `ShellCompDirectiveFilterFileExt` | Return extension strings as completions together with this directive flag; it is not a function |
+| `ShellCompDirectiveFilterDirs` | Filter directory completions; return the directory (if any) in the completion slice, not as a function argument |
 | `ShellCompDirectiveError` | Signal an error (show no completions) |
 
 Combine with bitwise OR: `cobra.ShellCompDirectiveNoFileComp | cobra.ShellCompDirectiveNoSpace`.

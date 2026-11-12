@@ -1,0 +1,20 @@
+{
+  "skill": "prometheus",
+  "version": "1.0.0",
+  "common_instruction": "State what is observed versus proposed; use source-appropriate versions and avoid inventing execution results.",
+  "cases": [
+    {
+      "id": "PROM-RELOAD-01",
+      "name": "Reloading without lifecycle enabled",
+      "prompt": "A Prometheus rule update passes promtool check rules, but curl -X POST http://localhost:9090/-/reload returns 403. Explain how to safely activate new rules and confirm they loaded.",
+      "trap": "Assumes HTTP lifecycle reload is enabled on every Prometheus server.",
+      "expectations": [
+        "Names --web.enable-lifecycle as prerequisite for HTTP reload or an authorized SIGHUP/service manager reload.",
+        "Checks Prometheus config and active loaded rule state; does not claim a 403 is success."
+      ],
+      "must_not": [
+        "Does not say the reload endpoint always works without configuration."
+      ]
+    }
+  ]
+}
