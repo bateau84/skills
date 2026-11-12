@@ -1,5 +1,7 @@
 # Node/TypeScript MCP Server Implementation Guide
 
+> **Modified work:** Adapted from [Anthropic's `mcp-builder`](https://github.com/anthropics/skills/tree/main/skills/mcp-builder) (Apache-2.0). Original licence: [LICENSE.txt](../LICENSE.txt); provenance: [LICENSING.md](../../../LICENSING.md).
+
 ## Overview
 
 This document provides Node/TypeScript-specific best practices and examples for implementing MCP servers using the MCP TypeScript SDK. It covers project structure, server setup, tool registration patterns, input validation with Zod, error handling, and complete working examples.

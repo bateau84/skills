@@ -1,3 +1,6 @@
+# Modified from Anthropic's mcp-builder (Apache-2.0) by bateau84/skills.
+# Original licence: ../LICENSE.txt; provenance: ../../../LICENSING.md.
+
 """MCP Server Evaluation Harness
 
 This script evaluates MCP servers by running test questions against them using Claude.

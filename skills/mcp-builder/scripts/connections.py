@@ -1,3 +1,6 @@
+# Modified from Anthropic's mcp-builder (Apache-2.0) by bateau84/skills.
+# Original licence: ../LICENSE.txt; provenance: ../../../LICENSING.md.
+
 """Lightweight connection handling for MCP servers."""
 
 from abc import ABC, abstractmethod

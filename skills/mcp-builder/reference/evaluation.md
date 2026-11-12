@@ -1,5 +1,7 @@
 # MCP Server Evaluation Guide
 
+> **Modified work:** Adapted from [Anthropic's `mcp-builder`](https://github.com/anthropics/skills/tree/main/skills/mcp-builder) (Apache-2.0). Original licence: [LICENSE.txt](../LICENSE.txt); provenance: [LICENSING.md](../../../LICENSING.md).
+
 ## Overview
 
 This document provides guidance on creating comprehensive evaluations for MCP servers. Evaluations test whether LLMs can effectively use your MCP server to answer realistic, complex questions using only the tools provided.

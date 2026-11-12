@@ -1,5 +1,7 @@
 # Python MCP Server Implementation Guide (SDK v1)
 
+> **Modified work:** Adapted from [Anthropic's `mcp-builder`](https://github.com/anthropics/skills/tree/main/skills/mcp-builder) (Apache-2.0). Original licence: [LICENSE.txt](../LICENSE.txt); provenance: [LICENSING.md](../../../LICENSING.md).
+
 **Compatibility:** These examples target Python MCP SDK v1 (`mcp>=1.28,<2`). For SDK v2, migrate all imports and transports using the [official migration guide](https://github.com/modelcontextprotocol/python-sdk/blob/main/docs/migration.md). Do not mix these examples with SDK v2 docs.
 
 ## Overview

@@ -6,6 +6,8 @@ license: Complete terms in LICENSE.txt
 
 # MCP Server Development Guide
 
+> **Modified work:** Adapted from [Anthropic's `mcp-builder`](https://github.com/anthropics/skills/tree/main/skills/mcp-builder) (Apache-2.0). Original licence: [LICENSE.txt](LICENSE.txt); provenance: [LICENSING.md](../../LICENSING.md).
+
 ## Overview
 
 Create MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. The quality of an MCP server is measured by how well it enables LLMs to accomplish real-world tasks.
