@@ -24,6 +24,8 @@ A Quality Scenario is a specialized behavioral obligation, not a vague non-funct
 6. Avoid duplication. A QS may derive from one or several BRs, or directly from accepted product authority. Do not restate a BR unless the condition/measure adds real quality meaning.
 7. Use design methodology for human-centered usability/accessibility realization; use quality scenarios for agreed measurable behavioral qualities within the task's scope.
 
+For example, ordinary save/readback behavior can belong in a BR; an agreed promise that already accepted work remains identifiable after a worker crash may warrant a QS because the crash condition distinguishes the guarantee. A request to "make it fast" does not authorize a 100 ms threshold. Carry the exact stimulus, environment, response measure, and provenance forward so an average-latency benchmark or nominal-path test cannot silently replace the scenario's actual claim.
+
 ## Durable artifact
 
 Use the consuming repository's OKF relationship vocabulary and heading rules when publishing the document. The example `## Derived from` heading is illustrative; relationship type and path are repository-owned.
