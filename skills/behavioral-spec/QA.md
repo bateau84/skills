@@ -15,7 +15,7 @@ Cross-artifact adversarial validation for any agent. Assume competent production
 - Ask whether two independent implementations could each claim conformance while disagreeing on a load-bearing meaning.
 - Challenge verification semantics that observe a neighboring behavior rather than the actual normative guarantee.
 - Attack false closure: can a recorded open question, circular derivation, repeated pass with no new findings, or an arbitrary scope boundary conceal a known unmet commitment? Conversely, has one local gap unnecessarily blocked unrelated settled work?
-- Challenge adjudication that resolves a BR/QS/OC contradiction by ranking document types, borrowing downstream policy, inventing a stronger promise, or treating a Specifier's self-check as independent review. Name the accepted source and exact conflict; limit the finding to affected scope and route any reserved semantic decision to its owner.
+- Challenge adjudication that resolves a BR/QS/OC contradiction by ranking document types, borrowing downstream policy, inventing a stronger promise, or treating the author's own composition check as independent review. Name the accepted source and exact conflict; limit the finding to affected scope and route any reserved semantic decision to its owner.
 
 ## QA depth
 

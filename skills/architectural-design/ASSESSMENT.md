@@ -7,6 +7,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 - Accepted obligations map to explicit components/boundaries without inventing product behavior; unresolved semantics remain unresolved.
 - New machinery earns its total cost against a named obligation, demonstrated material risk, or concrete maintenance burden, and an adequate existing/simpler seam was not ignored.
 - Genuine alternatives were developed before selection and compared on the same material forces; rejected options are not ceremonial strawmen.
+- When an accepted Quality Scenario drives the choice, alternatives are compared against its actual condition and response measure, not an invented target. The architectural satisfier and decisive verification (or unresolved measure) are traceable through the design's existing structure.
 - Data, control, authority, evidence, state ownership, lifecycle, and failure flows are coherent across boundaries.
 - Load-bearing guarantees identify their preconditions, responsible boundary, enforcement mechanism, and verification point.
 - Relevant input/state and operation coverage includes inverse paths and failure cases rather than only the happy path.

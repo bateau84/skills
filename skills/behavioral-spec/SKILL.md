@@ -78,7 +78,7 @@ Use these lenses as discovery questions, not as a template that demands a requir
 
 Investigate a case when it could alter an accepted outcome, violate a constraint, or expose an unresolved responsibility. Include consequential combinations, especially concurrency and destructive effects; avoid a full Cartesian enumeration of irrelevant cases. A lens does not authorize new capabilities, numerical quality targets, automatic recovery, or new security mechanisms. Note consequential exclusions or assumptions with their basis instead of silently omitting them.
 
-When accepted quality materially depends on a condition (peak load, degradation, interruption, threat, recovery, or a representative change), deliberately choose whether a Quality Scenario is the normative home, a BR/OC already owns the guarantee, or a material quality decision remains open. Preserve the condition, response boundary, and source. Surface the choice briefly in the bundle index when downstream design could otherwise miss it; do not create a QS for routine changes or invent numeric measures.
+When accepted quality materially depends on a condition (peak load, degradation, interruption, threat, recovery, or a representative change), deliberately choose whether a Quality Scenario is the normative home, a BR/OC already owns the guarantee, or a material quality decision remains open. Preserve the condition, response boundary, and source; do not create a QS for routine changes or invent numeric measures. See **Durable bundle** for index navigation.
 
 ### 4. Analyze obstacles, invariants, and progress
 
