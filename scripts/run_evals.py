@@ -58,6 +58,7 @@ def parser():
     p.add_argument("--copilot-image", help="Immutable local Copilot judge image ID/digest")
     p.add_argument("--artifact-dir", "--output", dest="artifact_dir", type=Path, help="Fresh single-run directory; default .skill-evals/<run-id>")
     p.add_argument("--provider-config", type=Path, help="V2 provider-only JSON; runtime policy/config inheritance is forbidden")
+    p.add_argument("--claude-config-dir", type=Path, help="Explicit dedicated native Claude subscription profile for claude-agent/* target/judge")
     for name in ("auth", "database", "models-catalog"):
         p.add_argument("--" + name, type=Path)
     p.add_argument("--env", action="append", default=[], help="Intentional extra provider env variable name; never logs values")
@@ -100,6 +101,28 @@ def validate_live(options, selected):
             raise ValueError(f"{option} must be a qualified provider/model ID (for example openai/gpt-6.1); got an unqualified or malformed ID")
 
     validate_model_id(options.model, "--model")
+    if getattr(options, "claude_config_dir", None):
+        if not options.model.startswith("claude-agent/"):
+            raise ValueError("--claude-config-dir requires a claude-agent/* target")
+        if options.judge_transport != "opencode" or (
+            options.judge_model and not options.judge_model.startswith("claude-agent/")
+        ):
+            raise ValueError("Claude Agent subscription profile requires an OpenCode claude-agent/* judge")
+        if options.parallel != 1:
+            raise ValueError("Claude Agent subscription profile currently requires --parallel 1 (shared native credential refresh is unqualified)")
+        if any((options.auth, options.database, options.env, options.provider_config)):
+            raise ValueError("Claude Agent subscriptions reject OpenCode auth/database, provider overrides and forwarded environment")
+        profile = options.claude_config_dir.expanduser()
+        if profile.is_symlink() or not profile.is_dir() or not (profile / ".credentials.json").is_file():
+            raise ValueError("Claude Agent requires a dedicated native profile with .credentials.json")
+        if any(os.environ.get(name) for name in (
+            "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_BASE_URL",
+            "CLAUDE_CODE_OAUTH_TOKEN", "CLAUDE_CODE_USE_BEDROCK", "CLAUDE_CODE_USE_VERTEX",
+            "CLAUDE_CODE_USE_FOUNDRY",
+        )):
+            raise ValueError("Claude Agent subscription refuses API/cloud/token environment overrides")
+    elif options.model.startswith("claude-agent/") or (options.judge_model or "").startswith("claude-agent/"):
+        raise ValueError("claude-agent/* requires --claude-config-dir")
     if options.judge_model is not None:
         validate_model_id(options.judge_model, "--judge-model")
     if not selected:
@@ -268,7 +291,8 @@ def run_plan(root, runner, options, plan, providers, invoker=None, reporter=None
                                   "outer_timeout": options.container_timeout, "transport_retries": options.transport_retries,
                                   "engine": options.engine, "network": options.network or "engine-default-live",
                                   "sampling": "provider-default/uncontrolled"},
-                              "budget": call_budget(len({j.case.id for j in plan.jobs}), options)},
+                              "budget": call_budget(len({j.case.id for j in plan.jobs}), options),
+                              "claude_agent_profile": bool(getattr(options, "claude_config_dir", None))},
     }
     sanitizer = runner.evidence_safety.Sanitizer.from_runtime(
         os.environ, json_sources=[options.auth or runner.cli.default_auth_path(),
@@ -467,7 +491,12 @@ def main(argv=None, *, report_root=None):
                 raise ValueError("model catalog acquisition or validation failed") from None
         providers = compile_provider_settings(provider_doc, runner, os.environ, options.env)
         options.engine = runner.cli.resolve_engine(options.engine)
-        options.target_image_proof = verify_image(runner, options.engine, options.opencode_image, "opencode")
+        if getattr(options, "claude_config_dir", None):
+            options.target_image_proof = verify_image(
+                runner, options.engine, options.opencode_image, "opencode", claude_agent=True,
+            )
+        else:
+            options.target_image_proof = verify_image(runner, options.engine, options.opencode_image, "opencode")
         options.target_image_id = options.target_image_proof["image_id"]
         if options.judge_transport == "opencode":
             options.judge_image_proof = options.target_image_proof

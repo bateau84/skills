@@ -319,6 +319,11 @@ class SkillsProfile:
             auth=o.auth, database=o.database, models_catalog=o.models_catalog,
             config=config, config_root=None, env_names=tuple(o.env),
             timeout_seconds=o.timeout_seconds, container_timeout=o.container_timeout,
+            claude_config_dir=(
+                Path(o.claude_config_dir) if getattr(o, "claude_config_dir", None)
+                and ((o.judge_model or o.model) if judge else o.model).startswith("claude-agent/")
+                else None
+            ),
         )
 
     def target_spec(self, case, prepared):
@@ -436,7 +441,8 @@ class SkillsProfile:
                          "inner_timeout": self.options.timeout_seconds, "outer_timeout": self.options.container_timeout,
                          "transport_retries": self.options.transport_retries,
                          "target_image": self.options.target_image_proof, "judge_image": self.options.judge_image_proof,
-                         "network": self.options.network or "engine-default-live", "sampling": "provider-default/uncontrolled"},
+                         "network": self.options.network or "engine-default-live", "sampling": "provider-default/uncontrolled",
+                          "claude_agent_profile": bool(getattr(self.options, "claude_config_dir", None))},
         }
 
 

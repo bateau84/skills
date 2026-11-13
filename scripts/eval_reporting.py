@@ -15,6 +15,7 @@ import unicodedata
 from pathlib import Path
 
 from eval_cases import strict_json
+from eval_runner import RUNNER_REVISION
 
 
 # Host check/contract/comparison messages are created AFTER the result sanitizer.
@@ -67,7 +68,7 @@ def boundary_error(exc):
         "cannot start git; install Git and verify --runner-root",
         "git could not inspect runner checkout; verify --runner-root points to a valid checkout",
         "runner-root must be the external checkout root; provide --runner-root pointing to the clean repository root",
-        f"runner checkout must be exactly dbbbf2a0740aee7a9e9035cc14a785a9467b8fb1; check out that revision in a dedicated clean checkout",
+        f"runner checkout must be exactly {RUNNER_REVISION}; check out that revision in a dedicated clean checkout",
         "model catalog acquisition or validation failed",
         "model catalog source is unavailable; check --models-catalog or OPENCODE_EVAL_RUNNER_MODELS",
         "pinned runner imports failed; verify the clean checkout and its Python dependencies",

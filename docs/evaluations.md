@@ -24,7 +24,7 @@ The execution dependency is the **clean checkout**, not an arbitrary executable
 found on PATH:
 
 - Runner: [`bateau84/opencode-eval-runner`](https://github.com/bateau84/opencode-eval-runner)
-  at `dbbbf2a0740aee7a9e9035cc14a785a9467b8fb1`.
+  at `eb2677680a1838f1b64f4a68e818d8257033a8d8` (runner PR #91 candidate; pin the reviewed merge revision after integration).
 - Resolution: `--runner-root /path/to/opencode-eval-runner`, then
   `SKILLS_EVAL_RUNNER_ROOT`, then the local sibling `../opencode-eval-runner`
   relative to this repository (not the current shell directory). In nested
@@ -33,7 +33,7 @@ found on PATH:
 - The checkout must have no modified, untracked, or ignored files, including
   bytecode. Imports do not write bytecode there. Use a dedicated clean checkout
   rather than a dependency tree carrying unrelated experiments or cache files.
-- Its pinned Containerfile specifies OpenCode **2.2.2** and Copilot **1.0.83** in
+- Its pinned Containerfile keeps legacy OpenCode **2.2.2** and Copilot **1.0.83**, and adds an opt-in Claude Agent 2.2.6 / Claude Code 2.1.318 target. See [Claude Agent trials](claude-agent-evals.md). The existing targets remain
   separate transport images. Changing only the Python host code is insufficient.
 
 The approved OpenCode image identity is
