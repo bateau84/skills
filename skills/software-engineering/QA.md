@@ -16,6 +16,8 @@ Adversarial validation for work produced with `software-engineering`, usable by 
 10. **Attack cross-skill composition.** Language, framework, security, database, concurrency, observability, and domain skills can impose constraints that conflict with generic simplicity. Verify the generic engineering baseline did not override stronger task-specific obligations.
 11. **Attack claimed future payoff.** A producer and reviewer can share the same speculative forecast. Examine a representative later change, or remove the assumed future feature: does the proposed boundary still hide useful complexity, or merely move coordination and maintenance cost elsewhere? Include preparation and review cost when comparing effort. Fewer lines, files, tokens, or dispatches alone do not prove improvement; a promised payoff remains unproven until the relevant evidence exists.
 
+12. **Attack comment-backed technical-debt propagation.** Sample repeated timer, retry, fallback, suppression, and special-case patterns whose comments claim they are necessary. Trace original constraints through the real callers, failure cases, and tests; check whether the explanation has turned an avoidable workaround into an accepted-looking convention. Also verify that a comment cleanup does not erase non-obvious invariants or mask unimplemented behavior. Escalate only demonstrated or credible obligation risks, not comment style.
+
 ## Adversarial probes
 
 Use probes proportionally to the change:
