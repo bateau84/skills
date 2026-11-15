@@ -443,5 +443,111 @@ class PinnedIntegrationTests(unittest.TestCase):
             self.assertEqual(artifact["sides"]["candidate"]["classification"], expected)
 
 
+    def companion_events(self, skill, companion=None, *, read_start=3, read_outcome="success", read_state="available", read_path=None):
+        available = lambda value: {"state": "available", "value": value}
+        def event(tool, args, ident, start, terminal, outcome="success", state="available"):
+            identity = {"invocation_id": ident, "tool": available(tool), "session_id": available("ses"),
+                        "agent": available("eval-target"), "message_id": available("msg"), "call_id": available(ident)}
+            return [{**identity, "kind": "native_start", "sequence": start, "input": available(args),
+                     "parent_session_id": available(None), "boundary": "decoded-tool-execute"},
+                    {**identity, "kind": "native_terminal", "sequence": terminal, "outcome": outcome,
+                     "result": available({"content": "native result"}) if state == "available" else
+                     {"state": state, "reason": "test result unavailable"}, "boundary": "session.tool.success"}]
+        records = event("skill", {"id": skill}, "skill-load", 1, 2)
+        if companion is not None:
+            path = read_path or f".opencode/skills/{skill}/{companion}"
+            records += event("read", {"path": path}, "companion-read", read_start, max(4, read_start + 1),
+                             read_outcome, read_state)
+        return self.build_evidence({"capture_started": True, "capture_ended": True,
+                                    "records": records, "observer_failures": 0, "callback_failures": 0, "issues": []})
+
+    def configure_companion(self, mode):
+        self.options.comparison = mode
+        self.baseline = SkillsProfile(ROOT, self.runner, self.options, "baseline", {})
+        self.candidate = SkillsProfile(ROOT, self.runner, self.options, "candidate", {})
+        case_id = "SoftwareEngineering-10" if mode == "assessment" else "SoftwareEngineering-13"
+        self.case = next(c for c in self.candidate.discover_cases()
+                         if c.id == f"SKILL-software-engineering-{case_id}")
+        self.job = self.runner.eval_plan.expand_jobs((self.case,), iterations=1)[0]
+
+    def test_companion_comparison_prepares_narrow_isolated_workspaces_and_records_actual_read(self):
+        for mode, companion in (("assessment", "ASSESSMENT.md"), ("qa", "QA.md")):
+            with self.subTest(mode=mode):
+                self.configure_companion(mode)
+                with self.baseline.prepare(self.case, 1) as base, self.candidate.prepare(self.case, 1) as cand:
+                    self.assertEqual(base["practitioner_files"], cand["practitioner_files"])
+                    self.assertEqual(set(cand["mounted_files"]) - set(base["mounted_files"]), {companion})
+                    self.assertFalse((base["target"] / ".opencode/skills/software-engineering" / companion).exists())
+                    self.assertTrue((cand["target"] / ".opencode/skills/software-engineering" / companion).exists())
+                    self.assertNotIn("QA.md" if mode == "assessment" else "ASSESSMENT.md", cand["mounted_files"])
+                    self.assertNotIn("evals/evals.json", cand["mounted_files"])
+                    self.assertIn(companion, cand["configs"]["candidate"][0].read_text())
+                def invoke(spec):
+                    self.calls.append(spec)
+                    if spec.agent == "eval-target":
+                        system = json.loads(spec.config.read_text())["agents"]["eval-target"]["system"]
+                        evidence = self.companion_events(spec.skill, companion if companion in system else None)
+                        return 0, self.result(spec, evidence=evidence)
+                    return 0, self.result(spec)
+                artifact = self.pair(invoke)
+                self.assertEqual(artifact["comparison"]["decision"]["data"]["treatment_integrity"], True)
+                self.assertEqual(artifact["sides"]["baseline"]["classification"], "pass")
+                self.assertEqual(artifact["sides"]["candidate"]["classification"], "pass")
+                self.assertEqual([x.skill for x in self.calls if x.agent == "eval-target"],
+                                 ["software-engineering", "software-engineering"])
+                self.calls.clear()
+
+    def test_companion_attribution_fails_closed_on_missing_early_failed_or_unreadable_read(self):
+        for mode, companion in (("assessment", "ASSESSMENT.md"), ("qa", "QA.md")):
+            self.configure_companion(mode)
+            for scenario in ("missing", "early", "failed", "unavailable", "other-file"):
+                with self.subTest(mode=mode, scenario=scenario):
+                    def invoke(spec):
+                        if spec.agent == "eval-target":
+                            is_candidate = companion in json.loads(spec.config.read_text())["agents"]["eval-target"]["system"]
+                            options = {"read_start": 2} if scenario == "early" else (
+                                {"read_outcome": "error"} if scenario == "failed" else (
+                                {"read_state": "omitted"} if scenario == "unavailable" else (
+                                {"read_path": f".opencode/skills/{spec.skill}/SKILL.md"} if scenario == "other-file" else {})))
+                            evidence = self.companion_events(spec.skill,
+                                                             companion if is_candidate and scenario != "missing" else None,
+                                                             **(options if is_candidate else {}))
+                            return 0, self.result(spec, evidence=evidence)
+                        return 0, self.result(spec)
+                    artifact = self.pair(invoke)
+                    candidate = artifact["sides"]["candidate"]
+                    if scenario == "unavailable":
+                        self.assertEqual(candidate["classification"], "non-evidence")
+                    else:
+                        self.assertEqual(candidate["classification"], "fail")
+                    self.assertEqual(artifact["comparison"]["decision"]["classification"], "unattributed"
+                                     if scenario != "unavailable" else artifact["comparison"]["decision"]["classification"])
+                    self.assertFalse(summarize(self.runner, [artifact])["all_pass"])
+
+    def test_revision_comparison_mounts_old_and_new_practitioner_bytes_without_companions(self):
+        with tempfile.TemporaryDirectory() as temp:
+            old = Path(temp)
+            folder = old / "skills" / "software-engineering"
+            folder.mkdir(parents=True)
+            (folder / "SKILL.md").write_text("Legacy practitioner instructions\n")
+            self.options.comparison = "revision"
+            self.options.baseline_skill_root = old
+            self.baseline = SkillsProfile(ROOT, self.runner, self.options, "baseline", {})
+            self.candidate = SkillsProfile(ROOT, self.runner, self.options, "candidate", {})
+            self.case = next(c for c in self.candidate.discover_cases()
+                             if c.id == "SKILL-software-engineering-SoftwareEngineering-09")
+            self.job = self.runner.eval_plan.expand_jobs((self.case,), iterations=1)[0]
+            with self.baseline.prepare(self.case, 1) as baseline, self.candidate.prepare(self.case, 1) as candidate:
+                self.assertEqual(baseline["practitioner_files"]["SKILL.md"], b"Legacy practitioner instructions\n")
+                self.assertNotEqual(baseline["practitioner_files"]["SKILL.md"],
+                                    candidate["practitioner_files"]["SKILL.md"])
+                self.assertEqual(baseline["configs"]["baseline"][0].read_bytes(),
+                                 candidate["configs"]["candidate"][0].read_bytes())
+                self.assertNotIn("ASSESSMENT.md", candidate["mounted_files"])
+                self.assertEqual(self.baseline.artifact_metadata(self.case, baseline)["comparison"], "revision")
+            artifact = self.pair()
+            self.assertTrue(artifact["comparison"]["decision"]["data"]["treatment_integrity"])
+
+
 if __name__ == "__main__":
     unittest.main()
