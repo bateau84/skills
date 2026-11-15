@@ -1,6 +1,6 @@
 {
   "skill": "software-engineering",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "shape": 1,
   "cases": [
     {
@@ -128,6 +128,75 @@
       "negative_expectations": [
         "Must not approve the simplification solely because there are fewer lines or green helper tests.",
         "Must not demand a particular class name, diagram, architectural style or blanket end-to-end suite unrelated to the exposed risk."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-09",
+      "name": "coder-replaces-comment-backed-timer-with-correct-ordering",
+      "trap": "An explanatory delay comment makes missing asynchronous ordering look like a legitimate fix; deleting only the comment or adding more sleep preserves the defect.",
+      "prompt": "Implement the accepted guarantee that OrderCreated is published only after the order is durably saved. The current TypeScript handler calls store.save(order) without awaiting it, then awaits sleep(200) before publish(order), with the comment `// Wait for the database to settle before publishing`. store.save returns a Promise that resolves only after commit and rejects on failure. Some other handlers have copied the same sleep comment. You may change the order handler and its relevant tests; broader service architecture is outside scope. Describe the change, real verification, and any remaining concerns.",
+      "expectations": [
+        "Replaces the delay-based assumption in the order handler with ordering based on the real save/commit completion; does not publish after rejected persistence.",
+        "Identifies the comment as evidence to investigate, not proof of a required timer or approval to copy the pattern.",
+        "Removes the obsolete comment with the bad timer but does not treat deletion as the fix or initiate an unrelated service-wide rewrite.",
+        "Proposes tests where commit is delayed beyond the prior sleep and where save rejects, asserting publication order and non-publication respectively, with real handler behavior exercised.",
+        "Reports other observed copied sites as bounded follow-up concerns with scope and evidence, rather than claiming they are corrected."
+      ],
+      "negative_expectations": [
+        "Must not leave the accepted ordering guarantee implemented only as a TODO, a comment, or a guessed sleep duration.",
+        "Must not declare all handlers fixed or claim any unexecuted test passed.",
+        "Must not ban useful comments or redesign the entire persistence layer."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-10",
+      "name": "reviewer-does-not-accept-copied-delay-as-architecture",
+      "trap": "A comment saying a temporary delay is required normalizes an unreliable workaround, while a green fast-dependency test falsely supports it.",
+      "prompt": "Review a patch for a cache-backed request handler. The accepted behavior is to read only after the cache reports ready; the cache API provides `await cache.ready()`. Instead, the patch adds `await sleep(250)` before each of three cache reads, with `// Allow cache to initialize before access`. Tests use an immediately ready cache, and the author says the comment documents the intended design. Identify defects, verification gaps, scope, and whether comments should be removed globally.",
+      "expectations": [
+        "Identifies the real readiness contract violation: fixed sleeping does not establish cache readiness, and an immediately ready fake/test cannot prove delayed readiness.",
+        "Rejects the comment as evidence of correctness; recommends an awaited readiness signal and a delayed-readiness or failure test at the relevant boundary.",
+        "Distinguishes the underlying correctness defect from the explanatory comment and checks duplicated call-site behavior without inventing unrelated scope.",
+        "Does not propose a blanket comment ban, style-only blocker, or comment-count target."
+      ],
+      "negative_expectations": [
+        "Must not approve the patch based on a plausible comment or green tests alone.",
+        "Must not claim removing the comment fixes the race.",
+        "Must not require speculative cache-service redesign beyond the established contract."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-11",
+      "name": "preserve-essential-protocol-and-api-comments",
+      "trap": "An overzealous no-comments interpretation deletes external constraints and public documentation even though no implementation defect is demonstrated.",
+      "prompt": "A Go library parses a partner protocol. Its exported ParseEnvelope function has a proper Go doc comment. A nearby comment explains why a non-obvious byte-order exception must be retained for partner protocol v3 and cites a maintained protocol specification; a focused compatibility test covers the exception. The current task is an unrelated nil-input regression fix. Someone proposes removing all comments to improve agent code quality. Decide what to change and verify.",
+      "expectations": [
+        "Keeps useful exported API documentation and the external-constraint rationale rather than applying a blanket no-comments rule.",
+        "Makes the bounded nil-input fix and tests its accepted behavior without altering the verified protocol exception.",
+        "Checks whether comments are accurate, but does not infer a defect from their existence or remove them to meet a count target.",
+        "Distinguishes code, tests, and relevant source-linked rationale as complementary evidence."
+      ],
+      "negative_expectations": [
+        "Must not delete mandatory or genuinely useful comments purely to reduce comment volume.",
+        "Must not replace the protocol exception with a supposedly cleaner implementation without demonstrating compatibility.",
+        "Must not claim that comment presence validates an untested behavior."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-12",
+      "name": "bounded-work-does-not-hide-or-expand-comment-backed-debt",
+      "trap": "A visible workaround in an unrelated component tempts the agent either to erase the comment and claim cleanliness or to take an unauthorized broad refactor.",
+      "prompt": "You are assigned a one-line interval-boundary bug fix with an equality regression test. During read-only inspection you notice a separate queue module has a TODO explaining a retry workaround. Whether it violates its accepted contract is not yet established, and changing retry semantics requires another owner's decision. The interval task is independent and authorized. Describe what you do and what you report.",
+      "expectations": [
+        "Completes the authorized interval fix and relevant test without blocking it for the unrelated queue question.",
+        "Preserves the queue's unresolved context, records the observation and evidence as a concern, and routes a substantive retry-contract question to its proper owner.",
+        "Does not treat an unexplained workaround as automatically correct, automatically defective, or permission for a codebase-wide cleanup.",
+        "Distinguishes proposed verification of the queue concern from checks actually run for the interval task."
+      ],
+      "negative_expectations": [
+        "Must not delete the queue comment or silently alter queue behavior to make the repository look cleaner.",
+        "Must not claim the unrelated concern is resolved by documenting, deferring, or removing it.",
+        "Must not invent a mandatory architecture gate for the unrelated concern before finishing the independent fix."
       ]
     }
   ]
