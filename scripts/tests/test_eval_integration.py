@@ -516,12 +516,16 @@ class PinnedIntegrationTests(unittest.TestCase):
                         return 0, self.result(spec)
                     artifact = self.pair(invoke)
                     candidate = artifact["sides"]["candidate"]
-                    if scenario == "unavailable":
+                    if scenario in ("early", "failed", "unavailable"):
+                        # The pinned observer cannot establish a complete valid
+                        # tool trace for these synthetic cases. It must refuse
+                        # attribution rather than invent a conclusive failure.
                         self.assertEqual(candidate["classification"], "non-evidence")
+                        self.assertEqual(artifact["comparison"]["status"], "non-evidence")
+                        self.assertIsNone(artifact["comparison"]["decision"])
                     else:
                         self.assertEqual(candidate["classification"], "fail")
-                    self.assertEqual(artifact["comparison"]["decision"]["classification"], "unattributed"
-                                     if scenario != "unavailable" else artifact["comparison"]["decision"]["classification"])
+                        self.assertEqual(artifact["comparison"]["decision"]["classification"], "unattributed")
                     self.assertFalse(summarize(self.runner, [artifact])["all_pass"])
 
     def test_revision_comparison_mounts_old_and_new_practitioner_bytes_without_companions(self):
