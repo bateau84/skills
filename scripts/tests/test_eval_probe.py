@@ -8,7 +8,7 @@ from unittest.mock import patch
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from eval_runner import build_probe_command, load_runner
-from eval_probe import effective_agent_matches
+from eval_probe import effective_agent_matches, isolated_skill_catalog
 from eval_profile import SkillsProfile
 from run_evals import parser, run_probe
 
@@ -93,6 +93,27 @@ class ProbeBoundaryTests(unittest.TestCase):
             prefix + candidate["permissions"] + [browser_deny, skill_deny]
         )}
         self.assertTrue(effective_agent_matches(candidate_actual, candidate, ["opencode.browser"]))
+
+    def test_isolated_skill_catalog_excludes_browser_even_when_skill_hidden(self):
+        clean = {
+            "skills": [], "plugins": ["opencode.tool.skill", "eval-runtime-observer"],
+            "workspace_evals": [], "loom_seed_exists": False,
+        }
+        self.assertTrue(isolated_skill_catalog(clean, []))
+        self.assertFalse(isolated_skill_catalog(clean, ["agent-run-audit"]))
+        self.assertTrue(isolated_skill_catalog(
+            {**clean, "skills": ["agent-run-audit"]}, ["agent-run-audit"],
+        ))
+        for contaminated in (
+            {**clean, "plugins": clean["plugins"] + ["opencode.browser"]},
+            {**clean, "skills": ["browser"]},
+            {**clean, "skills": ["agent-run-audit", "browser"]},
+            {**clean, "plugins": clean["plugins"] + ["arbitrary.plugin"]},
+            {**clean, "workspace_evals": ["/workspace/hidden/evals"]},
+            {**clean, "loom_seed_exists": True},
+        ):
+            with self.subTest(contaminated=contaminated):
+                self.assertFalse(isolated_skill_catalog(contaminated, []))
 
     def test_real_runner_probe_builder_excludes_all_credential_mounts_and_environment(self):
         runner = load_runner(Path(os.environ.get("SKILLS_EVAL_RUNNER_ROOT", str(ROOT.parent / "opencode-eval-runner"))))

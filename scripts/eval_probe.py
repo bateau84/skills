@@ -34,6 +34,22 @@ def effective_agent_matches(actual, expected, plugins):
     return permissions[-len(suffix):] == suffix
 
 
+def isolated_skill_catalog(result: dict, desired_skills: list[str]) -> bool:
+    """Fail closed on stock plugin/skill contamination in every eval phase."""
+    plugins = result["plugins"]
+    unknown = [
+        name for name in plugins
+        if not (name.startswith("opencode.") or name == "eval-runtime-observer")
+    ]
+    return (
+        result["skills"] == desired_skills
+        and not result["workspace_evals"]
+        and not result["loom_seed_exists"]
+        and "opencode.browser" not in plugins
+        and not unknown
+    )
+
+
 PROBE_CODE = r'''
 import hashlib, json, os, pathlib, sys
 sys.dont_write_bytecode = True
@@ -127,8 +143,7 @@ def probe_configs(root: Path, runner, options, case, record=None):
                                  + json.dumps({"agent_ids": [a["id"] for a in result["agents"]],
                                                "actual_agent": agent, "expected_agent": expected}))
             desired_skills = [case.project_data["skill"]] if side == "candidate" else []
-            unknown_plugins = [p for p in result["plugins"] if not (p.startswith("opencode.") or p == "eval-runtime-observer")]
-            if result["skills"] != desired_skills or result["workspace_evals"] or result["loom_seed_exists"] or unknown_plugins:
+            if not isolated_skill_catalog(result, desired_skills):
                 raise ValueError(f"{side}: runtime catalog/config contamination or rubric exposure")
             if not all(value["readable"] and not value["write_bits"] for value in result["files"].values()):
                 raise ValueError("selected practitioner reference is not readable/read-only")

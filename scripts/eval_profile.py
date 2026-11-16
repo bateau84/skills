@@ -177,9 +177,10 @@ def effective_config(side: str, skill: str, providers: dict, files) -> dict:
     config = {
         "$schema": "https://opencode.ai/config.json", "share": "disabled", "update": "disable",
         "snapshots": False, "warming": False, "instructions": [],
-        # The previously pinned 2.0.23 added opencode/report skills even to an
-        # empty workspace. Remove that content plugin, not loader or scanner.
-        "plugins": ["-opencode.skill"],
+        # Bundled skill content and the separate browser plugin register skills
+        # outside the selected practitioner directory. Disable both, keeping
+        # the native skill scanner/tool for the candidate's explicit skill load.
+        "plugins": ["-opencode.skill", "-opencode.browser"],
         "permissions": [dict(DENY)], "default_agent": agent,
         "agents": {agent: {"mode": "primary", "description": "Disposable evaluation practitioner" if side != "judge" else "Disposable rubric judge",
                            "system": system, "permissions": rules}},
