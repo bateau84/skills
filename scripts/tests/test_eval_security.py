@@ -12,7 +12,7 @@ class SecurityTests(unittest.TestCase):
     def test_all_treatments_disable_stock_skill_content_but_keep_native_loader(self):
         for side in ("baseline", "candidate", "judge"):
             config = effective_config(side, "s", {}, ("SKILL.md",))
-            self.assertEqual(config["plugins"], ["-opencode.skill"])
+            self.assertEqual(config["plugins"], ["-opencode.skill", "-opencode.browser"])
             self.assertNotIn("-opencode.tool.skill", config["plugins"])
             self.assertNotIn("-opencode.config.skill", config["plugins"])
 
