@@ -86,11 +86,12 @@ def probe_configs(root: Path, runner, options, case, record=None):
         with profile.prepare(case, 1) as prepared:
             workspace = prepared["judge"] if side == "judge" else prepared["target"]
             phase = "judge" if side == "judge" else profile.side
+            mounted = prepared["mounted_files"] if side != "judge" else {}
             config = prepared["configs"][phase][0]
             temp = config.parent
             agent_id = "eval-judge" if side == "judge" else "eval-target"
             code = ("AGENT=" + repr(agent_id) + "\nSKILL=" + repr(case.project_data["skill"]) + "\nFILES="
-                    + repr(list(prepared["files"]) if side == "candidate" else []) + "\n" + PROBE_CODE)
+                    + repr(list(mounted)) + "\n" + PROBE_CODE)
             command = build_probe_command(runner, options.engine, options.target_image_id, code, workspace, config, temp)
             proc = subprocess.run(command, env={"PATH": os.environ.get("PATH", os.defpath)}, capture_output=True, text=True, timeout=60)
             if proc.returncode:
@@ -109,7 +110,7 @@ def probe_configs(root: Path, runner, options, case, record=None):
                            "runner_protocol": result["runner_protocol"],
                            "effective_config_sha256": prepared["configs"][phase][1],
                            "practitioner_sha256": {name: digest(content)
-                                                   for name, content in prepared["files"].items()} if side == "candidate" else {}}
+                                                   for name, content in mounted.items()}}
             if record:
                 record(side, observation)
             # Stock agent defaults/global rules precede configured agent rules;
@@ -118,16 +119,16 @@ def probe_configs(root: Path, runner, options, case, record=None):
                 raise ValueError(f"{side}: stock runtime effective agent system/permissions differ from generated config: "
                                  + json.dumps({"agent_ids": [a["id"] for a in result["agents"]],
                                                "actual_agent": agent, "expected_agent": expected}))
-            desired_skills = [case.project_data["skill"]] if side == "candidate" else []
+            desired_skills = [case.project_data["skill"]] if mounted else []
             unknown_plugins = [p for p in result["plugins"] if not (p.startswith("opencode.") or p == "eval-runtime-observer")]
             if result["skills"] != desired_skills or result["workspace_evals"] or result["loom_seed_exists"] or unknown_plugins:
                 raise ValueError(f"{side}: runtime catalog/config contamination or rubric exposure")
             if not all(value["readable"] and not value["write_bits"] for value in result["files"].values()):
                 raise ValueError("selected practitioner reference is not readable/read-only")
-            expected_files = sorted(f".opencode/skills/{case.project_data['skill']}/{name}" for name in prepared["files"]) if side == "candidate" else []
+            expected_files = sorted(f".opencode/skills/{case.project_data['skill']}/{name}" for name in mounted)
             if result["workspace_files"] != expected_files or result["workspace_symlinks"] or not result["workspace_read_only"]:
                 raise ValueError(f"{side}: workspace bytes are not isolated/exactly selected/read-only")
-            if any(value["sha256"] != digest(prepared["files"][name]) for name, value in result["files"].items()):
+            if any(value["sha256"] != digest(mounted[name]) for name, value in result["files"].items()):
                 raise ValueError("container practitioner bytes differ from copied working-tree provenance")
             protocol = runner.cli.validate_container_result(result["runner_protocol"])
             readiness = runner.eval_evidence.check_evidence_readiness(

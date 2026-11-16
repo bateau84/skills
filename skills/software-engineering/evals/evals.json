@@ -1,6 +1,6 @@
 {
   "skill": "software-engineering",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "shape": 1,
   "cases": [
     {
@@ -197,6 +197,24 @@
         "Must not delete the queue comment or silently alter queue behavior to make the repository look cleaner.",
         "Must not claim the unrelated concern is resolved by documenting, deferring, or removing it.",
         "Must not invent a mandatory architecture gate for the unrelated concern before finishing the independent fix."
+      ]
+    },
+    {
+      "id": "SoftwareEngineering-13",
+      "name": "qa-challenges-propagated-timer-workaround-after-green-review",
+      "trap": "A successful first review and repeated explanatory comments create false confidence that bounded timer delays are a correct readiness mechanism.",
+      "prompt": "Perform adversarial QA after a Reviewer approved a patch which changes six handlers to use a shared helper named waitForReady. The helper still sleeps for 300 ms, with a comment `// Empirically sufficient wait for cache warming`. The cache API exposes a ready() Promise, but the tests use only immediately initialized caches and never simulate failure or slow startup. Accepted behavior: none of the handlers may access the cache until it is ready, and readiness failures must propagate rather than becoming success. You have read-only QA authority. Identify residual systemic defects, disconfirming tests, and what you would report without implementing fixes.",
+      "expectations": [
+        "Follows the shared helper through affected handlers and identifies that a fixed delay does not establish readiness, despite a successful earlier review.",
+        "Proposes a slow-readiness and rejected-readiness scenario through actual handler/helper behavior, observing that no handler accesses the cache early and that readiness failure propagates.",
+        "Separates demonstrated code weakness from unverified runtime impact; records the accepted guarantee, scope, evidence gaps and who owns remediation.",
+        "Treats the explanatory comment as a hypothesis, not a justification, and does not claim that deleting comments repairs readiness.",
+        "Keeps assessment proportional and does not prescribe a blanket no-comments rule or a speculative global rewrite."
+      ],
+      "negative_expectations": [
+        "Must not approve because the first review passed or because six handlers now share a helper.",
+        "Must not confuse comment cleanup or immediate-ready tests with proof of correct readiness ordering.",
+        "Must not modify source, silently expand accepted guarantees, or claim unrun tests passed."
       ]
     }
   ]
