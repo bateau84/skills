@@ -54,6 +54,46 @@ class ProbeBoundaryTests(unittest.TestCase):
         actual["permissions"][-1] = {"action": "read", "resource": "*", "effect": "deny"}
         self.assertFalse(effective_agent_matches(actual, expected, ["opencode.browser"]))
 
+    def test_opencode_226_stock_browser_skill_deny_preserves_isolation(self):
+        # The installed 2.2.6 runtime appends both denies, after the configured
+        # agent rule. This is a real probe observation, not a new allow rule.
+        deny = {"action": "*", "resource": "*", "effect": "deny"}
+        browser_deny = {"action": "browser", "resource": "*", "effect": "deny"}
+        skill_deny = {"action": "skill", "resource": "browser", "effect": "deny"}
+        expected = {"system": "isolated system", "permissions": [deny]}
+        prefix = [
+            {"action": "*", "resource": "*", "effect": "allow"},
+            {"action": "read", "resource": "*.env", "effect": "ask"},
+            deny, deny,
+        ]
+        actual = {"system": "isolated system",
+                  "permissions": prefix + [browser_deny, skill_deny]}
+        self.assertTrue(effective_agent_matches(actual, expected, ["opencode.browser"]))
+        self.assertFalse(effective_agent_matches(actual, expected, []))
+
+        for rules in (
+            prefix + [browser_deny, {**skill_deny, "effect": "allow"}],
+            prefix + [browser_deny, {**skill_deny, "resource": "*"}],
+            prefix + [{**browser_deny, "effect": "allow"}, skill_deny],
+            prefix + [skill_deny],
+            prefix + [browser_deny, {"action": "read", "resource": "*", "effect": "allow"}, skill_deny],
+        ):
+            with self.subTest(rules=rules):
+                self.assertFalse(effective_agent_matches(
+                    {"system": "isolated system", "permissions": rules},
+                    expected, ["opencode.browser"],
+                ))
+
+        candidate = {"system": "candidate system", "permissions": [
+            deny,
+            {"action": "skill", "resource": "agent-run-audit", "effect": "allow"},
+            {"action": "read", "resource": ".opencode/skills/agent-run-audit/SKILL.md", "effect": "allow"},
+        ]}
+        candidate_actual = {"system": "candidate system", "permissions": (
+            prefix + candidate["permissions"] + [browser_deny, skill_deny]
+        )}
+        self.assertTrue(effective_agent_matches(candidate_actual, candidate, ["opencode.browser"]))
+
     def test_real_runner_probe_builder_excludes_all_credential_mounts_and_environment(self):
         runner = load_runner(Path(os.environ.get("SKILLS_EVAL_RUNNER_ROOT", str(ROOT.parent / "opencode-eval-runner"))))
         with tempfile.TemporaryDirectory() as temp:
