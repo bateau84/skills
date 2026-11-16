@@ -18,12 +18,20 @@ from eval_runner import build_probe_command
 def effective_agent_matches(actual, expected, plugins):
     if not actual or actual.get("system") != expected["system"]:
         return False
-    # The previously pinned 2.0.23 BrowserConnection.make appended this deny.
-    # Recognize only that exact source-backed rule, never arbitrary extensions.
+    # OpenCode's stock browser plugin appends restrictive rules after the
+    # configured agent rules. Recognize only the exact observed suffixes:
+    # 2.2.2 adds the browser deny, while 2.2.6 also denies its skill entry.
+    # Unknown extensions or effects must remain probe failures.
     suffix = list(expected["permissions"])
+    permissions = actual.get("permissions", [])
+    if not isinstance(permissions, list):
+        return False
     if "opencode.browser" in plugins:
         suffix.append({"action": "browser", "resource": "*", "effect": "deny"})
-    return actual.get("permissions", [])[-len(suffix):] == suffix
+        skill_deny = {"action": "skill", "resource": "browser", "effect": "deny"}
+        if permissions[-(len(suffix) + 1):] == suffix + [skill_deny]:
+            return True
+    return permissions[-len(suffix):] == suffix
 
 
 PROBE_CODE = r'''
