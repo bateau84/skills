@@ -69,11 +69,23 @@ def load_runner(root: Path):
     if not getattr(cli.build_container_command, "skills_no_pull", False):
         original = cli.build_container_command
 
-        def local_only(*args, **kwargs):
-            command, result_path = original(*args, **kwargs)
-            if command[1] != "run":
+        def local_only(args, input_dir, output_dir, host_env=None, database_seed=None):
+            environment = dict(os.environ) if host_env is None else host_env
+            command, result_path = original(
+                args, input_dir, output_dir, host_env=environment, database_seed=database_seed,
+            )
+            if not command:
                 raise ValueError("pinned runner OCI command contract changed")
-            return command[:2] + ["--pull=never"] + command[2:], result_path
+            prefix = [command[0]]
+            if command[1:2] != ["run"]:
+                # The runner owns local-only global options before the run subcommand.
+                prefix, _ = cli.local_engine_prefix_and_environment(command[0], environment)
+            boundary = len(prefix) + 1
+            if command[:boundary] != prefix + ["run"]:
+                raise ValueError("pinned runner OCI command contract changed")
+            if "--pull=never" not in command[boundary:-1]:
+                command = command[:boundary] + ["--pull=never"] + command[boundary:]
+            return command, result_path
 
         local_only.skills_no_pull = True
         cli.build_container_command = local_only
