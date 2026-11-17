@@ -38,9 +38,9 @@ jobs:
           runner="$RUNNER_TEMP/opencode-eval-runner"
           git init -q "$runner"
           git -C "$runner" remote add origin https://github.com/bateau84/opencode-eval-runner.git
-          git -C "$runner" fetch -q --depth 1 origin eb2677680a1838f1b64f4a68e818d8257033a8d8
+          git -C "$runner" fetch -q --depth 1 origin e557f0383f051c7d1c092c36a81144d71125b714
           git -C "$runner" checkout -q --detach FETCH_HEAD
-          test "$(git -C "$runner" rev-parse HEAD)" = eb2677680a1838f1b64f4a68e818d8257033a8d8
+          test "$(git -C "$runner" rev-parse HEAD)" = e557f0383f051c7d1c092c36a81144d71125b714
           test -z "$(git -C "$runner" status --porcelain --ignored --untracked-files=all)"
           echo "SKILLS_EVAL_RUNNER_ROOT=$runner" >> "$GITHUB_ENV"
       - name: Build native Claude Agent image without login credentials

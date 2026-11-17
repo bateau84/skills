@@ -41,7 +41,22 @@ class OciCommandCompositionTests(unittest.TestCase):
             workspace = root / "workspace"
             workspace.mkdir()
             config = root / "config.json"
-            config.write_text("{}\n")
+            if claude:
+                # Exact same default-deny contract as the generated skills
+                # target/judge config; the runner now rejects broad tool access.
+                deny = {"action": "*", "resource": "*", "effect": "deny"}
+                config.write_text(json.dumps({
+                    "share": "disabled",
+                    "plugins": ["-opencode.skill", "-opencode.browser"],
+                    "instructions": [],
+                    "permissions": [deny],
+                    "default_agent": "eval-target",
+                    "agents": {"eval-target": {
+                        "mode": "primary", "permissions": [deny]
+                    }},
+                }) + "\n")
+            else:
+                config.write_text("{}\n")
             catalog = root / "models.json"
             catalog.write_text("{}\n")
             auth = root / "empty-auth.json"

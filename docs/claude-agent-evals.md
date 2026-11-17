@@ -32,12 +32,20 @@ mkdir -p "$HOME/.claude-eval-profile"
 chmod 700 "$HOME/.claude-eval-profile"
 CLAUDE_CONFIG_DIR="$HOME/.claude-eval-profile" claude auth login
 CLAUDE_CONFIG_DIR="$HOME/.claude-eval-profile" claude auth status --json
+chmod 600 "$HOME/.claude-eval-profile/.credentials.json"
 ```
 
 Do not mount your normal `~/.claude` or pass a Claude OAuth token, API key, cloud
-account or provider base URL. Disable paid extra usage at account level if
-included-only usage is required. Native subscription status does **not** prove
-that the account cannot incur charges. No paid requests are authorized by CI.
+account or provider base URL. The runner requires a dedicated, owner-only (0700)
+profile with private regular credentials/settings JSON files (0600); it rejects
+symlinks, hardlinks, unrelated contents, extra mounts, unreviewed permissions
+and writable evaluation workspaces. It serializes native profile use across
+independent runner processes with a private lock file.
+
+Disable paid usage credits in the dedicated Claude account *before* any live
+trial, and verify the account setting independently. Native subscription
+status does **not** prove that the account cannot incur charges. No paid
+requests are authorized by CI.
 
 ## First qualification
 
@@ -62,7 +70,12 @@ bun run eval:live -- \
   --iterations 1 --parallel 1 --transport-retries 0 --verbose
 ```
 
-The runner currently requires `--parallel 1` for Claude Agent subscription trials because concurrent native credential refresh is unqualified. Cross-provider/API judges are rejected. The default judge uses the same model and native subscription. Every pair
+The runner registers the native Claude Agent external connection and checks the
+requested model in its own discovered catalog before inference. This new
+bootstrap has provider-free tests but still requires installed-host validation.
+The cross-process profile lock complements the existing `--parallel 1` guard.
+Cross-provider/API judges are rejected. The default judge uses the same model
+and native subscription. Every pair
 nominally invokes two targets and two judges; one invocation can contain
 multiple model turns. Use a small explicit selection, never `--all` initially.
 
