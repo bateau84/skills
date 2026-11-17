@@ -28,9 +28,9 @@ jobs:
           root="$RUNNER_TEMP/opencode-eval-runner"
           git init -q "$root"
           git -C "$root" remote add origin https://github.com/bateau84/opencode-eval-runner.git
-          git -C "$root" fetch -q --depth 1 origin 93cab7eadb7b022ecbb9b4f9dcd750c7bee8c09e
+          git -C "$root" fetch -q --depth 1 origin 6d89fe466dc585cbfea58fae0f4a0899448af429
           git -C "$root" checkout -q --detach FETCH_HEAD
-          test "$(git -C "$root" rev-parse HEAD)" = 93cab7eadb7b022ecbb9b4f9dcd750c7bee8c09e
+          test "$(git -C "$root" rev-parse HEAD)" = 6d89fe466dc585cbfea58fae0f4a0899448af429
           printf 'SKILLS_EVAL_RUNNER_ROOT=%s\n' "$root" >> "$GITHUB_ENV"
       - name: Run provider-free harness tests
         run: python3 -I -B scripts/run_evals.py --harness-test

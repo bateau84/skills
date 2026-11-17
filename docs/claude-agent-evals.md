@@ -36,10 +36,15 @@ chmod 600 "$HOME/.claude-eval-profile/.credentials.json"
 ```
 
 Do not mount your normal `~/.claude` or pass a Claude OAuth token, API key, cloud
-account or provider base URL. The runner requires a dedicated, owner-only (0700)
-profile with private regular credentials/settings JSON files (0600); it rejects
-symlinks, hardlinks, unrelated contents, extra mounts, unreviewed permissions
-and writable evaluation workspaces. It serializes native profile use across
+account or provider base URL. The runner requires a dedicated owner-only (0700) profile. It now accepts
+nonempty safe native account metadata (including `.claude.json`) and private
+session/backups state, while rejecting executable hooks, MCP/plugins/provider
+overrides, linked files, broad mounts and writable evaluation workspaces.
+Inspect the **dedicated** profile after login and make all files and
+subdirectories private (`chmod -R go-rwx "$HOME/.claude-eval-profile"`).
+New files created by the Claude process use a private umask. Result emission
+checks both startup and refreshed credentials and withholds unsafe evidence;
+this is not a guarantee against arbitrary code execution inside the container. It serializes native profile use across
 independent runner processes with a private lock file.
 
 Disable paid usage credits in the dedicated Claude account *before* any live
