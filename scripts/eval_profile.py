@@ -161,15 +161,33 @@ def practitioner_files(source: Path) -> dict[str, bytes]:
     return files
 
 
-def effective_config(side: str, skill: str, providers: dict, files) -> dict:
+COMPANIONS = {"assessment": "ASSESSMENT.md", "qa": "QA.md"}
+
+
+def native_enabled(side: str, comparison: str) -> bool:
+    return side == "candidate" or (side == "baseline" and comparison != "skill")
+
+
+def companion_file(source: Path, comparison: str) -> tuple[str, bytes]:
+    name = COMPANIONS[comparison]
+    path = source / name
+    if source.is_symlink() or not source.is_dir() or path.is_symlink() or not path.is_file():
+        raise ValueError(f"selected {comparison} companion must be a regular non-symlink file")
+    return name, path.read_bytes()
+
+
+def effective_config(side: str, skill: str, providers: dict, files, *, comparison: str = "skill") -> dict:
     providers = provider_settings(providers)
     rules = [dict(DENY)]
     system = TARGET_SYSTEM
     agent = "eval-target"
-    if side == "candidate":
+    if native_enabled(side, comparison):
         rules.append({"action": "skill", "resource": skill, "effect": "allow"})
         rules.extend({"action": "read", "resource": f".opencode/skills/{skill}/{name}", "effect": "allow"} for name in files)
         system += f" Before answering, explicitly load skill `{skill}` using the native skill tool with id `{skill}`. Use its practitioner references when useful."
+        if side == "candidate" and comparison in COMPANIONS:
+            name = COMPANIONS[comparison]
+            system += f" After the native skill load finishes, read `.opencode/skills/{skill}/{name}` using the native read tool and apply that {comparison} perspective to the task."
     elif side == "judge":
         agent, system = "eval-judge", JUDGE_SYSTEM
     elif side != "baseline":
@@ -280,21 +298,29 @@ class SkillsProfile:
     @contextmanager
     def prepare(self, case, iteration):
         skill = case.project_data["skill"]
-        files = practitioner_files(self.root / "skills" / skill)
+        comparison = self.options.comparison
+        source_root = (self.options.baseline_skill_root if comparison == "revision" and self.side == "baseline"
+                       else self.root)
+        practitioner = practitioner_files(source_root / "skills" / skill)
+        files = dict(practitioner)
+        companion = None
+        if self.side == "candidate" and comparison in COMPANIONS:
+            companion, content = companion_file(self.root / "skills" / skill, comparison)
+            files[companion] = content
+        mounted = files if native_enabled(self.side, comparison) else {}
         with tempfile.TemporaryDirectory(prefix="portable-skill-eval-") as temp:
             base = Path(temp)
             target, judge = base / "target", base / "judge"
             target.mkdir()
             judge.mkdir()
-            if self.side == "candidate":
-                for name, content in files.items():
-                    path = target / ".opencode" / "skills" / skill / name
-                    path.parent.mkdir(parents=True, exist_ok=True)
-                    path.write_bytes(content)
-                    path.chmod(0o444)
+            for name, content in mounted.items():
+                path = target / ".opencode" / "skills" / skill / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(content)
+                path.chmod(0o444)
             configs = {}
             for phase, workspace in ((self.side, target), ("judge", judge)):
-                config = effective_config(phase, skill, self.providers, files)
+                config = effective_config(phase, skill, self.providers, mounted, comparison=comparison)
                 config_bytes = (json.dumps(config, ensure_ascii=False, sort_keys=True) + "\n").encode()
                 seed = base / f"{phase}-config.json"
                 seed.write_bytes(config_bytes)
@@ -303,6 +329,7 @@ class SkillsProfile:
                 # judge system and policy are not target-readable resources.
                 configs[phase] = (seed, digest(config_bytes))
             yield {"target": target, "judge": judge, "configs": configs, "files": files,
+                   "mounted_files": mounted, "practitioner_files": practitioner, "companion": companion,
                    "iteration": iteration, "side": self.side}
 
     def _spec(self, workspace, config, *, judge, prompt, skill=None):
@@ -334,7 +361,7 @@ class SkillsProfile:
         if data["common_instruction"]:
             prompt += "\n\n" + data["common_instruction"]
         return self._spec(prepared["target"], prepared["configs"][self.side][0], judge=False,
-                          prompt=prompt, skill=data["skill"] if self.side == "candidate" else None)
+                          prompt=prompt, skill=data["skill"] if native_enabled(self.side, self.options.comparison) else None)
 
     def target_evidence_requirement(self, case, prepared):
         return self.api.EvidenceRequirement(("native", "code_mode_execution"))
@@ -352,6 +379,8 @@ class SkillsProfile:
             return self.api.CheckOutcome("treatment-integrity", status, reason, {"side": self.side})
 
         data, loaded_terminal = case.project_data, None
+        expected_companion = prepared["companion"]
+        companion_read = False
         # Readiness validates accounting and both required boundaries. Exact
         # fields are checked separately; diagnostic tools/skills_loaded ignored.
         for observation in sorted(result["runtime_evidence"]["observations"], key=lambda o: o["start_sequence"]):
@@ -362,7 +391,7 @@ class SkillsProfile:
             tool, actor, args = (observation[f]["value"] for f in fields)
             if observation["mode"] != "native" or actor != "eval-target":
                 return check("fail", "unexpected tool execution mode or actor")
-            if self.side == "baseline":
+            if not native_enabled(self.side, self.options.comparison):
                 return check("fail", "baseline executed a tool; no skill/reference context is allowed")
             if tool == "skill":
                 if type(args) is not dict or args.get("id", args.get("name")) != data["skill"]:
@@ -378,13 +407,22 @@ class SkillsProfile:
                 if not isinstance(path, str):
                     return check("non-evidence", "read has no exact path")
                 path = posixpath.normpath(posixpath.join("/workspace", path))
-                allowed = {f"/workspace/.opencode/skills/{data['skill']}/{f}" for f in prepared["files"]}
+                allowed = {f"/workspace/.opencode/skills/{data['skill']}/{f}" for f in prepared["mounted_files"]}
                 if path not in allowed or loaded_terminal is None or observation["start_sequence"] <= loaded_terminal:
                     return check("fail", "read outside selected practitioner files or before native load")
+                if expected_companion and path.endswith("/" + expected_companion):
+                    if observation["outcome"] != "success":
+                        return check("fail", "selected companion read did not succeed")
+                    for field in ("result", "terminal_sequence"):
+                        if self.runner.eval_evidence.check_field_readiness(observation[field]).status != "ready":
+                            return check("non-evidence", f"native companion read {field} unavailable")
+                    companion_read = True
             else:
                 return check("fail", f"unexpected tool: {tool}")
-        if self.side == "candidate" and loaded_terminal is None:
+        if native_enabled(self.side, self.options.comparison) and loaded_terminal is None:
             return check("fail", "complete observation proves selected native skill was not successfully loaded")
+        if expected_companion and not companion_read:
+            return check("fail", "selected companion was not successfully read")
         return check("pass", "complete authoritative trace proves expected treatment")
 
     def judge_spec(self, case, prepared, target, checks):
@@ -433,7 +471,9 @@ class SkillsProfile:
             "methodology": {"repository": "https://github.com/bateau84/loom", "revision": LOOM_METHOD_REVISION,
                             "source": "scripts/run-evals.py", "reuse": "normalization/scoring methodology, not runtime or license grant"},
             "runner_revision": RUNNER_REVISION, "side": self.side, "skill": case.project_data["skill"],
-            "practitioner_sha256": {name: digest(content) for name, content in prepared["files"].items()},
+            "comparison": self.options.comparison,
+            "practitioner_sha256": {name: digest(content) for name, content in prepared["practitioner_files"].items()},
+            "mounted_sha256": {name: digest(content) for name, content in prepared["mounted_files"].items()},
             "effective_config_sha256": prepared["configs"][self.side][1],
             "judge_config_sha256": prepared["configs"]["judge"][1],
             "rubric_sha256": digest(json.dumps(case.project_data, ensure_ascii=False, sort_keys=True).encode()),

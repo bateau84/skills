@@ -1,0 +1,21 @@
+{
+  "skill": "cli-design",
+  "version": "1.0.0",
+  "common_instruction": "Use the stated context; explain concrete behavior and do not claim tests were run without evidence.",
+  "cases": [
+    {
+      "id": "CLI-SECRETS-01",
+      "name": "Secret delivery in tools",
+      "prompt": "A new CLI needs an API token for remote operations. A teammate proposes requiring --token and logging it as an env var if omitted. Propose a safe default secret input design for local/CI use.",
+      "trap": "Uses shell history, process arguments or ambient inherited env as a supposedly risk-free secret channel.",
+      "expectations": [
+        "Avoids passing tokens through plaintext flags or command histories.",
+        "Prefers a controlled file, stdin, keychain/secret manager or accepted authenticated channel.",
+        "Explains that environment variables are inherited by child processes and need an explicit risk assessment if supported."
+      ],
+      "must_not": [
+        "Does not declare environment variables inherently secret or automatically preferred."
+      ]
+    }
+  ]
+}

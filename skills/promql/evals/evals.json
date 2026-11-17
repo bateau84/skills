@@ -1,0 +1,20 @@
+{
+  "skill": "promql",
+  "version": 1,
+  "cases": [
+    {
+      "id": "p4",
+      "name": "zero-traffic-ratio",
+      "prompt": "Our 'error %' stat panel for the canary service shows NaN every night when it gets zero requests:\n\nsum(rate(errors_total{svc=\"canary\"}[5m])) / sum(rate(requests_total{svc=\"canary\"}[5m]))\n\nGive me a version that never yields NaN or +Inf, and say what the panel will show during zero-traffic periods with your version.",
+      "trap": "Model wraps everything in `or vector(0)` (reporting healthy 0% when nothing is measured) or adds a tiny epsilon to the denominator without explaining the semantics.",
+      "expectations": [
+        "Guards the denominator so zero is excluded, e.g. (sum(rate(requests_total{...}[5m])) > 0) or an equivalent filter.",
+        "States that during zero traffic the guarded query returns no data (empty result) rather than a number."
+      ],
+      "negative_expectations": [
+        "Does not claim the guarded query returns 0 during zero traffic.",
+        "Does not rely solely on `or vector(0)` as the fix."
+      ]
+    }
+  ]
+}

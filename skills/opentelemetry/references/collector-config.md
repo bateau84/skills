@@ -285,48 +285,7 @@ otelcol.auth.basic "cloud" {
 
 ### Helm Values (k8s-monitoring chart)
 
-```yaml
-# values.yaml
-cluster:
-  name: my-cluster
-
-externalServices:
-  prometheus:
-    host: https://prometheus-us-central1.grafana.net
-    basicAuth:
-      username: "123456"
-      password: "${GRAFANA_API_KEY}"
-  loki:
-    host: https://logs-us-central1.grafana.net
-    basicAuth:
-      username: "123456"
-      password: "${GRAFANA_API_KEY}"
-  tempo:
-    host: https://tempo-us-central1.grafana.net
-    basicAuth:
-      username: "123456"
-      password: "${GRAFANA_API_KEY}"
-
-receivers:
-  otlp:
-    enabled: true
-    grpc:
-      enabled: true
-    http:
-      enabled: true
-
-opencost:
-  enabled: false
-```
-
-```bash
-helm repo add grafana https://grafana.github.io/helm-charts
-helm upgrade --install k8s-monitoring grafana/k8s-monitoring \
-  --namespace monitoring --create-namespace \
-  -f values.yaml
-```
-
----
+Use `grafana-infrastructure-monitoring` and its version-matched values reference. Chart v4 uses destination/collector maps and feature-specific settings; do not copy a v1 `externalServices` block into a current chart. Endpoint IDs for Prometheus, Loki and Tempo are not interchangeable. Render the exact pinned chart and verify each enabled telemetry route.
 
 ## Upstream OpenTelemetry Collector
 
@@ -621,6 +580,8 @@ spec:
 
 ### Install Operator
 
+Install a compatible cert-manager first when using the default admission-webhook certificate configuration, or explicitly configure a supported alternate certificate path. Pin the operator/chart version and review cluster RBAC before applying it.
+
 ```bash
 kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
 ```
@@ -684,6 +645,8 @@ spec:
 
 ### Instrumentation CR (auto-injection)
 
+Match the **injected language distribution's exporter** to the collector receiver. Python Operator auto-instrumentation uses HTTP/protobuf; Java and .NET injection examples also default to HTTP/protobuf in current distributions. This does not mean every Python SDK lacks a gRPC exporter. Set the per-language protocol explicitly when selecting a different implementation.
+
 ```yaml
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
@@ -692,38 +655,29 @@ metadata:
   namespace: default
 spec:
   exporter:
-    endpoint: http://otelcol-collector.monitoring:4317
-
-  propagators:
-    - tracecontext
-    - baggage
-
+    endpoint: http://otelcol-collector.monitoring:4318
+  propagators: [tracecontext, baggage]
   sampler:
-    type: parentbased_traceidratio
-    argument: "0.25"   # 25% sampling
-
+    type: parentbased_always_on
   java:
-    # Use Grafana distribution
-    image: us-docker.pkg.dev/grafanalabs-global/docker-grafana-opentelemetry-java-prod/grafana-opentelemetry-java:2.3.0-beta.1
     env:
-    - name: OTEL_EXPORTER_OTLP_PROTOCOL
-      value: grpc
-
-  nodejs:
-    env:
-    - name: OTEL_EXPORTER_OTLP_PROTOCOL
-      value: grpc
-
+      - name: OTEL_EXPORTER_OTLP_PROTOCOL
+        value: http/protobuf
   python:
     env:
-    - name: OTEL_EXPORTER_OTLP_PROTOCOL
-      value: grpc
-
+      - name: OTEL_EXPORTER_OTLP_PROTOCOL
+        value: http/protobuf
   dotnet:
     env:
-    - name: OTEL_EXPORTER_OTLP_PROTOCOL
-      value: grpc
+      - name: OTEL_EXPORTER_OTLP_PROTOCOL
+        value: http/protobuf
+  nodejs:
+    env:
+      - name: OTEL_EXPORTER_OTLP_PROTOCOL
+        value: http/protobuf
 ```
+
+Use the Operator version's supported images instead of an unrelated beta Java agent image. Verify the collector exposes the chosen receiver and confirm a real span from each injected language.
 
 ### Inject into Pods
 
@@ -767,7 +721,7 @@ kubectl create secret generic grafana-cloud-creds \
   --from-literal=otlp-endpoint=https://otlp-gateway-prod-us-east-0.grafana.net/otlp \
   --from-literal=instance-id=123456 \
   --from-literal=api-key=glc_eyJ... \
-  --from-literal=basic-auth-base64=$(echo -n '123456:glc_eyJ...' | base64)
+  "--from-literal=basic-auth-base64=$(printf '%s' '123456:glc_eyJ...' | base64 | tr -d '\n')"
 ```
 
 ---

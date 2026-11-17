@@ -11,3 +11,5 @@ Any plausible violation of a mandatory safety/data-integrity/availability/securi
 ## QA depth
 
 Increase depth with untrusted input, privilege/destructive operations, persistence/filesystem/process access, unsafe/cgo/atomics, concurrency, and exposure to high request volume.
+
+Distinguish expected misuse/accidental data hazards from hostile exploitation. Security tests are relevant only when the accepted boundary includes that threat; this companion does not silently expand `golang-safety` into a security audit.

@@ -1,0 +1,20 @@
+{
+  "skill": "grafana-infrastructure-monitoring",
+  "version": "1.0.0",
+  "common_instruction": "State what is observed versus proposed; use source-appropriate versions and avoid inventing execution results.",
+  "cases": [
+    {
+      "id": "K8S-CHART-01",
+      "name": "Monitoring Helm schema drift",
+      "prompt": "A team pins grafana/k8s-monitoring chart 4.1.4 but copied a values.yaml with externalServices.prometheus and logs.pod_logs. Helm installs without the intended telemetry features. What should change and how would you verify?",
+      "trap": "Reuses a v1 values schema against a v4 chart, silently disabling features.",
+      "expectations": [
+        "Identifies version-specific destination and collector maps and feature keys such as clusterMetrics/podLogsViaLoki.",
+        "Requires helm show values/helm template for the exact chart and checks rendered workloads/routes before declaring telemetry active."
+      ],
+      "must_not": [
+        "Does not present externalServices and logs.pod_logs as v4-compatible."
+      ]
+    }
+  ]
+}

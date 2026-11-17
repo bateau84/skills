@@ -24,7 +24,7 @@ func ConfigPath() (string, error) {
 var ConfigPath = sync.OnceValue(func() string {
     dir, err := os.UserConfigDir()
     if err != nil {
-        panic(fmt.Printf("unable to get user config dir: %v", err))
+        panic(fmt.Errorf("unable to get user config dir: %w", err))
     }
     return filepath.Join(dir, AppName, "config.json")
 })

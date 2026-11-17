@@ -51,7 +51,7 @@
       "prompt": "Use Python sqlite3 to save parent(id INTEGER PRIMARY KEY, name). child(id PRIMARY KEY, parent_id REFERENCES parent(id) ON DELETE CASCADE) already contains a child of parent 1. FK enforcement is enabled. Existing save SQL is INSERT OR REPLACE INTO parent(id,name) VALUES (?,?). The requirement is to update name for an existing ID, insert a new ID when absent, and preserve existing children. Provide replacement Python/SQL and a real-database verification plan.",
       "expectations": [
         "Emits parameter-bound INSERT ... ON CONFLICT(id) DO UPDATE SET name=excluded.name or a correct atomic equivalent supported by the runtime.",
-        "Keeps transaction commit/rollback ownership explicit rather than adding an unrelated commit inside a caller-owned unit.",
+        "Makes commit/rollback ownership explicit: uses the caller's transaction when one is supplied, or names its own transaction boundary for standalone use; does not silently commit inside an unspecified caller-owned unit.",
         "Checks an existing parent update with the child retained, a new parent insert, and rollback or constraint failure in a real SQLite fixture."
       ],
       "negative_expectations": [

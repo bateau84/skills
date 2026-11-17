@@ -254,6 +254,86 @@
         "No deletion or weakening of existing crash/failure coverage or accepted provenance.",
         "No wholesale rewrite of unrelated documentation."
       ]
+    },
+    {
+      "id": "QS-03",
+      "name": "quality-coverage-index-and-downstream-handoff",
+      "trap": "The specifier writes a quality claim but puts the normative quality guarantee only in the non-normative index, duplicates the same guarantee in a BR, or leaves an invented recovery deadline for architecture to inherit.",
+      "prompt": "Produce the smallest normative obligation bundle and its index for this accepted scheduler behavior. BR-001 already says an accepted job has a durable identity. If its worker crashes after acceptance, the job must remain identifiable, must not be falsely reported completed, and must remain eligible for execution when an authorized worker becomes available again. There is no accepted recovery deadline, automatic retry count, or storage technology. Include verification semantics. Do not design implementation.",
+      "expectations": [
+        "Defines the worker-crash condition and truthful response in a Quality Scenario with a falsifiable qualitative boundary; retains the accepted BR's separate baseline job identity meaning without duplicating the conditioned promise.",
+        "The bundle index links the relevant QS and existing BR, makes the quality coverage discoverable, and is not a second normative contract.",
+        "Preserves crash, post-acceptance state, later authorized-worker condition, and the verification observations that would distinguish success from merely reporting a healthy worker.",
+        "Keeps source and ownership clear, without turning the unknown recovery deadline into an accepted requirement."
+      ],
+      "negative_expectations": [
+        "No invented seconds, retry count, queue implementation, database selection, or automatic recovery policy.",
+        "No mandatory QS file for every neighboring requirement, separate sign-off gate, or duplicated BR/QS recovery guarantee."
+      ]
+    },
+    {
+      "id": "QS-04",
+      "name": "no-quality-document-for-ordinary-local-fix",
+      "trap": "A quality-awareness improvement becomes a universal QS creation rule and unnecessarily routes a bounded fix through new design stages.",
+      "prompt": "The only agreed change is that a local CLI command with invalid JSON must return a nonzero exit code and an informative error; the behavior for valid JSON stays the same. No stressed-load, degraded-operation, timing, compatibility or other independent quality promise is stated. Produce the smallest appropriate obligation specification for the fix and explain any needed downstream handoff. Do not implement code.",
+      "expectations": [
+        "States the invalid-input behavior and preservation of valid-input behavior as a compact falsifiable requirement or cites an already sufficient baseline.",
+        "Does not create a Quality Scenario merely because invalid input is an error case; the conditioned quality semantics do not add an independent accepted promise.",
+        "Keeps verification focused on invalid/valid CLI outcomes and avoids unrelated architecture or recovery assumptions."
+      ],
+      "negative_expectations": [
+        "No ceremonial QS, OC, architecture decision, new user approval, or invented numeric target.",
+        "No loss of the regression proof for the accepted CLI error behavior."
+      ]
+    },
+    {
+      "id": "BehavioralSpec-09",
+      "name": "cross-artifact-cancel-crash-authorization-conflict",
+      "trap": "Individually plausible BR, QS, and OC are accepted in isolation even though a crash/recovery interleaving makes their guarantees conflict; the specifier resolves the conflict by privileging QS or silently adding a retry policy.",
+      "prompt": "Review and reconcile this specification bundle against accepted product meaning; do not implement. Accepted: cancelling a protected job while queued prevents any later protected effect start; each effect-start attempt requires authorization tied to that exact attempt, and a permit from a previous attempt cannot be reused after restart; after a worker crash, an accepted job remains identifiable and is not falsely reported completed, and non-cancelled eligible work may later progress when an authorized worker is available. No automatic redispatch deadline or retry count is promised. In the overlapping case, attempt A receives authorization, but the worker crashes **before any protected effect starts**; the job remains queued and the user cancels it while queued. Draft BR-007: cancellation while queued prevents effect start. Draft OC-004: an allow receipt applies only to its named execution attempt and is invalid for a new attempt after worker restart. Draft QS-003: after a worker crash, every accepted job without a recorded completed effect is automatically dispatched again using the latest allow receipt, including a job cancelled while the worker was down. Each draft has a separate plausible local acceptance check. Produce a bounded corrected requirement bundle, explain the overlapping execution trace, and identify any genuine open decision and downstream verification needed.",
+      "expectations": [
+        "Identifies a concrete timeline: job accepted, attempt A authorized without an effect starting, worker crashes while the job remains queued, the user cancels the queued job, and recovery wrongly dispatches attempt B using A's permit; this violates both the explicit queued cancellation in BR-007 and the attempt binding in OC-004.",
+        "Treats BR, QS and OC as equally authoritative when accepted and evaluates them jointly; does not treat the QS as overriding cancellation or the OC as merely technical detail.",
+        "Retains BR-007's cancellation promise and OC-004's attempt binding; repairs the unsupported automatic recovery rule in QS-003 to preserve accepted durable identity, honest status and progress for non-cancelled eligible work without reusing a prior permit.",
+        "Preserves stable artifact IDs and links where possible, uses a single normative owner per distinct promise, and states observable verification semantics for the combined cancellation/crash/authorization sequence.",
+        "Distinguishes an ordinary clarification from any genuine missing authorized choice; does not block unrelated settled scope or claim independent review from the producer's own composition check."
+      ],
+      "negative_expectations": [
+        "No automatic retry count, latency bound, permission reuse, new architecture mechanism, or assumption that newest/most technical document has precedence.",
+        "No claim that three separately passing artifact checks prove the bundle is consistent, and no mandatory production of all three types on every change."
+      ]
+    },
+    {
+      "id": "BehavioralSpec-10",
+      "name": "complementary-br-qs-oc-without-invented-conflict",
+      "trap": "Cross-artifact awareness leads to redundant requirements or false conflict escalation even though all three artifacts express different compatible obligations.",
+      "prompt": "Select the smallest coherent BR/QS/OC set from this accepted job-execution intent; do not design components. A protected effect must not start when its attempted operation has an explicit policy denial. Policy authority and effect executor are independently implemented and must apply a decision only to that same attempted operation. If an execution provider goes unavailable while another eligible healthy provider remains, work eligible for the healthy provider can still progress, and provider degradation remains visible. No failover deadline, retry count, routing algorithm or technology is prescribed. Explain how the selected artifacts relate and their combined verification intent.",
+      "expectations": [
+        "Uses a BR for denied-operation safety, an OC for cross-party attempt/decision association, and a QS for work continuity and observable degradation under a provider outage, with distinct normative ownership.",
+        "Shows a realistic combined denial/degradation sequence in which the healthy provider can progress with authorization while the denied attempt never executes, and correctly finds no contradiction.",
+        "Traces source and verification semantics without converting the outage response into a second authorization contract or copying the BR into QS.",
+        "Keeps a single coherent bundle with discoverable cross-references and proportional assessment needs."
+      ],
+      "negative_expectations": [
+        "No artificial hierarchy that treats QS or OC as optional when the accepted conditions genuinely require both.",
+        "No duplicate normative promises, new failover timing targets, technology choices, invented approval gate or fabricated incompatibility."
+      ]
+    },
+    {
+      "id": "BehavioralSpec-11",
+      "name": "accepted-designer-scenario-in-adversarial-composition",
+      "trap": "BR, QS and OC pass in isolation, so QA overlooks an accepted Designer Scenario showing that outage recovery contradicts the human-facing cancellation outcome.",
+      "prompt": "Adversarially assess this specification and design packet without implementing it. Accepted product direction allows a user to cancel a queued upload before transfer begins; the post-outage outcome must be reconciled with accepted human-facing design. Accepted Designer Scenario SC-004: while offline, a user cancels a queued upload, sees 'Cancelled', and on reconnection that canceled upload does not start. Draft BR-001: a successful upload must preserve the selected content. Draft OC-001: the uploader and storage writer agree on the upload identity, and a failed write cannot be reported as success. Draft QS-001: whenever connectivity returns, every previously queued upload resumes and transfers, including uploads marked 'Cancelled' by the interface. All three individually pass their supplied checks; BR and OC say nothing about cancellation. Find the consequential omission or contradiction, give a bounded adjudication and verification implication, and name the proper correction or decision owner.",
+      "expectations": [
+        "Constructs the outage, queued cancellation, UI 'Cancelled', connectivity restoration, and unwanted upload timeline; sees that the accepted Designer Scenario conflicts with the proposed QS and exposed behavior even when BR/QS/OC checks appear individually green.",
+        "Traces the accepted scenario and product direction rather than treating the QS's recovery language as a higher-priority product promise; identifies missing normative cancellation coverage or an unresolved consequential interpretation with its authority.",
+        "Distinguishes the accepted human-facing design scenario from normative specification authority; routes any needed correction to whoever owns the human-facing design and normative meaning, without independently rewriting product promises or architectural mechanisms.",
+        "Explains a combined verification scenario that observes both UI cancellation and absence of the later transfer after network restoration; preserves unaffected successful-upload and handoff guarantees."
+      ],
+      "negative_expectations": [
+        "No omission of the accepted Designer Scenario merely because BR/QS/OC are internally consistent; no claim that local tests alone prove the composition.",
+        "No invented timeout, reconnect policy, storage mechanism, artifact hierarchy, or mandatory new approval/review stage."
+      ]
     }
   ]
 }

@@ -20,7 +20,7 @@ metadata:
 
 ## AI Agent Rule: Ask Before Adding Dependencies
 
-**Before running `go get` to add any new dependency, AI agents MUST ask the user for confirmation.** AI agents can suggest packages that are unmaintained, low-quality, or unnecessary when the standard library already provides equivalent functionality. Using `go get -u` to upgrade an existing dependency is safe.
+**Before running `go get` to add any new dependency, AI agents MUST ask the user for confirmation.** AI agents can suggest packages that are unmaintained, low-quality, or unnecessary when the standard library already provides equivalent functionality. Updating an existing dependency is still a behavioral change: use the authorized version range, inspect transitive changes and test before claiming compatibility. `go get -u` is not inherently safe.
 
 Before proposing a dependency, evaluate:
 

@@ -36,7 +36,7 @@ func GetUser(id string) (*User, error) {
 
 | Anti-pattern | Example | Fix |
 | --- | --- | --- |
-| Pure paraphrase | `// GetUser gets a user` on `func GetUser()` — starts with the name (required by godoc) but adds nothing | After the name, add _when_ to use it, constraints, and what can go wrong |
+| Pure paraphrase | `// GetUser gets a user` on `func GetUser()` — starts with the name (Go documentation convention) but adds nothing | After the name, add _when_ to use it, constraints, and what can go wrong |
 | Signature restatement | `// Returns a string and an error` | Document _which_ error and _why_ — the signature already shows types |
 | Marketing vocabulary | `seamlessly`, `powerful`, `robust`, `enterprise-grade` | Remove — state facts instead |
 | Invented rationale | `// designed to improve scalability` | Only document what the code actually does |
@@ -45,44 +45,22 @@ func GetUser(id string) (*User, error) {
 
 ### Format
 
-Every doc comment MUST start with the function/method name followed by a verb phrase. This is how godoc renders it in package indexes.
+Conventionally start exported declaration comments with the symbol name and a useful summary. This is a style convention, not a rendering precondition imposed by godoc.
 
 ```go
 // FuncName verb-phrase describing what it does.
 ```
 
-### Full Comment Template
+### Prose by default
 
-Use this structure for exported functions and complex internal functions. Omit sections that don't apply (e.g., no Parameters section for zero-arg functions). Focus on the "why" — don't restate what the code already makes obvious:
+Write a short purpose/contract paragraph. Add error, cancellation, concurrency and ownership details only where callers need them. Do not enumerate every parameter or require Parameters/Returns/Example headings. Prefer executable `ExampleXxx` tests to duplicated long doc snippets. Never publish private source to Playground or external indexes without authorization.
 
 ```go
-// FuncName summarizes what this function does in one sentence.
-// Additional context explaining behavior, algorithms, or design decisions
-// that callers need to know.
-//
-// Parameters:
-//   - paramName: description of what this parameter represents
-//   - anotherParam: description with valid ranges or constraints
-//
-// Returns description of the return value(s).
-// Returns ErrSomething if [condition].
-// Returns ErrAnother if [different condition].
-//
-// Panics if [condition] (only document if the function can panic).
-//
-// It is safe for concurrent use (or: It is NOT safe for concurrent use).
-//
-// Play: https://go.dev/play/p/xxxxx
-//
-// Example:
-//
-//	result, err := pkg.FuncName(arg1, arg2)
-//	if err != nil {
-//	    log.Fatal(err)
-//	}
-//	fmt.Println(result)
-func FuncName(paramName Type, anotherParam Type) (ResultType, error) {
+// Decode parses a record. It returns ErrMalformed for invalid input and does
+// not retain data; the caller may reuse the buffer after Decode returns.
 ```
+
+Source: [Go doc comments](https://go.dev/doc/comment).
 
 ### What to Document
 

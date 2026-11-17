@@ -93,14 +93,13 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 {
   "id": "calculateField",
   "options": {
-    "alias": "Error %", "mode": "reduceRow",
-    "reduce": { "reducer": "last" },
+    "alias": "Error ratio", "mode": "binary",
     "binary": { "left": "errors", "right": "total", "operator": "/" }
   }
 }
 ```
 
-Add this to the panel's `transformations: []`. Verify in the UI panel inspector — the new field should appear and update with the variable selection.
+Add this to the panel's `transformations: []`. The value is a 0–1 ratio; set the field unit to `percentunit` for a percent display, or multiply by 100 explicitly if the consumer requires a 0–100 number. Handle total=0 deliberately. Verify in the UI panel inspector — the new field should appear and update with the variable selection.
 
 Full schema (panels, units, all transformations, annotations, links): [`references/json-schema.md`](references/json-schema.md).
 

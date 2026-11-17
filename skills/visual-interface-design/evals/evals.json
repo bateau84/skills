@@ -10,15 +10,15 @@
       "prompt": "We're building an application that has a web dashboard (for managers to view reports) and a TUI monitoring view (for engineers who watch it in terminal during incidents). Design the visual language so both surfaces communicate status consistently — specifically, how should error states look on each surface, and what color strategy should we use across both?",
       "expectations": [
         "Designer must address BOTH surfaces with surface-specific constraints — the TUI answer and the web answer must be substantively different, not the same advice with terminology swapped",
-        "For the TUI surface: Designer must address the 16-color ANSI constraint — red for error must be the ANSI red color token, not a hex value; hierarchy must use bold/bright variants and box-drawing characters, not CSS properties",
+        "For TUI, designs status indicators within terminal capabilities, including a 16-color ANSI fallback, character-grid hierarchy and non-color cues; does not treat CSS hex values as ANSI tokens.",
         "For the web dashboard: Designer must specify contrast requirements (WCAG 1.4.3: 4.5:1 for text, 1.4.11: 3:1 for UI components) and require that color is paired with a secondary signal (icon + text) not used alone",
-        "Designer must establish that the semantic role (error = red family) is consistent across both surfaces, while the implementation differs: ANSI red in TUI, a specific-value hex token in web",
+        "Keeps error meaning consistent between the TUI and web dashboard with semantic roles implemented through terminal capabilities and accessible web design tokens, not a mandatory identical literal color value.",
         "Designer must address color blindness: both surfaces must convey error state through a secondary signal (icon shape, text label, or pattern) so the design works without color distinction",
-        "Designer must specify that dark mode behavior differs: TUI always has a dark terminal background; the web dashboard may support both, requiring a separate color specification for each mode"
+        "Handles both light and dark terminal backgrounds selected by users, as well as supported web light/dark themes; TUI is not assumed to be permanently dark."
       ],
       "negative_expectations": [
         "Designer must not produce a design that addresses only the web surface and notes 'apply similar principles to the TUI' — the TUI has fundamentally different visual capabilities and requires distinct guidance",
-        "Designer must not specify hex color values for the TUI surface — the TUI operates within ANSI color names, not hex values",
+        "Must not use CSS hex values as ANSI color names; truecolor-capable terminals may support RGB colors.",
         "Designer must not treat dark mode as color inversion — dark mode for the web surface requires a separate color specification, not an inverted palette",
         "Designer must not produce advice that would be equally applicable if the TUI surface were replaced with a mobile app — TUI-specific constraints (character grid, box-drawing characters, cursor-based focus) must be present"
       ]

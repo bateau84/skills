@@ -61,7 +61,7 @@ The CLI and the MCP server expose the **same** operations under matching names. 
 
 ## Commands
 
-**Global flags (all commands):** `-o/--output table|json|raw|md` (default `table` — pass `-o md` for chat), `--base-url`, `--timeout`, `--log-level debug|info|warn|error|off`. All are also settable via `GODIG_*` env vars.
+**Global flags (all commands):** `-o/--output table|json|raw|md` (default `table` — pass `-o md` for chat), `--base-url`, `--vuln-base-url` (defaults to `https://vuln.go.dev`), `--timeout`, `--log-level debug|info|warn|error|off`. All are also settable via `GODIG_*` env vars.
 
 | Command | Args | Specific flags | Purpose |
 | --- | --- | --- | --- |
@@ -83,7 +83,7 @@ The CLI and the MCP server expose the **same** operations under matching names. 
 | `versions` | `<path>` | `--limit --filter` | All versions, newest first |
 | `major-versions` | `<path>` | `--limit --filter --exclude-pseudo` | Major versions (v1, v2 …) living as separate modules |
 | `imported-by` | `<path>` | `--module --version --limit --filter` | Packages that import this one |
-| `vulns` | `<path>` | `--module --version --limit --filter` | Known vulnerabilities |
+| `vulns` | `<path>` | Check `godig vulns --help` for installed version; do not assume --module or --filter | Known module vulnerability records from vuln.go.dev |
 | `mcp` | — | `--transport stdio\|http --addr --cache-ttl --cache-size` | Run as an MCP server |
 | `version` | — | — | Print godig version / commit / build date |
 
@@ -123,7 +123,6 @@ Filterable fields per command (string unless noted):
 | `packages` | `path`, `name`, `synopsis`, `isRedistributable` (bool) |
 | `imported-by` | `path` (the importing package path) |
 | `symbols` | `name`, `kind` (`Function`/`Method`/`Type`/`Variable`/`Constant`), `synopsis`, `parent` |
-| `vulns` | `ID`, `package`, `Details` |
 | `major-versions` | `modulePath`, `major`, `version`, `isLatest` (bool) |
 
 ```bash
@@ -182,3 +181,5 @@ godig vulns github.com/samber/ro -o md
 This skill is not exhaustive. `godig --help` and each sub-command's `--help` list current flags and output formats; the data mirrors what [pkg.go.dev](https://pkg.go.dev) exposes.
 
 If you encounter a bug or unexpected behavior in `godig`, open an issue at <https://github.com/samber/godig/issues>.
+
+A vulnerability-database hit does not establish call-path reachability in a particular application. Use the project-pinned `govulncheck` for source-level reachability evidence, and distinguish module records from observed exploitable paths. Source: [godig command catalog](https://github.com/samber/godig).

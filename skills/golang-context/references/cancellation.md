@@ -162,11 +162,18 @@ func (h *Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
     // Audit log must complete even if the client disconnects.
     // WithoutCancel preserves context values (trace_id) but detaches cancellation.
-    auditCtx := context.WithoutCancel(ctx)
-    go h.auditService.LogOrderCreated(auditCtx, order)
+    auditCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+    // This small example transfers cleanup ownership to the worker.
+    // Production handlers should submit to an app-owned, bounded executor.
+    go func() {
+        defer cancel()
+        h.auditService.LogOrderCreated(auditCtx, order)
+    }()
 
     w.WriteHeader(http.StatusCreated)
 }
 ```
 
 Without `WithoutCancel`, you'd have to choose between `ctx` (which gets cancelled when the handler returns, killing your background work) and `context.Background()` (which loses trace_id and other values). `WithoutCancel` gives you the best of both: values are preserved, but cancellation is detached.
+
+Detachment also removes the parent deadline and leaves Done nil until a new cancel/timeout context is derived. A timeout alone does not bound the number of per-request goroutines: submit detached work to an owned bounded executor when traffic can overlap; propagate cancellation and join it on shutdown.

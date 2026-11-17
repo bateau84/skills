@@ -41,6 +41,9 @@ def parser():
     p.add_argument("--target", "--skills", dest="target", help="Comma-separated skill names; optionally intersect --cases")
     p.add_argument("--all", action="store_true", help="Explicitly select all cases in selected targets (or entire corpus)")
     p.add_argument("--target-kind", choices=("skill",), default="skill")
+    p.add_argument("--comparison", choices=("skill", "revision", "assessment", "qa"), default="skill",
+                   help="skill: no skill vs practitioner; revision: old vs current practitioner; assessment/qa: practitioner vs selected companion")
+    p.add_argument("--baseline-skill-root", type=Path, help="Old skills checkout root, required only with --comparison revision")
     p.add_argument("--target-transport", choices=("opencode",), default="opencode")
     p.add_argument("--model", help="Required live target model ID: provider/model (for example openai/gpt-6.1)")
     p.add_argument("--judge-model", help="Optional judge model ID: provider/model; defaults to --model unchanged")
@@ -94,7 +97,19 @@ def select(cases, options):
     return selected
 
 
+def validate_comparison(options):
+    if options.comparison == "revision":
+        source = options.baseline_skill_root
+        if source is None:
+            raise ValueError("revision comparison requires --baseline-skill-root")
+        if source.is_symlink() or not source.is_dir() or not (source / "skills").is_dir():
+            raise ValueError("baseline-skill-root must be a real skills checkout directory")
+    elif options.baseline_skill_root is not None:
+        raise ValueError("--baseline-skill-root is only valid with --comparison revision")
+
+
 def validate_live(options, selected):
+    validate_comparison(options)
     def validate_model_id(value, option):
         if not value or not value.strip() or value != value.strip():
             raise ValueError(f"live execution requires explicit {option} provider/model ID (for example openai/gpt-6.1)")
@@ -188,7 +203,7 @@ def execute_pair(runner, baseline, candidate, job, run_id, invoker=None, reporte
     with ExitStack() as stack:
         bp = stack.enter_context(baseline.prepare(job.case, job.iteration))
         cp = stack.enter_context(candidate.prepare(job.case, job.iteration))
-        if bp["files"] != cp["files"]:
+        if baseline.options.comparison != "revision" and bp["practitioner_files"] != cp["practitioner_files"]:
             raise ValueError("skill working-tree bytes changed during pair preparation; no inference started")
         retry = runner.eval_execute.TransientProviderRetryPolicy()
         sides = []
@@ -289,7 +304,8 @@ def run_plan(root, runner, options, plan, providers, invoker=None, reporter=None
                               "report_sources": [{"case": j.case.id, "source_id": j.case.project_data["source_id"],
                                                   "source": j.case.metadata["source"], "source_sha256": j.case.metadata["source_sha256"]}
                                                  for j in plan.jobs],
-                              "report_controls": {"model": options.model, "target_transport": options.target_transport,
+                              "report_controls": {"comparison": options.comparison,
+                                   "model": options.model, "target_transport": options.target_transport,
                                   "judge_model": options.judge_model or options.model, "judge_transport": options.judge_transport,
                                   "reasoning": reasoning_control(options.model, options.target_reasoning or options.reasoning),
                                   "judge_reasoning": reasoning_control(options.judge_model or options.model, options.judge_reasoning or options.reasoning),
@@ -480,6 +496,7 @@ def main(argv=None, *, report_root=None):
             return 0
         root = runner_root(options)
         selected = select(cases, options)
+        validate_comparison(options)
         if options.probe and options.judge_transport != "opencode":
             raise ValueError("--probe verifies OpenCode configuration only; Copilot runtime proof is separate")
         if not options.probe:

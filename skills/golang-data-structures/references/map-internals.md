@@ -1,35 +1,22 @@
 # Map Internals Deep Dive
 
-## Hash Table Structure
+## Hash table layout depends on Go version
 
-Go maps use hash tables with bucket-based collision resolution. The map header holds:
+**Go 1.24+ (default runtime):** the built-in map uses Swiss Table-inspired groups of eight slots with control bytes, one or more tables, and table splitting/growth. Its exact fill thresholds and internal shapes are implementation details, not API contracts. Do not diagnose current memory behavior using the older `B`, `oldbuckets`, overflow-chain or `6.5 entries/bucket` model. See [Go's Swiss Table implementation](https://go.dev/blog/swisstable).
 
-- `count` — number of entries
-- `B` — log₂ of bucket count (2^B buckets total)
-- `buckets` — pointer to bucket array
-- `oldbuckets` — pointer to old buckets during growth
+**Before Go 1.24:** the older runtime used eight-entry buckets, overflow buckets, a bucket-count exponent `B`, and incremental evacuation. Only apply those details after verifying the target toolchain/runtime configuration.
 
-Each bucket holds 8 key-value pairs. Keys and values are stored in separate arrays within buckets to minimize padding waste.
+## Memory growth and capacity
 
-## Memory Growth and Capacity
-
-- **Load factor threshold**: 6.5 entries per bucket triggers growth (sweet spot between memory efficiency and collision performance)
-- **Overflow bucket chains** also trigger growth if too long (prevents O(1)→O(n) degradation)
-- **Bucket count doubles**: 2^B → 2^(B+1) (efficient rehashing with powers of 2)
-- **Incremental evacuation**: Old and new buckets coexist during growth; entries move lazily during operations to avoid GC pauses
-- **No `cap()` function**: Capacity depends on hash distribution and load factor, not a fixed limit. Preallocation (`make(map[string]int, expectedSize)`) is worthwhile for large maps to avoid repeated growth cycles
+- There is no map `cap()`; `make(map[K]V, hint)` offers an approximate size hint and reduces some growth costs but does not promise a specific number of groups/buckets.
+- Deleting keys does not guarantee the backing allocation immediately shrinks. If retained memory matters, measure it under the deployed Go version, then consider rebuilding a map at a bounded lifecycle boundary.
+- Keys must be comparable; map iteration order is unspecified. Benchmark actual access patterns before asserting a specific collision or growth cost.
 
 ## Preallocation
 
 ```go
-// Without preallocation — multiple growths as entries are added
-m := map[string]int{}
-
-// With preallocation — allocates enough buckets upfront
-m := make(map[string]int, expectedSize)
+m := make(map[string]int, expectedSize) // capacity hint, not a fixed bucket count
 ```
-
-Preallocation avoids repeated growths. The hint is approximate — Go allocates 2^B buckets where 2^B \* 6.5 >= hint.
 
 ## Pointers vs Values
 

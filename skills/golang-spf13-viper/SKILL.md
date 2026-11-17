@@ -46,7 +46,7 @@ Viper resolves a key by walking sources in this order (first set value wins):
 6. default             — viper.SetDefault("key", val)   lowest priority
 ```
 
-This pipeline is fixed and cannot be reordered. Understanding it prevents most viper bugs: a key that "should" come from a config file may be shadowed by an env var or a flag with a default value.
+This pipeline is fixed and cannot be reordered. Understanding it prevents most viper bugs: a key that "should" come from a config file may be shadowed by an explicit env var or a **changed** flag; an untouched flag default does not take precedence over file values.
 
 ## Sources and config files
 
@@ -54,7 +54,7 @@ This pipeline is fixed and cannot be reordered. Understanding it prevents most v
 viper.SetConfigName("config")
 viper.AddConfigPath("$HOME/.myapp")
 if err := viper.ReadInConfig(); err != nil {
-    var notFound *viper.ConfigFileNotFoundError
+    var notFound viper.ConfigFileNotFoundError
     if !errors.As(err, &notFound) {
         return fmt.Errorf("reading config: %w", err) // propagate real errors only
     }
@@ -63,7 +63,7 @@ if err := viper.ReadInConfig(); err != nil {
 
 `ConfigFileNotFoundError` must be handled gracefully — config files are usually optional. An unhandled error from a missing file crashes programs that are perfectly valid when run with only flags or env vars.
 
-For supported formats (JSON, TOML, YAML, HCL, INI, properties), `MergeInConfig`, and remote KV, see [sources-and-formats.md](references/sources-and-formats.md).
+Viper v1.20+ supports JSON/TOML/YAML in core; HCL, INI and properties require optional encoding codecs. For formats, `MergeInConfig`, and remote KV, see [sources-and-formats.md](references/sources-and-formats.md).
 
 ## Env binding and key replacers
 
@@ -82,7 +82,7 @@ For `BindEnv`, `AllowEmptyEnv`, and env-vs-default interaction, see [binding-and
 
 ## Flag binding (the cobra seam)
 
-Bind cobra flags to viper in `init()` or `PersistentPreRunE` — never in `RunE` (config loading in `PersistentPreRunE` already ran before `RunE`, so bindings set in `RunE` are missed):
+Bind each Cobra flag before the first `viper.Get*` or `Unmarshal` that depends on it, preferably in the owning command's initialization or `PreRunE`. A binding in `RunE` can be valid when all reads occur afterward; the risk is prior reads and different subcommands overwriting the same global binding:
 
 ```go
 func init() {
@@ -153,7 +153,7 @@ For `t.Setenv` interactions and `Reset()` limitations, see [testing-and-isolatio
 | `AutomaticEnv` without `SetEnvKeyReplacer` | `database.host` looks for `MYAPP_DATABASE.HOST` (dot preserved) — never matches | Add `SetEnvKeyReplacer(strings.NewReplacer(".", "_"))` before `AutomaticEnv` |
 | No `mapstructure` tags on struct fields | Silently misses nested and underscore-named fields | Add `mapstructure:"key_name"` to every field |
 | Using global viper in tests | State from one test contaminates the next, causing flaky ordering | Create `viper.New()` per test |
-| Missing `ConfigFileNotFoundError` check | Missing config file crashes a service that should run on flags/env alone | `errors.As(err, &notFound)` — only propagate non-not-found errors |
+| Missing `ConfigFileNotFoundError` check | Missing config file crashes a service that should run on flags/env alone | `var notFound viper.ConfigFileNotFoundError; errors.As(err, &notFound)` — the error is returned by value when searching config paths. A missing explicitly named file may return a different error; propagate it. |
 
 ## Further Reading
 

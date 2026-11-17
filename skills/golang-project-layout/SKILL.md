@@ -41,10 +41,10 @@ For applications, follow [12-Factor App](https://12factor.net/) conventions: env
 
 | Project Type | Use When | Key Directories |
 | --- | --- | --- |
-| **CLI Tool** | Building a command-line application | `cmd/{name}/`, `internal/`, optional `pkg/` |
-| **Library** | Creating reusable code for others | `pkg/{name}/`, `internal/` for private code |
+| **CLI Tool** | Building a command-line application | Root `main` for a small command; `cmd/{name}/` for multiple commands; `internal/` only where needed |
+| **Library** | Creating reusable code for others | Public package at module root (and root-level subpackages where useful), `internal/` for private implementation |
 | **Service** | HTTP API, microservice, or web app | `cmd/{service}/`, `internal/`, `api/`, `web/` |
-| **Monorepo** | Multiple related packages/modules | `go.work`, separate modules per package |
+| **Monorepo** | Related packages or independently versioned modules | One module by default; use `go.work` only for actual multi-module development |
 | **Workspace** | Developing multiple local modules | `go.work`, replace directives |
 
 ## Module Naming Conventions
@@ -53,7 +53,7 @@ Your module path in `go.mod` MUST match your repository URL, use lowercase only,
 
 ## Directory Layout
 
-All `main` packages must reside in `cmd/` with minimal logic — parse flags, wire dependencies, call `Run()`. Business logic belongs in `internal/` or `pkg/`. Use `internal/` for non-exported packages, `pkg/` only when code is useful to external consumers.
+A simple single-command module may place `package main` at the root; `cmd/<name>/` is a useful convention for multi-binary and mixed command/library repositories, not a universal requirement. Keep entry points thin; put private implementation under `internal/` as needed. Public libraries often expose a root package—`pkg/` is not mandatory. Follow [Go module layout guidance](https://go.dev/doc/modules/layout).
 
 See [directory layout examples](references/directory-layouts.md) for universal, small project, and library layouts, plus common mistakes.
 
@@ -104,10 +104,10 @@ When starting a new Go project:
 - [ ] Consider vertical slices where they improve locality for representative changes
 - [ ] Choose module name (matches repo URL, lowercase, hyphens)
 - [ ] Run `go mod init github.com/user/project-name`
-- [ ] Create `cmd/{name}/main.go` for entry point
-- [ ] Create `internal/` for private code; `pkg/` only for public libraries
-- [ ] For monorepos: Initialize `go work` and add modules
-- [ ] Run `gofmt -s -w .` to ensure formatting
+- [ ] Choose a root `main` for a simple command or `cmd/{name}/main.go` for a multi-command/mixed repository
+- [ ] Use `internal/` for private import boundaries when needed; public APIs may live at the module root
+- [ ] For actual multi-module workspaces: decide whether a `go.work` is needed; a monorepo can be one module
+- [ ] Run `gofmt -w .` to ensure formatting
 - [ ] Add `.gitignore` with `/vendor/` and binary patterns
 
 ## Related Skills

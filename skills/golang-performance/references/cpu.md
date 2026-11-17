@@ -164,9 +164,9 @@ Expect 2-4x improvement for tight arithmetic loops. Only use when profiling show
 
 ## SIMD (Single Instruction, Multiple Data)
 
-**Diagnose:** 1- `go tool pprof` (CPU profile) — confirm a numeric inner loop consumes >20% of CPU; SIMD only helps CPU-bound numeric work, not allocation or I/O bottlenecks 2- `go test -bench` — measure the loop's baseline ns/op; provides the reference point to validate SIMD gains 3- `go build -gcflags="-d=ssa/prove/debug=2"` — check if the compiler already auto-vectorized the loop; look for `"Proved"` bounds-check eliminations that enable vectorization 4- `GOSSAFUNC=MyFunc go build` — generate SSA dump (`ssa.html`) to inspect whether the compiler produces vector instructions for the hot loop 5- `go tool objdump -s MyFunc ./binary` — verify the final assembly contains SIMD instructions (e.g., `VMOVAPD`, `VADDPD` on amd64) rather than scalar equivalents
+**Diagnose:** 1- `go tool pprof` (CPU profile) — confirm a numeric inner loop consumes >20% of CPU; SIMD only helps CPU-bound numeric work, not allocation or I/O bottlenecks 2- `go test -bench` — measure the loop's baseline ns/op; provides the reference point to validate SIMD gains 3- `go build -gcflags="-d=ssa/prove/debug=2"` — inspect bounds-check elimination; this is not proof of vectorization 4- `GOSSAFUNC=MyFunc go build` — generate SSA dump (`ssa.html`) to inspect whether the compiler produces vector instructions for the hot loop 5- `go tool objdump -s MyFunc ./binary` — verify the final assembly contains SIMD instructions (e.g., `VMOVAPD`, `VADDPD` on amd64) rather than scalar equivalents
 
-Go 1.26+ includes an experimental `simd/archsimd` package (requires `GOEXPERIMENT=simd` flag) providing low-level SIMD intrinsics for amd64 with 128/256/512-bit vectors. For broader portability, the compiler auto-vectorizes simple loops, and several strategies exist.
+Go 1.26+ includes an experimental `simd/archsimd` package (requires `GOEXPERIMENT=simd` flag) providing low-level SIMD intrinsics for amd64 with 128/256/512-bit vectors. Do not assume ordinary loops are auto-vectorized. Inspect emitted instructions for the supported compiler/architecture; Go 1.27 adds experimental portable `simd`, while explicit intrinsics/assembly remain version- and architecture-specific.
 
 **Options for explicit SIMD in Go:**
 
@@ -180,7 +180,7 @@ Go 1.26+ includes an experimental `simd/archsimd` package (requires `GOEXPERIMEN
   v := archsimd.Int32x4{1, 2, 3, 4}
   ```
 
-- **Let the compiler do it** — write simple, idiomatic loops on `[]float64`/`[]int32` slices. Check auto-vectorization: `go build -gcflags="-d=ssa/prove/debug=2" ./...`
+- **Start with ordinary code and measure** — do not infer SIMD merely from simple loops or a successful bounds-check proof: `go build -gcflags="-d=ssa/prove/debug=2" ./...`
 - **`math/bits`** — operations like `OnesCount`, `LeadingZeros`, `RotateLeft` map directly to hardware instructions (POPCNT, CLZ, ROL)
 - **Hand-written assembly** — `.s` files with AVX2/NEON instructions for critical inner loops. Libraries like `klauspost/compress` and `minio/sha256-simd` use this approach
 - **Third-party vectorized libraries** — for common operations (hashing, compression, encoding), use libraries that already have optimized SIMD implementations rather than writing your own
@@ -189,17 +189,17 @@ Go 1.26+ includes an experimental `simd/archsimd` package (requires `GOEXPERIMEN
 
 Hand-written assembly unlocks higher performance but couples code to specific CPU features (AVX2, NEON, etc.). Three strategies exist:
 
-**1. Compile on a production-similar machine**
+**1. Select an explicit supported architecture baseline**
 
 Build binaries on hardware matching your deployment target, so the compiler generates code for the exact CPU instruction set available at runtime:
 
 ```bash
-# Compiling on production hardware ensures optimal code generation
+# Go does not automatically target the build machine CPU; set a supported GOAMD64 baseline explicitly
 # for that specific CPU architecture and generation
 ssh prod-server "cd /path && go build -o app ."
 ```
 
-**Tradeoff:** Simplest approach, but requires access to production hardware and different binaries per CPU type (Intel vs AMD vs Apple Silicon). Breaks CI/CD portability.
+**Tradeoff:** GOARCH/GOAMD64 select a portable minimum CPU feature level, not an Intel/AMD-specific host auto-tune. Test every deployment supports the chosen baseline; do not require builds on production hosts.
 
 **2. Runtime CPU feature detection + multiple implementations**
 
@@ -276,67 +276,21 @@ go build -tags=nosimd -o app-safe .                # Fallback everywhere
 
 **When SIMD is NOT worth pursuing:**
 
-- Go's lack of intrinsics means SIMD requires assembly — high maintenance burden, platform-specific, and harder to debug
-- Auto-vectorization covers the most common cases (simple numeric loops)
+- Hand-written assembly is one SIMD option, with maintenance and portability costs; version-gated experimental SIMD packages have a separate API/support contract.
+- Do not assume ordinary Go loops are automatically vectorized; inspect assembly for the actual compiler and target.
 - If your bottleneck is allocations or I/O, SIMD won't help
 
-**Recommendation:** Start with auto-vectorization. For Go 1.26+, evaluate `simd/archsimd` for AMD64-only workloads (remembering it's experimental). Move to runtime detection (option 2 above) if profiling shows a bottleneck and the code needs to run on heterogeneous hardware. Only use compile-time selection (option 3) if you control the deployment environment and can test each per-binary variant.
+**Recommendation:** Start by measuring ordinary scalar code and inspecting its generated assembly. For Go 1.26+, evaluate `simd/archsimd` for AMD64-only workloads (remembering it's experimental). Move to runtime detection (option 2 above) if profiling shows a bottleneck and the code needs to run on heterogeneous hardware. Only use compile-time selection (option 3) if you control the deployment environment and can test each per-binary variant.
 
-Only invest in hand-written SIMD when profiling shows a numeric inner loop consuming >20% of CPU and the compiler isn't auto-vectorizing it.
+Invest in SIMD only when measured workload benefit justifies its portability and maintenance costs; no universal CPU-percentage threshold decides this.
 
 ## Tight Loops and the Scheduler
 
-**Diagnose:** 1- `go tool pprof` (goroutine profile) — look for many goroutines stuck in `"runnable"` state (waiting for CPU) while one goroutine monopolizes execution 2- `go tool trace` — visualize goroutine scheduling over time; look for long uninterrupted execution spans on one goroutine while others show scheduling gaps 3- `GODEBUG=schedtrace=1000` — print scheduler state every second; look for unbalanced `runqueue` counts across P's indicating one P is starved 4- `runtime/metrics` (`/sched/latencies:seconds`) — measure how long goroutines wait before getting CPU; high p99 latencies confirm starvation 5- Prometheus `rate(process_cpu_seconds_total[2m])` — monitor if CPU usage hits GOMAXPROCS ceiling; if saturated while other goroutines are starved, a tight loop is monopolizing P's
+Go 1.14 introduced asynchronous goroutine preemption, including ordinary tight loops. A non-inlined call is **not** a required or guaranteed preemption mechanism, and `//go:noinline` controls inlining, not scheduling. Do not add it as a scheduling fix.
 
-A goroutine running a CPU-intensive tight loop without function calls may not yield to the scheduler, starving other goroutines. Go 1.14+ added asynchronous preemption, but very tight loops with fully inlined operations can still cause issues:
+Measure CPU saturation, runnable delay and cancellation latency with execution traces, scheduler metrics and profiles. A high CPU load alone does not prove one goroutine starves others. For long application-level work, divide it into bounded chunks and check the accepted cancellation/deadline between chunks. Do not invent a `runtime.Gosched` or compiler directive policy without evidence of the actual issue.
 
-```go
-// Potential starvation — pure computation, no function calls
-for { x = x*a + b }
-
-// Safe — non-inlined call triggers preemption check
-for item := range work {
-    processBatch(item) // function call = preemption point
-}
-```
-
-**When to use non-inlined calls for scheduling:** Use non-inlined function calls when:
-
-- The loop runs for a long time (hundreds of milliseconds or more of uninterrupted computation)
-- Other goroutines are waiting to run (e.g., handling requests, I/O completion, channel operations)
-- The loop contains only arithmetic or memory operations with no function calls
-
-For short bursts of computation (< 10ms), preemption isn't critical and inlining for CPU efficiency takes priority.
-
-**Detecting scheduler starvation:** Use these tools to confirm goroutines are being starved:
-
-- **`go tool pprof` goroutine profile** — shows goroutines stuck in "runnable" state (waiting for CPU). If many goroutines are runnable while one dominates CPU, starvation is happening
-- **`go tool trace`** — visualizes goroutine scheduling over time. Look for gaps where goroutines aren't running because one goroutine monopolized the scheduler
-- **`runtime/metrics` (Go 1.19+)** — measure `/sched/latencies:seconds` to quantify how long goroutines wait for CPU
-- **Observable symptoms** — high response latency, requests timing out, uneven request distribution, goroutine counts climbing
-
-**Preventing inlining with `//go:noinline`:** If you have a function that's normally inlinable (small, hot) but you specifically want it to not inline to force scheduler preemption checks, use the `//go:noinline` compiler directive:
-
-```go
-//go:noinline
-func processBatch(item WorkItem) {
-    // CPU-intensive work here
-    // This call site will NOT be inlined, even if the function is small
-    // The function call itself becomes a preemption point for the scheduler
-}
-
-// In tight loop
-for item := range work {
-    processBatch(item) // Guaranteed preemption point
-}
-```
-
-**Trade-off:** Using `//go:noinline` prevents inlining, which:
-
-- **Pros:** Guarantees scheduler preemption checks; prevents goroutine starvation
-- **Cons:** Adds function call overhead (~10-30 CPU cycles); reduces instruction-level parallelism (ILP) in the caller
-
-Only use `//go:noinline` if profiling shows that scheduler preemption starvation is actually blocking other goroutines. Unnecessary `//go:noinline` directives penalize throughput and latency.
+Source: [Go 1.14 runtime changes](https://go.dev/doc/go1.14#runtime).
 
 ## Reflection and Type Assertions
 

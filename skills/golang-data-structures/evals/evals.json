@@ -1,0 +1,20 @@
+{
+  "skill": "golang-data-structures",
+  "version": "1.0.0",
+  "common_instruction": "Use the stated context; explain concrete behavior and do not claim tests were run without evidence.",
+  "cases": [
+    {
+      "id": "GDATA-COPY-01",
+      "name": "Struct copy aliasing",
+      "prompt": "A Go struct contains a map[string]int, a []byte and an int. A developer copies it with b := a, edits b.Map and b.Slice[0], and expects a unchanged. What does this copy guarantee?",
+      "trap": "Calls a struct value copy a deep copy and misses shared referenced data.",
+      "expectations": [
+        "Distinguishes field-by-field value copy from cloning nested map/slice storage.",
+        "States which modifications can affect a and how to clone the mutable fields when independence is required."
+      ],
+      "must_not": [
+        "Does not claim b := a deep-clones maps and slice backing arrays."
+      ]
+    }
+  ]
+}

@@ -19,7 +19,7 @@ Call these before any `ReadInConfig` or `viper.Get*` call — typically in a roo
 | `AutomaticEnv()` | Every key is automatically mapped to its env equivalent (with prefix and replacer applied) |
 | `BindEnv(key, envVars...)` | Only the specified key is bound, to the specified env var name(s) |
 
-Use `AutomaticEnv` for the common case. Use `BindEnv` when you need to bind to an env var with a name that doesn't follow your prefix/replacer convention (e.g., third-party env vars like `GOOGLE_APPLICATION_CREDENTIALS`).
+Use `AutomaticEnv` for direct `Get*` lookups. `Unmarshal` iterates known keys and may omit env-only keys that have never been registered: use `BindEnv` or `SetDefault` for expected keys before unmarshalling. Use `BindEnv` when you need to bind to an env var with a name that doesn't follow your prefix/replacer convention (e.g., third-party env vars like `GOOGLE_APPLICATION_CREDENTIALS`).
 
 ```go
 // Bind a specific non-prefixed env var
@@ -48,7 +48,7 @@ viper.AutomaticEnv()
 viper.GetString("database.host")  // looks for MYAPP_DATABASE_HOST — matches
 ```
 
-The replacer operates on the viper key **before** prepending the prefix, so the lookup chain is: `database.host` → replace `.` with `_` → `database_host` → prepend prefix → `MYAPP_DATABASE_HOST`.
+The replacer is applied to the complete environment lookup string, including the prefix (for example `MYAPP_database.host` → `MYAPP_DATABASE_HOST` when replacing `.` with `_`). If the replacer also changes prefix characters, test that explicitly.
 
 ## AllowEmptyEnv
 
@@ -76,7 +76,7 @@ Bind an entire flag set:
 viper.BindPFlags(rootCmd.PersistentFlags())
 ```
 
-**Timing rule:** Bind flags in `init()` or in `PersistentPreRunE`. The binding call must happen before `Execute()` parses flags — specifically, before any `viper.Get*` call on a flag-backed key. Binding after `Execute()` causes the flag's `Changed` state to be unknown, so viper may not promote the flag value to the correct precedence layer.
+**Timing rule:** Bind the owning flag before the first relevant `Get*` or `Unmarshal`. Viper reads the bound flag's current `Changed` state lazily at lookup, so `BindPFlag` need not precede argument parsing. Do not bind the same key in several subcommand initializers: a later binding can silently replace the previous one.
 
 ## How pflag binding interacts with precedence
 

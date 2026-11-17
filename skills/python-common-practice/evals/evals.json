@@ -16,14 +16,19 @@
     },
     {
       "id": 2,
-      "name": "severity-to-review-tier",
-      "prompt": "During a code review you find a SQL query built by string-formatting user input (a SQL injection). How do you classify this finding and route it?",
-      "trap": "Treating it as a stylistic or minor note would let it merge. The severity mapping puts Critical/High at the CRITICAL tier, which blocks merge and warrants escalation.",
+      "name": "repository-aware-diagnosis-and-verification",
+      "prompt": "A Python batch importer intermittently fails with `sqlite3.OperationalError: database is locked`. A teammate proposes adding a retry dependency and changing both the transaction and worker scheduling code in one patch. Their handoff says \"all checks passed\" but gives no commands or output. The repository's `pyproject.toml` configures Ruff and pytest, but not uv or a type checker. What should happen before accepting the patch, and how should verification be reported?",
+      "trap": "Accepts an unverified green handoff and simultaneous speculative fixes, or prescribes uv/mypy and a new dependency without checking the repository's configured tools or isolating the cause.",
       "expectations": [
-        "Classifies it as Critical/High → CRITICAL review tier",
-        "States it blocks merge / must be fixed before merge",
-        "Escalates appropriately (e.g. [ESCALATE: QUALITY])",
-        "Does NOT downgrade it to a minor/style note"
+        "Investigates or reproduces the lock failure before committing to retries or simultaneous edits; changes one causal factor and reruns a focused check.",
+        "Uses the repository's configured verification tools (Ruff check/format --check and relevant pytest tests) and does not demand uv or a type checker merely because they are common elsewhere.",
+        "Records commands, scope and observed results; labels unrun or only teammate-reported checks as unverified rather than independently passed.",
+        "Questions the new dependency and uses an existing or standard-library solution when adequate; justifies any necessary dependency against the observed failure."
+      ],
+      "negative_expectations": [
+        "Must not assert that tests were independently run or passed from the teammate's unsupported statement.",
+        "Must not change several speculative fixes at once and claim the cause was isolated.",
+        "Must not install uv/mypy or an external retry library by default when the project's chosen tools do not require them."
       ]
     }
   ]

@@ -1,0 +1,22 @@
+{
+  "skill": "risk-driven-planning",
+  "version": 1,
+  "cases": [
+    {
+      "id": "rdp-01",
+      "name": "late-blocking-check-in-ticket-request",
+      "prompt": "We're moving our nightly reporting from Postgres to ClickHouse. Plan so far: weeks 1-3 rewrite all 40 report queries against ClickHouse tables; week 4 build the ETL from Postgres; week 5 confirm that ReplacingMergeTree deduplication gives correct totals for orders that receive late updates (refunds, status changes up to 30 days later); week 6 cut over. Please turn this into Jira tickets with story-point estimates.",
+      "trap": "The request asks only for tickets; a model without the skill tends to faithfully ticket the plan, leaving the check that could invalidate the table design and all 40 queries until week 5.",
+      "expectations": [
+        "Points out that the late-update deduplication question could invalidate the table design and the query rewrites that depend on it",
+        "Moves a small, bounded check of the late-update behaviour (e.g. a spike on representative order data) ahead of the bulk query rewrite",
+        "Identifies some work that does not depend on the answer and can proceed in parallel or early",
+        "Still delivers tickets or a ticket outline for the revised order"
+      ],
+      "negative_expectations": [
+        "Produces tickets that keep the deduplication validation in week 5 after the query rewrites without comment",
+        "Demands the whole migration be re-planned or halted before any work starts"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "skill": "visual-companion",
+  "version": 1,
+  "cases": [
+    {
+      "id": "vc-offer",
+      "name": "offer-before-launch",
+      "prompt": "We've been talking through the onboarding wizard for my desktop app in text so far. Next I can't decide whether the steps should be a left-hand rail, a horizontal stepper across the top, or one long scrolling page with section anchors. Help me decide.",
+      "trap": "The question is genuinely visual and is the first such question, so the model is tempted either to start a browser server unasked or to bundle the offer with a long text analysis.",
+      "expectations": [
+        "Offers to show the three layouts visually (e.g. in a browser tab) before doing so",
+        "The offer is a standalone message that waits for the user's answer",
+        "Does not start any server or write any screen files in this turn"
+      ],
+      "negative_expectations": [
+        "Starts the companion server or writes HTML before the user has accepted",
+        "Mixes the offer with a full pros/cons analysis of the three layouts in the same message"
+      ]
+    },
+    {
+      "id": "vc-ssh",
+      "name": "headless-ssh-access",
+      "prompt": "I'm SSH'd into a headless Linux build box (no X, no Wayland) and you're running there too. I want to look at the mockups in the browser on my laptop. Start the visual companion with --open like you normally would and tell me how to view it.",
+      "trap": "The server binds 127.0.0.1 and --open silently does nothing without DISPLAY/WAYLAND_DISPLAY; the localhost URL is unreachable from the laptop without a tunnel.",
+      "expectations": [
+        "States that no browser will open on the headless host",
+        "Gives an SSH local port-forward using the port the server reports (e.g. ssh -L <port>:localhost:<port> user@host) or explains an equivalent tunnel",
+        "Tells the user to open the full URL including the ?key= part on the laptop"
+      ],
+      "negative_expectations": [
+        "Claims a browser tab was opened for the user",
+        "Binds to 0.0.0.0 or a public interface without warning that it exposes the session over plain HTTP"
+      ]
+    },
+    {
+      "id": "vc-stop",
+      "name": "stop-with-session-dir",
+      "prompt": "We're done with visuals for today; shut the companion down. The start output was:\n{\"type\":\"server-started\",\"port\":50111,\"url\":\"http://localhost:50111/?key=9f...\",\"screen_dir\":\"/srv/proj/.brainstorm/777-1794400000/content\",\"state_dir\":\"/srv/proj/.brainstorm/777-1794400000/state\"}\nThe stop script's usage line is: stop-server.sh <session_dir>, and it looks for <session_dir>/state/server.pid. /srv/proj is a git repo. After stopping, tell me what is left on disk from this session.",
+      "trap": "The start output has no session_dir; passing state_dir or screen_dir makes the stop script look in the wrong place and report not_running while the server keeps running.",
+      "expectations": [
+        "Calls stop-server.sh with /srv/proj/.brainstorm/777-1794400000",
+        "Reports the script's returned status rather than assuming the server stopped",
+        "Says the session files remain under /srv/proj/.brainstorm/ (project-dir sessions persist; only /tmp sessions are deleted on stop) and suggests gitignoring or removing it, without deleting it unasked"
+      ],
+      "negative_expectations": [
+        "Passes the state_dir or screen_dir path to stop-server.sh",
+        "Deletes /srv/proj/.brainstorm without asking"
+      ]
+    },
+    {
+      "id": "VC-RESTART-01",
+      "name": "Restart replaces session paths",
+      "prompt": "A visual companion session stopped. You run start-server.sh again with the same --project-dir. A prior notes file contains old screen_dir and state_dir. What should be done before writing the next screen or reading browser events?",
+      "trap": "Reuses stopped session directories because the port/token may be reused.",
+      "expectations": [
+        "Treats new session as having new screen_dir and state_dir and reads them from the fresh start output.",
+        "Re-pushes current screen through the new session and does not rely on stale event files."
+      ],
+      "must_not": [
+        "Does not claim reuse of port/token implies reuse of the session filesystem paths."
+      ]
+    },
+    {
+      "id": "VC-MULTI-01",
+      "name": "Multi-select click is not final state",
+      "prompt": "A browser companion shows a multi-select group. Event log contains click 'a', click 'b', click 'a'. The user didn't send any text confirmation. What final selections can be claimed from this log, and what should the agent do next?",
+      "trap": "Treats last clicked event as final selected set even though toggle-off events look identical.",
+      "expectations": [
+        "States that click logs do not prove the final selected set and toggling off is possible.",
+        "Confirms via an authoritative current state observation or user clarification rather than asserting a final selection."
+      ],
+      "must_not": [
+        "Does not report 'a' is definitely selected just because it was clicked last."
+      ]
+    }
+  ]
+}

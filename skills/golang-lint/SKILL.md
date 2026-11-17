@@ -20,7 +20,7 @@ metadata:
 
 **Dependencies:**
 
-- golangci-lint: `go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest`
+- golangci-lint v2: install a pinned upstream [binary release](https://golangci-lint.run/docs/welcome/install/local/) when possible; if source installation is required, use `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@<pinned-v2-tag>` from a suitable Go toolchain. The old module path builds v1, and upstream warns source and `go tool` installs can affect dependency consistency.
 
 # Go Linting
 
@@ -74,7 +74,7 @@ Rules:
 
 1. **//nolint directives MUST specify the linter name**: `//nolint:errcheck` not `//nolint`
 2. **//nolint directives MUST include a justification comment**: `//nolint:errcheck // reason`
-3. **The `nolintlint` linter enforces both rules above** — it flags bare `//nolint` and missing reasons
+3. **`nolintlint` enforces both rules only when configured** — set `require-specific: true` and `require-explanation: true` under `linters.settings.nolintlint`; both default to false, so default settings accept bare `//nolint`
 4. **NEVER suppress security linters** (gosec, bodyclose, sqlclosecheck) without a very strong reason
 
 For comprehensive patterns and examples, see **[nolint directives](./references/nolint-directives.md)** — when to suppress, how to write justifications, patterns for per-line vs per-function suppression, and anti-patterns.

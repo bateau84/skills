@@ -14,7 +14,7 @@ metadata:
 
 **Modes:**
 
-- **Setup** — adding CI to a project for the first time: start with the Quick Reference table, then generate workflows in this order: test → lint → security → release. Prefer the latest stable major version for each GitHub Action.
+- **Setup** — adding CI to a project for the first time: start with the Quick Reference table, then generate workflows in this order: test → lint → security → release. Resolve a suitable supported release, review it, and pin its full commit SHA; use `github-workflow` for trust and credential boundaries.
 - **Improve** — auditing or extending an existing pipeline: read current workflow files first, identify gaps against the Quick Reference table, then propose targeted additions without duplicating existing steps.
 
 **Dependencies:**
@@ -244,7 +244,7 @@ ln -s .agents .copilot
 | Caching integration test results | Use `-count=1` to disable caching |
 | `go mod tidy` not checked | Add `go mod tidy && git diff --exit-code` step |
 | Missing `fail-fast: false` | One Go version failing shouldn't cancel other jobs |
-| Not pinning action versions | GitHub Actions MUST use pinned major versions (e.g. `@vN`, not `@master`) |
+| Not pinning action versions | Pin third-party action code to a reviewed full commit SHA, with its release tag in a comment; a mutable major tag is an explicit trust exception |
 | No `permissions` block | Follow least-privilege per job |
 | Ignoring govulncheck findings | Fix or suppress with justification |
 | Treating AI review as guaranteed coverage | Keep it optional, validate findings, and retain the project's required checks and review |

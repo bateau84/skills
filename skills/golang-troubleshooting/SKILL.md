@@ -175,5 +175,5 @@ If any of these are happening, stop and return to Step 1:
 
 - → See `golang-performance` skill for optimization patterns after identifying bottlenecks
 - → See `golang-observability` skill for metrics, alerting, and Grafana dashboards for Go runtime monitoring
-- → See `promql-cli` skill for querying Prometheus metrics during production incident investigation
+- → See `promql` skill for querying Prometheus metrics during production incident investigation
 - → See `golang-concurrency`, `golang-safety`, `golang-error-handling` skills

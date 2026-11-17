@@ -61,7 +61,7 @@ go tool cobra-cli add serve
 go tool cobra-cli add migrate
 
 # Add with a parent other than root
-cobra-cli add list --parent serve
+cobra-cli add list --parent serveCmd  # generated Go variable name, not the displayed command name
 ```
 
 Generated files follow the standard pattern:

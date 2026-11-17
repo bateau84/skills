@@ -303,7 +303,7 @@ class UserService:
         # Check cache first
         cached = await self._cache.get(f"user:{user_id}")
         if cached:
-            self._logger.info("Cache hit", user_id=user_id)
+            self._logger.info("Cache hit", extra={"user_id": user_id})  # stdlib Logger-compatible
             return User.from_json(cached)
 
         # Fetch from database
@@ -336,13 +336,13 @@ service = UserService(
 # BAD: Leaking ORM model to API
 @app.get("/users/{id}")
 def get_user(id: str) -> UserModel:  # SQLAlchemy model
-    return db.query(UserModel).get(id)
+    return db.get(UserModel, id)
 
 # GOOD: Use response schemas
 @app.get("/users/{id}")
 def get_user(id: str) -> UserResponse:
-    user = db.query(UserModel).get(id)
-    return UserResponse.from_orm(user)
+    user = db.get(UserModel, id)
+    return UserResponse.model_validate(user, from_attributes=True)
 ```
 
 **Don't mix I/O with business logic:**

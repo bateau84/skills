@@ -1,0 +1,20 @@
+{
+  "skill": "golang-code-style",
+  "version": "1.0.0",
+  "common_instruction": "Use the stated context; explain concrete behavior and do not claim tests were run without evidence.",
+  "cases": [
+    {
+      "id": "GSTYLE-NIL-01",
+      "name": "Nil slice vs API JSON",
+      "prompt": "A Go service represents an optional internal list and a JSON API response array. Should all slices be initialized to empty literals and all maps preallocated? Include whether nil is safe for reads and writes.",
+      "trap": "Applies a universal never-nil rule and changes JSON semantics accidentally.",
+      "expectations": [
+        "Recognizes nil slices as idiomatic when nil is acceptable, while JSON array contracts may require an initialized empty slice.",
+        "Distinguishes nil map lookup (safe) from nil map assignment (panic)."
+      ],
+      "must_not": [
+        "Does not demand non-nil slices for every use."
+      ]
+    }
+  ]
+}

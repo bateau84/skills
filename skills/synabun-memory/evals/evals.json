@@ -1,0 +1,42 @@
+{
+  "skill": "synabun-memory",
+  "version": 1,
+  "cases": [
+    {
+      "id": "merge-dup",
+      "name": "consolidate-near-duplicates-preserving-metadata",
+      "prompt": "Synabun memory tools are connected (schemas: reflect{memory_id, content?, tags?, add_tags?, related_files?, related_memory_ids?, expected_revision?}, forget{memory_id}, memories{action:'get', id}). User: 'These two are duplicates, consolidate them into one.' I already fetched both full records:\n\nA = {id:'3f1c9a2e-7b44-4d0e-9a51-0c2d8e6f1a10', revision:7, project:'indexer', category:'engineering-lessons', tags:['watcher','recovery','oncall-p1'], related_memory_ids:['a90e5512-1c3b-4f7e-8d2a-55b0e7c4d201'], content:'Watcher recovery must run a reconciliation scan; restarting the watcher alone left files changed during the outage stale. Regression: tests/recovery_test.go::TestOutageEdits. Observed 2026-08-02.'}\n\nB = {id:'c7d24b10-2e9f-4a63-b8f1-6e3a90d1c55e', revision:2, project:'indexer', category:'engineering-lessons', tags:['watcher'], content:'Need reconciliation after watcher restart or index goes stale. Only verified on ext4; on NFS the reconciliation scan itself missed renames (tried, failed, see issue #412). Observed 2026-09-20.'}\n\nGive the exact tool-call JSON you would send, in order, and the short report you would give the user.",
+      "trap": "Without the skill, a model tends to send reflect with a fresh 'tags' array (wiping oncall-p1/recovery) or omit related_memory_ids handling, rewrite content generically and drop B's ext4-only limit and NFS negative result, skip the revision guard, or forget B before the survivor is confirmed.",
+      "expectations": [
+        "Updates A (or one survivor) with content that keeps both the ext4-only verification limit and the NFS rename failure/issue #412 as well as A's regression test pointer",
+        "Preserves A's existing tags and related_memory_ids (uses add_tags or a deliberately merged full array, not a replacement that drops them)",
+        "Includes expected_revision 7 (the revision just read) on the reflect call",
+        "Verifies the survivor's stored content (e.g. memories get by id) before calling forget on the other record",
+        "Uses full UUIDs and the memory_id field for reflect/forget, and id for memories get"
+      ],
+      "negative_expectations": [
+        "Calls forget before the survivor update is confirmed",
+        "Sends a tags array that omits 'oncall-p1' or 'recovery'",
+        "States the lesson as applying to all filesystems",
+        "Mentions purging trash or permanent deletion"
+      ]
+    },
+    {
+      "id": "distil",
+      "name": "distil-one-lesson-from-session",
+      "prompt": "Session wrap-up for project 'ledger' (Synabun connected; remember requires project and category; existing categories: engineering-lessons, decisions). Today 2026-11-11 we: renamed three helpers; bumped lint config; merged PR #301 after review; spent 5 hours on a flaky test that turned out to be time-zone dependent: TestMonthClose passed in UTC CI but failed locally in Europe/Oslo because month boundaries were computed with time.Local; switching to an explicit UTC location fixed it, and the test now fails when TZ=Europe/Oslo is forced and the fix is reverted (commit 9c1e2fa). We also suspect, but did not test, that the same pattern exists in the reporting service. Do whatever memory work is appropriate and show the calls.",
+      "trap": "Models without the skill tend to save a session journal (renames, lint, PR merged, hours spent), or several memories, or record the untested reporting-service suspicion as fact.",
+      "expectations": [
+        "Searches for an existing equivalent lesson before writing",
+        "Writes at most one memory, about the time.Local month-boundary failure, in project ledger with an existing category",
+        "Content includes symptom, cause, fix, evidence pointer (commit 9c1e2fa or TestMonthClose) and observation date",
+        "Labels the reporting-service occurrence as an untested suspicion, if mentioned at all"
+      ],
+      "negative_expectations": [
+        "Creates memories for helper renames, lint bump, or PR #301 status",
+        "States as fact that the reporting service has the bug",
+        "Justifies importance by the 5 hours spent"
+      ]
+    }
+  ]
+}

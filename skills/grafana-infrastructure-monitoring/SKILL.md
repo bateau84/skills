@@ -21,12 +21,13 @@ K8s + host + container + cloud-provider telemetry, mostly via the `grafana/k8s-m
 ### 1. Onboard a Kubernetes cluster (k8s-monitoring chart)
 
 ```bash
-# 1. Create the namespace + secret
+# 1. Create the namespace. Configure destination authentication using a
+#    version-supported secret reference or approved secret injection into
+#    values.yaml. Creating an unrelated Secret does not connect it to Alloy.
 kubectl create namespace monitoring
-kubectl create secret generic grafana-cloud-secret \
-  -n monitoring --from-literal=api-key=<your-api-key>
 
-# 2. Install — values.yaml in references/k8s-monitoring-values.md
+# 2. Inspect version-matched values in references/k8s-monitoring-values.md;
+#    render the chart before installing (the older v1 values do not work on 4.x).
 helm repo add grafana https://grafana.github.io/helm-charts && helm repo update
 helm install k8s-monitoring grafana/k8s-monitoring \
   --version 4.1.4 -n monitoring -f values.yaml
@@ -36,16 +37,18 @@ kubectl get pods -n monitoring
 # Expect alloy-*, kube-state-metrics-*, node-exporter-*, etc. all Ready.
 
 # 4. Verify no error logs in the metrics/logs/traces Alloys
-kubectl -n monitoring logs deploy/k8s-monitoring-alloy-metrics --tail=50 | grep -iE 'error|level=err' || echo "clean"
+kubectl -n monitoring get pods -o wide
+# Select each Alloy pod from the actual rendered workload; metrics may use a StatefulSet.
+# Inspect its container logs and readiness; absence of grep matches alone is not proof.
 
 # 5. Verify telemetry landed in Grafana Cloud
 #    PromQL on the metrics datasource (should be > 0):
-#      sum(up{cluster="production-us-east"})
-#    LogQL on Loki:
-#      sum(count_over_time({cluster="production-us-east"}[5m]))
+#      sum(up{cluster="example-cluster"})
+#    Only if pod-log collection and a Loki destination were additionally configured:
+#      sum(count_over_time({cluster="example-cluster"}[5m]))
 ```
 
-Full `values.yaml`, key PromQL, dashboard IDs (15520, 1860, 14282…), and alert rules: [`references/k8s-monitoring-values.md`](references/k8s-monitoring-values.md).
+Metrics-only `values.yaml` skeleton, key PromQL, dashboard IDs (15520, 1860, 14282…), and alert rules: [`references/k8s-monitoring-values.md`](references/k8s-monitoring-values.md).
 
 ### 2. Monitor a Linux host
 
@@ -79,7 +82,7 @@ Provision the datasource (full YAML in [`references/clouds-and-hosts.md`](refere
 
 ## Troubleshooting
 
-- chart installed but no metrics in Cloud → check the `grafana-cloud-secret` `api-key` value; check Alloy logs for `401`
+- chart installed but no metrics in Cloud → check the rendered destination authentication and any referenced Secret keys; check Alloy logs for `401`
 - `kube-state-metrics` pod Pending → likely RBAC; reapply the chart's CRDs/CRBs
 - Node-exporter pod CrashLoopBackOff → typically `hostNetwork: true` collision with the host's :9100; change the port
 - CloudWatch "Access denied" → IAM role missing `cloudwatch:GetMetricData`, `cloudwatch:ListMetrics`

@@ -37,3 +37,7 @@ After authorized delivery or an experiment, compare available use evidence with 
 The receiving owner can explain the problem, why this bounded approach is worth trying, which important assumptions remain, and how usefulness could be observed. More interviews or artifacts are not required merely because uncertainty still exists.
 
 Example: a dashboard can accurately show every job without reducing manual supervision. Distinguish the delivery criterion from the benefit hypothesis, compare a smaller intervention path when direction is open, and propose observing whether the operator can handle stalled work without inspecting every session. Do not claim that benefit from a screenshot or the user's approval.
+
+## Optional review perspectives
+
+[conformance review](ASSESSMENT.md), [residual-confidence challenges](QA.md). Load for the corresponding review activity; these are not extra producer permissions or mandatory context.

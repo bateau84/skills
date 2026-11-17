@@ -34,7 +34,7 @@ An explicit request to remember a safe item may bypass the normal reuse threshol
 
 Search around an unfamiliar design choice, stubborn failure, known pitfall, or request for past learning—not mechanically at every session boundary.
 
-Start with the actual project's existing identifier and a specific problem query. Respect configured result limits; use compact discovery when supported. Fetch the full original before relying on, editing, merging, or deleting it. Check its source, version, constraints, and current evidence. Similarity is not truth; top-k results are not a complete inventory.
+Start with the actual project's existing identifier and a specific problem query. Resolve a missing identifier from authorized project metadata or the installed tool's scoped project-list/discovery operation after reading its schema. A minimal stats/list call is appropriate if it is the supported discovery route; do not dump unrelated memories or invent an ID from a folder name. Ask for the project only when no authorized discovery route establishes it. Respect configured result limits; use compact discovery when supported. Fetch the full original before relying on, editing, merging, or deleting it. Check its source, version, constraints, and current evidence. Similarity is not truth; top-k results are not a complete inventory.
 
 Broaden across projects only when relevant and permitted. Keep external lessons labelled as experience from elsewhere. Do not keep broadening an empty search indefinitely.
 
@@ -75,3 +75,7 @@ No save-per-task rule, periodic write requirement, minimum count, mandatory repo
 If tools fail, do not fabricate success, change settings, or write directly to the database. Continue unrelated work; return an explicitly requested save as an unsaved candidate when persistence cannot be confirmed.
 
 This skill guides an agent when loaded. It does not disable existing prompts, hooks, or automatic capture, and does not enforce permissions.
+
+## Optional review perspectives
+
+[conformance review](ASSESSMENT.md), [residual-confidence challenges](QA.md). Load for the corresponding review activity; these are not extra producer permissions or mandatory context.

@@ -4,7 +4,7 @@ Logging sensitive information can lead to data exposure and compliance violation
 
 **Rules:**
 
-1. PII MUST NEVER be logged — filter passwords, tokens, emails, and personal data.
+1. Never log passwords, tokens or authentication secrets. Minimize personal data; record it only under an accepted purpose, access and retention policy. An opaque user ID can still be personal data.
 2. Log injection MUST be prevented — sanitize user input before logging.
 3. Error messages MUST NOT expose internals to users — log details server-side, return generic messages.
 
@@ -35,7 +35,7 @@ import "log/slog"
 func logUserLogin(logger *slog.Logger, user *User) {
     logger.Info("user_login",
         "user_id", user.ID,
-        "username", user.Username,
+        // Do not include a raw username/email unless an explicit audit contract requires it.
         // Don't log: password, token
     )
 }
@@ -56,23 +56,28 @@ log.Printf("User logged in: %s\n", username)  // DON'T: No sanitization
 **Good:**
 
 ```go
-import "log/slog"
+import (
+    "log/slog"
+    "strings"
+    "unicode"
+)
 
-// Sanitize user input before logging
+// For a custom plain-text sink, prevent embedded record/control characters.
+// slog JSON/Text handlers escape quoted values; this is not a JSON parser substitute.
 func sanitizeLogInput(input string) string {
     // Remove control characters
     var result strings.Builder
     for _, r := range input {
-        if !unicode.IsControl(r) || r == '\n' || r == '\t' {
+        if !unicode.IsControl(r) {
             result.WriteRune(r)
         }
     }
     return result.String()
 }
 
-func logUsername(logger *slog.Logger, username string) {
-    sanitized := sanitizeLogInput(username)
-    logger.Info("user_login", "username", sanitized)
+func logSubjectEvent(logger *slog.Logger, opaqueSubjectID string) {
+    // Prefer a scoped correlation key under the accepted audit/retention policy.
+    logger.Info("user_login", "subject_id", sanitizeLogInput(opaqueSubjectID))
 }
 ```
 
@@ -142,7 +147,7 @@ logger.Info("user_login",
 ## Log Security Checklist
 
 - [ ] No passwords, tokens, or secrets in logs
-- [ ] No PII/PHI in production logs
+- [ ] Personal data is minimized and governed by explicit purpose/access/retention requirements
 - [ ] Sanitize user input before logging
 - [ ] Use structured logging (JSON)
 - [ ] Implement log level strategy

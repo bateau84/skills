@@ -1,5 +1,7 @@
 # Node/TypeScript MCP Server Implementation Guide
 
+> **Modified work:** Adapted from [Anthropic's `mcp-builder`](https://github.com/anthropics/skills/tree/main/skills/mcp-builder) (Apache-2.0). Original licence: [LICENSE.txt](../LICENSE.txt); provenance: [LICENSING.md](../../../LICENSING.md).
+
 ## Overview
 
 This document provides Node/TypeScript-specific best practices and examples for implementing MCP servers using the MCP TypeScript SDK. It covers project structure, server setup, tool registration patterns, input validation with Zod, error handling, and complete working examples.
@@ -186,7 +188,7 @@ Examples:
   - Don't use when: You need to create a user (use example_create_user instead)
 
 Error Handling:
-  - Returns "Error: Rate limit exceeded" if too many requests (429 status)
+  - Returns an MCP tool error with isError: true for upstream failures, including rate limits (429 status)
   - Returns "No users found matching '<query>'" if search returns empty`,
     inputSchema: UserSearchInputSchema,
     annotations: {
@@ -263,6 +265,7 @@ Error Handling:
       };
     } catch (error) {
       return {
+        isError: true,
         content: [{
           type: "text",
           text: handleApiError(error)
@@ -544,12 +547,14 @@ async function getUser(id: string): Promise<any> {
     "node": ">=18"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.6.1",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "express": "^5.1.0",
     "axios": "^1.7.9",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
+    "@types/express": "^5.0.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }
@@ -581,300 +586,25 @@ async function getUser(id: string): Promise<any> {
 }
 ```
 
-## Complete Example
+## Complete, checked SDK-v1 example
 
-```typescript
-#!/usr/bin/env node
-/**
- * MCP Server for Example Service.
- *
- * This server provides tools to interact with Example API, including user search,
- * project management, and data export capabilities.
- */
+The executable [TypeScript example](../examples/typescript/server.ts) is the source of truth for imports and transport wiring. Its [package file](../examples/typescript/package.json) pins SDK **1.32.2**; do not mix it with the separate SDK-v2 package/API family. It implements a local arithmetic tool, real protocol error responses and a resource, rather than claiming an unimplemented external service is a complete example.
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
-import axios, { AxiosError } from "axios";
-
-// Constants
-const API_BASE_URL = "https://api.example.com/v1";
-const CHARACTER_LIMIT = 25000;
-
-// Enums
-enum ResponseFormat {
-  MARKDOWN = "markdown",
-  JSON = "json"
-}
-
-// Zod schemas
-const UserSearchInputSchema = z.object({
-  query: z.string()
-    .min(2, "Query must be at least 2 characters")
-    .max(200, "Query must not exceed 200 characters")
-    .describe("Search string to match against names/emails"),
-  limit: z.number()
-    .int()
-    .min(1)
-    .max(100)
-    .default(20)
-    .describe("Maximum results to return"),
-  offset: z.number()
-    .int()
-    .min(0)
-    .default(0)
-    .describe("Number of results to skip for pagination"),
-  response_format: z.nativeEnum(ResponseFormat)
-    .default(ResponseFormat.MARKDOWN)
-    .describe("Output format: 'markdown' for human-readable or 'json' for machine-readable")
-}).strict();
-
-type UserSearchInput = z.infer<typeof UserSearchInputSchema>;
-
-// Shared utility functions
-async function makeApiRequest<T>(
-  endpoint: string,
-  method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
-  data?: any,
-  params?: any
-): Promise<T> {
-  try {
-    const response = await axios({
-      method,
-      url: `${API_BASE_URL}/${endpoint}`,
-      data,
-      params,
-      timeout: 30000,
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      }
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-}
-
-function handleApiError(error: unknown): string {
-  if (error instanceof AxiosError) {
-    if (error.response) {
-      switch (error.response.status) {
-        case 404:
-          return "Error: Resource not found. Please check the ID is correct.";
-        case 403:
-          return "Error: Permission denied. You don't have access to this resource.";
-        case 429:
-          return "Error: Rate limit exceeded. Please wait before making more requests.";
-        default:
-          return `Error: API request failed with status ${error.response.status}`;
-      }
-    } else if (error.code === "ECONNABORTED") {
-      return "Error: Request timed out. Please try again.";
-    }
-  }
-  return `Error: Unexpected error occurred: ${error instanceof Error ? error.message : String(error)}`;
-}
-
-// Create MCP server instance
-const server = new McpServer({
-  name: "example-mcp",
-  version: "1.0.0"
-});
-
-// Register tools
-server.registerTool(
-  "example_search_users",
-  {
-    title: "Search Example Users",
-    description: `[Full description as shown above]`,
-    inputSchema: UserSearchInputSchema,
-    annotations: {
-      readOnlyHint: true,
-      destructiveHint: false,
-      idempotentHint: true,
-      openWorldHint: true
-    }
-  },
-  async (params: UserSearchInput) => {
-    // Implementation as shown above
-  }
-);
-
-// Main function
-// For stdio (local):
-async function runStdio() {
-  if (!process.env.EXAMPLE_API_KEY) {
-    console.error("ERROR: EXAMPLE_API_KEY environment variable is required");
-    process.exit(1);
-  }
-
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("MCP server running via stdio");
-}
-
-// For streamable HTTP (remote):
-async function runHTTP() {
-  if (!process.env.EXAMPLE_API_KEY) {
-    console.error("ERROR: EXAMPLE_API_KEY environment variable is required");
-    process.exit(1);
-  }
-
-  const app = express();
-  app.use(express.json());
-
-  app.post('/mcp', async (req, res) => {
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: undefined,
-      enableJsonResponse: true
-    });
-    res.on('close', () => transport.close());
-    await server.connect(transport);
-    await transport.handleRequest(req, res, req.body);
-  });
-
-  const port = parseInt(process.env.PORT || '3000');
-  app.listen(port, () => {
-    console.error(`MCP server running on http://localhost:${port}/mcp`);
-  });
-}
-
-// Choose transport based on environment
-const transport = process.env.TRANSPORT || 'stdio';
-if (transport === 'http') {
-  runHTTP().catch(error => {
-    console.error("Server error:", error);
-    process.exit(1);
-  });
-} else {
-  runStdio().catch(error => {
-    console.error("Server error:", error);
-    process.exit(1);
-  });
-}
+```bash
+cd skills/mcp-builder/examples/typescript
+npm install
+npm test                 # TypeScript build plus actual stdio client/server round trip
+node dist/server.js --stdio
+# Alternatively: --http listens only on 127.0.0.1:3000
 ```
 
----
+For stateless HTTP, create both `McpServer` and `StreamableHTTPServerTransport` per request and close both on response completion/error. Do not reconnect a shared server for concurrent requests. The example uses `createMcpExpressApp()` with host protection, and binds loopback. It is **not** a production authentication design: configure accepted OAuth/tenant isolation, allowed origins, size limits and timeouts before exposing it remotely.
 
-## Advanced MCP Features
+### Resources and notifications
 
-### Resource Registration
+In SDK v1 import `ResourceTemplate` from `@modelcontextprotocol/sdk/server/mcp.js`, not `types.js`. The supported registration form is `server.registerResource(name, uriOrTemplate, metadata, readCallback)`. A template's `list` callback supplies discovery; there is no `registerResourceList` method. URI parameters are untrusted inputs: authorize and validate them before filesystem or API access.
 
-Expose data as resources for efficient, URI-based access:
-
-```typescript
-import { ResourceTemplate } from "@modelcontextprotocol/sdk/types.js";
-
-// Register a resource with URI template
-server.registerResource(
-  {
-    uri: "file://documents/{name}",
-    name: "Document Resource",
-    description: "Access documents by name",
-    mimeType: "text/plain"
-  },
-  async (uri: string) => {
-    // Extract parameter from URI
-    const match = uri.match(/^file:\/\/documents\/(.+)$/);
-    if (!match) {
-      throw new Error("Invalid URI format");
-    }
-
-    const documentName = match[1];
-    const content = await loadDocument(documentName);
-
-    return {
-      contents: [{
-        uri,
-        mimeType: "text/plain",
-        text: content
-      }]
-    };
-  }
-);
-
-// List available resources dynamically
-server.registerResourceList(async () => {
-  const documents = await getAvailableDocuments();
-  return {
-    resources: documents.map(doc => ({
-      uri: `file://documents/${doc.name}`,
-      name: doc.name,
-      mimeType: "text/plain",
-      description: doc.description
-    }))
-  };
-});
-```
-
-**When to use Resources vs Tools:**
-- **Resources**: For data access with simple URI-based parameters
-- **Tools**: For complex operations requiring validation and business logic
-- **Resources**: When data is relatively static or template-based
-- **Tools**: When operations have side effects or complex workflows
-
-### Transport Options
-
-The TypeScript SDK supports two main transport mechanisms:
-
-#### Streamable HTTP (Recommended for Remote Servers)
-
-```typescript
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import express from "express";
-
-const app = express();
-app.use(express.json());
-
-app.post('/mcp', async (req, res) => {
-  // Create new transport for each request (stateless, prevents request ID collisions)
-  const transport = new StreamableHTTPServerTransport({
-    sessionIdGenerator: undefined,
-    enableJsonResponse: true
-  });
-
-  res.on('close', () => transport.close());
-
-  await server.connect(transport);
-  await transport.handleRequest(req, res, req.body);
-});
-
-app.listen(3000);
-```
-
-#### stdio (For Local Integrations)
-
-```typescript
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-
-const transport = new StdioServerTransport();
-await server.connect(transport);
-```
-
-**Transport selection:**
-- **Streamable HTTP**: Web services, remote access, multiple clients
-- **stdio**: Command-line tools, local development, subprocess integration
-
-### Notification Support
-
-Notify clients when server state changes:
-
-```typescript
-// Notify when tools list changes
-server.notification({
-  method: "notifications/tools/list_changed"
-});
-
-// Notify when resources change
-server.notification({
-  method: "notifications/resources/list_changed"
-});
-```
-
-Use notifications sparingly - only when server capabilities genuinely change.
-
----
+Use the supported `server.sendToolListChanged()` and `server.sendResourceListChanged()` methods when the advertised capability list changes, not a nonexistent `server.notification(...)`. A stateless server does not provide an arbitrary later outbound notification channel: choose a session/transport contract that actually supports it when required. Consult [the v1 SDK server guide](https://ts.sdk.modelcontextprotocol.io/server).
 
 ## Code Best Practices
 
@@ -965,6 +695,6 @@ Before finalizing your Node/TypeScript MCP server implementation, ensure:
 ### Testing and Build
 - [ ] `npm run build` completes successfully without errors
 - [ ] dist/index.js created and executable
-- [ ] Server runs: `node dist/index.js --help`
+- [ ] A bounded client handshake/tool call succeeds; use `--help` only when your CLI explicitly implements it (a stdio server may otherwise wait forever)
 - [ ] All imports resolve correctly
 - [ ] Sample tool calls work as expected

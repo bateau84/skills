@@ -159,7 +159,7 @@ return m, tea.Batch(cmds...)
 Can also utilize a helper function to reduce the verbosity:
 
 ```go
-func Propagate[T any](m T, msg tea.Msg, cmds []tea.Cmd) (T, []tea.Cmd) {
+func Propagate[T interface{ Update(tea.Msg) (T, tea.Cmd) }](m T, msg tea.Msg, cmds []tea.Cmd) (T, []tea.Cmd) {
     var cmd tea.Cmd
     m, cmd = m.Update(msg)
     if cmd != nil {

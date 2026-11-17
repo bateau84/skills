@@ -59,7 +59,7 @@ Design questions:
 - Are error messages specific — do they name the field that failed, describe what went wrong, and suggest a correction?
 - Does behavior change only when the user initiates it — or do focus/selection trigger unexpected context changes?
 - Are components used consistently — if a component performs the same function in two places, does it have the same label?
-- Is authentication free of cognitive function tests (memorized passwords, CAPTCHA, transcribing codes)?
+- Does authentication avoid unsupported cognitive tests, or provide a compliant mechanism, alternative, or applicable SC 3.3.8 AA exception?
 
 The designer's obligation: error messages, labels, and behavior patterns are design decisions — specifying "show an error" without specifying the error message content is incomplete.
 
@@ -77,14 +77,14 @@ The designer's obligation: when you specify a custom component, you are creating
 
 ## WCAG 2.2 — Normative Structure for Designers
 
-WCAG 2.2 (W3C Recommendation, December 2024) is organized in three layers: **Principles → Guidelines → Success Criteria**. Designers reason about all three layers, but interact most directly with Success Criteria (SC) — the testable requirements.
+WCAG 2.2 (W3C Recommendation, 5 October 2023) is organized in three layers: **Principles → Guidelines → Success Criteria**. Designers reason about all three layers, but interact most directly with Success Criteria (SC) — the testable requirements.
 
 ### Three Conformance Levels
 
 | Level | Meaning | Obligation |
 |---|---|---|
 | **A** | Minimum — absence creates serious barriers | Required; omission locks out users |
-| **AA** | Standard — legally required in most jurisdictions | Required for most product contexts |
+| **AA** | Common conformance target; applicable law and accepted contract determine obligations | Required for most product contexts |
 | **AAA** | Enhanced — typically applied to specific content, not universally | Apply where feasible; not required everywhere |
 
 Target for most design work: **WCAG 2.2 Level AA**. This includes all Level A criteria.
@@ -110,7 +110,7 @@ These are the criteria where the design decision — not the implementation — 
 | 2.4.7 Focus Visible | AA | Specify that focus indicators are visible — this is a design state, not a CSS implementation detail |
 | 2.4.11 Focus Not Obscured | AA | *(New in 2.2)* Sticky headers must not fully hide the focused element |
 | 2.5.7 Dragging Movements | AA | *(New in 2.2)* Every drag interaction must have a single-pointer alternative |
-| 2.5.8 Target Size Minimum | AA | *(New in 2.2)* 24×24 CSS pixels minimum with 4px spacing, or larger targets |
+| 2.5.8 Target Size Minimum | AA | *(New in 2.2)* 24×24 CSS pixels, or the defined spacing and other exceptions for smaller targets |
 | 3.2.1 On Focus | A | Focus alone must not trigger context change |
 | 3.2.2 On Input | A | Selecting a form control must not automatically navigate or submit |
 | 3.2.6 Consistent Help | A | *(New in 2.2)* Help mechanisms must appear in consistent locations |
@@ -121,7 +121,7 @@ These are the criteria where the design decision — not the implementation — 
 | 3.3.8 Accessible Authentication | AA | *(New in 2.2)* No cognitive function tests in authentication without an alternative |
 | 4.1.2 Name, Role, Value | A | Every interactive element must have an accessible name — specify it |
 
-**Design rule:** You do not need to memorize all 78 success criteria. You need to be able to reason about which criteria apply to each design decision as you make it. The table above covers the criteria most frequently violated by design decisions (as opposed to implementation decisions).
+**Design rule:** You do not need to memorize every success criterion. You need to be able to reason about which criteria apply to each design decision as you make it. The table above covers the criteria most frequently violated by design decisions (as opposed to implementation decisions).
 
 ---
 
@@ -170,13 +170,13 @@ Motor disability includes limited hand control, tremor, paralysis, switch access
 
 **Target Size (WCAG 2.2 SC 2.5.8, AA — new)**
 
-Minimum: 24×24 CSS pixels with 4px spacing to adjacent targets (or the target's bounding box must meet a 24px circle without intersection). This is a design constraint, not an implementation detail. The designer specifies minimum target sizes; the implementation must meet them.
+Minimum: a target is at least 24×24 CSS pixels, **or** it qualifies for an exception. The spacing exception places an imaginary 24px-diameter circle at each undersized target's bounding-box center; that circle must not intersect another target or the circle for another undersized target. There is **no universal 4px gap**. Other exceptions (equivalent target, inline, user-agent control, essential) follow WCAG 2.5.8. Designers specify testable sizes/relationships; implementations verify the rendered result. See [W3C Understanding 2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum).
 
 Recommended practice: 44×44 CSS pixels for touch targets (SC 2.5.5, AAA) — especially for mobile. The 44px guideline comes from iOS and Android platform guidelines and WCAG 2.5.5; it is widely adopted as the practical standard even though SC 2.5.8 specifies 24px as the AA minimum.
 
 Design failures created by the designer:
-- Icon buttons specified smaller than 24×24 CSS pixels
-- Grouped buttons with less than 4px spacing
+- Undersized icon buttons without a compliant 24px-circle spacing exception or another applicable WCAG exception
+- Undersized grouped buttons whose 24px spacing-exception circles overlap adjacent targets or other circles
 - Small touch targets in mobile-first designs
 
 **Keyboard-Only Navigation**
@@ -220,7 +220,7 @@ The W3C "Making Content Usable for People with Cognitive and Learning Disabiliti
 
 #### Working Memory Load
 
-Working memory capacity: users can reliably hold approximately 3-4 items in working memory at once (Miller's Law; practical design ceiling is lower than the often-cited "7±2"). Design failures that overload working memory:
+Avoid forcing users to retain unrelated details across screens. Working-memory capacity varies with task, familiarity and presentation; do not use a fixed item count as a universal design law. Design failures that overload working memory:
 - Requiring users to remember a confirmation code shown on a previous screen (SC 3.3.8 violation)
 - Multi-step forms where the user must remember what they entered in step 1 when completing step 3
 - Error messages that don't repeat the field name ("This field is invalid" without naming which field)
@@ -230,7 +230,7 @@ Design requirement: specify persistence of user context across steps; specify er
 
 #### Authentication Without Cognitive Function Tests (SC 3.3.8, AA — new)
 
-A cognitive function test is: memorizing a password, transcribing a one-time code from a previous screen, solving a CAPTCHA, performing arithmetic, or identifying distorted characters. SC 3.3.8 requires that all authentication paths have an alternative that does not require a cognitive function test.
+A cognitive function test is: memorizing a password, transcribing a one-time code from a previous screen, solving a CAPTCHA, performing arithmetic, or identifying distorted characters. SC 3.3.8 (AA) permits a suitable alternative **or a mechanism** such as password-manager/paste support, and also includes **object-recognition** and **user-provided personal-content recognition** exceptions. A CAPTCHA is therefore not automatically an AA violation solely because it is a CAPTCHA; object-recognition challenges may meet 3.3.8 even when they remain difficult for some users. The stricter SC 3.3.9 (AAA) does not include these two recognition exceptions. See [W3C Understanding 3.3.8](https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-minimum).
 
 Acceptable alternatives:
 - Password manager autofill (do not block paste — blocking paste is a design failure that forces memorization)
@@ -264,7 +264,7 @@ Design failures: a select dropdown that navigates immediately on arrow key (no c
 
 Hearing disability primarily affects audio and video content. For software without audio/video, hearing accessibility has minimal impact. When audio is present:
 
-- All audio content that conveys information requires captions (SC 1.2.2, AA)
+- Prerecorded synchronized media with audio needs captions under SC 1.2.2 (Level A); audio-only and live media have different criteria.
 - Video with meaningful audio requires captions or audio description
 - Alerts that use sound must also have a visual equivalent
 - The design must specify that audio is NOT the primary channel for important information — a sound-only error alert is an accessibility failure
@@ -387,7 +387,7 @@ Design implications of each mode:
 
 **By heading:** Heading hierarchy must be semantic, not presentational. The design must specify heading levels (H1, H2, H3) based on content hierarchy, not based on visual size. Design failure: "use a large, bold font for section titles" without specifying H2. A developer who renders large bold text as a `<p>` element with CSS creates a visual hierarchy with no semantic structure — screen reader users cannot navigate by heading.
 
-**By interactive elements:** Every interactive element must have an accessible name. The ARIA naming order (highest priority to lowest): `aria-labelledby` → `aria-label` → `<label>` association → `title` attribute → element content (for buttons). The designer specifies the accessible name; the implementer implements the most appropriate HTML mechanism.
+**By interactive elements:** Every interactive element must have an accessible name. The ARIA naming order (highest priority to lowest): role-dependent: explicit ARIA naming and native labels are evaluated under the accessible-name algorithm; buttons can derive names from content, with `title` normally a fallback, not ahead of that content. The designer specifies the accessible name; the implementer implements the most appropriate HTML mechanism.
 
 ### The Reading Order Problem
 
@@ -419,7 +419,7 @@ These are minimums, not targets. Good accessible design typically exceeds these:
 | Large text (≥ 18pt or ≥ 14pt bold) | 3:1 | 4.5:1 |
 | UI component boundaries (borders, outlines) | 3:1 | — |
 | Graphical objects conveying information | 3:1 | — |
-| Focus indicators | 3:1 against unfocused state | — |
+| Author-styled focus indicator | Apply SC 1.4.11 adjacent-color contrast where applicable, plus visible focus | SC 2.4.13 adds indicator area and 3:1 focused-versus-unfocused change requirements |
 | Inactive/disabled components | No requirement | — |
 | Logotypes | No requirement | — |
 
@@ -544,7 +544,7 @@ Screen readers work with terminal output. All CLI output is inherently screen-re
 
 TUI (terminal UI interactive applications) have a fundamentally different accessibility model from web:
 
-**No browser accessibility tree exists.** Terminal screen readers (BRLTTY on Linux, JAWS for terminal on Windows) read the terminal buffer character-by-character. There is no landmark, heading, or ARIA concept — what the user hears or reads in braille is exactly the rendered character grid.
+**Terminal accessibility is host-dependent.** Do not apply browser ARIA attributes to terminal output. Some terminal hosts expose text through native accessibility APIs (for example UI Automation on Windows); assistive technology may read lines or buffer content rather than your TUI's logical widgets. BRLTTY is a braille-access service, not a universal terminal screen reader. Test the actual terminal and assistive-technology pairing, including focus announcements and full-screen redraw behavior.
 
 **Keyboard is the only input method — this is baseline, not accommodation.** Keyboard-only navigation in a TUI is not an accessibility feature; it is the only mode of operation. The design obligation is to ensure keyboard navigation is complete and documented.
 
@@ -642,8 +642,8 @@ Verification: Run the command without --env; confirm stderr output matches the f
 ```
 Component/interaction: Icon-only toolbar buttons (close, settings, refresh)
 Standard: WCAG 2.2 SC 2.5.8 Target Size Minimum (AA), SC 1.1.1 Non-text Content (A)
-Requirement: Each button renders at minimum 24×24 CSS pixels with 4px spacing between
-  adjacent buttons. Each button has an aria-label matching its function: "Close", "Settings",
+Requirement: Each button is at least 24×24 CSS pixels (no fixed gap required),
+  or documents and passes the 24px-circle spacing exception. Each button has an aria-label matching its function: "Close", "Settings",
   "Refresh". The aria-label matches the tooltip text (when a tooltip is present).
 Verification: Measure rendered size in browser DevTools (computed size, not declared size).
   Automated: axe-core confirms aria-label presence. Spot check: hover each button; confirm
@@ -707,9 +707,9 @@ These failures originate at design time. Flagging them in code review is too lat
 
 5. **Motion as required feedback** — The spec uses animation as the only confirmation of an action (card flip = selected). Users with `prefers-reduced-motion` get no feedback. The design must specify the non-motion alternative.
 
-6. **Target size below minimum** — Small icon buttons with < 24px spacing. SC 2.5.8 violation designed in, not implemented in.
+6. **Target size without compliant exception** — An undersized control whose 24px spacing circle intersects another target/circle (and no other applicable exception) violates SC 2.5.8; a fixed 4px gap is not the rule.
 
-7. **Authentication requiring memorization** — PIN or password field that blocks paste, or a CAPTCHA with no alternative. SC 3.3.8 violation designed in.
+7. **Authentication lacking an allowed mechanism or exception** — A password field that blocks both paste and compatible password-manager assistance, or a cognitive CAPTCHA with no valid AA alternative/exception, can violate SC 3.3.8. Object recognition and user-provided personal-content recognition are AA exceptions, not blanket failures.
 
 8. **Reading order not specified** — Multi-column layout without reading order specification. DOM order is implementation-defined; visual order is the spec; they will diverge.
 

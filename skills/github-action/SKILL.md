@@ -173,3 +173,11 @@ Also test:
 - release artifact/source consistency.
 
 Use GitHub's current action metadata and secure-use documentation for version-sensitive runtime behavior.
+
+## JavaScript runtime compatibility
+
+Use an explicitly supported `runs.using` runtime. GitHub-hosted runners retired Node 20 for actions on 23 September 2026; new or updated JavaScript actions should target `node24`, with compatible self-hosted runner/OS versions. Test the built distribution on that runtime rather than assuming the developer's Node version changes the action runtime. Existing node20 metadata may be automatically executed under Node24, so do not claim every old declaration necessarily fails; validate native dependencies and runtime behavior. Source: [GitHub Node20 deprecation](https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/).
+
+## Optional review perspectives
+
+[conformance review](ASSESSMENT.md), [residual-confidence challenges](QA.md). Load for the corresponding review activity; these are not extra producer permissions or mandatory context.

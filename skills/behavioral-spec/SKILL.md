@@ -78,6 +78,8 @@ Use these lenses as discovery questions, not as a template that demands a requir
 
 Investigate a case when it could alter an accepted outcome, violate a constraint, or expose an unresolved responsibility. Include consequential combinations, especially concurrency and destructive effects; avoid a full Cartesian enumeration of irrelevant cases. A lens does not authorize new capabilities, numerical quality targets, automatic recovery, or new security mechanisms. Note consequential exclusions or assumptions with their basis instead of silently omitting them.
 
+When accepted quality materially depends on a condition (peak load, degradation, interruption, threat, recovery, or a representative change), deliberately choose whether a Quality Scenario is the normative home, a BR/OC already owns the guarantee, or a material quality decision remains open. Preserve the condition, response boundary, and source; do not create a QS for routine changes or invent numeric measures. See **Durable bundle** for index navigation.
+
 ### 4. Analyze obstacles, invariants, and progress
 
 For each promise ask: **how could this become false?** Describe plausible in-scope events or sequences, including failures at shared boundaries, rather than only ideal operation.
@@ -113,7 +115,7 @@ Choose the artifact whose semantic role is primary:
 - **Quality Scenario:** a quality must hold measurably under a meaningful condition/stimulus. Make the QS normative when the obligation exists specifically under a condition, load, degradation, threat, or recovery situation. Add a BR only for a distinct baseline behavior meaningful independently of that scenario.
 - **Obligation Contract:** independently realized parties must share semantic agreement at a correctness-sensitive seam. Make the OC normative for that shared meaning. Add a BR only for a distinct system-level outcome outside the seam contract.
 
-Give each guarantee one normative home. Cross-reference related artifacts instead of making BR/QS/OC copies for symmetry or completeness. State what must be observed to prove or falsify the obligation, not implementation-specific test mechanics unless the verification surface is itself authoritative. Keep its basis, applicability, dependencies, and verification intent clear within the existing artifact formats.
+BR, QS, and OC have **equal normative standing when applicable** but cover different dimensions: baseline behavior, quality under meaningful conditions, and shared semantics at independent boundaries. Artifact type is not a precedence rule. Give each guarantee one normative home. Cross-reference related artifacts instead of making BR/QS/OC copies for symmetry or completeness. State what must be observed to prove or falsify the obligation, not implementation-specific test mechanics unless the verification surface is itself authoritative. Keep its basis, applicability, dependencies, and verification intent clear within the existing artifact formats.
 
 ### 7. Challenge the set in both directions
 
@@ -121,7 +123,7 @@ Before handoff, apply three bounded counterexample checks:
 
 - **Omission:** could a plausible system satisfy every written obligation yet violate an accepted anchor commitment? Add missing meaning or expose the unresolved gap.
 - **Invention:** could a system satisfy the accepted authority while violating a supposedly derived obligation? It is not necessary as claimed; establish it as a legitimate specified choice, route a material decision to its owner, or remove it.
-- **Composition:** can all applicable obligations hold together in the same execution? Check consequential intersections such as cancellation during completion, retry after partial success, or authority changing during execution.
+- **Composition:** can all applicable BRs, QSs, and OCs hold together in the same execution? For material overlaps, follow one concrete event sequence across baseline behavior, the QS operating condition/response, and OC participant semantics—particularly cancellation versus recovery, or authorization versus a new execution attempt. If they conflict, repair the unsupported or ordinarily specified clause within the authoring authority; when accepted sources genuinely conflict or a reserved policy is missing, identify the decision owner and keep only affected work open. Never resolve it by assuming one artifact type outranks another.
 
 These are practitioner self-checks, not an assertion of independent review or a new approval gate. Correct the affected meaning and repeat the affected checks; do not restart unrelated specification work.
 
@@ -159,6 +161,8 @@ docs/requirements/<anchor-slug>/
 In this layout, use separate BR/QS/OC numbering. The bundle index is navigation and relationship context, not a replacement for the artifacts. Other identifiers and layouts are valid when relationships remain clear.
 
 Existing flat BR/OC bundles remain valid until an intentional migration updates them and their references; do not move artifacts merely to match this example.
+
+For material quality expectations, use the existing bundle index to link applicable QS artifacts (or the BR/OC that already owns the guarantee) and identify any unsettled measure with its decision owner. The index is navigation, not another normative contract or a mandatory coverage matrix.
 
 Read the artifact reference before authoring each artifact type:
 

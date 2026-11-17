@@ -98,7 +98,7 @@ go build -gcflags="-m" ./pkg/handler 2>&1 | grep -E "(inline|escape|moved to hea
 ./pkg/handler/handler.go:42:19: inlining call to validateInput
 ```
 
-The inline cost budget is approximately 80–82 AST nodes (as of Go 1.22+; has increased in later releases). Functions with higher cost (more AST nodes, complex control flow) are not inlined. Check the actual threshold with `-gcflags="-m -m"`.
+Inlining is a toolchain-dependent heuristic, including cost budgets and PGO effects. Do not infer it merely from the presence of a type switch, interface call or select. Inspect the actual compiler decisions with `-gcflags="-m -m"`.
 
 ### Common inlining blockers
 
@@ -168,7 +168,7 @@ View the actual machine code the compiler generates. Use for verifying SIMD inst
 go build -gcflags="-S" ./pkg/parser 2>&1 | head -200
 
 # Assembly for a specific function (grep for the function name)
-go build -gcflags="-S" ./pkg/parser 2>&1 | grep -A 50 '"".Parse'
+go build -gcflags="-S" ./pkg/parser 2>&1 | grep -A 50 'parser.Parse'  # use actual package-qualified symbol from output
 
 # Assembly for all packages (including dependencies — very verbose)
 go build -gcflags="all=-S" ./... 2>&1 | grep -A 50 'myapp/pkg/parser.Parse'
@@ -214,17 +214,17 @@ GOARCH=arm64 go build -gcflags="-S" ./pkg/parser 2>&1 | head -200
 - `CALL runtime.growslice` — slice capacity exceeded, triggering copy
 - `PCDATA` / `FUNCDATA` — GC metadata (ignore for performance analysis)
 - Bounds check sequences: `CMPQ` + `JCC` before array/slice access — can sometimes be eliminated
-- SIMD instructions: `VMOVDQU`, `VPSHUFB`, `VPADDB`, etc. — verify auto-vectorization or manual SIMD
+- SIMD instructions: `VMOVDQU`, `VPSHUFB`, `VPADDB`, etc. — inspect explicit intrinsics/assembly or library SIMD; bounds-check elimination alone is not vectorization
 - `CALL runtime.morestack_noctxt` — stack growth (normal, but frequent calls indicate deep recursion)
 
 ### Comparing assembly before/after optimization
 
 ```bash
 # Before your change
-go build -gcflags="-S" ./pkg/parser 2>&1 > asm-before.txt
+go build -gcflags="-S" ./pkg/parser > asm-before.txt 2>&1
 
 # After your change
-go build -gcflags="-S" ./pkg/parser 2>&1 > asm-after.txt
+go build -gcflags="-S" ./pkg/parser > asm-after.txt 2>&1
 
 # Diff the assembly
 diff asm-before.txt asm-after.txt

@@ -16,11 +16,11 @@ Style rules that require human judgment — linters handle formatting, this skil
 
 > "Clear is better than clever." — Go Proverbs
 
-When ignoring a rule, add a comment to the code.
+Explain consequential deviations in review when useful; do not add noise comments merely to justify a stylistic choice.
 
 ## Line Length & Breaking
 
-No rigid line limit, but lines beyond ~120 characters MUST be broken. Break at **semantic boundaries**, not arbitrary column counts. Function calls with 4+ arguments MUST use one argument per line — even when the prompt asks for single-line code:
+Go has no fixed line length or four-argument wrapping rule. Follow gofmt and repository conventions; break at semantic boundaries when this improves readability. Respect explicitly requested output constraints rather than inventing a conflicting style mandate:
 
 ```go
 // Good — each argument on its own line, closing paren separate
@@ -38,6 +38,8 @@ mux.HandleFunc("/api/users", func(w http.ResponseWriter, r *http.Request) {
 
 When a function signature is too long, the real fix is often **fewer parameters** (use an options struct) rather than better line wrapping. For multi-line signatures, put each parameter on its own line.
 
+Preserve short-circuit semantics when naming complex conditions: never hoist `u.Role` above `u != nil`, an indexed read above a bounds guard, or a conditional side effect into an unconditional boolean assignment.
+
 ## Variable Declarations
 
 SHOULD use `:=` for non-zero values, `var` for zero-value initialization. The form signals intent: `var` means "this starts at zero."
@@ -50,11 +52,12 @@ var buf bytes.Buffer       // zero value is ready to use
 
 ### Slice & Map Initialization
 
-Slices and maps MUST be initialized explicitly, never nil. Nil maps panic on write; nil slices serialize to `null` in JSON (vs `[]` for empty slices), surprising API consumers.
+Prefer nil slices when an empty collection is acceptable (`var users []User`); nil slices support append, iteration and length checks. Use a non-nil empty slice for a JSON array contract (`[]`, not `null`). Maps may be nil for read-only lookups, but must be initialized before writes. Never demand explicit initialization merely for style.
 
 ```go
-users := []User{}                       // always initialized
-m := map[string]int{}                   // always initialized
+var users []User                        // preferred empty slice when nil is acceptable
+usersForJSON := []User{}                 // use when the API requires [] instead of null
+m := map[string]int{}                   // initialized map is writable
 users := make([]User, 0, len(ids))      // preallocate when capacity is known
 m := make(map[string]int, len(items))   // preallocate when size is known
 ```
@@ -105,14 +108,14 @@ switch {
 case debug:
     level = slog.LevelDebug
 case verbose:
-    level = slog.LevelWarn
+    level = slog.LevelDebug
 }
 
 // Bad — else-if chain hides that there's a default
 if debug {
     level = slog.LevelDebug
 } else if verbose {
-    level = slog.LevelWarn
+    level = slog.LevelDebug
 } else {
     level = slog.LevelInfo
 }
@@ -205,7 +208,7 @@ func Contains[T comparable](slice []T, target T) bool  // not []any
 ## Philosophy
 
 - **"A little copying is better than a little dependency"**
-- **Use `slices` and `maps` standard packages**; for filter/group-by/chunk, use `github.com/samber/lo`
+- **Use standard library `slices`, `maps`, and `iter` first**, including `slices.Chunk` (Go 1.23+) for batching. Choose an external collection helper only if justified by the actual task and supported Go version.
 - **"Reflection is never clear"** — avoid `reflect` unless necessary
 - **Don't abstract prematurely** — extract when the pattern is stable
 - **Minimize public surface** — every exported name is a commitment

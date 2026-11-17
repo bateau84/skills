@@ -1,5 +1,7 @@
 # Cloud-provider + host / container collection
 
+Local YAML provisioning applies to **self-hosted Grafana**. For hosted Grafana Cloud, use its UI/API or the Grafana Terraform provider; there is no host filesystem to edit or Grafana process to restart. Cloud-hosted Grafana cannot use the customer VM's EC2/GCE metadata identity. Select an explicitly supported hosted authentication/assume-role method.
+
 ## AWS CloudWatch
 
 Scrape via the CloudWatch exporter:
@@ -21,12 +23,12 @@ datasources:
     type: cloudwatch
     jsonData:
       defaultRegion: us-east-1
-      authType: default          # uses EC2 instance / ECS task role
+      authType: keys             # inline credentials supplied securely below
       # Or explicit creds:
-      # authType: credentials
+      # authType: credentials   # means a shared credentials file, not inline keys
     secureJsonData:
-      accessKey: AKIAIOSFODNN7EXAMPLE
-      secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      accessKey: <injected-access-key>
+      secretKey: <injected-secret-key>
 ```
 
 ## Azure Monitor
@@ -38,7 +40,9 @@ datasources:
   - name: Azure Monitor
     type: grafana-azure-monitor-datasource
     jsonData:
-      cloudName: AzureCloud
+      azureAuthType: clientsecret
+      cloudName: azuremonitor
+      subscriptionId: your-subscription-id
       tenantId:  your-tenant-id
       clientId:  your-client-id
     secureJsonData:
@@ -54,12 +58,17 @@ datasources:
   - name: Google Cloud Monitoring
     type: stackdriver
     jsonData:
-      authenticationType: gce    # uses GCE metadata server
+      authenticationType: jwt
+      clientEmail: service-account@project.iam.gserviceaccount.com
+      tokenUri: https://oauth2.googleapis.com/token
+      defaultProject: your-project
       # Or JWT:
       # authenticationType: jwt
     secureJsonData:
       privateKey: |
-        { "type": "service_account", ... }
+        -----BEGIN PRIVATE KEY-----
+        <injected PEM key, not the full service-account JSON>
+        -----END PRIVATE KEY-----
 ```
 
 ## Node Exporter (Linux host) via Alloy
@@ -96,3 +105,30 @@ loki.source.docker "containers" {
   forward_to = [loki.write.cloud.receiver]
 }
 ```
+
+## Forwarding components required by the host snippets
+
+The scrape/source fragments above reference these writers; include them in the same Alloy configuration. Their endpoints/tenant IDs are signal-specific, and secrets below must come from an approved deployment secret mechanism.
+
+```alloy
+prometheus.remote_write "cloud" {
+  endpoint {
+    url = sys.env("PROMETHEUS_REMOTE_WRITE_URL")
+    basic_auth {
+      username = sys.env("METRICS_TENANT_ID")
+      password = sys.env("METRICS_WRITE_TOKEN")
+    }
+  }
+}
+loki.write "cloud" {
+  endpoint {
+    url = sys.env("LOKI_PUSH_URL")
+    basic_auth {
+      username = sys.env("LOGS_TENANT_ID")
+      password = sys.env("LOGS_WRITE_TOKEN")
+    }
+  }
+}
+```
+
+Validate the assembled Alloy configuration and inspect actual exported telemetry; references to undefined components are not a complete deployment. Sources: Grafana [CloudWatch](https://grafana.com/docs/grafana/latest/datasources/aws-cloudwatch/configure/), [Azure Monitor](https://grafana.com/docs/grafana/latest/datasources/azure-monitor/configure/) and the installed plugin's GCP authentication schema.

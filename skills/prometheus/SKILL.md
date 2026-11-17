@@ -8,78 +8,46 @@ description: "Prometheus metrics collection, scraping, TSDB, alerting rules, rec
 
 > **Docs**: https://prometheus.io/docs/ | **Grafana Cloud Metrics**: https://grafana.com/docs/grafana-cloud/send-data/metrics/
 
-## PromQL Quick Reference
+## Collection and storage contract
 
-### Instant Vector Selectors
+Own plain Prometheus server configuration here; use `promql` for query derivation, `grafana-mimir` for Mimir topology, and `grafana-infrastructure-monitoring` for Alloy/Helm deployment. Start with the actual scrape targets, authentication, interval, retention, cardinality budget and remote-storage destination.
 
-```promql
-# By metric name
-http_requests_total
+A minimal local scrape example (replace illustrative targets with the deployment's actual service discovery):
 
-# Label filter
-http_requests_total{job="api-server"}
-
-# Multiple labels (AND)
-http_requests_total{job="api-server", method="GET"}
-
-# Regex
-http_requests_total{job=~"api.*", status=~"5.."}
-
-# Negative
-http_requests_total{status!="200"}
+```yaml
+global:
+  scrape_interval: 30s
+  scrape_timeout: 10s
+rule_files:
+  - rules/*.yml
+scrape_configs:
+  - job_name: api
+    static_configs:
+      - targets: ["127.0.0.1:8080"]
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'unneeded_debug_.*'
+        action: drop
 ```
 
-### Range Vectors & Rates
+`relabel_configs` changes or drops discovered **targets before scraping**; `metric_relabel_configs` filters scraped samples before ingestion. They are not interchangeable. A target dropped before scraping never gets an `up=0` series. Bound labels to stable dimensions: request IDs, emails, trace IDs and arbitrary paths belong in logs/traces or exemplars, not metric labels. Counter rates require a range rate/increase; averaging a raw CPU counter is not utilization.
 
-```promql
-# Per-second rate over 5 minutes
-rate(http_requests_total[5m])
+For remote write, use the endpoint supplied for the exact tenant, and load secrets from an approved mounted file instead of committing tokens:
 
-# Increase over interval
-increase(http_requests_total[1h])
-
-# Instant rate (last two samples)
-irate(http_requests_total[5m])
-
-# Offset (5 minutes ago)
-rate(http_requests_total[5m] offset 5m)
+```yaml
+# Merge into the Prometheus server configuration after supplying real values.
+remote_write:
+  - url: https://prometheus-<region>.grafana.net/api/prom/push
+    basic_auth:
+      username: "<metrics-instance-id>"
+      password_file: /run/secrets/metrics-write-token
 ```
 
-### Aggregations
+Set the accepted TSDB retention deliberately using `--storage.tsdb.retention.time` and/or `--storage.tsdb.retention.size`; monitor disk headroom, WAL and remote-write queue failures. Remote write is not proof the destination is receiving current data or an automatic replacement for local retention. Confirm ingestion on the actual downstream datasource.
 
-```promql
-# Sum by label
-sum by (job) (rate(http_requests_total[5m]))
+Use `up{job="api"} == 0` for discovered targets whose scrape fails, and a separate `absent(up{job="api"})` check when the **whole expected job** disappears. Per-instance disappearance requires an expected inventory; do not equate absent data with a healthy zero. Validate a rule with representative fixtures, missing-data cases and `promtool test rules` before publishing.
 
-# Average
-avg by (instance) (node_cpu_seconds_total)
-
-# Top-K
-topk(5, rate(http_requests_total[5m]))
-
-# Histogram quantiles
-histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))
-
-# Count distinct
-count(up{job="api"})
-```
-
-### Common Patterns
-
-```promql
-# Error rate percentage
-sum(rate(http_requests_total{status=~"5.."}[5m]))
-  / sum(rate(http_requests_total[5m])) * 100
-
-# Saturation (CPU usage %)
-100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
-
-# Memory usage
-node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes
-
-# Predict disk full (linear extrapolation)
-predict_linear(node_filesystem_free_bytes[6h], 24*3600) < 0
-```
+Sources: [Prometheus configuration](https://prometheus.io/docs/prometheus/latest/configuration/configuration/), [storage](https://prometheus.io/docs/prometheus/latest/storage/).
 
 ## Alerting Rules
 
@@ -91,8 +59,8 @@ groups:
     rules:
       - alert: HighErrorRate
         expr: |
-          sum(rate(http_requests_total{status=~"5.."}[5m]))
-            / sum(rate(http_requests_total[5m])) > 0.05
+          sum by (job) (rate(http_requests_total{status=~"5.."}[5m]))
+            / sum by (job) (rate(http_requests_total[5m])) > 0.05
         for: 5m
         labels:
           severity: critical
@@ -110,17 +78,15 @@ route:
   group_wait: 30s
   group_interval: 5m
   routes:
-    - match:
-        severity: critical
+    - matchers: ['severity="critical"']
       receiver: pagerduty
-    - match:
-        severity: warning
+    - matchers: ['severity="warning"']
       receiver: slack
 
 receivers:
   - name: pagerduty
     pagerduty_configs:
-      - service_key: "<key>"
+      - routing_key: "<pagerduty-events-v2-routing-key>"
   - name: slack
     slack_configs:
       - channel: "#alerts"
@@ -160,7 +126,10 @@ groups:
 promtool check rules rules/recording.yml
 
 # 2. Reload Prometheus (after adding to rule_files in prometheus.yml)
+promtool check config prometheus.yml
+# The HTTP reload endpoint requires --web.enable-lifecycle (disabled by default):
 curl -X POST http://localhost:9090/-/reload
+# Alternatively, signal the Prometheus process with SIGHUP via the service manager.
 
 # 3. Verify rules are active
 curl -s http://localhost:9090/api/v1/rules | jq '.data.groups[].rules[] | {name, health}'
@@ -169,7 +138,7 @@ curl -s http://localhost:9090/api/v1/rules | jq '.data.groups[].rules[] | {name,
 ## Metrics Drilldown (Grafana 12+)
 
 Queryless Prometheus exploration — browse metrics without writing PromQL. Navigate to
-**Explore > Metrics Drilldown** or use `<grafana-url>/a/grafana-metricsdrilldown-app`.
+**Drilldown > Metrics** or use `<grafana-url>/a/grafana-metricsdrilldown-app`.
 Provides metric search with label breakdown, smart segmentation for anomaly detection,
 auto-visualization, and telemetry pivoting from metrics to related logs and traces.
 

@@ -93,6 +93,23 @@
         "Must not hide unrelated adapter policy in one god module merely to reduce the number of entry points or files.",
         "Must not call the preparation complete while required callers still reconstruct incompatible lifecycle rules, or claim verification that was not performed."
       ]
+    },
+    {
+      "id": "Design-06",
+      "name": "quality-scenario-option-comparison-with-unsettled-recovery-time",
+      "trap": "The architect compares options using an invented recovery SLA or generic resilience claim, or maps the scenario to a component without proving the post-crash response.",
+      "prompt": "Design a local single-host job execution system using the accepted obligations below. A job is acknowledged only after durable acceptance. Quality Scenario QS-012: if the worker crashes after accepting but before starting an effect, the job must remain identifiable, must not be reported completed, and can be continued when an authorized worker becomes available. No recovery deadline, failover percentile, automatic redispatch policy, or retry count is accepted. Existing product infrastructure includes SQLite durable metadata and one active local process. Two viable realization candidates are (A) reconcile accepted/in-progress state from SQLite on restart under ownership guards, and (B) add a separate local supervisor coordinating a durable execution queue and worker restarts. Compare the choices and choose the minimum sufficient complete design, preserving all accepted meanings. State what evidence would prove the QS and how unresolved quality targets affect the decision; do not implement code or commit to a concrete API schema.",
+      "expectations": [
+        "Preserves QS-012's precise stimulus and environment (worker crash after durable acceptance, before effect start), observable identity and truthful-status response, and the qualitative continuation condition involving an available authorized worker.",
+        "Develops both viable candidates with their mechanisms, ownership, failure behavior, maintenance and operational costs; compares them against the actual QS condition instead of treating 'more resilient' as a self-evident advantage.",
+        "Chooses the least complex complete realization justified by accepted obligations and real constraints, accounting for the extra supervision boundary if selected, rather than mandating it for an imaginary recovery SLA.",
+        "Identifies the missing numerical recovery measure as an unresolved target only where it materially changes an architectural choice, without inventing a deadline or automatically blocking independent work.",
+        "Maps QS-012 to the responsible structural satisfier and a falsifying crash/restart/continuation verification path using the design's existing documentation format, not mandatory named headings."
+      ],
+      "negative_expectations": [
+        "No invented recovery-time target, mandatory automatic retry count, distributed cluster or technology beyond the agreed requirements.",
+        "No nominal healthy-worker test presented as proof of the crash Quality Scenario, and no commitment to a specific Markdown section name or extra approval gate."
+      ]
     }
   ]
 }

@@ -10,7 +10,7 @@ from unittest.mock import patch
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from eval_cases import discover
-from run_evals import parser, select, validate_live, call_budget, freeze_environment
+from run_evals import parser, select, validate_live, validate_comparison, call_budget, freeze_environment
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -115,6 +115,33 @@ class CliTests(unittest.TestCase):
             options = parser().parse_args(["--model", "p/m", "--cases", "product-acceptance:PA1", *argv])
             with self.assertRaises(ValueError):
                 validate_live(options, select(discover(ROOT), options))
+
+
+    def test_comparison_requires_explicit_revision_source_and_excludes_unrelated_root(self):
+        for argv, fragment in (
+            (["--comparison", "revision"], "requires --baseline-skill-root"),
+            (["--comparison", "assessment", "--baseline-skill-root", "/tmp/unused"], "only valid"),
+            (["--comparison", "qa", "--baseline-skill-root", "/tmp/unused"], "only valid"),
+            (["--comparison", "revision", "--baseline-skill-root", "/tmp/does-not-exist"], "real skills checkout"),
+        ):
+            with self.subTest(argv=argv):
+                options = parser().parse_args(["--cases", "software-engineering:SoftwareEngineering-10",
+                                               "--model", "test/model", *argv])
+                with self.assertRaisesRegex(ValueError, fragment):
+                    validate_live(options, select(discover(ROOT), options))
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp)
+            (path / "skills").mkdir()
+            options = parser().parse_args(["--cases", "software-engineering:SoftwareEngineering-09",
+                                           "--model", "test/model", "--comparison", "revision",
+                                           "--baseline-skill-root", str(path)])
+            validate_comparison(options)
+            validate_live(options, select(discover(ROOT), options))
+        for mode in ("skill", "assessment", "qa"):
+            options = parser().parse_args(["--model", "test/model", "--cases",
+                                           "software-engineering:SoftwareEngineering-10",
+                                           "--comparison", mode])
+            validate_live(options, select(discover(ROOT), options))
 
 
 if __name__ == "__main__":

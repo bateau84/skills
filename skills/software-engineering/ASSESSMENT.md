@@ -15,6 +15,8 @@ Review methodology for implementation work produced with `software-engineering`,
 9. **Delivery artifacts match the work.** When commits or a PR are part of the task, verify the dedicated Git/PR skill was used and that the artifact accurately explains the change and observed verification rather than overstating proof.
 10. **Preparation earns its cost.** When a refactor is proposed, check the observed difficulty, direct alternative, total preparation/review/verification/migration cost, and claimed simplification across callers. Distinguish current benefit from assumptions about future work. Verify that preparation preserves accepted observable behavior and stops at its enabling purpose. Direct implementation and justified deferral remain valid; recording deferred required work does not complete it.
 
+11. **Comments are hypotheses, not guarantees.** For comments justifying delays, retries, fallbacks, skipped checks, or incomplete paths, inspect the original constraint, actual behavior, and any accepted obligation. Challenge copied workaround patterns and comment-only completion claims, including TODOs, without treating the presence of a comment as a defect. Removing prose is not a substitute for a root-cause fix. Preserve useful API, invariant, legal, and external-constraint explanations; distinguish in-scope defects from separately owned concerns. Do not use comment counts as a quality threshold.
+
 ## Evidence boundaries
 
 - Static inspection can establish source defects and missing coverage; it cannot establish that build, test, runtime, security, or integration checks passed.
@@ -34,6 +36,7 @@ Pay particular attention to:
 - logs that announce success before the outcome is known;
 - a refactor whose main effect is moving one behavior across more files;
 - compatibility code with no identified consumer or migration requirement;
+- a "temporary" workaround copied because a nearby comment claims it is necessary, without checking the real ordering or failure contract;
 - observability added mechanically to pure local logic while the real operational boundary remains dark.
 
 Do not turn stylistic preference into a finding. Review whether the implementation is correct, proportionate, diagnosable where needed, honestly verified, and easier rather than harder to maintain.

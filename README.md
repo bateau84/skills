@@ -2,6 +2,14 @@
 
 Reusable engineering, design, product, and documentation guidance for any AI agent or human practitioner. No plugin, agent hierarchy, orchestration framework, or MCP server is required to use the library.
 
+## License and provenance
+
+Original contributions are available under the [Apache License, Version 2.0](LICENSE),
+to the extent their authors have rights to license them. Third-party materials
+retain their original copyright and applicable licensing obligations.
+See [NOTICE](NOTICE) and [LICENSING.md](LICENSING.md) for confirmed attribution,
+including the Anthropic-derived `mcp-builder` skill.
+
 ## Use a skill
 
 1. Browse [`skills/`](skills/) and select the smallest set relevant to the task.
@@ -15,7 +23,7 @@ Skills provide methodology. The user's request, host instructions, repository co
 
 Some technical skills explain particular external tools or services. Those dependencies apply only when using that integration; check availability and use documented alternatives where provided. Evaluation files are scenario fixtures, not a required execution harness.
 
-See [`skills/README.md`](skills/README.md) for selection guidance and [`skills/PORTING.md`](skills/PORTING.md) for source lineage.
+Browse [`skills/`](skills/) for the catalogue; see [LICENSING.md](LICENSING.md) for confirmed source lineage.
 
 ## Optional runnable evaluations
 

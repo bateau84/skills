@@ -26,7 +26,7 @@ metadata:
 8. NEVER create a new `context.Background()` in the middle of a request path
 9. Context value keys MUST be unexported types to prevent collisions
 10. Context values MUST only carry request-scoped metadata — NEVER function parameters
-11. **Use `context.WithoutCancel`** (Go 1.21+) when spawning background work that must outlive the parent request
+11. **Use `context.WithoutCancel`** (Go 1.21+) only for explicitly owned work that must outlive the parent request. It drops the parent's cancellation **and deadline** (its `Done()` is nil) while preserving values; establish a new bounded `WithTimeout`/`WithCancel` lifetime and a shutdown/join path for the work. Never use it as a blanket goroutine-leak workaround.
 
 ## Creating Contexts
 

@@ -101,7 +101,7 @@ read-only catalog (never host metadata), then starts isolated stock
 OpenCode servers through the runner's preflight helpers. Its activation prompt
 uses `resume: false`, so no model inference runs. Networking is `none`, and no
 credentials are forwarded. It checks the effective agent system/permission
-suffix, baseline/judge skill absence, the candidate's selected skill catalog,
+suffix, treatment-appropriate baseline/candidate skill catalogs and judge skill absence,
 readable/read-only practitioner files, excluded eval directories, and absence
 of external/Loom plugins/config-root inheritance. It does **not** assert that a
 model called the native skill tool. An unavailable or incompatible image exits
@@ -126,6 +126,63 @@ The deterministic synthetic empty model catalog is mounted read-only; no host
 model catalog, auth, credential-database or config-root seeds are mounted, and
 no provider credential variables are forwarded. Copilot runtime proof is
 separate; `--probe` currently accepts only the OpenCode judge configuration.
+
+## Comparing skill revisions and optional companions
+
+The default `--comparison skill` retains the existing no-skill baseline against
+the current practitioner `SKILL.md`. The explicit alternatives isolate the
+additional guidance instead of conflating it with skill loading:
+
+| Comparison | Baseline (native load) | Candidate (native load) |
+| --- | --- | --- |
+| `revision` | Previous checkout's practitioner files | Current checkout's practitioner files |
+| `assessment` | Current practitioner files | Same practitioner files plus `ASSESSMENT.md` |
+| `qa` | Current practitioner files | Same practitioner files plus `QA.md` |
+
+Both sides run the identical case prompt, model and judge settings. For companion
+comparisons, only the candidate can read the selected companion file; the judge
+cannot access either skill directory. Treatment integrity requires native skill
+load and a successful, observed read of the exact selected companion *after*
+skill loading. Missing, failed, denied, premature or unreadable companion reads
+prevent attributed improvement. A successful read does not itself prove that
+the guidance changed reasoning; the judge scores the resulting behavior
+separately. Hashes of each side's actual mounted files and practitioner bytes
+are retained in the paired evidence. This is a controlled **prompt-level**
+comparison, not a real autonomous Reviewer/Critic dispatch.
+
+Example: compare the comment-policy skill before and after PR #34, then
+independently test its assessment and QA companions:
+
+```sh
+# From a checkout of the candidate skills repository:
+git worktree add --detach ../skills-before-comment-policy 890173154ac7672eab848f0f69528830ae6a5d38
+
+# Four new comment-policy cases; each paired case uses 4 nominal model invocations.
+python3 -I -B scripts/run_evals.py --comparison revision \
+  --baseline-skill-root ../skills-before-comment-policy \
+  --cases software-engineering:SoftwareEngineering-09,software-engineering:SoftwareEngineering-10,software-engineering:SoftwareEngineering-11,software-engineering:SoftwareEngineering-12 \
+  --model "$EVAL_MODEL" --engine podman --image "$OPENCODE_IMAGE_ID"
+
+python3 -I -B scripts/run_evals.py --comparison assessment \
+  --cases software-engineering:SoftwareEngineering-10 \
+  --model "$EVAL_MODEL" --engine podman --image "$OPENCODE_IMAGE_ID"
+
+python3 -I -B scripts/run_evals.py --comparison qa \
+  --cases software-engineering:SoftwareEngineering-13 \
+  --model "$EVAL_MODEL" --engine podman --image "$OPENCODE_IMAGE_ID"
+```
+
+`--baseline-skill-root` is required **only** for `revision` and points to
+an explicitly selected full skills checkout. Keep that checkout stable throughout
+the run; old and current files are hashed independently, while evaluation
+fixtures and rubrics always come from the current checkout. Do not mix
+`--comparison` modes in a single run. Select a single representative case first
+to limit spend, and use more independent tasks/repetitions before drawing
+general conclusions. All calls above use live inference and require a
+pre-existing pinned runner and compatible local image, explicitly selected
+credentials/model access, and a network configuration that permits provider
+requests. Fixture validation and provider-free harness tests do **not** measure
+agent behavior.
 
 ## Live selection and spend controls
 

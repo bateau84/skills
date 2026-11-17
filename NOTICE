@@ -1,0 +1,13 @@
+Portable Agent Skills
+Copyright 2026 bateau84 and contributors (for their original contributions).
+
+This distribution includes adapted third-party material:
+
+Anthropic, PBC — mcp-builder
+Copyright 2026 Anthropic, PBC.
+Original source: https://github.com/anthropics/skills/tree/main/skills/mcp-builder
+Licence: Apache License, Version 2.0.
+Original per-skill licence retained at skills/mcp-builder/LICENSE.txt.
+
+The mcp-builder instructions, reference guides, and scripts contain modifications.
+See LICENSING.md for confirmed provenance and redistribution guidance.

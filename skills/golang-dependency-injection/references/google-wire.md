@@ -90,3 +90,5 @@ func TestUserService(t *testing.T) {
 - Generated files (`wire_gen.go`) must be committed and kept in sync
 
 Wire injectors MUST use `//go:build wireinject` build constraint. Generated `wire_gen.go` MUST NOT be edited manually — always regenerate with `wire ./...`.
+
+Do not adopt this unmaintained upstream as a new-project default. Its provider-set fragments require the containing project's package imports and constructors; `wire.Bind` selects an implementation but does not create it. Generate wiring in an isolated checkout and compile both normal and `wireinject` variants before trusting it.

@@ -1,48 +1,40 @@
 # `k8s-monitoring` Helm values reference
 
-## Full values.yaml
+## Values for `grafana/k8s-monitoring` 4.x
+
+**Do not reuse the old v1 `externalServices`, `metrics.*`, or `logs.pod_logs` values:** chart 4.x expects named destination and collector **maps** with independently enabled features. This is a minimal **metrics-only skeleton**, not a complete production deployment or an example of secure credential provisioning. Derive the complete values (including logs, traces and collection routing) from the **exact installed version** and [Grafana's chart upgrade documentation](https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring). Never commit real access-policy tokens in a values file.
 
 ```yaml
 cluster:
-  name: production-us-east
+  name: example-cluster
 
-externalServices:
-  prometheus:
-    host: https://prometheus-prod-xx.grafana.net
-    basicAuth:
-      username: "123456"
-      password: { secretName: grafana-cloud-secret, secretKey: api-key }
-  loki:
-    host: https://logs-prod-xx.grafana.net
-    basicAuth:
-      username: "234567"
-      password: { secretName: grafana-cloud-secret, secretKey: api-key }
-  tempo:
-    host: https://tempo-prod-xx.grafana.net:443
-    basicAuth:
-      username: "345678"
-      password: { secretName: grafana-cloud-secret, secretKey: api-key }
+destinations:
+  grafanaMetrics:
+    type: prometheus
+    url: https://prometheus-prod-<region>.grafana.net/api/prom/push
+    auth:
+      type: basic
+      username: "<metrics-instance-id>"
+      password: "<substitute-securely-before-apply>"
 
-metrics:
+clusterMetrics:
   enabled: true
-  cost: { enabled: true }            # Kubernetes cost monitoring
-  podMonitors:     { enabled: true }
-  serviceMonitors: { enabled: true }
-  kube-state-metrics: { enabled: true }
-  node-exporter:      { enabled: true }
-  cadvisor:           { enabled: true }
 
-logs:
-  pod_logs:       { enabled: true }
-  cluster_events: { enabled: true }
-
-traces:   { enabled: true }
-profiles: { enabled: false }
-
-receivers:
-  grpc: { enabled: true, port: 4317 }
-  http: { enabled: true, port: 4318 }
+collectors:
+  alloy-metrics:
+    presets: [clustered, statefulset]
 ```
+
+The `<...>` placeholders are **not** valid production configuration. Supply real endpoints and credentials through an approved secret-injection mechanism and validate the chart schema and generated resource manifests before installing:
+
+```bash
+helm show values grafana/k8s-monitoring --version 4.1.4 > chart-4.1.4.defaults.yaml
+helm template k8s-monitoring grafana/k8s-monitoring --version 4.1.4 \
+  -n monitoring -f values.yaml > rendered.yaml
+# Review rendered destinations, collectors, permissions and receiver ports.
+```
+
+For pod logs and events, use the matching v4 feature names (`podLogsViaLoki`, `clusterEvents`); for traces configure `applicationObservability` and its receiver ports. Confirm support and required collector settings in the version-pinned chart rather than assuming this metrics skeleton enables all signals.
 
 ## Useful Kubernetes PromQL
 

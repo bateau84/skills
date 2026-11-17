@@ -1,0 +1,42 @@
+{
+  "skill": "desktop-ui-design",
+  "version": 1,
+  "cases": [
+    {
+      "id": "dk-02",
+      "name": "gnome-port-chrome-and-menus",
+      "prompt": "We're porting a Windows desktop app (classic title bar, File/Edit/View/Tools/Help menu bar, toolbar, sidebar) to Linux as a GTK4/libadwaita app aimed at GNOME users. Describe the window chrome, where the menu commands should go, and which standard keys we should support.",
+      "trap": "Reproducing the Windows title bar plus in-window menu bar on GNOME, or using Super-key shortcuts, instead of a header bar with a primary menu.",
+      "expectations": [
+        "Uses a header bar (client-side decorations) as the window chrome instead of a separate title bar plus menu bar",
+        "Places secondary/app-level commands (Preferences, Keyboard Shortcuts, About) in a primary menu button in the header bar",
+        "Names F10 as opening the primary menu",
+        "Names Ctrl+? as opening a keyboard shortcuts window",
+        "Mentions F9 for toggling the sidebar or F1 for help",
+        "States that the Super key must not be used for app shortcuts",
+        "Requires every action to be reachable by keyboard"
+      ],
+      "negative_expectations": [
+        "Recommends keeping a traditional File/Edit/View in-window menu bar as the primary GNOME pattern",
+        "Assigns any application shortcut using the Super key"
+      ]
+    },
+    {
+      "id": "dk-04",
+      "name": "tauri-state-persistence-spec",
+      "prompt": "Tauri 2 photo-culling app for macOS, Windows and Linux. Users open a folder of RAW files, flag/reject images, and zoom per image. Write the state-persistence part of the design spec: what is remembered between launches, where, and what first launch and an unexpected crash look like.",
+      "trap": "Assuming the OS or framework restores window and session state automatically, mixing per-image zoom with global preferences, and skipping first-launch and crash-recovery design.",
+      "expectations": [
+        "Separates state into categories: ephemeral (not restored), session (restored on relaunch), user preferences, and per-document/per-image state",
+        "Lists window size/position, open folder, panel visibility/sizes and current selection or scroll as restored session state",
+        "Treats per-image zoom as document-level state, not a global preference",
+        "States that Tauri does not restore session state automatically and names an explicit mechanism such as tauri-plugin-window-state and/or tauri-plugin-store",
+        "Specifies the first-launch experience (empty state or onboarding, defaults taken from system settings such as dark mode)",
+        "Specifies crash detection on next launch and an offer to restore or discard unsaved flags"
+      ],
+      "negative_expectations": [
+        "Claims the OS will automatically restore the app's windows and open folder for a Tauri app"
+      ]
+    }
+  ]
+}

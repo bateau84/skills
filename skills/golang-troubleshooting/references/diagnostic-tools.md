@@ -20,9 +20,13 @@ gc 123 @45.67s 4%: 0.8+10+0.3 ms clock, 6+5/10/0 ms cpu, 512->300->150 MB
 
 | Field            | Meaning                                         |
 | ---------------- | ----------------------------------------------- |
-| 4%               | GC CPU overhead (if >10%, over-allocating)      |
+| 4%               | Cumulative percentage of time spent in GC since program start; not a recent or instantaneous CPU-utilization reading |
 | 512->300->150 MB | Heap at GC start -> heap at GC end -> live heap |
-| Large pause      | Allocation storm                                |
+| 0.8+10+0.3 ms    | Stop-the-world sweep termination + concurrent mark/assist + stop-the-world mark termination (the middle value is **not** a stop-the-world pause) |
+
+A high cumulative GC-time percentage or a large concurrent phase can indicate allocation or assist pressure, but neither proves why user-facing latency spiked. Correlate traces/latency with GC activity and use allocation/CPU profiles before attributing a cause.
+
+See [Go runtime documentation](https://pkg.go.dev/runtime#hdr-Environment_Variables) for the version-specific `gctrace` format.
 
 ### Scheduler Tracing
 

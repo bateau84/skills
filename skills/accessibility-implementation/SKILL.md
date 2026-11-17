@@ -1,6 +1,6 @@
 ---
 name: accessibility-implementation
-description: Use when designing, implementing, or reviewing user interfaces, web components, dialogs, or any code that produces visual or interactive output — when keyboard navigation, screen reader support, or WCAG 2.1 AA compliance could be affected by implementation choices.
+description: Use when designing, implementing, or reviewing user interfaces, web components, dialogs, or any code that produces visual or interactive output — when keyboard navigation, screen reader support, or WCAG 2.2 AA compliance could be affected by implementation choices.
 license: MIT
 metadata:
   author: Bateau
@@ -22,7 +22,7 @@ metadata:
 
 2. **Focus management is non-negotiable.** On open, focus moves into the dialog (capture `document.activeElement`). On close, it returns to the trigger. A modal that drops focus on close is broken for keyboard users, even if it "looks fine."
 
-3. **Never `autoFocus` a destructive action.** Delete, Remove, Reset must focus Cancel, the dialog itself, or nothing. autoFocusing Delete means a screen-reader user who hits Enter reflexively destroys their data. Destructive buttons must specify the object: "Delete account" not "Delete".
+3. **Never `autoFocus` a destructive action.** Delete, Remove, Reset dialogs must deliberately focus the least destructive control (normally Cancel) or an appropriate focusable introductory element. Leaving focus unspecified is not safe: `showModal()` can focus the first focusable element, including Delete. autoFocusing Delete means a screen-reader user who hits Enter reflexively destroys their data. Destructive buttons must specify the object: "Delete account" not "Delete".
 
 4. **ARIA fills gaps semantic HTML cannot.** `aria-labelledby` and `aria-describedby` on dialogs. `aria-live` for state changes. `aria-expanded` for disclosure widgets. If semantic HTML covers it, do not add ARIA.
 

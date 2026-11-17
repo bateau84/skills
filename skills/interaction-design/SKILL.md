@@ -147,7 +147,7 @@ Nielsen's three limits (Nielsen 1993, confirmed nngroup.com 2014) are grounded i
 
 ## The Eight Component States — All Are Design Decisions
 
-The eight canonical UI states apply to every interactive component on every surface. Leaving any state unspecified means engineering invents the behavior — usually wrong.
+The eight categories are a completeness check for applicable GUI/web component behavior, not a requirement to invent hover or persistent focus for a CLI. For other surfaces, adapt the relevant states to their interaction model and explicitly mark inapplicable states rather than silently omitting material ones.
 
 | State | What it means | Design obligation |
 |-------|--------------|-------------------|
@@ -165,6 +165,8 @@ The eight canonical UI states apply to every interactive component on every surf
 2. Specify *what feedback the user receives* when entering this state
 3. Specify *how the user exits* this state
 4. Verify the state has no trapped exit — no state the user cannot leave
+
+**Produce the state decisions, not a claim that they were checked.** For an interaction design covering several states, show the actual state/action/feedback/exit decisions in a compact table or transition map. Identify initial focus and visible keyboard focus where applicable. A sentence such as "all states have recovery" does not substitute for the per-state behavior. Scale the artifact to the requested interaction, not every state of the whole product.
 
 **Surface-specific states beyond the canonical eight:**
 - **CLI**: `waiting-for-input` (interactive mode prompt); `pipe-mode` (stdin receiving data); `complete` (process exited)
@@ -234,6 +236,8 @@ Design in this order — preventing errors is always cheaper than recovering fro
 2. **Detect early** — validate at the earliest point where the error is detectable (inline field validation on blur, not on submit; preflight checks before destructive operations begin)
 3. **Recover gracefully** — preserve the user's work; return them to the nearest sensible prior state; provide a specific recovery path
 4. **Explain clearly** — if the error occurs, make the message actionable, specific, and human-readable
+
+**Distinguish materially different failure families.** A user-input validation error, an explicit server rejection and a network failure/timeout can require different recovery. For each applicable family, specify what happened or remains unknown, the message, which input/state is preserved, the user's next action and focus after dismissal. A request that timed out may have reached the server: never promise "nothing happened" unless the contract can prove it. Preserve the user's work unless an accepted privacy or security requirement says otherwise.
 
 ### Error Message Design
 
@@ -381,6 +385,7 @@ Design obligations:
   - Modal distinction: different key bindings active in different modes (insert mode vs normal mode in vim-style tools)
 - **Gulf of Execution in TUI**: key bindings without a visible legend are hidden affordances. Design the discoverability mechanism alongside the key binding itself
 - **Gulf of Evaluation in TUI**: the status bar is the primary feedback channel. Design what the status bar shows in each state: current mode, current action in progress, last action result, navigation context
+- **Separate startup and runtime failures**: connection failure before the main view is available needs a visible preflight/connecting state, a useful sanitized reason, and retry/quit paths. A later disconnect differs from a failed log/restart/delete operation. For each, identify overlay/status treatment, retained selection/scroll position, and focus after recovery.
 
 ---
 

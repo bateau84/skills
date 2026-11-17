@@ -127,7 +127,7 @@ tasks:
     desc: run in debug mode
     interactive: true
     cmds:
-      - go run
+      - go run .
   debug:basic:
     desc: run with reduced color depth for testing
     interactive: true
@@ -136,7 +136,7 @@ tasks:
   test:
     desc: run tests
     cmds:
-      - go test -count 5 -p 3
+      - go test -count 5 -p 3 ./...
   test:update:
     desc: run tests and update snapshots
     cmds:

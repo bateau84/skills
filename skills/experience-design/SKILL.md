@@ -350,3 +350,5 @@ Experience design outputs are the inputs to every other loaded skill:
 Experience design feeds all downstream disciplines. It is not revised by them. If a downstream skill reveals that a scenario was missing an important case, or that an experience goal was unachievable given surface constraints, that finding goes back to the problem framing — not silently dropped.
 
 ---
+
+For a bounded, already accepted change, do not reframe the product problem merely because this skill is loaded. Use `product-discovery` for genuinely unresolved problem/value framing, and obtain the user's agreement before replacing their requested outcome with a materially different one. Use `user-stories-and-scenarios` for the canonical scenario artifact; here scenarios are inputs to experience evaluation, not a competing authority.

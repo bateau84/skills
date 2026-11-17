@@ -90,42 +90,12 @@ If contributors are available and authorized, independent package/documentation 
 
 ## Step 3: Function & Method Doc Comments
 
-Every exported function and method MUST have a doc comment. Document complex internal functions too. Skip test functions.
-
-The comment starts with the function name and a verb phrase. Focus on **why** and **when**, not restating what the code already shows. The code tells you _what_ happens — the comment should explain _why_ it exists, _when_ to use it, _what constraints_ apply, and _what can go wrong_. Include parameters, return values, error cases, and a usage example:
+For exported declarations, start with the symbol name and explain the purpose, non-obvious behavior, constraints, errors or concurrency guarantees that callers actually need. **Do not require Javadoc-style Parameters/Returns/Example sections for every function.** Mention specific arguments and return values only when their meaning is surprising. Keep simple methods concise; link a deterministic `ExampleXxx` test where executable usage adds value.
 
 ```go
-// CalculateDiscount computes the final price after applying tiered discounts.
-// Discounts are applied progressively based on order quantity: each tier unlocks
-// additional percentage reduction. Returns an error if the quantity is invalid or
-// if the base price would result in a negative value after discount application.
-//
-// Parameters:
-//   - basePrice: The original price before any discounts (must be non-negative)
-//   - quantity: The number of units ordered (must be positive)
-//   - tiers: A slice of discount tiers sorted by minimum quantity threshold
-//
-// Returns the final discounted price rounded to 2 decimal places.
-// Returns ErrInvalidPrice if basePrice is negative.
-// Returns ErrInvalidQuantity if quantity is zero or negative.
-//
-// Play: https://go.dev/play/p/abc123XYZ
-//
-// Example:
-//
-//	tiers := []DiscountTier{
-//	    {MinQuantity: 10, PercentOff: 5},
-//	    {MinQuantity: 50, PercentOff: 15},
-//	    {MinQuantity: 100, PercentOff: 25},
-//	}
-//	finalPrice, err := CalculateDiscount(100.00, 75, tiers)
-//	if err != nil {
-//	    log.Fatalf("Discount calculation failed: %v", err)
-//	}
-//	log.Printf("Ordered 75 units at $100 each: final price = $%.2f", finalPrice)
-func CalculateDiscount(basePrice float64, quantity int, tiers []DiscountTier) (float64, error) {
-    // implementation
-}
+// CalculateDiscount applies quantity-based discount tiers in ascending order.
+// It returns ErrInvalidQuantity if quantity is not positive and
+// ErrInvalidPrice if the base price is negative.
 ```
 
 For the full comment format, deprecated markers, interface docs, and file-level comments, see **[Code Comments](./references/code-comments.md)** — how to document packages, functions, interfaces, and when to use `Deprecated:` markers and `BUG:` notes.
@@ -167,7 +137,7 @@ For Go libraries, add these on top of the basics:
 - **Generous code examples** — include multiple examples in doc comments showing common use cases.
 - **godoc** — your doc comments render on [pkg.go.dev](https://pkg.go.dev). Use `go doc` locally to preview; to inspect how a published package renders its docs, symbols, and examples, → See `golang-pkg-go-dev` skill.
 - **Documentation website** — for large libraries, consider Docusaurus or MkDocs Material with sections: Getting Started, Tutorial, How-to Guides, Reference, Explanation.
-- **Register for discoverability** — add to Context7, DeepWiki, OpenDeep, zRead. Even for private libraries.
+- **Discoverability** — for public packages, consider indexing/catalog services when useful. **Never upload private source, API docs or usage examples to third-party indexers without explicit authorization and approved confidentiality controls.**
 
 See [Library Documentation](./references/library.md) for details.
 

@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from eval_profile import sanitized_environment, provider_settings, practitioner_files, effective_config
+from eval_profile import sanitized_environment, provider_settings, practitioner_files, companion_file, effective_config
 
 
 class SecurityTests(unittest.TestCase):
@@ -63,6 +63,40 @@ class SecurityTests(unittest.TestCase):
         self.assertTrue(all(r["action"] in {"*", "read", "skill"} for r in rules))
         self.assertNotIn("permission", candidate)
         self.assertNotIn("tools", candidate["agents"]["eval-target"])
+
+
+    def test_companion_bytes_are_explicitly_selected_and_symlink_safe(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / "s"
+            source.mkdir()
+            for name in ("SKILL.md", "ASSESSMENT.md", "QA.md"):
+                (source / name).write_text(name)
+            self.assertEqual(set(practitioner_files(source)), {"SKILL.md"})
+            self.assertEqual(companion_file(source, "assessment"), ("ASSESSMENT.md", b"ASSESSMENT.md"))
+            self.assertEqual(companion_file(source, "qa"), ("QA.md", b"QA.md"))
+            (source / "QA.md").unlink()
+            (source / "QA.md").symlink_to(source / "ASSESSMENT.md")
+            with self.assertRaisesRegex(ValueError, "non-symlink"):
+                companion_file(source, "qa")
+            (source / "ASSESSMENT.md").unlink()
+            with self.assertRaisesRegex(ValueError, "non-symlink"):
+                companion_file(source, "assessment")
+
+    def test_companion_permissions_are_different_on_each_side_without_affecting_default(self):
+        for comparison, companion in (("assessment", "ASSESSMENT.md"), ("qa", "QA.md")):
+            base_files = {"SKILL.md": b"skill", "references/guide.md": b"guide"}
+            candidate_files = {**base_files, companion: b"companion"}
+            baseline = effective_config("baseline", "s", {}, base_files, comparison=comparison)
+            candidate = effective_config("candidate", "s", {}, candidate_files, comparison=comparison)
+            def permissions(config):
+                return config["agents"]["eval-target"]["permissions"]
+            self.assertIn({"action": "skill", "resource": "s", "effect": "allow"}, permissions(baseline))
+            self.assertNotIn({"action": "read", "resource": f".opencode/skills/s/{companion}", "effect": "allow"}, permissions(baseline))
+            self.assertIn({"action": "read", "resource": f".opencode/skills/s/{companion}", "effect": "allow"}, permissions(candidate))
+            self.assertNotIn(companion, baseline["agents"]["eval-target"]["system"])
+            self.assertIn(companion, candidate["agents"]["eval-target"]["system"])
+        default = effective_config("baseline", "s", {}, {"SKILL.md": b"skill"})
+        self.assertEqual(default["agents"]["eval-target"]["permissions"], [{"action": "*", "resource": "*", "effect": "deny"}])
 
 
 if __name__ == "__main__":

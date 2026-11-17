@@ -28,21 +28,22 @@
       "id": "IxD-02",
       "name": "happy-path-only-state-design",
       "trap": "Designer specifies interaction only for the default and success states, leaving the loading state, error state, disabled state, and focus state unspecified — producing a happy-path behavioral contract that engineering must complete with invented behavior. The design implicitly assumes all operations succeed instantly.",
-      "prompt": "We're designing a form where users submit a request to transfer ownership of a repository to another organization. The transfer requires the user to type the repository name to confirm. Design the interaction for this form.",
+      "prompt": "We're designing a web form where users submit a request to transfer ownership of a repository to another organization. The transfer requires the user to type the repository name to confirm. Design the interaction for this form.",
       "expectations": [
-        "Designer must enumerate all eight canonical states for the form's submit button: default, focus, active, disabled, loading, error, success — and define the design obligation for each",
+        "Specifies all eight applicable web component states: default, hover, focus, active, disabled, loading, error and success, with observable behavior for each.",
         "Designer must specify the disabled state: the submit button must be disabled until the confirmation text matches the repository name — specifying when it enables is an interaction design decision",
         "Designer must specify the loading state: what happens in the 0.1–1.0 second window after the user submits? What changes immediately to signal the action registered?",
-        "Designer must specify at least three distinct error states: validation error (confirmation text mismatch), server rejection (organization does not accept transfers), and network failure (request did not reach server)",
-        "For each error state, Designer must specify what feedback the user receives, what data is preserved (the confirmation text field should not be cleared on error), and what recovery path exists",
+        "Distinguishes validation, explicit server rejection and network failure/timeout. A timeout may leave the server-side outcome unknown; it is not proof that no transfer occurred.",
+        "For each failure type, specifies feedback, preserved confirmation input and safe recovery; timeout/unknown-outcome handling reconciles status before blindly retrying an irreversible transfer.",
         "Designer must specify the success state: what happens after transfer completes? Does the user land on the new repository URL? What is the confirmation message?",
-        "Designer must specify the focus state: the confirmation text field has focus by default on page load, or the user must tab to it — this is a design decision that affects usability"
+        "States the initial keyboard focus policy and how users perceive focus on the confirmation field and submit control; autofocus is a design choice, not a default requirement."
       ],
       "negative_expectations": [
         "Designer must not specify only the default state and success state — a behavioral contract that omits loading, error, and disabled states is not a complete interaction design",
         "Designer must not write 'error handling TBD' or defer error state design to engineering — each error state is a design decision, not an implementation detail",
         "Designer must not describe the confirmation text field behavior only for the case where the user types correctly — the mismatch case, the copy-paste case, and the partial-match case are interaction design decisions",
-        "Designer must not omit the 0.1–1.0 second feedback obligation — a submit button that shows no acknowledgment until the server responds will cause users to re-submit"
+        "Designer must not omit the 0.1–1.0 second feedback obligation — a submit button that shows no acknowledgment until the server responds will cause users to re-submit",
+        "Must not assume timeout proves the ownership transfer was never received or completed."
       ]
     },
     {
@@ -77,7 +78,7 @@
         "Designer must specify how column resizability is signified: the resize handle must be visible (or appear on hover) and the cursor must change to a resize cursor — a column that can be resized but provides no visible handle is a hidden affordance",
         "Designer must specify the bulk selection affordance: how does the user discover they can select rows? (checkbox column, Shift+click pattern) — and what happens when one row is selected (does a bulk action toolbar appear?)",
         "Designer must specify the focus state for keyboard navigation: when the table is navigated by keyboard, which cell/row has focus and how is it visually indicated?",
-        "For each affordance, Designer must verify: perceptible (action possible + signifier present), not hidden (action possible but no signifier), not false (signifier present but no action)",
+        "For each named affordance, the action is discoverable from an appropriate signifier and the signifier matches an actual available action; flags missing or misleading signifiers rather than merely listing capability names.",
         "Designer must specify the active state for sorting: when a column is sorted ascending, the sort icon shows ascending direction — this is an affordance signifier for the 'click to sort descending' next action"
       ],
       "negative_expectations": [

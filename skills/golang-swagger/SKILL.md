@@ -138,6 +138,8 @@ Optional attributes on `@Param`: `default(v)`, `minimum(n)`, `maximum(n)`, `minL
 
 **Nested composition**: `@Success 200 {object} api.Response{data=model.User}`
 
+**Dynamic map responses:** `map[string]bool` represents an object with boolean-valued `additionalProperties`, not a fixed struct with invented flag names. Generator syntax/support can vary; use a raw or named map declaration supported by the pinned `swag` version, regenerate, and inspect `swagger.json` before calling it correct. Do not categorically reject typed maps based on the `map[string]any` limitation.
+
 ## Security Definitions
 
 Define once at the API level (in main.go), apply per endpoint with `@Security`.
@@ -182,7 +184,12 @@ type CreateUserRequest struct {
     Role   string `json:"role" enums:"admin,user,guest" example:"user"`
     Age    int    `json:"age" minimum:"18" maximum:"120"`
     Avatar []byte `json:"avatar" swaggertype:"string" format:"base64"`
-    Secret string `json:"-" swaggerignore:"true"`  // excluded from docs
+    Secret string `json:"-" swaggerignore:"true"`  // omitted from JSON and Swagger
+}
+
+// A serialized field can be excluded only from generated documentation.
+type CachePayload struct {
+    LastModified time.Time `json:"last_modified" swaggerignore:"true"` // JSON yes; schema no
 }
 ```
 
@@ -194,6 +201,8 @@ type CreateUserRequest struct {
 | `swaggerignore:"true"` | Exclude field from the generated schema |
 | `extensions` | Add OpenAPI extensions: `extensions:"x-nullable,x-deprecated=true"` |
 
+`json:"-"` suppresses JSON serialization. Use a normal JSON tag together with `swaggerignore:"true"` if the accepted API contract requires serialization but omits that field from generated docs. The `CachePayload` example needs the usual `time` import in its Go source.
+
 ## Common Mistakes
 
 | Mistake | Why it breaks | Fix |
@@ -203,7 +212,7 @@ type CreateUserRequest struct {
 | `@Param body` with primitive type | swag cannot derive schema from `string`; generation fails | Always use a named struct for body params |
 | No `@Security` on protected routes | Swagger UI shows no lock icon; testers send unauthenticated requests | Apply `@Security` to every authenticated endpoint |
 | General info annotations in the wrong file | swag silently skips them; spec has no title/host | Use `-g <file>` flag or move annotations to `main.go` |
-| Using `{object}` with a map type | swag cannot generate a schema for `map[string]any` without help | Use a named struct or annotate with `swaggertype` |
+| Unsupported/ambiguous map value schema (for example `map[string]any` on some versions) | Generated OpenAPI may omit the intended `additionalProperties` shape | Use a supported raw/named map or schema override; inspect the generated spec |
 | Multi-word `@Tags` without quotes | Tags split on spaces, producing malformed grouping | Quote tags with spaces: `@Tags "user accounts"` |
 
 ## Cross-References

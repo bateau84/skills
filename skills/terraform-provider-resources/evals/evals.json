@@ -1,0 +1,20 @@
+{
+  "skill": "terraform-provider-resources",
+  "version": 1,
+  "cases": [
+    {
+      "id": "RESOURCE-READ-01",
+      "name": "refresh-absence-versus-api-failure",
+      "prompt": "A Plugin Framework resource Read decodes its saved widget ID, then calls GET /widgets/{id}. Its current code calls resp.State.RemoveResource(ctx) for every API error. The API distinguishes a typed 404 NotFound, a 401 Unauthorized, and transport timeouts. Review the state-handling behavior and show the minimum correction with tests for these three responses.",
+      "trap": "Treats any failed read as confirmation that the managed resource no longer exists.",
+      "expectations": [
+        "Removes managed-resource state only for a confirmed not-found response under the API contract.",
+        "Keeps prior identity/state on unauthorized and timeout errors and emits diagnostics rather than reporting disappearance.",
+        "Proposes distinct checks for 404, 401 and timeout, without claiming real cloud acceptance was executed."
+      ],
+      "must_not": [
+        "Must not delete state for arbitrary authentication or transport failures."
+      ]
+    }
+  ]
+}

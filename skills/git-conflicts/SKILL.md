@@ -48,7 +48,7 @@ git log --merge -p -- path/to/file   # the competing commits' diffs
 The default merge style shows only ours/theirs. Turn on **diff3** to see the base too — it makes "what changed on each side" obvious and resolution far less error-prone:
 
 ```bash
-git config merge.conflictStyle znew diff3      # (zdiff3 in modern git; diff3 otherwise)
+git config merge.conflictStyle zdiff3  # Git 2.35+; use 'diff3' on older Git
 ```
 
 With base visible, each hunk becomes a clear three-way question: *what did each side change relative to the base, and what is the union of those intents?*
@@ -130,7 +130,7 @@ A rebased branch may require a history-rewriting push if it was already publishe
 git push --force-with-lease origin <branch>     # NEVER plain --force
 ```
 
-`--force-with-lease` refuses the push if someone else advanced the remote since you last fetched, so you can't silently clobber a teammate. Plain `--force` is a foot-gun — do not use it.
+An implicit `--force-with-lease` compares against the local remote-tracking ref, which a background fetch may advance. For an authorized rewrite, capture and verify the exact expected remote SHA, then use `--force-with-lease=<remote-ref>:<expected-sha>`; refuse a mismatched remote and investigate rather than overwriting teammates. Plain `--force` is a foot-gun — do not use it.
 
 ## Stagnation stop (do not skip this)
 
@@ -147,7 +147,7 @@ If picking a side would discard intended functionality, explain the consequence 
 
 ### Never `git rebase --skip` or `git rebase --abort` as an escape hatch
 
-`--skip` silently drops a feature commit from history. `--abort` throws away all the resolution work in progress and re-does the merge as a merge commit. Both are not "I give up" buttons — they are destructive operations that should require explicit user confirmation, the same way `git reset --hard` does in `git-commit-discipline`. If `--continue` is stuck and the §6 escape hatch (manual `git commit -C REBASE_HEAD`) didn't work, escalate — do not skip or abort.
+`--skip` silently drops a feature commit from history. `git rebase --abort` returns to the original pre-rebase state, discarding uncommitted conflict-resolution work; it does **not** create a merge commit. Both are not "I give up" buttons — they are destructive operations that should require explicit user confirmation, the same way `git reset --hard` does in `git-commit-discipline`. If `--continue` is stuck and the §6 escape hatch (manual `git commit -C REBASE_HEAD`) didn't work, escalate — do not skip or abort.
 
 When stopped, use the documented recovery option only when authorized, or report the operation in progress, conflicted files, attempted resolutions, and exact error to the user or responsible collaborator. No special status token or coordinator agent is required. Do not abort the rebase/merge unless authorized — an abort throws away resolution work.
 

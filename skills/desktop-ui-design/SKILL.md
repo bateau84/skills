@@ -49,7 +49,7 @@ These are the primary constraint documents. They define what "correct" means on 
 
 ### macOS conventions (Apple HIG)
 
-- **Primary modifier:** `Cmd` (⌘) — not Ctrl. macOS users have bone-deep muscle memory for Cmd+C, Cmd+V, Cmd+Z. Using Ctrl for application shortcuts on macOS creates systematic errors — the user presses Ctrl+S and triggers a terminal-style interrupt instead of saving.
+- **Primary modifier:** `Cmd` (⌘) — not Ctrl. macOS users have bone-deep muscle memory for Cmd+C, Cmd+V, Cmd+Z. Using Ctrl for application shortcuts on macOS creates systematic errors — the user presses Ctrl+S and fails to invoke the expected Save action.
 - **Global menu bar:** The menu bar at the top of the screen belongs to the currently focused application. It is not inside the application window. Standard menu names: **[App Name], File, Edit, View, Window, Help**. Deviating from this order or omitting standard menus signals unfamiliarity with the platform.
 - **Window controls:** Red/yellow/green traffic light buttons in the top-left corner of every window — always. Red = close, yellow = minimize, green = zoom/full screen. Replacing or relocating these breaks the user's spatial memory for window management.
 - **Dock presence:** Apps appear in the Dock while running. A dot indicates an open app. Clicking the Dock icon brings the app forward if running, or launches it if not. The Dock is how macOS users manage their running app landscape — a desktop app must participate in it.
@@ -61,7 +61,7 @@ These are the primary constraint documents. They define what "correct" means on 
 
 - **Primary modifier:** `Ctrl` — not Cmd. Ctrl+C, Ctrl+V, Ctrl+Z are the universal Windows vocabulary.
 - **Window chrome:** The title bar is part of the window, not a system-wide resource. Windows apps may use Fluent-style acrylic materials in the title bar region. The system provides the window control buttons (minimize, maximize/restore, close) in the top-right corner.
-- **Alt+F4:** Closes the application. Apps must not intercept Alt+F4 to do something other than close. It is the user's last resort when an application is unresponsive.
+- **Alt+F4:** Closes the application. Apps must not intercept Alt+F4 to do something other than close. It requests normal window closure; it is not a forced termination of an unresponsive process.
 - **Application menu bar:** May be embedded in the window (traditional), implemented as a Ribbon (Office-style), or omitted in favor of hamburger menus (more common on Windows than macOS for simpler apps). The design must choose consciously.
 - **System tray (Notification Area):** A legitimate integration point for background applications — backup software, sync clients, messaging. Design the tray icon, its tooltip, its context menu, and what happens when the user double-clicks it.
 - **Right-click context menus:** Users expect context menus with standard items: Cut, Copy, Paste, Select All, and app-specific items relevant to the selected element. Non-standard context menus (or no context menu) break user expectations.
@@ -81,21 +81,17 @@ These are the primary constraint documents. They define what "correct" means on 
 
 Actions that have converged across platforms (different modifier, same meaning):
 
-| Action | macOS | Windows / GNOME |
-|---|---|---|
-| Undo | Cmd+Z | Ctrl+Z |
-| Redo | Cmd+Shift+Z | Ctrl+Shift+Z |
-| Cut | Cmd+X | Ctrl+X |
-| Copy | Cmd+C | Ctrl+C |
-| Paste | Cmd+V | Ctrl+V |
-| Select All | Cmd+A | Ctrl+A |
-| Find | Cmd+F | Ctrl+F |
-| Save | Cmd+S | Ctrl+S |
-| New | Cmd+N | Ctrl+N |
-| Open | Cmd+O | Ctrl+O |
-| Close window | Cmd+W | Ctrl+W |
-| Quit app | Cmd+Q | Ctrl+Q (Ctrl+F4 in some Windows contexts) |
-| Print | Cmd+P | Ctrl+P |
+| Action | macOS | Windows | GNOME |
+|---|---|---|---|
+| Undo | Cmd+Z | Ctrl+Z | Ctrl+Z |
+| Redo | Cmd+Shift+Z | Ctrl+Y | Ctrl+Shift+Z |
+| Cut | Cmd+X | Ctrl+X | Ctrl+X |
+| Copy | Cmd+C | Ctrl+C | Ctrl+C |
+| Paste | Cmd+V | Ctrl+V | Ctrl+V |
+| Save | Cmd+S | Ctrl+S | Ctrl+S |
+| Find | Cmd+F | Ctrl+F | Ctrl+F |
+| Close window | Cmd+W | Alt+F4 (Ctrl+F4 closes a child document) | Ctrl+W / platform window close |
+| Quit app | Cmd+Q | No universal Ctrl+Q; Alt+F4 closes the active window | Ctrl+Q |
 
 These shortcuts are expected to work correctly in every desktop application. Repurposing any of them for an unrelated action is a major usability defect.
 
@@ -307,7 +303,7 @@ Desktop users have a deep expectation: when I reopen an application, it will loo
 
 | Platform | Preferences | Session state |
 |---|---|---|
-| macOS | `NSUserDefaults`; Info.plist; App Sandbox (~Library/Application Support) | macOS Resume API (`NSApplicationDelegate restorationClass`); automatic document restoration for AppKit/SwiftUI |
+| macOS | `UserDefaults` for preferences; sandbox data under the app container; Info.plist is bundle metadata, not mutable user preferences | macOS Resume API (`NSWindow.restorationClass`); document restoration when the app implements/enables the appropriate document/autosave model |
 | Windows | Windows Registry; `%APPDATA%` config files | No platform-standard session restoration; app must implement manually |
 | GNOME Linux | `gsettings` schemas | `~/.config/<appname>/` directory; app must implement manually |
 
@@ -361,7 +357,7 @@ Design implications of choosing Electron or Tauri:
 
 3. **Native menu bar on Linux:** Electron does not support GNOME's global menu bar (application menu in the Shell top bar). Linux users see an in-window menu bar instead of the GNOME-idiomatic application menu in the Header Bar.
 
-4. **Accessibility edge cases:** Electron apps must call `app.setAccessibilitySupportEnabled(true)` or the accessibility tree is not populated (per Electron docs). Custom-drawn controls in the webview do not automatically expose to platform accessibility APIs — they require explicit ARIA annotation.
+4. **Accessibility edge cases:** Electron normally enables accessibility when assistive technology is detected. `app.setAccessibilitySupportEnabled(true)` is an explicit override, not a mandatory startup call. Custom-drawn controls in the webview do not automatically expose to platform accessibility APIs — they require explicit ARIA annotation.
 
 5. **App bundle size:** Electron ships Chromium (~80-100MB minimum bundle size). Tauri uses the system webview (1-10MB bundle, webview provided by the OS). If bundle size is a design concern for distribution, Tauri is substantially better.
 
@@ -383,7 +379,7 @@ When designing a hybrid application, these integration points must be explicitly
 
 **Notion (Electron):** A weaker example. Known for inconsistent keyboard shortcut support, accessibility gaps, and non-native scrollbar behavior. The design investment in platform conventions is lower; users familiar with macOS conventions encounter repeated friction.
 
-**1Password 8 (Rust + system webview, similar to Tauri):** Deliberately matches platform conventions despite not being native. Uses system fonts, matches platform dark mode, implements native keyboard shortcuts, uses native dialogs. Shows that the platform-convention investment in a webview-based desktop app is a design choice, not a technical constraint.
+**1Password 8 (Rust backend + Electron UI):** Deliberately matches platform conventions despite not being native. Uses system fonts, matches platform dark mode, implements native keyboard shortcuts, uses native dialogs. Shows that the platform-convention investment in a webview-based desktop app is a design choice, not a technical constraint.
 
 ---
 
@@ -395,7 +391,7 @@ Desktop accessibility differs architecturally from web ARIA. The design obligati
 
 - Native AppKit and SwiftUI controls expose their accessibility automatically. VoiceOver reads the accessibility tree without developer intervention for standard controls.
 - Custom views must implement `NSAccessibility` protocol: `accessibilityRole`, `accessibilityLabel`, `accessibilityValue`, `accessibilityActions`, `accessibilityHelp`. These are design decisions — what is this control? what is its label? what can it do?
-- **Electron on macOS:** accessibility works through Chromium's ARIA-to-AX bridge. The app must call `app.setAccessibilitySupportEnabled(true)`. ARIA roles in the HTML map to macOS accessibility roles. Custom-rendered controls without ARIA are invisible to VoiceOver.
+- **Electron on macOS:** accessibility works through Chromium's ARIA-to-AX bridge. Electron enables support automatically on assistive-technology detection; the explicit setter is an optional override. ARIA roles in the HTML map to macOS accessibility roles. Custom-rendered controls without ARIA are invisible to VoiceOver.
 - **Tauri on macOS:** uses WKWebView, which has its own accessibility bridge to VoiceOver. More native-feeling than Electron on macOS.
 
 ### Windows: UI Automation (UIA)
@@ -416,7 +412,7 @@ Desktop accessibility differs architecturally from web ARIA. The design obligati
 
 2. **Keyboard navigation must be complete.** Tab moves focus between interactive elements. Arrow keys navigate within complex widgets (menus, lists, trees, grids). Enter activates the focused element. Escape closes dialogs and dismisses overlays and returns focus to the trigger. This is the minimum; the Design Spec must name the key behavior for every custom interactive component.
 
-3. **Focus visibility is non-negotiable.** The currently focused element must be visually distinguishable. On macOS and Windows, system-provided focus rings are available for native controls. Custom focus indicators must meet WCAG 2.4.11 (minimum 3:1 contrast ratio against adjacent colors; area at least as large as the outline of the unfocused control).
+3. **Focus visibility is non-negotiable.** The currently focused element must be visually distinguishable. On macOS and Windows, system-provided focus rings are available for native controls. Custom focus indicators must meet the accepted web conformance target: 2.4.11 is Focus Not Obscured (AA); 2.4.13 Focus Appearance is AAA with its area/contrast requirements. AA non-text contrast is 1.4.11, not a universal AAA focus-area mandate.
 
 4. **For hybrid apps, ARIA applies.** Electron and Tauri apps expose accessibility through their webview's ARIA bridge. All ARIA authoring practices from `accessibility-design` apply. Web ARIA in the webview maps to the platform accessibility API. Custom React or web components without ARIA roles are invisible to platform screen readers.
 
@@ -528,7 +524,7 @@ When an agent applies this skill:
 | Microsoft Fluent 2 Design System | Windows | fluent2.microsoft.design | Current Windows design system, component conventions, accessibility |
 | GNOME Human Interface Guidelines | GNOME Linux | developer.gnome.org/hig/ | GNOME keyboard conventions, CSD (Header Bar), standard shortcuts, navigation, keyboard navigation requirement |
 | GNOME HIG — Keyboard Reference | GNOME Linux | developer.gnome.org/hig/reference/keyboard.html | Complete standard shortcut table, modifier conventions, reserved keys |
-| Electron Accessibility Documentation | Electron | electronjs.org/docs/latest/tutorial/accessibility | How Electron exposes the accessibility tree; `setAccessibilitySupportEnabled()` requirement |
+| Electron Accessibility Documentation | Electron | electronjs.org/docs/latest/tutorial/accessibility | How Electron exposes the accessibility tree; automatic enablement and optional `setAccessibilitySupportEnabled()` override |
 | Tauri Documentation | Tauri | tauri.app | System webview model, Rust backend, plugin ecosystem (window-state, store) |
 | macOS Accessibility API | macOS | developer.apple.com/documentation/accessibility | NSAccessibility protocol, AXUIElement, VoiceOver integration |
 | Windows UI Automation | Windows | docs.microsoft.com/ui-automation | UIA control patterns, accessibility for Windows applications |

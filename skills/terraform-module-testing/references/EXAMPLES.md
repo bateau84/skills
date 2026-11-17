@@ -66,22 +66,15 @@ run "test_subnets" {
 }
 
 run "test_outputs" {
-  command = plan
+  command = plan  # assert only values known at plan time
 
   variables {
     vpc_cidr = "10.0.0.0/16"
     vpc_name = "test-vpc"
   }
 
-  assert {
-    condition     = output.vpc_id != ""
-    error_message = "VPC ID output should not be empty"
-  }
-
-  assert {
-    condition     = can(regex("^vpc-", output.vpc_id))
-    error_message = "VPC ID should have correct format"
-  }
+  # Provider-computed IDs are unknown in plan mode. Check these in a
+  # separately authorized real apply or explicitly mocked apply test.
 
   assert {
     condition     = output.vpc_cidr == "10.0.0.0/16"
@@ -183,7 +176,7 @@ mock_provider "aws" {
 }
 
 run "test_instance_with_mocks" {
-  command = plan
+  command = apply
 
   variables {
     instance_type = "t2.micro"
@@ -221,7 +214,7 @@ run "test_data_source_with_mocks" {
 }
 
 run "test_outputs_with_mocks" {
-  command = plan
+  command = apply
 
   assert {
     condition     = output.vpc_id == "vpc-12345678"
@@ -285,7 +278,7 @@ run "test_invalid_cidr_with_mocks" {
 }
 
 run "setup_vpc_with_mocks" {
-  command = plan
+  command = apply
 
   variables {
     vpc_cidr = "10.0.0.0/16"

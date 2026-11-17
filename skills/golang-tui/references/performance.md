@@ -63,13 +63,13 @@ plain := ansi.Strip(styledString)
 
 ```go
 // Word wrap at width (preserves ANSI, breaks at spaces)
-s := ansi.Wordwrap(text, width)
+s := ansi.Wordwrap(text, width, "")
 
 // Wrap with custom break points
-s := ansi.Wrap(text, width) // Or lipgloss.Wrap(text, width, " "), which uses this behind the scenes
+s := ansi.Wrap(text, width, "") // Or lipgloss.Wrap(text, width, " "), which uses this behind the scenes
 
 // Hard wrap at exact width (breaks mid-word)
-s := ansi.Hardwrap(text, width)
+s := ansi.Hardwrap(text, width, false)
 ```
 
 ## View() Optimization
@@ -243,9 +243,9 @@ Track `allocs/op` to catch regressions in rendering allocation count.
 | `ansi.Truncate(s, w, tail)` | Truncate to width with tail |
 | `ansi.Cut(s, start, end)` | Extract visible cell range |
 | `ansi.Strip(s)` | Remove ANSI sequences |
-| `ansi.Wordwrap(s, w)` | Word wrap preserving ANSI |
-| `ansi.Wrap(s, w)` | Wrap with custom breaks |
-| `ansi.Hardwrap(s, w)` | Hard wrap at exact width |
+| `ansi.Wordwrap(s, w, "")` | Word wrap preserving ANSI |
+| `ansi.Wrap(s, w, "")` | Wrap with custom breaks |
+| `ansi.Hardwrap(s, w, false)` | Hard wrap at exact width |
 | `lipgloss.Width(s)` | `ansi.StringWidth` but accounts for max length over multiple newlines |
 | `lipgloss.Height(s)` | Count newlines |
 | `lipgloss.Size(s)` | Width and height |

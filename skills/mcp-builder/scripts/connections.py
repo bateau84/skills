@@ -1,3 +1,6 @@
+# Modified from Anthropic's mcp-builder (Apache-2.0) by bateau84/skills.
+# Original licence: ../LICENSE.txt; provenance: ../../../LICENSING.md.
+
 """Lightweight connection handling for MCP servers."""
 
 from abc import ABC, abstractmethod
@@ -67,7 +70,8 @@ class MCPConnection(ABC):
     async def call_tool(self, tool_name: str, arguments: dict[str, Any]) -> Any:
         """Call a tool on the MCP server with provided arguments."""
         result = await self.session.call_tool(tool_name, arguments=arguments)
-        return result.content
+        # Keep isError and structuredContent intact for the evaluator.
+        return result
 
 
 class MCPConnectionStdio(MCPConnection):

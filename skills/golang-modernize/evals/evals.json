@@ -1,0 +1,20 @@
+{
+  "skill": "golang-modernize",
+  "version": "1.0.0",
+  "common_instruction": "Use the stated context; explain concrete behavior and do not claim tests were run without evidence.",
+  "cases": [
+    {
+      "id": "GM-SORT-01",
+      "name": "Sorted map keys",
+      "prompt": "A Go 1.26 program iterates a map of string keys in stable order with this proposed patch: for k := range slices.Sorted(maps.Keys(m)) { fmt.Println(m[k]) }. Review correctness and a minimal fix.",
+      "trap": "Ranging a slice with one variable returns the numeric index, not the key.",
+      "expectations": [
+        "Uses for _, k := range slices.Sorted(maps.Keys(m)) or an equivalent correct sorted-keys iteration.",
+        "Explains the slice range index vs element distinction and version requirements."
+      ],
+      "must_not": [
+        "Does not use int indices as string map keys."
+      ]
+    }
+  ]
+}

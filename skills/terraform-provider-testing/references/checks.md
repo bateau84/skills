@@ -88,7 +88,7 @@ Check if a value exists in a collection attribute:
 
 ```go
 statecheck.CompareValueCollection(
-    "example_widget.test", tfjsonpath.New("tags"),
+    "example_widget.test", []tfjsonpath.Path{tfjsonpath.New("tags")},
     "example_widget.test", tfjsonpath.New("name"),
     compare.ValuesSame())
 ```
@@ -209,7 +209,7 @@ plancheck.ExpectSensitiveValue("example_widget.test",
 
 ### No-Op After Update Example
 
-Verify that updating a config back to original values produces no diff:
+After applying the updated configuration, planning that same updated configuration should be empty (reverting to the original config is a real change):
 
 ```go
 Steps: []resource.TestStep{
@@ -220,7 +220,7 @@ Steps: []resource.TestStep{
         Config: testAccConfig_updated(rName),
     },
     {
-        Config: testAccConfig_basic(rName),
+        Config: testAccConfig_updated(rName),
         ConfigPlanChecks: resource.ConfigPlanChecks{
             PreApply: []plancheck.PlanCheck{
                 plancheck.ExpectEmptyPlan(),

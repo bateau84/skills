@@ -10,7 +10,7 @@ Each profile type answers a different performance question. Choosing the wrong p
 | --- | --- | --- | --- |
 | **CPU** | `-cpuprofile` or `/debug/pprof/profile?seconds=30` | High CPU usage, slow functions | Samples which functions are on-CPU at 100Hz; misses off-CPU time (I/O, sleep) |
 | **Heap (alloc_objects)** | `-memprofile` then `pprof -alloc_objects` | GC pressure, too many allocations | Counts allocation events regardless of size; useful when allocation frequency and object churn dominate |
-| **Heap (alloc_space)** | `pprof -alloc_space` | Finding largest allocation sites by volume | Measures total bytes allocated; use when you need to reduce peak memory, not just GC frequency |
+| **Heap (alloc_space)** | `pprof -alloc_space` | Finding largest allocation sites by volume | Measures cumulative allocated bytes, including freed objects; not current heap or RSS |
 | **Heap (inuse_space)** | `pprof -inuse_space` | Memory growing over time, suspected leaks | Shows currently live heap objects; compare two snapshots to isolate leak sources |
 | **Heap (inuse_objects)** | `pprof -inuse_objects` | Object count growth, suspected leak of small objects | Counts live objects regardless of size; useful when leak is many small objects not visible in inuse_space |
 | **Goroutine** | `/debug/pprof/goroutine` | Blocked I/O, goroutine leaks, pool exhaustion | Snapshots all goroutine stacks; look for goroutines piling up on the same call site |
@@ -21,7 +21,7 @@ Each profile type answers a different performance question. Choosing the wrong p
 ### Choosing between alloc_objects and alloc_space
 
 - **alloc_objects** — "where do I allocate the most often?" — use when allocation frequency and object churn are driving GC work
-- **alloc_space** — "where do I allocate the most bytes?" — use for reducing peak memory usage and RSS
+- **alloc_space** — "where do I allocate the most bytes?" — use to reduce cumulative allocation volume; use inuse_space for retained heap and OS metrics for RSS
 - In practice, start with `alloc_objects` because GC churn is the most common allocation-related bottleneck in Go.
 
 ### Choosing between inuse_space and alloc_space
@@ -350,7 +350,7 @@ Narrow the analysis to specific functions or exclude noise. These are stateful �
 
 ```
 (pprof) focus=myapp            # only show call paths that pass through "myapp"
-(pprof) ignore=runtime         # remove runtime functions from display
+(pprof) ignore=runtime         # drop entire samples containing a matching frame
 (pprof) hide=testing           # hide testing framework noise from graphs
 (pprof) show=handler           # only show functions matching "handler"
 (pprof) tagfocus=endpoint=/users  # only show samples with this tag value
@@ -360,14 +360,19 @@ Narrow the analysis to specific functions or exclude noise. These are stateful �
 **Difference between `focus`, `show`, `hide`, and `ignore`:**
 
 - `focus` — keeps only paths that contain a matching function; everything else is dropped
-- `ignore` — removes matching functions from the graph entirely; their costs are attributed to callers
+- `ignore` — removes entire samples whose stack matches; it does not reassign their cost to callers
 - `show` — like `focus` but only affects display, not cost accounting
-- `hide` — like `ignore` but only hides from display, not cost accounting
+- `hide` — hides matching stack frames from display without discarding the entire sample
 
 **Clear all filters:**
 
 ```
-(pprof) reset
+(pprof) focus=
+(pprof) ignore=
+(pprof) hide=
+(pprof) show=
+(pprof) tagfocus=
+(pprof) tagignore=
 ```
 
 ### `normalize` — normalize against a base profile

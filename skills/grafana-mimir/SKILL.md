@@ -65,11 +65,13 @@ docker run --rm -p 9009:9009 -v $(pwd)/demo.yaml:/etc/mimir/demo.yaml \
 curl -sf http://localhost:9009/ready
 
 # 3. Verify it's serving the API
-curl -s http://localhost:9009/api/v1/labels | jq '.status'   # → "success"
+curl -s http://localhost:9009/prometheus/api/v1/labels | jq '.status'   # → "success"
 
 # 4. Verify self-metrics scrape
 curl -s http://localhost:9009/metrics | grep -E '^mimir_(distributor|ingester)_' | head
 ```
+
+The Prometheus-compatible **read** endpoints use Mimir's default `/prometheus` prefix (configurable with `api.prometheus_http_prefix`). The **write** endpoint remains `/api/v1/push`. See [Mimir HTTP API](https://grafana.com/docs/mimir/latest/references/http-api/).
 
 ### 2. Send metrics — Prometheus remote_write
 
@@ -83,7 +85,7 @@ remote_write:
 ```bash
 # Verify samples are landing
 curl -s -H 'X-Scope-OrgID: tenant1' \
-  'http://localhost:9009/api/v1/query?query=up' | jq '.data.result | length'
+  'http://localhost:9009/prometheus/api/v1/query?query=up' | jq '.data.result | length'
 # Expect > 0 within ~30s of Prometheus scraping
 ```
 
@@ -109,10 +111,14 @@ helm install mimir grafana/mimir-distributed --version 6.0.6 -f values.yaml
 kubectl get pods -n mimir
 #   distributor, ingester, querier, query-frontend, store-gateway, compactor, ruler
 
-# 3. Verify the gateway is ready
-kubectl port-forward -n mimir svc/mimir-nginx 9009:80 &
+# 3. Verify the gateway is ready (chart 6.0 removed the `nginx` values section and the
+#    mimir-nginx Service; use the unified gateway Service)
+kubectl get svc -n mimir | grep gateway
+kubectl port-forward -n mimir svc/<gateway-service> 9009:80 &
 curl -sf http://localhost:9009/ready
 ```
+
+Chart 6.0 deploys the ingest storage architecture by default: writes go through Kafka (or a Kafka-compatible backend) instead of directly to ingesters. The chart bundles a single-node Kafka for demos only; for production, point Mimir at an external Kafka-compatible cluster. To keep the classic architecture, disable ingest storage before upgrading (see the 5.x to 6.0 migration guide). Move any `nginx:` values to `gateway:` first.
 
 ## Multi-tenancy
 

@@ -28,6 +28,8 @@ Do not use automatic fix flags as a substitute for understanding changes.
 
 When conclusions rely on test/build/lint/security/runtime results, record the commands, scope, and observed outcomes in the task summary or the project's verification record. Distinguish unrun checks and limitations from passing results.
 
+`go build` does not compile `_test.go` files; `./...` covers packages in the selected module, not arbitrary nested modules or excluded build tags. Add scoped `go test`/tag/module checks where the change requires them, and name any untested matrix in the result.
+
 ## Diagnose before fixing
 
 Prefer evidence over intuition. Reproduce and inspect the failure before changing code. When profiling, race detection, static analysis, or runtime tracing is relevant, run the diagnostic first, change one causal factor, then re-check.

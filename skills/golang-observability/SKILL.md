@@ -44,7 +44,7 @@ When using observability libraries (Prometheus client, OpenTelemetry SDK, vendor
 
 See the `observability` skill for the language-agnostic standard (three pillars, log categories, severity contract, audit hard rules, economics). This skill is the Go mechanics layer.
 
-See `golang-error-handling` skill for the single handling rule. See `golang-troubleshooting` skill for using observability signals to diagnose production issues. See `golang-security` skill for protecting pprof endpoints and avoiding PII in logs. See `golang-context` skill for propagating trace context across service boundaries. See `promql-cli` skill for querying and exploring PromQL expressions against Prometheus from the CLI.
+See `golang-error-handling` skill for the single handling rule. See `golang-troubleshooting` skill for using observability signals to diagnose production issues. See `golang-security` skill for protecting pprof endpoints and avoiding PII in logs. See `golang-context` skill for propagating trace context across service boundaries. See `promql` skill for querying and exploring PromQL expressions against Prometheus from the CLI.
 
 ### Go 1.26+: slog multi-handler
 
@@ -96,13 +96,16 @@ Signals are most powerful when connected. A trace_id in your logs lets you jump 
 ```go
 import "go.opentelemetry.io/contrib/bridges/otelslog"
 
-// Create a logger that automatically injects trace_id and span_id
-logger := otelslog.NewHandler("my-service")
+// Bridge slog records to OpenTelemetry; ctx must contain a valid active span
+// logProvider is an initialized SDK LoggerProvider with an exporter.
+// Without one (or a configured global provider), the bridge may emit nothing.
+logger := otelslog.NewHandler("my-service", otelslog.WithLoggerProvider(logProvider))
 slog.SetDefault(slog.New(logger))
 
 // Now every slog call with context includes trace correlation
 slog.InfoContext(ctx, "order created", "order_id", orderID)
-// Output includes: {"trace_id":"abc123", "span_id":"def456", "msg":"order created", ...}
+// Verify TraceID/SpanID on the exported OTel record; this does not automatically
+// configure a JSON stdout handler or guarantee a stored/sampled trace exists.
 ```
 
 ### Metrics + Traces: Exemplars
@@ -118,41 +121,21 @@ if eo, ok := obs.(prometheus.ExemplarObserver); ok {
 }
 ```
 
-## Stack decisions (locked for this workspace)
+## Respect the repository's logger and export contract
 
-These decisions were resolved through architecture review and are binding — not guidelines. The *why* lives in `observability`; this section is the *how*.
+This portable skill cannot create a binding workspace stack decision. Prefer stdlib `slog` for suitable new code; keep an existing zap/logrus/zerolog stack unless migration is authorized and useful.
 
-### Logger: zap + otelzap
+For `go.opentelemetry.io/contrib/bridges/otelzap`, the API is a zap core, not the unrelated Uptrace `.Ctx` wrapper:
 
-Library: `zap` + `go.opentelemetry.io/contrib/bridges/otelzap`.
-
-**Bridge setup — once at startup:**
 ```go
-zapLogger, _ := zap.NewProduction()
-otelLogger := otelzap.New(zapLogger)
-// Use otelLogger everywhere; pass ctx at every call site
+// provider is an initialized OpenTelemetry SDK LoggerProvider.
+logger := zap.New(otelzap.NewCore("my-service", otelzap.WithLoggerProvider(provider)))
+logger.Info("operation completed", zap.Any("context", ctx))
 ```
 
-**The only acceptable call pattern:**
-```go
-// CORRECT — trace_id and span_id injected automatically from ctx
-otelLogger.Ctx(ctx).Info("payment processed",
-    zap.String("order_id", orderID),
-    zap.Float64("amount", amount),
-)
-```
+That bridge extracts a `context.Context` field into the OTel record. Test actual exported correlation with a valid span and flush/shutdown the provider. Do not mix it with `github.com/uptrace/opentelemetry-go-extra/otelzap` APIs.
 
-**Reviewable anti-pattern — mandatory fix in code review:**
-```go
-// WRONG — compiles, runs, emits no trace_id. Silent failure.
-otelLogger.Info("payment processed",
-    zap.String("order_id", orderID),
-)
-```
-
-The failure mode is silent: the log emits normally but is permanently unlinked from its trace. Any `logger.Info(` / `.Error(` / `.Warn(` / `.Debug(` without `.Ctx(ctx)` is a mandatory fix, not a suggestion. Consider a wrapper type that removes the context-free methods from the exported API entirely to make the wrong thing impossible.
-
----
+Source: [official otelzap bridge](https://pkg.go.dev/go.opentelemetry.io/contrib/bridges/otelzap).
 
 ### Loki label strategy
 
@@ -259,7 +242,7 @@ The deciding rule (from `observability`): if *your system* failed, it's `ERROR`.
 
 ## Migrating Legacy Loggers
 
-If the project currently uses `zap`, `logrus`, or `zerolog`, migrate to `log/slog`. It is the standard library logger since Go 1.21, has a stable API, and the ecosystem has consolidated around it. Continuing with third-party loggers means maintaining an extra dependency for no benefit.
+For an authorized migration, compare slog with the existing logger's performance, output, handlers and operational contracts. An existing zap/logrus/zerolog dependency is not by itself a defect or permission to rewrite call sites.
 
 **Migration strategy:**
 

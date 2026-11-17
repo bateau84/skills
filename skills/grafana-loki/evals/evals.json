@@ -1,0 +1,20 @@
+{
+  "skill": "grafana-loki",
+  "version": "1.0.0",
+  "common_instruction": "Use the stated context; explain concrete behavior and do not claim tests were run without evidence.",
+  "cases": [
+    {
+      "id": "LOKI-DURATION-01",
+      "name": "Unwrap unit conversion",
+      "prompt": "Loki logs have a duration field like duration=1.5s in logfmt. A proposed latency query uses | unwrap duration | duration_seconds [5m] and returns a parse error. Give a valid p95-by-app LogQL expression and handle parse errors.",
+      "trap": "Treats duration_seconds as a pipeline stage after unwrap rather than the supported unwrap converter.",
+      "expectations": [
+        "Uses unwrap duration_seconds(duration) in the unwrapped range expression.",
+        "Filters pipeline errors with __error__=\"\" and preserves valid aggregation groupings."
+      ],
+      "must_not": [
+        "Does not retain | duration_seconds as a stage."
+      ]
+    }
+  ]
+}

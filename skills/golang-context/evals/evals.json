@@ -1,0 +1,20 @@
+{
+  "skill": "golang-context",
+  "version": "1.0.0",
+  "common_instruction": "Answer as an engineer using the stated project and tool constraints; do not claim to have executed any checks.",
+  "cases": [
+    {
+      "id": "CTX-DETACH-01",
+      "name": "Detached work lifetime",
+      "prompt": "An HTTP handler starts a background audit write using context.WithoutCancel(r.Context()). The team expects the request's five-second deadline to bound the audit, and launches one goroutine per request. Review the actual cancellation/lifetime guarantees.",
+      "trap": "Assumes WithoutCancel retains the parent deadline and uses it as unlimited unowned background work.",
+      "expectations": [
+        "States WithoutCancel discards the parent deadline and cancellation while preserving values.",
+        "Requires a separately bounded/shutdown-owned lifetime for authorized background work and guards against unbounded goroutines."
+      ],
+      "must_not": [
+        "Does not claim the audit has the original five-second deadline."
+      ]
+    }
+  ]
+}

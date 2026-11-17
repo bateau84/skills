@@ -1,0 +1,67 @@
+name: Skill reference regression checks
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  python-sdk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - name: Install bounded SDK test dependencies in an isolated environment
+        run: |
+          python3 -m venv "$RUNNER_TEMP/mcp-check"
+          "$RUNNER_TEMP/mcp-check/bin/python" -m pip install -r skills/mcp-builder/scripts/requirements.txt -c skills/mcp-builder/scripts/test-constraints.txt
+      - name: Exercise real SDK types through the connection and model adapter
+        env:
+          SKILLS_REQUIRE_MCP_SDK_TESTS: '1'
+        run: |
+          "$RUNNER_TEMP/mcp-check/bin/python" -B -m unittest discover -s scripts/tests -p 'test_mcp*.py' -v
+  typescript-sdk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22.23.4'
+          package-manager-cache: false
+      - name: Compile the pinned SDK-v1 reference and exercise the stdio transport
+        working-directory: skills/mcp-builder/examples/typescript
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm test
+  go-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: examples/reference-go/go.mod
+          cache: false
+      - name: Compile public provider interfaces and verify pinned library behavior
+        working-directory: examples/reference-go
+        env:
+          GOSUMDB: sum.golang.org
+          GOPROXY: https://proxy.golang.org
+          GOTOOLCHAIN: local
+        run: |
+          go mod download
+          go mod verify
+          go mod tidy -diff
+          go test -mod=readonly ./...
+          git diff --exit-code -- go.mod go.sum

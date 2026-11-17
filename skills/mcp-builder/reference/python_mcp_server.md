@@ -1,4 +1,8 @@
-# Python MCP Server Implementation Guide
+# Python MCP Server Implementation Guide (SDK v1)
+
+> **Modified work:** Adapted from [Anthropic's `mcp-builder`](https://github.com/anthropics/skills/tree/main/skills/mcp-builder) (Apache-2.0). Original licence: [LICENSE.txt](../LICENSE.txt); provenance: [LICENSING.md](../../../LICENSING.md).
+
+**Compatibility:** These examples target Python MCP SDK v1 (`mcp>=1.28,<2`). For SDK v2, migrate all imports and transports using the [official migration guide](https://github.com/modelcontextprotocol/python-sdk/blob/main/docs/migration.md). Do not mix these examples with SDK v2 docs.
 
 ## Overview
 
@@ -11,6 +15,7 @@ This document provides Python-specific best practices and examples for implement
 ### Key Imports
 ```python
 from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.exceptions import ToolError
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Optional, List, Dict, Any
 from enum import Enum
@@ -40,7 +45,7 @@ The official MCP Python SDK provides FastMCP, a high-level framework for buildin
 - Decorator-based tool registration with `@mcp.tool`
 
 **For complete SDK documentation, use WebFetch to load:**
-`https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/main/README.md`
+`https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/v1.x/README.md`
 
 ## Server Naming Convention
 
@@ -72,6 +77,7 @@ Tools are defined using the `@mcp.tool` decorator with Pydantic models for input
 ```python
 from pydantic import BaseModel, Field, ConfigDict
 from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.exceptions import ToolError
 
 # Initialize the MCP server
 mcp = FastMCP("example_mcp")
@@ -87,7 +93,7 @@ class ServiceToolInput(BaseModel):
 
     param1: str = Field(..., description="First parameter description (e.g., 'user123', 'project-abc')", min_length=1, max_length=100)
     param2: Optional[int] = Field(default=None, description="Optional integer parameter with constraints", ge=0, le=1000)
-    tags: Optional[List[str]] = Field(default_factory=list, description="List of tags to apply", max_items=10)
+    tags: Optional[List[str]] = Field(default_factory=list, description="List of tags to apply", max_length=10)
 
 @mcp.tool(
     name="service_tool_name",
@@ -345,6 +351,7 @@ from enum import Enum
 import httpx
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.exceptions import ToolError
 
 # Initialize the MCP server
 mcp = FastMCP("example_mcp")
@@ -465,7 +472,7 @@ async def example_search_users(params: UserSearchInput) -> str:
             return json.dumps(response, indent=2)
 
     except Exception as e:
-        return _handle_api_error(e)
+        raise ToolError(_handle_api_error(e)) from e
 
 if __name__ == "__main__":
     mcp.run()
@@ -489,38 +496,28 @@ async def advanced_search(query: str, ctx: Context) -> str:
     '''Advanced tool with context access for logging and progress.'''
 
     # Report progress for long operations
-    await ctx.report_progress(0.25, "Starting search...")
+    await ctx.report_progress(progress=0.25, total=1.0, message="Starting search...")
 
     # Log information for debugging
-    await ctx.log_info("Processing query", {"query": query, "timestamp": datetime.now()})
+    await ctx.info("Processing search request")  # do not log raw query inputs
 
     # Perform search
     results = await search_api(query)
-    await ctx.report_progress(0.75, "Formatting results...")
+    await ctx.report_progress(progress=0.75, total=1.0, message="Formatting results...")
 
     # Access server configuration
     server_name = ctx.fastmcp.name
 
     return format_results(results)
 
-@mcp.tool()
-async def interactive_tool(resource_id: str, ctx: Context) -> str:
-    '''Tool that can request additional input from users.'''
-
-    # Request sensitive information when needed
-    api_key = await ctx.elicit(
-        prompt="Please provide your API key:",
-        input_type="password"
-    )
-
-    # Use the provided key
-    return await api_call(resource_id, api_key)
+# Obtain credentials out of band (OAuth or an approved secret store).
+# MCP form elicitation must never collect API keys or passwords.
 ```
 
 **Context capabilities:**
-- `ctx.report_progress(progress, message)` - Report progress for long operations
-- `ctx.log_info(message, data)` / `ctx.log_error()` / `ctx.log_debug()` - Logging
-- `ctx.elicit(prompt, input_type)` - Request input from users
+- `ctx.report_progress(progress=..., total=..., message=...)` - Report progress for long operations
+- `ctx.info(message)` / `ctx.error(message)` / `ctx.debug(message)` - Logging (do not log secrets or raw personal data)
+- `ctx.elicit(message=..., schema=...)` - Non-secret structured input only; form elicitation is not a credential channel
 - `ctx.fastmcp.name` - Access server configuration
 - `ctx.read_resource(uri)` - Read MCP resources
 
@@ -594,24 +591,24 @@ Initialize resources that persist across requests:
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
-async def app_lifespan():
+async def app_lifespan(server: FastMCP):
     '''Manage resources that live for the server's lifetime.'''
     # Initialize connections, load config, etc.
     db = await connect_to_database()
     config = load_configuration()
 
     # Make available to all tools
-    yield {"db": db, "config": config}
-
-    # Cleanup on shutdown
-    await db.close()
+    try:
+        yield {"db": db, "config": config}
+    finally:
+        await db.close()
 
 mcp = FastMCP("example_mcp", lifespan=app_lifespan)
 
 @mcp.tool()
 async def query_data(query: str, ctx: Context) -> str:
     '''Access lifespan resources through context.'''
-    db = ctx.request_context.lifespan_state["db"]
+    db = ctx.request_context.lifespan_context["db"]
     results = await db.query(query)
     return format_results(results)
 ```
@@ -627,7 +624,7 @@ if __name__ == "__main__":
 
 # Streamable HTTP transport (for remote servers)
 if __name__ == "__main__":
-    mcp.run(transport="streamable_http", port=8000)
+    mcp.run(transport="streamable-http")  # configure host/port with supported SDK settings
 ```
 
 **Transport selection:**
@@ -713,7 +710,7 @@ Before finalizing your Python MCP server implementation, ensure:
 - [ ] Constants are defined at module level in UPPER_CASE
 
 ### Testing
-- [ ] Server runs successfully: `python your_server.py --help`
+- [ ] Server runs successfully: `python -m py_compile your_server.py` (then run a bounded MCP client handshake)
 - [ ] All imports resolve correctly
 - [ ] Sample tool calls work as expected
 - [ ] Error scenarios handled gracefully

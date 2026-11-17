@@ -4,7 +4,7 @@ description: "Baseline engineering discipline for changing software. Use when au
 license: MIT
 metadata:
   author: Bateau
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 # Software Engineering
@@ -19,6 +19,16 @@ This is the baseline discipline for changing software. It does not replace langu
 - **Make intent explicit.** Names, interfaces, state transitions, errors, and important decisions should reveal what the code means without requiring archaeology.
 - **Fail visibly.** Surface and preserve actionable errors. Do not silently swallow failures, convert them into success, or hide partial failure behind fallback behavior unless accepted semantics explicitly require that behavior.
 - **Respect accepted authority.** Implementation realizes accepted product, design, specification, security, lifecycle, and architecture meaning. It does not invent missing meaning.
+
+## Comments, obligations, and workarounds
+
+Treat comments as clues about intent and constraints, not proof that an implementation is correct. This is **not** a no-comments rule.
+
+- Let code, names, types, and tests explain *what* happens. Keep comments where *why* matters and cannot reasonably be expressed there: non-obvious invariants, concurrency or security reasoning, external protocol constraints, and compatibility decisions. Preserve required public API documentation, licenses, and language-specific comment conventions.
+- A `TODO`, `FIXME`, explanatory placeholder, or comment calling a workaround "temporary" does not satisfy an accepted requirement. Implement and verify required behavior. If it cannot be completed within authorized scope, explicitly report the unmet obligation, consequence, evidence, and appropriate owner; do not delete the marker or report completion to conceal the gap.
+- Before copying or removing a comment-backed delay, retry, fallback, skipped check, or other workaround, verify the original constraint and trace the actual behavior. Fix the underlying cause when it is in scope and authorized. An existing explanation is neither approval of the pattern nor permission for unrelated redesign.
+- Remove obsolete or misleading comments after the corresponding code is corrected. Preserve necessary rationale in a focused comment or an appropriate contract or decision record, with a traceable reference when useful. Deleting comments alone is not a root-cause fix.
+- Comment counts and TODO counts may help identify review candidates, but neither is a correctness metric or a basis for blanket deletion.
 
 ## Deep modules and information locality
 
