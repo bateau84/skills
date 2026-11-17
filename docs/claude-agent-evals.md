@@ -43,9 +43,11 @@ and writable evaluation workspaces. It serializes native profile use across
 independent runner processes with a private lock file.
 
 Disable paid usage credits in the dedicated Claude account *before* any live
-trial, and verify the account setting independently. Native subscription
-status does **not** prove that the account cannot incur charges. No paid
-requests are authorized by CI.
+trial, and verify the account setting independently. The live-only
+`--claude-billing-confirmed` flag requires an operator to acknowledge
+this check before execution. It does **not** verify provider billing settings,
+or guarantee zero overage. Native subscription status does **not** prove
+that the account cannot incur charges. No paid requests are authorized by CI.
 
 ## First qualification
 
@@ -66,6 +68,7 @@ bun run eval:live -- \
   --cases agent-run-audit:RUN-AUDIT-01 \
   --model 'claude-agent/<EXACT_AVAILABLE_MODEL_ID>' \
   --claude-config-dir "$HOME/.claude-eval-profile" \
+  --claude-billing-confirmed \
   --engine podman --image "$CLAUDE_IMAGE_ID" \
   --iterations 1 --parallel 1 --transport-retries 0 --verbose
 ```

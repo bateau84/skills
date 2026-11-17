@@ -74,7 +74,7 @@ class OciCommandCompositionTests(unittest.TestCase):
                 credential = profile / ".credentials.json"
                 credential.write_text("{}\n")
                 credential.chmod(0o600)
-                arguments += ["--claude-config-dir", str(profile)]
+                arguments += ["--claude-config-dir", str(profile), "--claude-billing-confirmed"]
             else:
                 arguments += ["--auth", str(auth)]
             options = self.runner.cli.parser().parse_args(arguments)

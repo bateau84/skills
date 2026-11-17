@@ -325,6 +325,7 @@ class SkillsProfile:
                 and ((o.judge_model or o.model) if judge else o.model).startswith("claude-agent/")
                 else None
             ),
+            claude_billing_confirmed=bool(getattr(o, "claude_billing_confirmed", False)),
         )
 
     def target_spec(self, case, prepared):

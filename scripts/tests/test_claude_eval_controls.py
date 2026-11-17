@@ -14,7 +14,7 @@ class ClaudeEvalControlTests(unittest.TestCase):
     def test_native_profile_is_explicit_and_requires_known_file(self):
         with tempfile.TemporaryDirectory() as tmp:
             profile = Path(tmp)
-            options = self.args("--claude-config-dir", str(profile))
+            options = self.args("--claude-config-dir", str(profile), "--claude-billing-confirmed")
             with self.assertRaisesRegex(ValueError, "dedicated native profile"):
                 validate_live(options, ("case",))
             (profile / ".credentials.json").write_text('{"claudeAiOauth":{"accessToken":"FAKE"}}')
@@ -32,7 +32,7 @@ class ClaudeEvalControlTests(unittest.TestCase):
                     (["--parallel", "2"], "parallel 1"),
                 ]:
                     with self.subTest(extra=extra), self.assertRaisesRegex(ValueError, match):
-                        validate_live(self.args("--claude-config-dir", str(profile), *extra), ("case",))
+                        validate_live(self.args("--claude-config-dir", str(profile), "--claude-billing-confirmed", *extra), ("case",))
 
     def test_never_falls_back_to_api_or_default_host_login(self):
         with self.assertRaisesRegex(ValueError, "requires --claude-config-dir"):
@@ -40,10 +40,21 @@ class ClaudeEvalControlTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             profile = Path(tmp)
             (profile / ".credentials.json").write_text("{}")
-            options = self.args("--claude-config-dir", str(profile))
+            options = self.args("--claude-config-dir", str(profile), "--claude-billing-confirmed")
             with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "FAKE-KEY"}, clear=True):
                 with self.assertRaisesRegex(ValueError, "refuses API"):
                     validate_live(options, ("case",))
+
+    def test_billing_operator_confirmation_is_mandatory_and_nonsubstitutable(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            profile = Path(tmp)
+            (profile / ".credentials.json").write_text("{}")
+            with patch.dict("os.environ", {}, clear=True):
+                with self.assertRaisesRegex(ValueError, "--claude-billing-confirmed"):
+                    validate_live(self.args("--claude-config-dir", str(profile)), ("case",))
+                with self.assertRaisesRegex(ValueError, "only valid"):
+                    validate_live(parser().parse_args(["--model", "openai/test", "--target", "agent-run-audit",
+                                                       "--claude-billing-confirmed"]), ("case",))
 
 
 if __name__ == "__main__":

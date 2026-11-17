@@ -59,6 +59,8 @@ def parser():
     p.add_argument("--artifact-dir", "--output", dest="artifact_dir", type=Path, help="Fresh single-run directory; default .skill-evals/<run-id>")
     p.add_argument("--provider-config", type=Path, help="V2 provider-only JSON; runtime policy/config inheritance is forbidden")
     p.add_argument("--claude-config-dir", type=Path, help="Explicit dedicated native Claude subscription profile for claude-agent/* target/judge")
+    p.add_argument("--claude-billing-confirmed", action="store_true",
+                   help="Confirm dedicated Claude account paid usage credits disabled before live evaluation; operator assertion only")
     for name in ("auth", "database", "models-catalog"):
         p.add_argument("--" + name, type=Path)
     p.add_argument("--env", action="append", default=[], help="Intentional extra provider env variable name; never logs values")
@@ -102,6 +104,8 @@ def validate_live(options, selected):
 
     validate_model_id(options.model, "--model")
     if getattr(options, "claude_config_dir", None):
+        if not options.claude_billing_confirmed:
+            raise ValueError("--claude-billing-confirmed required for live Claude evaluation after disabling paid usage credits")
         if not options.model.startswith("claude-agent/"):
             raise ValueError("--claude-config-dir requires a claude-agent/* target")
         if options.judge_transport != "opencode" or (
@@ -123,6 +127,8 @@ def validate_live(options, selected):
             raise ValueError("Claude Agent subscription refuses API/cloud/token environment overrides")
     elif options.model.startswith("claude-agent/") or (options.judge_model or "").startswith("claude-agent/"):
         raise ValueError("claude-agent/* requires --claude-config-dir")
+    elif options.claude_billing_confirmed:
+        raise ValueError("--claude-billing-confirmed is only valid for a dedicated Claude profile")
     if options.judge_model is not None:
         validate_model_id(options.judge_model, "--judge-model")
     if not selected:
