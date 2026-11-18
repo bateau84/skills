@@ -1,6 +1,6 @@
 ---
 name: experience-design
-description: Problem framing and scenario construction — the upstream discipline that identifies the actual human problem before any interface decision is made. Use when the problem is new or poorly defined, the interface type is unclear, the stated solution might not address the real need, or the user population is broad or unfamiliar. Not for information structure or navigation (→ `information-architecture`), per-action interface response (→ `interaction-design`), task-step sequencing (→ `user-flow-design`), or surface-specific design (→ `cli-design`, `tui-design`, `web-ui-design`, `desktop-ui-design`).
+description: Problem framing, experience goals, and useful-innovation hypotheses. Use when the problem is new or poorly defined, the interface type is unclear, a proposed capability needs comparison with the current workflow, or the user population is broad or unfamiliar. Not for information structure or navigation (→ `information-architecture`), per-action interface response (→ `interaction-design`), task-step sequencing (→ `user-flow-design`), or surface-specific design (→ `cli-design`, `tui-design`, `web-ui-design`, `desktop-ui-design`).
 metadata:
   version: "1.0.0"
 ---
@@ -9,10 +9,10 @@ metadata:
 
 ## What this skill is for
 
-Experience design is the entry discipline for every design engagement. It identifies the actual human problem from a stated request, defines the quality criteria a solution must meet, and produces the scenarios and experience goals that feed every downstream design discipline.
+Experience design frames unresolved human needs, defines the quality criteria a solution must meet, and supplies scenarios and experience goals to other design disciplines. Start with accepted framing and available evidence. For a bounded change with an agreed need, reuse that context and proceed; loading this skill does not require new discovery, personas, or a separate document.
 
 **Load this skill when:**
-- The problem is stated as a request for a specific UI component, feature, or interaction ("add a button", "add a dashboard", "redesign the settings page")
+- The problem is stated as a UI component, feature, or interaction request whose underlying need is unclear ("add a button", "add a dashboard", "redesign the settings page")
 - The interface type is not yet determined — could be CLI, TUI, web, desktop
 - The human need behind the stated request has not been established in a prior, documented design
 - The user population is unfamiliar, broad, or working in contexts that have not been analyzed
@@ -32,7 +32,7 @@ Experience design is the entry discipline for every design engagement. It identi
 
 ## The problem reframing protocol
 
-A stated request is never a problem statement. It is a proposed solution. Experience design's first move is always to identify what problem the proposed solution assumes is real, then verify that assumption.
+A stated request may contain a proposed solution, an established problem, or both. Identify the assumptions that matter to the decision; verify uncertain ones without reopening accepted scope. Use the steps below where framing is needed, rather than as a mandatory sequence for every change.
 
 ### Step 1 — Deconstruct the stated request
 
@@ -110,9 +110,13 @@ Experience goals are qualitative criteria for what a successful interaction feel
 
 Aim for 2–4 experience goals per design problem. More than four is usually a sign the goals are too granular (they have become task requirements) or too numerous (the problem scope is too broad).
 
+Include the intended feeling and value when they matter: calm under pressure, expressive ownership in a creative tool, curiosity in an exploration view, or pleasure in a well-crafted reading experience. Tie the quality to this audience and task; "beautiful" or "delightful" alone does not guide a decision. For example: "Exploring the collection should feel inviting and personal because readers are choosing what to spend an evening with; its presentation should support browsing without obscuring titles or authors."
+
+These are design intentions, not measured user reactions. Carry them into visual art direction and interaction choices, then evaluate rendered work and available user evidence. Usability and accessibility remain obligations; emotional or aesthetic value is also a legitimate goal.
+
 ### Step 6 — Check for premature interface framing
 
-Before completing experience design, verify: **Has any design decision already been made about how the interface will work?**
+Before completing unresolved framing, ask: **Is an unexamined interface assumption constraining the solution?** Accepted constraints and prior decisions are inputs, not reasons to restart discovery.
 
 Premature interface framing means a specific component, layout, or interaction pattern was decided before experience goals were established. The component decision then constrains all downstream work, even if it was the wrong choice.
 
@@ -121,7 +125,31 @@ Recognition signals:
 - The brief describes a component's behavior without stating what human problem it solves
 - The interaction model (CLI command, web form, menu) was decided before the surface type was evaluated against the user's context
 
-When premature framing is detected: name the assumption explicitly, set it aside, and work through the problem reframing protocol. Then re-evaluate whether the assumed interface is still the right choice. Often it is — but the evaluation must happen, not the assumption must be preserved.
+When a material, unexamined assumption is detected, name it and evaluate it against the human need. Use only the framing steps needed to resolve it, then reconsider the proposed interface. Preserve accepted scope and route any proposed replacement to its owner.
+
+---
+
+## Useful innovation as a hypothesis
+
+Use this method when a new capability or interaction mechanism is proposed and its benefit is uncertain. Keep it to a paragraph or small table in the existing brief; omit it for a settled correction. Novelty is an option, not a quota.
+
+1. **Name the baseline.** Who is doing what, in which context, and how do they accomplish it today? Identify the obstacle or workaround, using evidence where available and labeling assumptions.
+2. **State the benefit and mechanism.** Explain what the proposed capability changes and which user outcome should improve. Compare a familiar or simpler approach as well; do not equate added features, automation, or AI with value.
+3. **Account for costs.** Consider first-use learning, repeated-use effort, predictability, control, correction, and failure consequences. Preserve appropriate inspection, interruption, recovery, or fallback paths. If automation is involved, distinguish useful assistance from removing a part of the task people value doing themselves.
+4. **Choose a discriminating check.** Name a representative scenario, the observable improvement over the baseline, and an observation that would cause rejection or revision. Use `prototyping` for the smallest useful experiment; do not invent measurements or claim user validation from a hypothetical walkthrough.
+5. **Keep scope and capability honest.** Mark unaccepted functionality as a proposal. Record required capabilities and unknown dependencies; a convincing mockup does not establish that they exist. Route material changes to accepted product intent to its owner instead of silently expanding the task.
+
+Example: "For an on-call engineer correlating related alerts, grouping candidate incidents may reduce manual scanning compared with the chronological list. Test whether engineers can identify the cause and correct a mistaken grouping without losing evidence. Revise the proposal if correction takes more effort than the original workflow. Automatic correlation remains a capability assumption until established."
+
+This method adapts the Design Council's iterative exploration and Google PAIR's comparison of user needs with technology value; it does not establish that every novel mechanism will improve the experience.
+
+## Continuity across surfaces
+
+Consider only the surfaces needed for the user's task. Trace where the journey begins, pauses, resumes, or moves between browser, desktop, mobile, CLI, TUI, or conversation. Preserve shared meaning: object names, action consequences, state, progress, and recoverable work. Decide which context must travel with a handoff and what the receiving surface must make visible.
+
+Adapt presentation and interaction to input method, attention, platform conventions, accessibility, and environment. A terminal transcript, a desktop detail panel, and a mobile summary can serve the same outcome without identical controls or feature density. Do not assume every feature belongs on every surface or that state synchronization exists. Record an unsupported handoff as a dependency or limitation.
+
+For a relevant transition, add one scenario that exposes interruption or mismatch: an engineer starts an investigation in a TUI, checks it on a phone, then resumes at a desktop; can they recover the selected incident, pending work, and latest state? Use surface-specific skills for the controls and layout once the continuity need is clear.
 
 ---
 
@@ -200,7 +228,7 @@ From the distracted ops engineer scenario: an engineer who returns to the TUI af
 
 ## Experience design outputs
 
-Experience design produces four artifacts. These are the inputs to all downstream design skills.
+Record the useful outputs below in the existing brief or design record. They need not be four separate artifacts; reuse accepted material and omit work that adds no decision value.
 
 ### 1. Problem statement
 The human need, not the interface solution. Named user in specific context, goal they are trying to accomplish, current obstacle to success, no interface vocabulary. One paragraph.
@@ -303,7 +331,7 @@ Small features embed themselves in larger experiences and can damage coherence, 
 
 ## AI-agent adaptation
 
-A human experience designer has access to: user interviews, ethnographic observation, usability testing, behavioral analytics. An AI design agent has access to none of these. The adaptations:
+Available evidence depends on the task and host. Inspect supplied research, observed interactions, analytics, recordings, or authorized research tools when available. Otherwise use the analytical methods below and state their limits. Tool access does not turn a simulated user into a real participant.
 
 ### What remains available
 
@@ -317,11 +345,11 @@ A human experience designer has access to: user interviews, ethnographic observa
 
 **Structured heuristic walkthrough:** The cognitive walkthrough method — asking "would the user know what to do here?" and "would the user know if they succeeded?" for each step of a scenario — requires no user observation.
 
-### What is unavailable — and must be acknowledged
+### What requires actual evidence
 
-- Real user observation: no ethnography, no field visits, no contextual inquiry
-- User testing: no usability sessions, no think-aloud protocols
-- Quantitative behavioral data: no analytics unless explicitly provided
+- Real user observation: identify the participants, context, and observations actually available
+- User testing: distinguish actual sessions or recordings from expert predictions
+- Quantitative behavioral data: identify the dataset and limits; do not fabricate analytics
 - Lived context knowledge: the AI agent cannot experience the user's actual environment
 
 ### How to handle unavailability honestly
@@ -348,6 +376,14 @@ Experience design outputs are the inputs to every other loaded skill:
 | Experience principles | `design-specification` (as constraints that must be preserved in the spec), all surface skills (as constraints that cannot be violated by surface-specific decisions) |
 
 Experience design feeds all downstream disciplines. It is not revised by them. If a downstream skill reveals that a scenario was missing an important case, or that an experience goal was unachievable given surface constraints, that finding goes back to the problem framing — not silently dropped.
+
+---
+
+## Sources for innovation and continuity
+
+- [Design Council, Framework for Innovation](https://www.designcouncil.org.uk/resources/framework-for-innovation/) — iterative problem and solution exploration; not a fixed sequence of required artifacts.
+- [Google PAIR, User Needs + Defining Success](https://pair.withgoogle.com/guidebook-v2/chapter/user-needs/) — compare proposed technology with user needs, simpler alternatives, and the costs of automation. The broader innovation hypothesis above is an adaptation.
+- [GOV.UK Service Standard, Joined up experience across channels](https://www.gov.uk/service-manual/service-standard/point-3-join-up-across-channels) — support the mix of channels people need and examine their interactions; adapted here to user surfaces.
 
 ---
 

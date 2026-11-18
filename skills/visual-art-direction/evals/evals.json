@@ -1,0 +1,85 @@
+{
+  "skill": "visual-art-direction",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "ArtDirection-01",
+      "name": "product-specific-directions-with-evidence-limits",
+      "trap": "Recoloring a generic dashboard, treating appearance as decoration only, or claiming an unseen render proves quality.",
+      "prompt": "Develop visual directions for a new incident-review web tool. On-call engineers need to compare an incident timeline, affected services, and operator notes; these capabilities already exist. The desired character is calm, precise, and recognizably our product. Current constraints: keyboard use, long service names, and both dense wide views and narrow layouts. Visual direction is open and routine design choices are delegated to you. Available evidence is this brief only; no screenshots or rendering tools are available in this exercise. Provide the direction and a useful implementation handoff without adding product features.",
+      "expectations": [
+        "Connects intended character to concrete hierarchy, composition, typography, density, and visual relationships suited to the supplied content.",
+        "Compares meaningfully different directions rather than only palette swaps, and chooses with task/context-based rationale.",
+        "Preserves keyboard, long-content, dense and narrow conditions in the design reasoning without inventing product capabilities.",
+        "Distinguishes a proposed visual direction and professional reasoning from observed rendering, user preference, and validated usability; identifies the material checks still needed."
+      ],
+      "negative_expectations": [
+        "Does not default to an oversized hero and identical decorative cards without explaining fit to the task.",
+        "Does not claim to have viewed references, rendered screens, or measured user preference.",
+        "Does not require the user to choose routine delegated craft details."
+      ]
+    },
+    {
+      "id": "ArtDirection-02",
+      "name": "expressive-language-without-style-blacklist",
+      "trap": "Treating gradients, common fonts, rounded forms, or decorative color as inherently bad AI design.",
+      "prompt": "Refine the visual direction for a playful music discovery app. Accepted brand decisions: saturated gradients, rounded controls, and a widely used sans-serif family. People browse cover art, preview tracks, and save albums; no new features are requested. We want it to feel crafted rather than generic. Propose improvements that respect the accepted language and work on phone and desktop.",
+      "expectations": [
+        "Retains accepted expressive ingredients and improves their composition, hierarchy, type, imagery treatment, or consistency with product-specific reasoning.",
+        "Protects readable content, usable controls, clear states, and relevant reduced-motion behavior without equating all expression with noise.",
+        "Adapts density and controls to phone/desktop rather than shrinking one layout.",
+        "Diagnoses generic execution through concrete mismatches rather than forbidden-style lists."
+      ],
+      "negative_expectations": [
+        "Does not remove the accepted gradient/font/rounding solely because it is fashionable or common in generated interfaces.",
+        "Does not impose sterile minimalism or novelty in navigation as the only path to quality."
+      ]
+    },
+    {
+      "id": "ArtDirection-03",
+      "name": "bounded-refinement-keeps-language",
+      "trap": "Turning one local visual defect into a brand exercise, new documentation, or forced alternatives.",
+      "prompt": "Our desktop app has an accepted visual system and a finished account form. The only change requested is to improve the spacing between each label and input so association is clearer. All behavior, copy, typography, and colors are settled. Explain the bounded design adjustment and how to inspect it.",
+      "expectations": [
+        "Keeps the change within existing spacing/typography language and focuses on grouping and association.",
+        "Recommends a proportional check of the affected form at relevant conditions without reopening accepted behavior or branding."
+      ],
+      "negative_expectations": [
+        "Does not demand three directions, reference hunting, new personas, or a DESIGN.md file.",
+        "Does not ask for approval of an ordinary delegated spacing correction."
+      ]
+    },
+    {
+      "id": "ArtDirection-04",
+      "name": "terminal-and-conversation-expression",
+      "trap": "Applying a web visual identity literally to terminal or spoken surfaces.",
+      "prompt": "A deployment service has a web dashboard, CLI, full-screen TUI, and optional voice status readout. Accepted state vocabulary is pending, running, succeeded, failed. The web identity is precise and reassuring, with blue accents and compact grouping. Propose how that character should carry across the other surfaces, and what evidence would support a quality judgment. No tools or actual captures are supplied.",
+      "expectations": [
+        "Preserves shared state meaning and tone while adapting output/controls to each surface.",
+        "Discusses human-readable and redirected/machine output for CLI, and focus/keys/size/theme or glyph constraints for TUI.",
+        "Addresses turn length, repair, interruption, and understandable status for voice without prescribing graphical ornament.",
+        "Names different evidence for transcripts/streams, terminal interaction/captures, and audio/timing; does not claim any was observed."
+      ],
+      "negative_expectations": [
+        "Does not prescribe identical literal colors, web cards, CSS tokens, or font sizes for all surfaces.",
+        "Does not claim screenshots prove voice pacing or terminal accessibility."
+      ]
+    },
+    {
+      "id": "ArtDirection-05",
+      "name": "real-content-over-showcase",
+      "trap": "Treating a beautiful sparse showcase as proof of complete visual quality.",
+      "prompt": "Assess the next visual checks for a document browser. The only available artifact is a reported screenshot description: a beautiful sparse grid with four short titles, generous whitespace, and decorative thumbnails. The actual task includes comparing hundreds of records, very long titles, empty/error states, and keyboard navigation. There is no accepted replacement layout. What can we conclude and what should be examined next?",
+      "expectations": [
+        "Treats the screenshot description as limited reported evidence, not direct observation or proof of task fitness.",
+        "Identifies realistic content density, title wrapping, state coverage, and keyboard interaction as relevant uncertainties.",
+        "Keeps craft opportunities separate from accepted-design violations and does not invent a mandatory replacement design."
+      ],
+      "negative_expectations": [
+        "Does not claim the product is validated or fully accessible because the showcase looks good.",
+        "Does not ban grids/whitespace/thumbnails without considering the task and constraints."
+      ]
+    }
+  ]
+}

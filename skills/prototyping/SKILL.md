@@ -1,6 +1,6 @@
 ---
 name: prototyping
-description: Design exploration through text-based prototyping artifacts — structured scenario walkthroughs, state-transition sketches, behavioral pseudocode, comparative scenario analysis, and CLI command transcripts. Use when design decisions are unresolved and building the wrong thing would be costly; when the interaction model is unclear; when multiple design options need comparing before committing to a Design Spec. Not for producing the final Design Spec (→ `design-specification`), validating an existing implementation (→ `design-validation`), or creating interactive Figma/Sketch prototypes — the five formats here are an AI design agent's genuine contribution to prototyping, not a workaround.
+description: Question-led design exploration through scenario walkthroughs, state sketches, behavioral pseudocode, comparative analysis, CLI transcripts, and rendered or interactive prototypes. Use when interaction, visual character, or capability decisions need evidence before commitment, or alternatives need comparison. Not for the final design contract (→ `design-specification`) or validating an actual implementation (→ `design-validation`).
 metadata:
   version: "1.0.0"
 ---
@@ -11,7 +11,7 @@ metadata:
 
 Prototyping is the practice of making design decisions concrete and testable at lower cost than full implementation. Its purpose is to *reduce uncertainty* — to move from "I think this will work" to "I have evidence this works (or doesn't)" before committing to a Design Spec or to code.
 
-A prototype is not a deliverable. It is a tool for making decisions.
+A prototype is a tool for making decisions. It may be the requested deliverable, but its appearance or interactivity alone does not make it an implementation contract or a working product.
 
 **Load this skill when:**
 - Design decisions are genuinely unresolved and building the wrong thing is costly
@@ -19,25 +19,26 @@ A prototype is not a deliverable. It is a tool for making decisions.
 - Two or more design approaches exist and you need to compare them against real scenarios before choosing
 - A scenario walkthrough would reveal whether the design handles the user's goal — but the Design Spec hasn't been written yet
 - A novel interaction pattern needs to be specified precisely enough to reveal ambiguity
+- Visual character, composition, density, motion, or another sensory quality needs comparison through actual samples
 
 **Do NOT load this skill when:**
 - The design is already specified to a level sufficient for implementation — prototyping is for resolving uncertainty, not for creating deliverables from a resolved design
 - You are evaluating an existing implementation (→ `design-validation`)
 - You are ready to commit the resolved design into a handoff contract (→ `design-specification`)
 
-**Boundary with `design-specification`:** A prototype is exploratory — it tests whether a design approach works. A Design Spec is prescriptive — it defines what the final design is. Prototyping precedes the spec. When the prototype has answered its design questions, convert its outputs into the Design Spec; the spec is then the implementation contract.
+**Boundary with `design-specification`:** A prototype explores a design question; the accepted Design Spec defines the implementation contract. Prototype when uncertainty warrants it, including while refining an existing design. Record resolved choices and remaining limits in the appropriate part of the spec; do not impose a whole-project prototype-before-spec stage.
 
-**Boundary with `design-validation`:** Prototyping evaluates a design concept *before* implementation. Design-validation evaluates an *existing implementation* after it exists. Both use inspection methods; the subject is different.
+**Boundary with `design-validation`:** Prototyping investigates a proposed concept or change, including changes to existing products. Design-validation evaluates the actual implementation against accepted intent. An interactive prototype remains a prototype unless its production capability has been established.
 
 **Boundary with `experience-design`:** Experience-design produces scenarios. Prototyping uses those scenarios as test inputs to evaluate whether the proposed design handles them. Scenarios are the fuel; this skill defines how to use them.
 
 ---
 
-## Why prototyping exists (the economic argument)
+## Why prototyping exists
 
-Nielsen (2003) established the economic foundation: "Benefits from early usability data are at least ten times greater than those from late usability data." Early change is approximately 100× cheaper than post-implementation change.
+Prototypes let a team explore, compare, and discard ideas without the commitment of full production implementation. The benefit depends on what uncertainty they resolve; a prototype without a consequential question can waste time as readily as code can.
 
-For an AI design agent, this means: spending 20 minutes on a scenario walkthrough that reveals a missing state is worth more than 2 hours of implementation that builds the wrong thing. Prototyping is not optional ceremony — it is the mechanism for making design decisions with evidence rather than assumption.
+Before making one, state the question, the observation that would inform the decision, and what this artifact cannot establish. For a small accepted correction, inspect the relevant states directly instead of creating an elaborate prototype.
 
 **What prototypes expose:**
 - **Gaps**: interactions the design has not specified ("what happens when the user presses Escape here?")
@@ -49,20 +50,20 @@ For an AI design agent, this means: spending 20 minutes on a scenario walkthroug
 
 ## Decision prototyping vs validation prototyping
 
-Two modes exist. Most AI design agent prototyping is decision-type.
+Two useful purposes are decision exploration and evaluation. Choose methods based on the question and available evidence, not the practitioner's identity.
 
 **Decision prototyping** — resolving a design question before it becomes speculation
 - Purpose: compare approaches or work out interaction details before committing to the spec
 - Evaluation question: "Which approach handles the important scenarios better, and what does each reveal about edge cases?"
 - Completion criterion: the design question is answered with sufficient evidence to record it as a Design Decision
-- Formats: comparative scenario analysis, behavioral pseudocode, state-transition sketches
+- Formats: comparative scenario analysis, behavioral pseudocode, state-transition sketches, rendered or interactive samples
 
 **Validation prototyping** — simulating whether the design works for its intended user
 - Purpose: test whether the design's interaction model works from a new-user perspective
 - Evaluation question: "At each step, would a user trying to achieve this goal know what to do, and would the system's response confirm progress?"
 - Completion criterion: the scenario is walked through step by step and gaps/contradictions are surfaced
 - Formats: structured scenario walkthroughs using the four cognitive walkthrough questions
-- AI agent limitation: An AI agent cannot observe real user behavior — the scenario walkthrough applies the four cognitive walkthrough questions (see §Scenario walkthroughs) as a *simulated* validation. This is a genuine evaluation method, not a poor substitute: the agent can apply the framework systematically to every step without the inconsistency of informal mental walkthroughs.
+- Evidence boundary: A cognitive walkthrough is an expert prediction, not observed user behavior. Use actual participant observations or recordings when available and identify their source and limits. An agent acting as a user or clicking through a prototype does not establish learnability for the intended population.
 
 ---
 
@@ -70,30 +71,29 @@ Two modes exist. Most AI design agent prototyping is decision-type.
 
 Fidelity describes how closely the prototype matches the final design. The right fidelity is the **minimum needed to answer the design question** — not the maximum the designer can produce.
 
-Fidelity varies in three dimensions independently (Pernice, 2016):
+Choose fidelity independently for each relevant dimension; these are working distinctions, not required stages:
 
 | Dimension | Low fidelity | Medium fidelity | High fidelity |
 |---|---|---|---|
-| **Interactivity** | Static; designer plays "the system" | Key flows specified | All interactions defined |
-| **Content** | Placeholder labels and labels | Representative content | Production-ready content |
-| **Completeness** | Key scenarios only | Primary flows + error paths | All flows including edge cases |
+| **Visual or sensory detail** | Rough composition or dialogue sketch | Selected type, color, density, or voice samples | Closely rendered appearance, motion, or audio for the question |
+| **Interactivity** | Static states or narrated response | Key transitions simulated or executable | Realistic interaction for the tested journey |
+| **Content** | Minimal labeled examples | Representative content and lengths | Realistic varied data needed for the decision |
+| **Coverage** | One decisive scenario | Relevant success, failure, and recovery cases | Broader journeys where the question warrants them |
+| **Implementation realism** | Proposed behavior only | Explicitly simulated dependencies | Verified integration for the tested slice |
 
-**When each level is appropriate:**
-- **Low fidelity** when the design question is about structure and flow — not visual appearance. Use early when comparing multiple approaches. You can create and evaluate three low-fidelity concepts faster than one high-fidelity concept.
-- **Medium fidelity** when the design question is about interaction logic: does this command hierarchy make sense? Does this workflow's decision order serve the user? Medium fidelity catches behavioral problems that low fidelity misses.
-- **High fidelity** when the design question is about specific content, labeling, or edge case handling. Only appropriate when structural and interaction questions have already been answered.
+**Match the artifact to the uncertainty:** Use a rough sketch to compare composition, a transcript to inspect command semantics, an interactive slice to investigate feedback timing, or a carefully rendered view to compare visual character. Look and feel can be investigated early when they are load-bearing; unresolved interaction decisions do not forbid visual exploration. Conversely, polished visuals add little evidence to a question about cancellation or persisted state.
 
-**Anti-pattern:** High-fidelity prototypes create designer attachment — "once we invest more time and sweat in a design, it's harder to give it up if it does not work well" (Nielsen, 2003). Start low. Move up only when the lower-fidelity question has been answered.
+Use representative content when judging density, labels, composition, or tone. Limit investment to the part being investigated and remain willing to discard it. Higher visual fidelity does not imply broader behavior coverage, production readiness, or verified usability.
 
 ---
 
 ## The five prototyping formats
 
-The five formats are arranged by primary use case, not by fidelity — any format can be applied at low, medium, or high fidelity depending on the depth of coverage.
+The five formats are arranged by use case, not sequence. Combine or adapt them to the available tools and the question; they are not a closed list of permitted tools or outputs.
 
-### Format 1: Structured scenario walkthrough (primary format)
+### Format 1: Structured scenario walkthrough
 
-The scenario walkthrough is the primary prototyping artifact for an AI design agent. It adapts the cognitive walkthrough method (Flaherty, 2022) to text-based evaluation — making it the AI agent's equivalent of watching someone use a paper prototype.
+The scenario walkthrough applies cognitive walkthrough questions (Flaherty, 2022) to a proposed journey. It can expose ambiguity and predict learnability problems; it is not equivalent to watching a participant use a prototype.
 
 **When to use:** When you need to test whether the design handles a specific user goal end-to-end. Use for primary task flows, critical error paths, and scenarios that involve state changes.
 
@@ -154,7 +154,7 @@ A step that fails one of these questions is a design gap — not a user error.
 
 **CLI surface: command transcript** — the scenario walkthrough for CLI takes the form of a command transcript. This is the most powerful CLI prototyping artifact: it shows exactly what the user types and what the tool outputs, making the design concrete before any code is written.
 
-**When to use (CLI transcript):** For any CLI design question. Design the transcript first; write the spec from it. The transcript is low-fidelity by default (one scenario), medium-fidelity when it covers primary flows + error paths, high-fidelity when it covers all invocations.
+**When to use (CLI transcript):** When command input, output, recovery, or scripting semantics are uncertain. Show the relevant invocations and streams, then record accepted behavior in the spec. A short transcript can be precise; covering every invocation is unnecessary unless the question requires it.
 
 **Structure:**
 
@@ -214,7 +214,7 @@ $ echo $?
 ```
 
 **What the transcript reveals:**
-- Whether the exit code taxonomy is complete (three distinct failure modes need three codes, not one `1`)
+- Whether automation needs distinct exit codes for different failure modes, or a shared non-zero code with structured diagnostics is sufficient for callers
 - Whether the output is correctly split between stdout (data) and stderr (diagnostics) — the transcript makes this ambiguous until the spec is explicit
 - Whether error messages are constructive (suggestion for typo, actionable resolution for dependency failure)
 - Whether `--quiet` suppresses ALL output, or just progress output (the transcript above leaves this a design gap: does the final confirmation line appear in quiet mode?)
@@ -238,17 +238,17 @@ $ echo $?
 
 ### Format 2: State-transition sketch
 
-The state-transition sketch makes all states explicit — as text — with the transitions between them labeled by trigger and feedback. It reveals missing states and impossible transitions before they reach the spec.
+The state-transition sketch makes relevant states explicit, with transitions labeled by trigger and feedback. It can reveal missing states and impossible transitions; its coverage must still be inspected.
 
 **Two manifestations:**
-- **TUI terminal state sketch** — ASCII representation of key TUI screen states with labeled regions and key bindings (see below)
+- **TUI terminal state sketch** — character-cell sketch or rendered terminal sample of key states with labeled regions and key bindings (see below)
 - **Component state-transition diagram** — textual enumeration of all states a component passes through, with entry conditions, exit conditions, and transitions
 
 **When to use:** When the design question is "what states does this screen or component have, and how does it transition between them?" Use for interactive components with multiple states (forms, modals, search, async operations) and for TUI navigation design.
 
-**TUI terminal state sketch** — the state-transition sketch for TUI takes the form of ASCII state representations:
+**TUI terminal state sketch** — use character-cell sketches or actual terminal renderings as available. Sketches support structure and state reasoning; check cell width, clipping, contrast, resize behavior, and terminal interaction in an actual rendering or runtime when those are the question.
 
-**When to use (TUI sketches):** When designing TUI layout, navigation, or state transitions. Use early to establish the structural model before specifying key bindings or interaction details.
+**When to use (TUI sketches):** When designing TUI layout, navigation, or state transitions. Investigate structure, visible state, key bindings, and interaction details together where they constrain one another.
 
 **Structure:**
 
@@ -550,34 +550,24 @@ Record as: Design Decision — "Invalid CLI invocations display contextual usage
 
 ---
 
-### Format 5: HTML/CSS static mockup (web only)
+### Format 5: Rendered or sensory prototype
 
-For web-specific design problems where visual decisions need to be evaluated — not just structural or interaction decisions — a static HTML/CSS rendering makes visual choices concrete enough to evaluate.
+Use actual samples when the question concerns appearance, composition, density, motion, sound, or the feel of an interaction. Choose the available medium that can expose the issue: HTML/CSS in a browser, a native or mobile preview, rendered terminal states, or spoken dialogue samples. A browser rendering of a desktop concept can inform visual composition; it does not verify native behavior. A transcript can test voice sequencing and wording; it cannot establish acoustic clarity or timing.
 
-**When to use:** Web design problems only. When the design question is about visual hierarchy, layout density, color semantics, or component composition on a web surface — after structural and interaction questions have been answered at lower fidelity. This is NOT an interactive prototype; it is a visual exploration.
+**How to use it:** Name the intended character and the decision under review. Render a representative view or short journey with realistic content. For alternatives, keep the scenario, data, and viewing conditions comparable; vary the consequential design choices. Inspect the actual output rather than treating source code or a description of the intended result as visual evidence. Use relevant surface guidance and `visual-art-direction` for craft decisions.
 
-**How it works:** When Designer has access to the visual companion (browser tool), Designer can produce a static HTML/CSS rendering of a key view. The rendering makes visual decisions concrete: does this color strategy actually distinguish primary from secondary actions? Does this information density feel oppressive or clear?
+**Choose and report the evidence level:**
+- **Static sample:** Can inform hierarchy, typography, rhythm, color, density, composition, tone, and fit at the sampled size. It does not establish transitions, keyboard focus, responsiveness between samples, or task success.
+- **Interactive prototype:** Can demonstrate the transitions and input behavior actually implemented and exercised. Mark simulated data and dependencies; it does not establish persistence, latency, synchronization, reliability, or production capability beyond the evidence available.
+- **Real product observation:** Can establish observed behavior in the named build and environment. Use `design-validation` for implementation conformance; user-population claims still need appropriate user evidence.
 
-**Scope:** This format produces the output of the divergence funnel technique (see `web-ui-design` skill) — a static rendering that answers visual questions. It does NOT produce interactive behavior; click handlers, dynamic state changes, and API integration are out of scope.
-
-**What it reveals:**
-- Whether the visual hierarchy is effective at communicating structure and priority
-- Whether the spacing and density feel appropriate for the content
-- Whether the color and typography decisions serve the information goals
-- Whether the component layout works at the target viewport size
-
-**What it does NOT reveal:**
-- Interaction behavior (states, transitions, focus management — use Formats 1–3 for these)
-- Whether the design works for users (requires real user observation)
-- Whether the implementation is feasible (HTML/CSS prototypes may not reflect implementation constraints)
-
-**Not applicable to:** CLI, TUI, or desktop surfaces — use Formats 1–3 for all non-web surfaces.
+Use the tools the host actually provides. No particular browser server, preview skill, design application, or simulator is mandatory. If rendering or audio is unavailable, provide the best usable artifact, identify what remains unassessed, and avoid claiming visual or sensory validation. Do not substitute a generated picture for exact interaction behavior or a functioning interface.
 
 ---
 
 ## Scenario walkthroughs as AI-usable validation
 
-The scenario walkthrough is the AI design agent's primary form of design validation *before implementation*. It applies the four cognitive walkthrough questions (Flaherty, 2022) systematically at each step — which is what the structured walkthrough format does.
+A scenario walkthrough applies the four cognitive walkthrough questions (Flaherty, 2022) systematically to a proposed journey. Use it for analytical inspection, alongside rendered, interactive, or participant evidence where the question needs those forms.
 
 **What good scenario walkthroughs surface:**
 - **Missing states**: steps where the design doesn't specify what the user sees or what happens
@@ -595,10 +585,10 @@ The scenario walkthrough is the AI design agent's primary form of design validat
 
 **What scenario walkthroughs do NOT surface:**
 - Whether the design actually meets real user needs (requires real users — this is the limitation of all expert review methods)
-- Whether the visual appearance is effective (requires rendering — use terminal state sketches or static mockups for visual questions)
+- Whether the visual appearance achieves its intent (inspect rendered samples; sketches alone do not establish finished appearance)
 - Whether the interaction is fast enough for expert users who have learned it (requires observation over time)
 
-The gap between "what walkthroughs surface" and "what they miss" is the limit of decision prototyping. When these missing signals matter, the design decision should be recorded as an Open Design Question for post-implementation validation.
+Record missing signals as open questions with the evidence needed to resolve them. Seek that evidence before commitment when the risk warrants it; do not automatically defer a decisive user or visual question until after implementation.
 
 ---
 
@@ -606,13 +596,13 @@ The gap between "what walkthroughs surface" and "what they miss" is the limit of
 
 A prototype is "done" when it has answered the design questions it was created to answer — not when it is complete, detailed, or polished.
 
-**Readiness check:** For each relevant state, check entry condition, available actions, exit transitions, and unresolved decisions. Prefer moving answered questions into the Design Spec over creating another prototype; only repeat prototyping for a named unresolved decision that a new scenario can settle.
+**Readiness check:** For the investigated slice, check relevant states, actions, transitions, visual or sensory decisions, and unresolved assumptions. Prefer recording answered questions in the Design Spec over creating another prototype. Repeat only for a named uncertainty that another scenario, rendering, or experiment can reduce.
 
 **When to transition:**
-- The design approach has been selected (comparative scenario analysis is complete)
-- The key interactions are worked out (state sketches and behavioral pseudocode have no remaining gaps)
-- No major structural or flow uncertainties remain
-- The remaining open questions are documented as Open Design Questions for post-implementation validation
+- The specific question has enough evidence for an accepted decision, including its limits
+- The affected behavior and visual intent can be recorded without inventing decisions hidden in the prototype
+- Material unresolved questions are assigned an appropriate next check rather than presented as settled
+- The existing spec can be updated proportionally; a bounded change does not require a new whole-product document
 
 **How to transition:**
 
@@ -626,10 +616,11 @@ Each prototype artifact maps to elements in the Design Spec (see `design-specifi
 | Key binding map | Focus behavior, Interaction/actions (Behavioral specification) |
 | State-transition sketch | States + Transitions (States and interactions) |
 | Behavioral pseudocode | Interactions/actions with conditional logic (Behavioral specification) |
+| Rendered or sensory sample | Accepted visual or sensory intent, references, representative states, and evidence limits |
 | Design gaps discovered | Open design questions |
 | Design decisions made | Design decisions |
 
-The prototype does NOT ship. The Design Spec is the implementation contract. The prototype is the evidence that informs it.
+The Design Spec is the implementation contract. Prototype artifacts inform it and may accompany it. Do not promote prototype code to production merely because it looks complete; production readiness requires the appropriate engineering work and verification.
 
 **Prototype limbo anti-pattern:** The failure pattern where a prototype is refined indefinitely instead of transitioning to a spec. Signs: the prototype is growing in detail, not in answered questions. No design questions remain open, but the prototype "isn't ready yet." Fix: the prototype is ready when its questions are answered, not when it is finished.
 
@@ -647,24 +638,26 @@ The prototype does NOT ship. The Design Spec is the implementation contract. The
 | How does the CLI handle error cases? | CLI command transcript (primary + error paths) | Medium |
 | What exactly happens at each transition? | State-transition sketch with full transition table | Medium |
 | How does complex conditional logic work? | Behavioral pseudocode | Medium |
-| Is the complete interaction model specified? | Full scenario walkthrough + all states + pseudocode | High |
-| Am I ready to write the Design Spec? | Review all prototype artifacts for remaining gaps | High |
+| Does this visual direction fit the intended experience? | Comparable rendered samples with representative content | Enough visual detail to judge the difference; behavior may remain simulated |
+| Does an interaction or spoken response feel understandable? | Interactive slice or actual audio sample | Enough timing and input realism for the question |
+| Is the affected interaction model specified? | Relevant walkthrough and states; pseudocode if needed | Coverage appropriate to the change |
+| Am I ready to update the Design Spec? | Review evidence and remaining questions for the investigated slice | No fixed fidelity requirement |
 
 ---
 
 ## Anti-patterns
 
-**1. Prototyping visual appearance before interaction logic is resolved**
-Building ASCII art layout before understanding whether the flow is correct. Fix: resolve what states exist and what triggers transitions before deciding where things appear on screen. The state-transition sketch comes before the terminal state sketch.
+**1. Using the wrong evidence for the question**
+Judging visual character from prose, or treating a polished screen as proof of usable behavior. Fix: render when appearance matters, exercise interactions when behavior matters, and use actual user evidence for claims about users. Investigate these together when they constrain each other; do not force visual exploration to wait for every interaction decision.
 
-**2. Treating the prototype as the final artifact**
-Sharing the prototype with stakeholders as "the design," or handing transcripts to an implementer as implementation instructions. Fix: when the prototype has answered its questions, translate it into a Design Spec. The spec is the contract; the prototype is the evidence.
+**2. Treating the prototype as the implementation contract**
+Handing over an exploratory artifact while leaving consequential choices or simulated capabilities implicit. Fix: record accepted behavior, visual intent, and evidence limits in the Design Spec. A prototype can accompany that contract or be the requested exploration deliverable; it does not silently resolve its own gaps.
 
 **3. Happy-path-only scenarios**
 Walking through only the success case (valid input, all systems up, no prior state). Fix: for every success-path walkthrough, add at least one error-path walkthrough (invalid input, system unavailable, prior failed state). Error paths reveal more design gaps than success paths.
 
-**4. Over-fidelity too early**
-Specifying every interaction in detail before the structural questions are answered. Fix: the question drives the fidelity. If you don't yet know whether two-panel or single-panel navigation is right, a detailed two-panel state sketch is premature.
+**4. Investment beyond the question**
+Refining unrelated details or completing every state before comparing an uncertain approach. Fix: the question drives fidelity and coverage. If two-panel versus single-panel navigation is unresolved, make comparable slices sufficient to judge that difference rather than fully building only one.
 
 **5. Prototyping without a design question**
 "Let's prototype the onboarding flow" without naming what question the prototype will answer. Fix: before starting, complete this sentence: "This prototype will tell us whether [design decision] by showing us [observable evidence]."
@@ -672,18 +665,20 @@ Specifying every interaction in detail before the structural questions are answe
 **6. Skipping "obvious" steps in scenario walkthroughs**
 The step that seems obvious to the designer who has been thinking about it for days is the step that reveals the most gaps — because that's where the designer's assumptions are invisible. Apply the four cognitive walkthrough questions at every step, especially the "obvious" ones.
 
-**7. Apologizing for the absence of interactive prototypes**
-The five formats here are not a workaround for not having Figma access — they are the primary prototyping contribution an AI design agent makes. A scenario walkthrough applied systematically is more thorough than an informal mental walkthrough. A state-transition sketch reveals all missing states. A CLI command transcript makes exit codes and stream contracts visible before any code is written. These are genuine tools.
+**7. Treating one tool's absence as a blocker, or inventing tool access**
+Use an available format that produces useful evidence and state what remains unknown. A transcript can expose command contracts without a GUI; a state sketch can expose missing transitions without a simulator. Where the question needs actual rendering, interaction, or audio, name that limit instead of claiming a textual substitute verified it. Use richer tools when available and appropriate.
 
 ---
 
 ## Sources
 
-- Nielsen, J. (2003). "Paper Prototyping: Getting User Data Before You Code." Nielsen Norman Group. [nngroup.com/articles/paper-prototyping/] — economic argument for early prototyping; 10× benefit ratio established.
+- [Houde, S. and Hill, C. (1997), What Do Prototypes Prototype?](https://hci.stanford.edu/courses/cs294h/2006/readings/houde-prototypes-97.pdf) — choose prototypes by questions about role, look and feel, and implementation; detail is not completeness.
+- [GOV.UK Service Manual, Making prototypes](https://www.gov.uk/service-manual/design/making-prototypes) — choose appropriate fidelity, compare and discard ideas, and distinguish prototype code from production readiness.
+- Nielsen, J. (2003). "Paper Prototyping: Getting User Data Before You Code." Nielsen Norman Group. [nngroup.com/articles/paper-prototyping/] — early exploration and feedback; no universal cost multiplier is assumed here.
 - Pernice, K. (2016). "UX Prototypes: Low Fidelity vs. High Fidelity." Nielsen Norman Group. [nngroup.com/articles/ux-prototype-hi-lo-fidelity/] — fidelity dimensions (interactivity, visuals, content); designer attachment anti-pattern.
 - Flaherty, K. (2022). "Evaluate Interface Learnability with Cognitive Walkthroughs." Nielsen Norman Group. [nngroup.com/articles/cognitive-walkthroughs/] — the four cognitive walkthrough questions; learnability evaluation method.
 - Gothelf, J. & Seiden, J. (2021). *Lean UX* (3rd ed.). — decision prototyping concept; minimum viable prototype principle. [partially verified]
 - Carroll, J.M. (1995). *Scenario-Based Design*. — scenarios as design hypotheses evaluable through structured analysis. [partially verified]
-- This skill focuses on five text-based prototype formats that can be produced with ordinary agent tools. Interactive prototypes may supplement them when the task and available tools support it.
+- The evidence distinctions and surface examples here adapt those principles to available host tools; they do not establish empirical effectiveness across every surface.
 
 ---

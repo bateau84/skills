@@ -7,7 +7,7 @@ description: Produce an implementation-ready human-experience handoff from accep
 
 Use when agreed human-facing design must be explicit enough for architecture, planning, implementation, review, and later validation without rediscovering material UX decisions. These are activities any agent may perform.
 
-The specification is a **human-experience contract**, not backend architecture and not a pixel blueprint.
+The specification is a **human-experience contract**. Preserve the behavior and consequential visual intent that implementation must carry forward; leave backend architecture and incidental pixel choices to their proper owners.
 
 ## Make the intended experience visible
 
@@ -31,11 +31,11 @@ When changing or relying on a design whose wording makes the user journey diffic
 6. **Cover applicable states.** Deliberately consider default, focus, disabled, loading, empty, validation/error, success, interrupted/stale, and domain-specific states. Do not require meaningless states by quota; do not leave reachable states for implementation to invent.
 7. **Design recovery and continuity.** State what users retain or lose after error, cancel, back, retry, interruption, refresh/restart, or context change where those conditions are part of the accepted experience. Name re-entry points and truthful terminal states.
 8. **Integrate input/focus/accessibility.** Specify keyboard/focus behavior, pointer/touch alternatives, dynamic announcements, destructive-action safeguards, reduced-motion alternatives, and concrete accessibility requirements where relevant. Accessibility may eliminate an otherwise attractive direction.
-9. **Define surface/context adaptation.** Specify behavior when viewport, terminal size, input mode, device class, or interaction surface changes enough to affect task completion. Use native conventions for CLI/TUI/web/desktop rather than transplanting another surface's interaction model.
-10. **Separate behavior from appearance.** Behavioral intent must remain implementable if visual examples/mockups are removed. Record visual semantics only where hierarchy, meaning, trust, or design language depends on them.
+9. **Define surface/context adaptation.** Specify behavior when viewport, terminal size, input mode, device class, or interaction surface changes enough to affect task completion. Use appropriate conventions for web, mobile, desktop, CLI, TUI, or conversation rather than transplanting another surface's interaction model. Where a journey crosses surfaces, identify the context, progress, vocabulary, and state meaning that must survive; do not invent unsupported synchronization or continuity guarantees.
+10. **Preserve behavior and visual intent.** Behavioral intent must remain implementable if visual examples/mockups are removed. Where visual quality is in scope, carry the accepted character and consequential composition, type relationships, density, color/material, imagery, and motion choices from `visual-art-direction` or existing product guidance. Link representative examples and record why they matter. Distinguish accepted invariants from illustrative references, adjustable implementation details, and unresolved decisions. A token list or the word "polished" is not a sufficient visual handoff.
 11. **Record consequential design decisions.** When meaningful alternatives existed, compare a small set of genuinely different directions against Stories/Scenarios, accessibility, existing design language, product capability, and constraints; record why the selected direction wins and what trade-off it accepts.
 12. **Resolve ambiguity before handoff.** A consequential UX question is either resolved, explicitly tracked as a blocking open question, or safely left as an ordinary implementation detail. "TBD" is not a design decision.
-13. **Run the implementation-without-UX-invention test.** A competent implementation team should be able to build the accepted journey without deciding material human semantics. If they would have to invent a state, response, recovery path, focus destination, or user-visible meaning, the design is incomplete.
+13. **Run the implementation-without-UX-invention test.** A competent implementation team should be able to build the accepted journey without deciding material human semantics or replacing an accepted visual direction with its own. If they would have to invent a state, response, recovery path, focus destination, user-visible meaning, or consequential craft decision, the handoff is incomplete. Keep ordinary implementation flexibility; do not prescribe a visual system for a task that does not need one.
 
 ## Durable handoff shape
 
@@ -60,7 +60,7 @@ Use only sections that apply; keep them proportional.
 
 ## Responsive / surface constraints
 
-## Visual semantics
+## Visual intent and semantics
 
 ## Design decisions
 

@@ -355,7 +355,7 @@ Web applications cache data. The user may be viewing data that has changed since
 
 ## Responsive Interaction Design
 
-Responsive design is not layout scaling. At mobile breakpoints, the **interaction model itself changes**. Hover is unavailable. Touch targets must grow. Two-column layouts collapse, requiring different navigation hierarchies. Touch-specific gestures appear.
+Responsive design is not layout scaling. At mobile breakpoints, the **interaction model itself changes**. Hover is unavailable. Touch-first controls often benefit from larger activation areas. Two-column layouts collapse, requiring different navigation hierarchies. Touch-specific gestures appear.
 
 Specifying responsive breakpoints as pure layout changes — "at 768px, move the sidebar to bottom" — without addressing the interaction changes is an incomplete spec.
 
@@ -364,7 +364,7 @@ Specifying responsive breakpoints as pure layout changes — "at 768px, move the
 | Desktop | Mobile web |
 |---|---|
 | Hover states available — `:hover`, tooltips reveal on cursor approach | No hover; touch requires a tap to reveal anything |
-| Mouse click — precise, small targets acceptable | Touch tap — minimum 44×44px target (WCAG 2.5.5) |
+| Mouse/trackpad targets — WCAG 2.2 SC 2.5.8 (AA) applies | Touch targets — the same AA rule applies; prefer larger hit areas when practical |
 | Multiple columns visible simultaneously | Single column; context outside viewport requires scroll |
 | Sidebar navigation always visible | Sidebar must collapse or become bottom navigation |
 | Dense data tables render legibly | Tables must scroll horizontally or reformat to cards |
@@ -372,7 +372,11 @@ Specifying responsive breakpoints as pure layout changes — "at 768px, move the
 
 ### Touch target sizing
 
-Minimum 44×44 CSS pixels for touch targets — this is WCAG 2.5.5. This is an interaction design decision, not a CSS detail. Interactive elements that are smaller require precision the human thumb cannot reliably provide; users tap neighboring targets, producing errors and frustration.
+**WCAG 2.2 Level AA — SC 2.5.8 Target Size (Minimum):** Pointer targets must be at least 24×24 CSS pixels **or** qualify for an exception. For the spacing exception, a 24-CSS-pixel-diameter circle centered on each undersized target's bounding box must not intersect another target or another undersized target's circle; there is no universal fixed-gap allowance. Other exceptions cover equivalent controls, inline targets, unmodified user-agent controls, and essential presentation. Assess the actual hit area, not only the visible icon, in relevant layouts.
+
+**Touch-first recommendation — SC 2.5.5 Target Size (Enhanced), Level AAA:** Prefer generous activation areas, often at least 44×44 CSS pixels, especially for frequent, consequential, or hard-to-reach actions. The 44×44 threshold belongs to **AAA**, with its own exceptions (equivalent, inline, user-agent control, essential); it is **not** a mandatory AA minimum. Preserve usable density when justified, and verify any smaller target against the AA rule and its applicable exceptions.
+
+References: [WCAG 2.2 SC 2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) and [WCAG 2.2 SC 2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html).
 
 Interactive elements near the edges of the screen must account for thumb reach zones. Thumb zones on a right-handed user: comfortable in the bottom center, difficult in the top corners. This is why bottom navigation bars are thumb-accessible and why top-corner close buttons on mobile require more effort.
 
@@ -536,6 +540,6 @@ When an agent applies this skill:
 | NN/G Infinite Scrolling — Neusesser 2022 (nngroup.com) | Anti-pattern evidence, pagination vs infinite scroll decision framework |
 | NN/G Hamburger Menus — Pernice & Budiu 2016 (nngroup.com) | Quantitative study of hidden navigation cost on desktop and mobile |
 | NN/G Modal Dialogs — Fessenden 2017 (nngroup.com) | When modal dialogs are justified vs harmful |
-| WCAG 2.1 (w3.org/TR/WCAG21/) | Web Content Accessibility Guidelines — 1.4.4 (zoom), 1.4.1 (color), 2.4.3 (focus), 2.5.5 (touch target size) |
+| WCAG 2.2 (w3.org/TR/WCAG22/) | Web Content Accessibility Guidelines — 1.4.4 (zoom), 1.4.1 (color), 2.4.3 (focus), 2.5.8 (AA target size), 2.5.5 (AAA enhanced target size) |
 
 ---

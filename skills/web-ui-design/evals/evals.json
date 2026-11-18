@@ -54,7 +54,7 @@
       "prompt": "Design a data management dashboard that shows a list of records with inline editing and bulk actions. On desktop, there are two columns of records visible. Users can hover over a record to reveal edit and delete buttons. Users can select multiple records with checkboxes and perform bulk actions (export, delete). Design the responsive behavior for this dashboard.",
       "expectations": [
         "Designer must explicitly address that the hover-reveal pattern for edit and delete buttons does not work on touch — and specify the touch alternative: always-visible action buttons, a tap-to-reveal row action bar, or swipe-to-reveal actions (with explicit note about iOS back-swipe conflict if swipe is used)",
-        "Designer must specify minimum touch target size for interactive elements at mobile breakpoints: 44×44 CSS pixels minimum per WCAG 2.5.5 — row action buttons, checkboxes, and any interactive element must meet this requirement",
+        "Designer must specify WCAG 2.2 SC 2.5.8 Level AA pointer targets of at least 24×24 CSS pixels or a documented applicable exception; for touch use larger activation areas when appropriate (often 44×44 CSS pixels per Level AAA SC 2.5.5), but do not treat 44×44 as mandatory AA.",
         "Designer must specify how bulk selection works on touch: desktop checkbox behavior may be preserved, but the interaction must be explicitly specified — does a long press initiate selection mode? Is there a toggle to enter multi-select mode?",
         "Designer must specify how the two-column layout changes at mobile breakpoints as an interaction change, not just a layout change: what columns are visible? What data is hidden? Does a card replace the row layout?",
         "Designer must specify what happens to bulk actions at mobile: are they always visible? Hidden behind a button? The interaction model for bulk operations changes when users cannot hover and may have limited thumb reach to top-of-screen action bars",
@@ -64,7 +64,8 @@
         "Designer must not describe the responsive behavior purely as layout changes without addressing interaction model changes",
         "Designer must not specify hover-reveal as the primary interaction pattern for mobile without providing a touch-accessible alternative",
         "Designer must not assume checkboxes function identically for touch and mouse — the selection interaction requires explicit specification for touch contexts",
-        "Designer must not leave touch target sizes unaddressed when specifying interactive elements at mobile breakpoints"
+        "Designer must not leave touch target sizes unaddressed when specifying interactive elements at mobile breakpoints",
+        "Designer must not mislabel the 44×44 CSS pixel AAA enhanced target as a mandatory WCAG 2.2 AA minimum or assume an arbitrary gap exempts undersized targets"
       ]
     },
     {
@@ -86,6 +87,23 @@
         "Designer must not leave focus management to 'the developer will handle accessibility' — focus placement is a design specification requirement",
         "Designer must not specify dynamic comment updates without addressing how screen reader users are notified of new content",
         "Designer must not specify modal-style panels without specifying the focus trap — an overlay panel that does not trap focus is a WCAG 2.4.3 failure"
+      ]
+    },
+    {
+      "id": "Web-05",
+      "name": "wcag-touch-target-levels-and-exceptions",
+      "trap": "Design review treats 44×44 as the Level AA minimum and rejects a properly spaced compact target without checking WCAG 2.5.8, or accepts an undersized target based on a made-up fixed gap.",
+      "prompt": "Review a compact monitoring dashboard for a responsive web app with a documented WCAG 2.2 AA target. It has frequent action buttons with 44×44 CSS pixel hit areas and a set of secondary 20×20 CSS pixel icon targets in a tightly arranged toolbar. The team claims every target must be 44×44 for AA and suggests a blanket 4px gap for smaller icons. Identify the right acceptance criteria and next measurements without redesigning the whole dashboard.",
+      "expectations": [
+        "Correctly identifies SC 2.5.8 Level AA as 24×24 CSS pixels or one of its specified exceptions, including the circle-based spacing rule; the 20×20 targets require measurement against that rule or another real exception",
+        "Correctly identifies SC 2.5.5 Level AAA as the enhanced 44×44 CSS pixel threshold with its own exceptions, and recommends larger hit areas for frequent or consequential touch controls as design guidance rather than an AA obligation",
+        "States the 24px-diameter circle is centered on each undersized target's bounding box and must not intersect neighboring targets or other undersized targets' circles; does not invent a universal fixed gap",
+        "Distinguishes visible icon dimensions from the effective pointer hit target and identifies what must be inspected or measured on the actual UI"
+      ],
+      "negative_expectations": [
+        "Does not claim 44×44 CSS pixels is mandatory under WCAG 2.2 Level AA",
+        "Does not automatically pass 20×20 targets based only on a 4px gap or automatically fail them without evaluating the applicable exceptions",
+        "Does not turn an accessibility threshold clarification into a wholesale redesign of the dashboard"
       ]
     }
   ]
