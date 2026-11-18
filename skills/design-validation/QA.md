@@ -6,6 +6,7 @@ Adversarial validation for any agent. Assume competent validation and conformanc
 
 - Try to reproduce material findings and also search for false negatives in states, viewports, input modes, permissions, seed data, or degraded conditions the validator never exercised.
 - Check for stale screenshots/builds, mock services, seeded state that bypasses the real journey, or evidence captured from a different revision/environment.
+- Compare showcase imagery with representative dense, long-content, narrow, and failure states. Check whether attractive appearance or a preferred style is masking accepted visual drift or an untested benefit claim.
 - Repeat primary journeys after interruption, retry, navigation back/forward, refresh/restart, and repeated use where relevant.
 - Look for observer bias where the validator knows the intended design and mentally supplies missing labels, status, affordances, or recovery cues.
 - Attack accessibility claims that rely only on markup/code inspection when focus order, announcements, contrast, or actual interaction requires rendered/assistive-technology evidence.

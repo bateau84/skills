@@ -48,6 +48,58 @@
         "Specifies key bindings, layout or screens",
         "Either scenario ends with straightforward success and no complication"
       ]
+    },
+    {
+      "id": "ed-05",
+      "name": "useful-innovation-with-baseline-and-refutation",
+      "prompt": "Our incident dashboard already lists timestamped alerts with filters. Someone proposes an AI incident canvas that automatically groups alerts and suggests the likely cause. We have no correlation API or user-study results yet. Explore whether the idea is worthwhile for an on-call engineer under time pressure; do not expand the accepted product scope or design the screens.",
+      "trap": "Treating AI and novelty as value, inventing capability or user evidence, and promoting a speculative feature into accepted scope.",
+      "expectations": [
+        "Compares the proposal with the current alert list and a plausible simpler improvement, using a specific incident scenario.",
+        "States a user benefit as a hypothesis and considers learning, inspection, control, mistaken grouping, and correction or recovery costs.",
+        "Names an observable check and an outcome that would reject or revise the hypothesis; does not merely ask whether people like it.",
+        "Identifies correlation and suggestion capability as unverified dependencies, distinguishes expert reasoning from user evidence, and keeps added functionality a proposal."
+      ],
+      "negative_expectations": [
+        "Claims the feature improves response time, trust, or usability without evidence.",
+        "Treats automation, visual novelty, or a polished prototype as proof of value or feasibility.",
+        "Requires novel functionality regardless of whether the baseline or simpler approach serves the task.",
+        "Silently adds the proposal to product requirements or mandates a new approval workflow."
+      ]
+    },
+    {
+      "id": "ed-06",
+      "name": "cross-surface-continuity-and-experience-character",
+      "prompt": "Frame the experience for an incident investigation that starts in our TUI, is checked briefly on a phone, and resumes in the desktop app. Engineers want it to feel calm and precise. Shared incident IDs exist, but cross-device draft synchronization is not implemented. Give the essential goals and one handoff scenario; do not design controls or assume every feature belongs everywhere.",
+      "trap": "Confusing continuity with identical UI or feature parity, inventing synchronization, or ignoring intended feeling as a legitimate goal.",
+      "expectations": [
+        "Ties calm and precision to the incident context and makes clear that these are intended qualities rather than observed reactions.",
+        "Identifies shared meaning and state needed to resume work, including the incident identity and what happened during interruption.",
+        "Considers different attention and input constraints across TUI, phone, and desktop without specifying identical controls.",
+        "Marks draft synchronization as a missing capability and offers an honest bounded handoff or unresolved dependency rather than claiming continuity exists."
+      ],
+      "negative_expectations": [
+        "Requires full feature parity or the same layout on every surface.",
+        "Claims automatic resume of draft state despite the stated capability gap.",
+        "Treats calm or visual quality as irrelevant because they are not functional requirements.",
+        "Produces a new product roadmap or detailed UI instead of the requested framing."
+      ]
+    },
+    {
+      "id": "ed-07",
+      "name": "bounded-fix-with-accepted-framing",
+      "prompt": "The accepted design says Escape closes a read-only details panel and returns keyboard focus to the item that opened it. The implementation closes the panel but loses focus. The user need and design decision are settled. Tell the implementer what this correction must preserve, in a short handoff; do not reopen product design.",
+      "trap": "Reframing a settled correction into a discovery project, adding innovation or persona requirements merely because the skill is loaded.",
+      "expectations": [
+        "Uses the supplied accepted behavior and identifies focus restoration and the relevant keyboard journey as the bounded correction.",
+        "Keeps the handoff short and preserves the existing intended outcome.",
+        "Does not claim an implementation check or user test has been performed."
+      ],
+      "negative_expectations": [
+        "Requires interviews, personas, alternative product concepts, an innovation hypothesis, or a new whole-product spec before the fix can proceed.",
+        "Replaces the requested panel behavior with a different interaction model.",
+        "Adds unsupported assumptions about implementation architecture or claims conformance without observing it."
+      ]
     }
   ]
 }

@@ -58,6 +58,36 @@
         "No simplification that drops the necessary failure, retry, or accessible feedback behavior.",
         "No new offline queue, auto-retry, or backend mechanism invented as a design requirement."
       ]
+    },
+    {
+      "id": "DesignSpec-04",
+      "name": "accepted-craft-survives-handoff",
+      "trap": "Keeping behavior precise while reducing accepted art direction to vague polish or incidental tokens.",
+      "prompt": "Write the bounded handoff for a web incident timeline whose behavior is already accepted: select an incident, inspect ordered events and notes, and return to the list with the selection preserved. The accepted visual direction is calm and precise: a dominant chronological reading spine, compact aligned timestamps with readable long notes, restrained severity emphasis, and a distinct secondary notes region on wide screens. At narrow widths the reading order remains chronological and notes remain discoverable. A static reference is illustrative, not a requirement for identical pixels. Preserve this direction for implementation without choosing backend architecture.",
+      "expectations": [
+        "Preserves the consequential composition, type/alignment, density, severity and wide/narrow relationships alongside behavior.",
+        "Distinguishes accepted visual invariants from adjustable spacing/component details and illustrative reference pixels.",
+        "Provides enough rationale and checks for an implementer to retain the direction without inventing identity.",
+        "Leaves protocols/storage and unsupported capabilities outside the handoff."
+      ],
+      "negative_expectations": [
+        "Does not replace accepted direction with a generic card-grid or merely say use brand tokens.",
+        "Does not require exact pixel copying or infer interaction/assistive-technology proof from a static reference."
+      ]
+    },
+    {
+      "id": "DesignSpec-05",
+      "name": "cli-behavior-without-visual-ceremony",
+      "trap": "Applying art-direction artifact requirements to an unrelated command contract.",
+      "prompt": "Create a small experience handoff for an accepted noninteractive CLI status command. It prints one of pending, running, succeeded, failed to stdout with a newline, prints operational diagnostics to stderr, and exits nonzero on query failure. The task is to clarify the user-visible behavior and failure explanation. No branding or visual redesign is requested.",
+      "expectations": [
+        "Keeps the handoff centered on exact output, failure meaning, stream behavior, and useful understandable diagnostics.",
+        "Avoids adding unrelated visual-system artifacts or unsupported state/capability guarantees."
+      ],
+      "negative_expectations": [
+        "Does not add a palette, moodboard, multi-direction exploration, or mandatory DESIGN.md.",
+        "Does not decorate machine-readable stdout or change the accepted state names."
+      ]
     }
   ]
 }

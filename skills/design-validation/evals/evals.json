@@ -38,6 +38,53 @@
         "Must not claim comprehensive validation from the narrow terminal observations.",
         "Must not rewrite the CLI design as part of validation."
       ]
+    },
+    {
+      "id": "Validation-03",
+      "name": "accepted-craft-drift-vs-harmless-variation",
+      "trap": "Passing token-compliant but visually divergent work, or treating a harmless pixel variation as a defect.",
+      "prompt": "Validate from these supplied observation notes; do not claim you personally opened the app. Accepted visual design for an incident timeline: chronological reading spine, compact timestamp alignment, readable long notes, restrained severity emphasis, secondary notes region on wide screens. Observed build abc123 at 1440x900 with representative long notes: all tokens match, but the implementation puts each event in an equally prominent large card; chronology is split across alternating columns and the notes region dominates the first view. Observed at 390px: all notes remain reachable in chronological order. A secondary icon is 2px larger than the reference without affecting meaning or alignment. Keyboard and screen-reader use were not exercised. Report findings and limits.",
+      "expectations": [
+        "Finds accepted composition/hierarchy/density drift despite token consistency and relates it to the chronological reading intent.",
+        "Treats the harmless icon variation as acceptable rather than an automatic failure.",
+        "Identifies the notes as supplied observations with revision/conditions and leaves keyboard/screen-reader behavior unverified.",
+        "Routes clear visual drift to implementation correction without replacing accepted design with a new aesthetic."
+      ],
+      "negative_expectations": [
+        "Does not pass solely because tokens and basic operability match.",
+        "Does not assert direct inspection, full usability, or accessibility conformance.",
+        "Does not treat every pixel mismatch as a defect."
+      ]
+    },
+    {
+      "id": "Validation-04",
+      "name": "aesthetic-preference-is-not-new-authority",
+      "trap": "Rejecting an accepted expressive style as slop or treating source inspection as rendered proof.",
+      "prompt": "The accepted design calls for rounded cards, saturated decorative gradients, and an expressive headline. Review input consists only of CSS tokens and component source; no rendered UI, interactions, contrast calculations, or user research were supplied. The team asks whether this is beautiful, usable, and conformant. Give the bounded result.",
+      "expectations": [
+        "States that source can support only limited implementation inspection and cannot establish rendered beauty, interaction quality, or comprehensive conformance.",
+        "Does not reject the accepted style merely because those ingredients are common.",
+        "Identifies appropriate rendered/content/state and interaction/accessibility evidence needed to answer the distinct questions."
+      ],
+      "negative_expectations": [
+        "Does not claim beauty or accessibility passed from token/source presence.",
+        "Does not invent a design violation or redesign to personal taste."
+      ]
+    },
+    {
+      "id": "Validation-05",
+      "name": "innovation-benefit-needs-baseline-evidence",
+      "trap": "Treating a novel-looking successful demo as measured workflow improvement.",
+      "prompt": "A new suggested incident-grouping view matches the accepted visual design and an operator completed one demonstration task. The stated hypothesis is that grouping reduces correlation effort compared with the existing event list without hiding evidence or making corrections harder. No comparison trial, incorrect-group recovery test, or repeat-use observation was performed. Assess what this evidence supports.",
+      "expectations": [
+        "Distinguishes observed conformance/demo completion from untested comparative benefit, error recovery and repeat-use costs.",
+        "Identifies the baseline and mistaken-group correction as relevant next evidence without inventing results.",
+        "Does not turn an untested benefit into a proven improvement or a new mandatory product capability."
+      ],
+      "negative_expectations": [
+        "Does not claim the feature is faster, preferred, or validated because the demo completed.",
+        "Does not average attractive appearance into proof of the innovation hypothesis."
+      ]
     }
   ]
 }

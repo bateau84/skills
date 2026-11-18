@@ -1,6 +1,6 @@
 {
   "skill": "visual-interface-design",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "shape": 1,
   "cases": [
     {
@@ -45,39 +45,91 @@
     {
       "id": "VID-03",
       "name": "typographic-hierarchy-missing-from-data-dense-interface",
-      "trap": "Designer produces a visual design for a data-dense interface (data table, monitoring dashboard, log viewer) that uses marketing-page typography conventions: large headings, generous whitespace, minimal information density. The result forces excessive scrolling and prevents users from seeing the global picture. Designer does not distinguish density as a deliberate design decision appropriate to expert users with data-intensive tasks.",
+      "trap": "A dense incident log viewer inherits marketing-page spacing or illegible metadata; alternatively a rigid monospace/size recipe replaces judgment about stable columns, severity and the actual scanning task.",
       "prompt": "Design the visual typography system for an engineering log viewer that shows application logs in real time. Engineers use this during incidents to find error patterns across hundreds of log entries. Each log entry has: timestamp, severity level (DEBUG/INFO/WARN/ERROR/FATAL), service name, and message text. They need to scan vertically at high speed to spot errors.",
       "expectations": [
-        "Designer must specify a high-density layout appropriate for expert users scanning logs at speed — row height should be minimal (a single line per entry), not padded for aesthetic comfort",
-        "Designer must specify monospace font for all log entry content — timestamp, severity, service name, and message must use a monospace typeface so column positions are visually stable and scannable",
-        "Designer must use type weight and color to encode severity as hierarchy: FATAL/ERROR entries should have the highest visual weight (bold + full-contrast foreground or status color), WARN slightly less, INFO/DEBUG muted/reduced",
-        "Designer must specify that timestamp and service name use a smaller, muted caption-level treatment so the log message — the content engineers need to read — has the highest visual weight",
-        "Designer must address the line length and wrapping behavior: log messages can be arbitrarily long; the design must specify whether lines wrap or truncate (with expand-on-click) and how this affects scanning speed",
-        "Designer must specify that severity color is never the sole differentiator — ERROR and FATAL must be distinguishable from each other through color + weight + optionally label, not just different shades of red"
+        "Specifies a compact layout that preserves useful context across many entries while keeping text legible at the intended viewing size; does not maximize density without regard to reading.",
+        "Keeps structured fields aligned and messages readable. Monospace is valid, but an aligned field layout with suitable type and supported tabular numerals is also valid; tabular numerals alone do not align arbitrary text strings.",
+        "Makes severity quickly scannable through explicit labels and appropriate non-color emphasis; ERROR and FATAL remain distinguishable without hue differences.",
+        "Keeps timestamps and service names readable and prominent enough for cross-service incident correlation rather than automatically shrinking or muting all metadata.",
+        "Specifies wrapping, truncation, horizontal scrolling or expansion deliberately for long messages, retaining a way to inspect exact content without destroying scanning context.",
+        "States which density, glyph-legibility and hierarchy judgments require inspecting representative rendered logs rather than claiming that a list of type sizes proves them."
       ],
       "negative_expectations": [
-        "Designer must not specify a type scale and spacing that would be appropriate for a marketing page or onboarding flow — this is a data-dense expert tool, and 24px vertical padding between rows is wrong",
-        "Designer must not specify a proportional font (Helvetica, Inter, system-ui) for the log entries without monospace — proportional fonts do not maintain column alignment, which is critical for scanning structured log fields",
-        "Designer must not treat severity level as a background-color-only distinction (red background for ERROR) without also specifying foreground contrast, weight, and icon signals — background-only is a colorblind failure and reduces readability of the message text"
+        "Must not impose oversized headings or large repeated row padding that hides the cross-entry context required by the incident task.",
+        "Must not reject a well-aligned proportional layout solely because the font family is not monospace, or claim tabular numerals give letters fixed character widths.",
+        "Must not encode severity only through background color or reduce task-critical timestamps and service identifiers to unreadable secondary text."
       ]
     },
     {
       "id": "VID-04",
-      "name": "motion-decorative-and-harmful",
-      "trap": "Designer specifies motion and animation that is decorative rather than communicative — animations that play continuously, transitions that slow down habitual interactions, or motion effects (parallax, large-scale zoom) that cause vestibular harm. Designer treats animation as a visual design asset rather than as a communication tool with costs and accessibility obligations.",
+      "name": "motion-preserves-task-control-and-reduced-motion",
+      "trap": "The request to feel dynamic produces distracting perpetual effects or input-blocking transitions; alternatively the answer bans expression or substitutes a universal duration limit for evidence about the actual interaction.",
       "prompt": "Design the motion behavior for a project management web application. The app has: a kanban board where cards move between columns, a dashboard with live-updating metric widgets, and a notification system that shows alerts when tasks are overdue. The design team says they want the app to 'feel dynamic and alive'.",
       "expectations": [
-        "Designer must distinguish between motion that communicates (card drag + drop, alert appearance) and motion that is decorative ('feels dynamic and alive') — and explicitly recommend against decorative ambient motion",
-        "Designer must specify that live-updating metric widgets must not use continuous animation — auto-refreshing animations in a peripheral widget distract from the primary work area and cause attention hijacking",
-        "Designer must specify a maximum duration for habitual interactions: kanban card movement should complete in under 200ms; transitions users perform dozens of times daily must not feel slow",
-        "Designer must specify prefers-reduced-motion behavior: when the OS has reduced-motion enabled, all non-essential animation stops; state changes are communicated through immediate visual difference (color, icon, text update) rather than motion",
-        "Designer must address the notification alert: motion that draws attention to the alert is appropriate (because the alert is a system-state change the user needs to notice), but the motion must be brief and terminate — not a continuously pulsing animation",
-        "Designer must explicitly flag that parallax, large-scale zoom, and continuous rotation are vestibular hazards under WCAG 2.3.3 and must not be used as 'dynamic' design elements"
+        "Translates the desired character into concrete motion purposes for this working application, such as continuity when moving a card or a brief finite completion detail, and evaluates repetition and attention costs.",
+        "Avoids continuous decorative animation of metric widgets merely to indicate live data; distinguishes truthful value/update feedback from perpetual activity effects.",
+        "Keeps the next action available without waiting for nonessential transitions and proposes brief, appropriate timing to inspect under repeated input rather than asserting a universal millisecond limit.",
+        "Specifies a reduced-motion treatment that removes or replaces nonessential movement while preserving state, progress and outcomes; simply accelerating every effect is not assumed sufficient.",
+        "Makes notification attention cues proportionate and finite rather than continuously pulsing, while preserving the alert content after motion ends.",
+        "Specifies disabling nonessential interaction-triggered motion and appropriate controls for applicable automatic moving or auto-updating content. Any WCAG attribution preserves the criteria's levels, conditions and essential exceptions rather than claiming all animation is forbidden.",
+        "Treats a still mockup or proposed timings as insufficient evidence that the motion is comfortable, responsive or effective for actual users."
       ],
       "negative_expectations": [
-        "Designer must not endorse 'the app should feel alive' as a design direction without translating it into specific, purposeful motion with defined communicative function — 'alive' is an aesthetic judgment, not a design specification",
-        "Designer must not specify a continuously running animation on the dashboard metrics as a way to signal 'real-time data' — the data update itself (value change) is the signal; continuous animation is noise",
-        "Designer must not omit prefers-reduced-motion from the design specification — it is not an implementation detail but a design requirement that shapes what the motion system must fall back to"
+        "Must not endorse perpetual metric animation solely because the application should feel alive.",
+        "Must not use a fixed under-150ms or under-200ms rule as proof of acceptable interaction or accessibility.",
+        "Must not reject every expressive flourish for lacking a separate information payload, or omit reduced-motion and applicable user controls."
+      ]
+    },
+    {
+      "id": "VID-05",
+      "name": "accepted-expressive-language-with-readable-semantics",
+      "trap": "The visual skill strips an accepted expressive identity back to neutral colors or rejects gradients and editorial typography as generic, while failing to preserve functional distinctions.",
+      "prompt": "The accepted visual direction for a museum collection web app uses an aubergine-to-coral gradient in the exhibition introduction, subtle paper texture, and an editorial serif for exhibition titles. The collection grid and account controls need clear search, selection, loading and error states. The direction is approved; we are refining its visual semantics, not rebranding. No rendered captures or final color values are available in this task. Recommend how the visual language should work and which checks remain.",
+      "expectations": [
+        "Preserves the accepted expressive direction and gives concrete composition, typography and palette-role guidance that makes exhibition identity coexist with readable collection and account tasks.",
+        "Uses clear labels or other non-color distinctions for selection, loading and errors, with applicable contrast checks against actual backgrounds including the gradient.",
+        "Refines ornament when it competes with content or resembles misleading state cues rather than requiring every texture or color to encode data.",
+        "Explicitly bounds the advice as unverified in rendering and avoids claiming contrast compliance, user preference or the actual emotional effect without the missing evidence."
+      ],
+      "negative_expectations": [
+        "Must not remove the accepted gradient, texture or serif merely because decoration is nonfunctional or the treatment is fashionable.",
+        "Must not reopen the brand, require a fixed set of new directions, or invent a new product capability.",
+        "Must not excuse illegible text or ambiguous state under the approved aesthetic direction."
+      ]
+    },
+    {
+      "id": "VID-06",
+      "name": "optical-adjustment-and-numeric-alignment",
+      "trap": "An audit treats a spacing multiple, a four-pixel type step, or a monospace family as a universal law and discards a justified optical correction.",
+      "prompt": "Review these proposed visual refinements within an accepted account dashboard. Its spacing tokens use a 4px base. A supplied render review notes that an icon appears off-center inside its mathematically centered button; a 1px optical offset is proposed. Body text is 16px regular and group labels are 18px semibold with clear separation. Amounts use the accepted proportional text family, which supports tabular numerals, in right-aligned cells with consistent decimal formatting. No direct render or font file is available to you. Which choices need correction or verification? Keep the design system and workflow.",
+      "expectations": [
+        "Allows the optical offset as a potentially justified local exception and calls for checking actual centering, alignment and consistency rather than automatically snapping it back to the spacing scale.",
+        "Assesses the 16px/18px hierarchy through combined weight, placement and rendering; does not reject it for having less than a four-pixel size difference.",
+        "Recognizes that supported tabular numerals and aligned, consistently formatted numeric cells can serve the stated comparison task without replacing the proportional family with monospace.",
+        "Separates the supplied review evidence from checks it has not performed and identifies relevant rendered samples or scale conditions needed to confirm the result."
+      ],
+      "negative_expectations": [
+        "Must not state that all non-multiple spacing values destroy rhythm or that each adjacent type role requires at least four pixels of size difference.",
+        "Must not claim tabular numerals make every glyph fixed-width or guarantee arbitrary string alignment.",
+        "Must not claim it viewed the result or verified the font when no such access was supplied."
+      ]
+    },
+    {
+      "id": "VID-07",
+      "name": "bounded-polish-preserves-effective-conventions",
+      "trap": "A local polish request turns into a new brand, novelty exercise or arbitrary airy layout, instead of correcting concrete problems within an effective expert interface.",
+      "prompt": "Polish the visual treatment of our accepted incident search results. Keep the neutral palette, system typeface, table structure, filters and existing behavior. Supplied review notes: repeated row padding differs without purpose; equal-status icons have inconsistent apparent weight; long service names collide with the timestamp column at narrow widths. Engineers rely on the current dense view. This is a bounded design recommendation; no running product or screenshots are available. What should change and what should be checked?",
+      "expectations": [
+        "Proposes concrete corrections to repeated spacing relationships, apparent icon weight, and column/wrapping behavior within the accepted language and dense scanning task.",
+        "Preserves readable full content or a usable way to inspect it, meaningful status distinctions, and applicable contrast and scaling behavior.",
+        "Limits recommendations to the affected visual details and identifies rendered narrow-width/content checks still required.",
+        "Can complete without new visual directions, a new design-system artifact, user stories, or novelty for its own sake."
+      ],
+      "negative_expectations": [
+        "Must not replace the accepted neutral palette or system font merely to make the work distinctive.",
+        "Must not convert the table to spacious cards or alter filters and workflow without a demonstrated need and authority.",
+        "Must not claim the visual result was inspected or is proven effective for users from the supplied notes alone."
       ]
     }
   ]

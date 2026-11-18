@@ -4,6 +4,9 @@ Reviewer applies the **implementation-without-UX-invention test**: a competent i
 
 ## Review criteria
 
+- Where visual quality is in scope, the handoff preserves accepted character and consequential composition, typography, density, imagery/material, and motion decisions with useful examples. It distinguishes invariants from adjustable details and does not impose visual artifacts on unrelated tasks.
+- Cross-surface continuity preserves accepted meaning and progress without inventing synchronization capability or forcing identical controls across platforms.
+
 - Design traces to accepted product intent and relevant User Stories/Scenarios without fabricating missing product capability.
 - Information hierarchy, flows, entry/exit points, branches, abandonment, and recovery compose into complete human journeys.
 - Every material action has an explicit observable response and resulting state across applicable success/failure paths.

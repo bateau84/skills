@@ -6,21 +6,21 @@
     {
       "id": "PROTO-01",
       "name": "figma-apology-instead-of-walkthrough",
-      "trap": "Designer apologizes for the inability to create an interactive Figma or clickable prototype, then either produces nothing or offers only a vague textual description of what a prototype 'would look like.' Instead of applying the scenario walkthrough method, the response treats the absence of GUI prototyping tools as a blocker rather than using the five available text-based formats.",
+      "trap": "The practitioner treats missing graphical prototyping software as a blocker and produces no concrete artifact, or assumes text is the only permitted medium even when a rendered terminal prototype is available.",
       "prompt": "I'm designing a TUI for a Kubernetes cluster manager. The user should be able to view all pods, filter by namespace, select a pod, and view its logs in a split panel. I want to validate the navigation design before we start building. Can you prototype this for me?",
       "expectations": [
-        "Designer must produce at least one terminal state sketch showing the TUI layout at a key state (e.g., pod list view with namespace filter), using ASCII characters to represent the panel structure, with labeled regions (pod list, filter bar, log panel, status bar)",
+        "Produces a concrete terminal state sketch or rendered terminal prototype with labeled regions (pod list, filter bar, log panel, status bar); inspect the artifact rather than accepting a claim that it was created.",
         "Designer must show multiple states — at minimum: initial list view (no selection), selection state (pod selected, log panel populated), and the filter-active state — because the navigation design cannot be validated from a single state",
         "Designer must produce a key binding map or embed key binding information in the state sketches that covers: navigation between pods, triggering log view, filtering by namespace, and clearing the filter — because key binding conflicts and discoverability are the primary TUI navigation design risks",
         "Designer must identify at least one design gap from the prototype — something the sketches reveal the design has not yet specified, such as: focus behavior when the filter input is activated, what happens to the log panel when the user navigates to a different pod, or how namespace filter interacts with the current selection",
         "Designer must apply at minimum a partial scenario walkthrough for one user task (e.g., 'operator finds logs for a crashing pod') — naming what the user sees, what they do, and what the system responds — not just describe the layout statically",
-        "Designer must frame the terminal state sketch and walkthrough as the primary prototyping contribution, not as a workaround for missing tools"
+        "Uses the available medium to investigate navigation and labels evidence limits; does not claim that sketches or an agent walkthrough establish real-user learnability or runtime behavior."
       ],
       "negative_expectations": [
         "Designer must not apologize for the inability to create an interactive Figma or clickable wireframe and then produce nothing actionable",
         "Designer must not describe what a prototype 'would look like' in prose without producing any actual prototype artifact",
         "Designer must not produce only a written description of the feature requirements without testing the navigation design against a scenario",
-        "Designer must not produce a static ASCII sketch that shows layout only, without specifying states, key bindings, or any walkthrough — a layout sketch alone cannot validate navigation design"
+        "Must not produce only a static layout without states, key bindings, or a walkthrough; visual appearance alone cannot establish the navigation behavior."
       ]
     },
     {
@@ -31,14 +31,14 @@
       "expectations": [
         "Designer must produce a command transcript for the primary success path (e.g., 'dbmigrate up' applies two pending migrations successfully) that shows the exact output and exit code",
         "Designer must produce at least two error-path transcripts, covering at minimum: (1) running 'dbmigrate up' when no pending migrations exist — is this success (exit 0) or a distinct signal? (2) running 'dbmigrate down' when no migrations have been applied — what does the tool do when rollback is impossible?",
-        "Designer must produce a transcript for a migration failure midway — where the first of three pending migrations fails — revealing: does the tool stop and leave the database in a partially-migrated state? Does it roll back? Does it exit non-zero? What exactly does the output say?",
+        "Produces a transcript for a migration failure after at least one earlier migration succeeds, showing the non-zero outcome, persisted or explicitly unknown state, and unresolved rollback or retry guarantees.",
         "Designer must identify at least one design gap from the transcripts — something the transcripts reveal that the design has not yet resolved (e.g., the ambiguity between 'no pending migrations' and 'migration failed')",
         "Designer must address the non-interactive scripting context in at least one transcript — showing that 'dbmigrate up' works correctly in a CI pipeline where there is no human to interpret diagnostic text",
         "The exit code taxonomy must be explicit: at minimum, the transcripts must reveal whether 'no migrations to apply' and 'migration failed' use different exit codes"
       ],
       "negative_expectations": [
         "Designer must not produce only the success-path transcript and consider the design validated — the design gaps in error handling are the most important outputs of the prototype",
-        "Designer must not use 'exit code 1 for all errors' across all error paths — the transcript must force the question of whether different failure modes need different codes",
+        "Must not hide whether automation needs to distinguish no-op, impossible rollback, and failed migration outcomes; distinct numeric codes are required only where the chosen caller contract needs them.",
         "Designer must not produce a prose description of how the CLI 'would behave' instead of concrete transcripts showing exact commands, exact output, and exact exit codes",
         "Designer must not skip the partial-failure scenario (first migration succeeds, second fails) — this is the scenario most likely to reveal the design's most difficult unresolved question"
       ]
@@ -80,6 +80,58 @@
         "Designer must not declare a winner based on 'best practice' or 'what most tools do' without applying that claim to the specific scenario",
         "Designer must not present the comparison as a design preference question — 'it depends on what your users prefer' — when the scenario walkthrough reveals which approach handles the primary task more coherently",
         "Designer must not skip the 'gaps revealed' section — the most valuable output of the comparative analysis is what each approach fails to specify, not just what it does well"
+      ]
+    },
+    {
+      "id": "PROTO-05",
+      "name": "early-look-and-feel-needs-rendered-evidence",
+      "prompt": "Before we settle the navigation, compare two visual directions for a reading-list web app: a quiet editorial list and a warm, image-led collection. The open question is whether either can feel inviting while keeping titles, authors, and reading status easy to scan. Use the same realistic sample content and a narrow and wide view. Create inspectable samples using the file and preview tools actually available; tell us what your evidence supports. No data backend exists yet.",
+      "trap": "Forbidding visual exploration before interaction decisions are complete, substituting prose for rendered inspection, or mistaking polish for usable production behavior.",
+      "expectations": [
+        "Treats look and feel as a valid early question and creates materially different samples with comparable content and viewing conditions.",
+        "Uses actual available rendering or preview tools and inspects the output when possible; if rendering is unavailable, supplies a useful artifact and states that appearance remains unassessed.",
+        "Evaluates observable composition, hierarchy, density, typography, and fit against the stated experience instead of only listing design adjectives.",
+        "Distinguishes static visual evidence from navigation, responsive behavior between samples, user preference, and backend capability; records the unanswered questions."
+      ],
+      "negative_expectations": [
+        "Requires all navigation and interaction decisions to be settled before making any visual sample.",
+        "Requires a particular visual companion, framework, server, or design application as the only permitted prototyping route.",
+        "Claims to have viewed a rendering or produced files absent observable tool evidence.",
+        "Declares the concept usable, preferred by users, responsive at all sizes, or production ready based on static samples."
+      ]
+    },
+    {
+      "id": "PROTO-06",
+      "name": "native-mobile-tui-and-voice-evidence-boundaries",
+      "prompt": "Our prototype plan contains a browser-rendered desktop concept, two mobile screen mockups, a TUI character sketch, and a written voice dialogue. None is interactive, and no native build, terminal runtime, audio sample, or user observation exists. The team wants to claim that native keyboard navigation, phone recovery after interruption, terminal resize, and spoken pacing are validated. Review that claim and choose the smallest next prototype for each unresolved question. The artifacts are not attached, so assess the plan rather than their visual quality.",
+      "trap": "Treating visual or textual fidelity as evidence for unimplemented behavior, or declaring non-web sensory and interactive prototypes outside the skill.",
+      "expectations": [
+        "Rejects the stated validation claims with specific evidence gaps rather than a blanket assertion that agents cannot evaluate designs.",
+        "Matches native keyboard behavior, mobile interrupted state, terminal resizing, and spoken pacing to relevant interactive or actual sensory evidence when tools permit.",
+        "Recognizes that a browser concept can inform composition but cannot establish native behavior, and that a dialogue transcript cannot establish acoustic timing.",
+        "Does not claim to have inspected missing artifacts or to have run proposed tests; preserves static, interactive, product, and user-evidence distinctions."
+      ],
+      "negative_expectations": [
+        "Restricts rendered prototypes to web or declares TUI, mobile, native, and voice samples categorically forbidden.",
+        "Claims all four behaviors are validated by the current materials.",
+        "Requires building a complete production application before any focused question can be investigated.",
+        "Treats a simulated participant or agent walkthrough as actual user research."
+      ]
+    },
+    {
+      "id": "PROTO-07",
+      "name": "resolved-correction-does-not-need-new-prototype",
+      "prompt": "We already accepted the design: in this read-only details panel, Escape closes it and restores focus to the row that opened it. A focused keyboard check on the current build found that closing works but focus goes to the document body. The correction is settled. Do we need another prototype or a new Design Spec before implementation? Give a short recommendation with the next evidence needed.",
+      "trap": "Forcing resolved, bounded work through new prototyping, high-fidelity completion, or whole-product documentation.",
+      "expectations": [
+        "Recommends implementing the accepted focus correction without new discovery or a new prototype unless a concrete unresolved question is found.",
+        "Reuses the existing design contract and identifies a focused keyboard check on the corrected implementation as the next evidence.",
+        "Distinguishes the supplied observed failure from work the practitioner has actually performed."
+      ],
+      "negative_expectations": [
+        "Requires multiple alternatives, a complete state inventory of the product, a high-fidelity prototype, or a new whole-product Design Spec before the bounded fix.",
+        "Claims the corrected implementation passes without observing it.",
+        "Reopens the accepted interaction model or treats optional prototype work as a permission gate."
       ]
     }
   ]

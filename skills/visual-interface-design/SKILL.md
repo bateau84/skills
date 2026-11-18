@@ -1,17 +1,17 @@
 ---
 name: visual-interface-design
-description: "Surface-independent visual design reasoning: use type, color, spacing, and visual hierarchy to communicate meaning. Use for visual decisions in web apps, desktop GUIs, TUIs, or CLI output. Not for surface rendering mechanics (use tui-design or web-ui-design), interaction behavior (use interaction-design), or accessibility implementation (use accessibility)."
+description: "Surface-independent visual design reasoning: use type, color, spacing, and visual hierarchy to communicate meaning and express an accepted product character. Use for visual decisions in web apps, mobile and desktop GUIs, TUIs, or CLI output. For a new aesthetic direction, compose with visual-art-direction. Not for surface rendering mechanics, interaction behavior (use interaction-design), or accessibility implementation (use accessibility-implementation)."
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Visual Interface Design
 
 ## What this skill is for
 
-Visual interface design is the discipline of using visual properties — type, color, spacing, size, weight, contrast, position — as a **communication system** to encode meaning, establish hierarchy, and guide attention. It is not about making interfaces attractive. The measure of a visual design decision is whether it correctly communicates structure, priority, and state to users.
+Use type, color, spacing, size, weight, contrast, and position to communicate meaning, guide attention, and create a coherent, attractive interface with the intended character. Judge these goals together: beauty does not establish usability, and correct semantics alone do not establish visual quality.
 
-**The foundational test:** Can this visual decision be justified by what it communicates, independent of aesthetics? If the only justification is "it looks nice," the decision lacks communicative grounding.
+**The foundational test:** What does this choice contribute to the task, visual coherence, or intended character, and what does it cost in legibility, attention, or consistency? Aesthetic purpose is legitimate. Make it concrete against the brief and rendered composition; do not require every decorative detail to encode information.
 
 **Load this skill when:**
 - Making visual decisions that communicate meaning: hierarchy, status, state, type, category, action affordance
@@ -21,6 +21,7 @@ Visual interface design is the discipline of using visual properties — type, c
 
 **Compose with project-specific visual guidance when useful:**
 - For products with application and marketing surfaces, preserve a coherent design language while respecting their different user goals. No external design skill is required.
+- Use `visual-art-direction` when defining a visual direction, diagnosing generic output, or making consequential craft choices. For a bounded refinement, preserve the accepted language and improve the affected detail without reopening the identity or requiring alternatives.
 
 **Do NOT load this skill when:**
 - Producing framework-specific marketing-page layouts: use the project's design system and implementation conventions; this skill focuses on visual reasoning.
@@ -46,7 +47,7 @@ These signals work in combination. Any single signal used alone is fragile; comb
 
 | Signal | How it works | Use for |
 |--------|-------------|---------|
-| **Scale** | Larger elements claim more attention. 2–3 distinct sizes per composition. | Primary vs secondary vs tertiary content |
+| **Scale** | Larger elements claim more attention. Use a coherent set of levels that fits the content. | Primary vs secondary vs tertiary content |
 | **Weight** | Bold draws more attention than regular. Heavy weight signals primary content. | Emphasis within body copy, primary labels |
 | **Contrast** | High contrast (dark on light, light on dark) claims attention; low contrast recedes. | Focus indicators, primary actions, critical state |
 | **Position** | Top-left is the primary reading-entry point in LTR interfaces. | Primary actions in predictable positions |
@@ -74,15 +75,15 @@ Gestalt principles are not aesthetic guidelines — they describe how human visu
 
 ## Color as information encoding
 
-Color in application interfaces encodes meaning. Every color in an application UI should have a role. Color without information function is visual noise that reduces the signal-to-noise ratio for the colors that do carry meaning.
+Color can encode meaning and establish identity, atmosphere, and visual appeal. Distinguish those purposes so expressive surfaces do not obscure status, content, or actions. Evaluate the palette as a composition, including the visibility of its semantic signals.
 
 ### Color roles for application UI
 
-**Foreground / Background:** The neutral surface on which content appears. In light mode: dark text on light surfaces. In dark mode: light text on dark surfaces. The neutral pair must meet WCAG contrast requirements.
+**Foreground / Background:** The surfaces on which content appears, whether neutral or expressive. The relevant text and controls must meet applicable contrast requirements against their actual backgrounds, including gradients and images.
 
-**Brand / Accent:** A single color (or narrow palette) that identifies the application and marks interactive affordances. Use sparingly — the more an accent color is used, the less it signals interactivity.
+**Brand / Accent:** A coherent palette that identifies the product and supports its character. If an accent also marks interactive affordances, preserve other cues that distinguish controls from decoration.
 
-**Status colors:** Four reserved roles with established semantic conventions. These must not be inverted or reused for non-status purposes.
+**Status colors:** Preserve stable, understandable meanings. The following are common starting conventions; use the accepted product and domain language rather than treating the table as a universal palette.
 
 | Status | Convention | What it communicates |
 |--------|-----------|---------------------|
@@ -91,13 +92,13 @@ Color in application interfaces encodes meaning. Every color in an application U
 | Success | Green | An action completed correctly |
 | Info | Blue | Neutral information, no action required |
 
-The status color conventions are universal — they have been established by decades of interface convention and operating system design. Inverting them (green for error, red for success) is not a creative decision. It is a communication failure.
+Do not casually reverse established status meanings for novelty. A brand color may also appear decoratively when context, labels, and other visual cues keep it distinguishable from status. Check the actual composition for ambiguity.
 
 **Interactive states:** Separate visual treatment for hover, focus, active, and disabled states. See §Interactive state colors below.
 
-### The non-decorative rule
+### Semantic clarity and expressive color
 
-Ask of every color in an application: "What information does this color encode?" If the answer is "none" or "it looks good with the other colors," the color should be removed or replaced with neutral. Decorative color competes with semantic color for attention and trains users to ignore color signals.
+Ask what each treatment contributes: information, grouping, identity, mood, or visual balance. Decorative color, gradients, texture, and imagery can serve the accepted direction. Refine or remove them when they compete with task priority, reduce readability, resemble misleading status signals, or fragment the design language. A popular effect is neither automatically generic nor automatically appropriate.
 
 ### Color accessibility: designing for color blindness
 
@@ -109,7 +110,7 @@ Color blindness affects approximately 8% of males and 0.5% of females. The three
 | Deuteranopia | Green receptors | Green appears dark; red-green distinction lost (most common) |
 | Tritanopia | Blue receptors | Blue-yellow distinction lost |
 
-**The design rule:** Never use color as the only visual means of conveying information. WCAG 1.4.1 (Level AA) makes this a conformance requirement. Always pair color with a secondary signal:
+**The design rule:** Never use color as the only visual means of conveying information, identifying an action, or prompting a response. WCAG 1.4.1 (Level A) requires an additional visual distinction where color conveys meaning; decorative color need not carry information. Useful redundant signals include:
 - Status indicators: color + icon (✓, ✗, !, ℹ) + text label
 - Chart series: color + line style (solid, dashed, dotted) + data point shape
 - Validation state: color + border change + explanatory text
@@ -120,16 +121,16 @@ WCAG 2.2 contrast requirements are design minimums, not targets:
 
 | Context | Minimum ratio | Applies to |
 |---------|--------------|-----------|
-| Normal text (< 18pt or 14pt bold) | 4.5:1 | Body text, labels, captions |
-| Large text (≥ 18pt or 14pt bold) | 3:1 | Headings, large labels |
-| UI components and graphics | 3:1 | Buttons, inputs, icons, chart elements |
-| Focus indicators | 3:1 | Focus ring vs adjacent color |
+| Text other than large text | 4.5:1 | Text and images of text under 1.4.3 |
+| Large text (≥ 18pt, or ≥ 14pt bold) | 3:1 | Large-scale text under 1.4.3 |
+| Required non-text visual information | 3:1 | Cues needed to identify controls/states or understand graphics, against adjacent colors, under 1.4.11 |
+| Author-supplied focus indicators | 3:1 | Required focus cues against adjacent colors under 1.4.11; this is not the complete set of focus requirements |
 
-**Design practice:** Check contrast ratios for body text, interactive elements, and focus indicators before finalizing any color decision. A color combination that fails 4.5:1 cannot be used for body text regardless of how visually appealing it appears.
+**Design practice:** Check contrast before finalizing colors. Apply the criteria to the information they cover: 1.4.3 has exceptions for incidental text and logotypes; 1.4.11 excludes inactive controls and unmodified user-agent appearance. A decorative border is not automatically a required control boundary. Do not use these exceptions to excuse unreadable task content. A body-text pair subject to 1.4.3 must meet 4.5:1 regardless of aesthetic intent.
 
 ### Interactive state colors
 
-Each interactive state must be visually distinguishable from all other states through a signal that is not color alone:
+Make meaningful interactive states distinguishable with appropriate visual cues. The following are possible treatments, not a compulsory appearance recipe for every control:
 
 | State | What to change | Secondary signal |
 |-------|---------------|-----------------|
@@ -137,8 +138,8 @@ Each interactive state must be visually distinguishable from all other states th
 | Hover | Subtle background shift | Cursor change |
 | Focus | Visible focus ring (3:1 minimum) | Ring, not just color change |
 | Active | Pressed state (shadow inward, slight scale) | Visual compression |
-| Disabled | Reduced opacity (≥ 30% to remain perceptible) | Cursor change, non-interactive |
-| Loading | Spinner or skeleton | Motion signal (be motion-sensitive) |
+| Disabled | Recognizably unavailable while preserving needed context | Explanation where the reason is otherwise unclear |
+| Loading | Progress indicator or loading content | Text/status that remains understandable without motion |
 | Error | Red / status-error token | Icon + text |
 | Success | Green / status-success token | Icon + text |
 
@@ -165,7 +166,7 @@ Full RGB. Most modern terminal emulators support this. Check `$COLORTERM` before
 
 ## Typography for interfaces
 
-Typography in interfaces is not font selection. It is a system that encodes information structure through visual contrast between levels.
+Typography combines family selection, proportion, rhythm, and hierarchy. Choose a voice that fits the product while keeping real content legible and easy to scan at its rendered size.
 
 ### Legibility vs readability
 
@@ -177,17 +178,17 @@ Both must be addressed. Legibility is the floor (can they read it at all?); read
 
 ### Type scale for application UI
 
-A type scale is a constrained set of sizes — typically 5–8 — where each step signals a level in the information hierarchy. Without a type scale, sizes proliferate arbitrarily (11px, 12px, 13px, 14px, 15px appear with no hierarchy signal between them).
+A type scale is a coherent set of roles and sizes that supports the information hierarchy. Reuse accepted roles where they work; add a level only when the content needs it. The number of sizes is not a quality score.
 
-**Scale design principle:** Adjacent scale steps must have enough contrast to read as distinct levels. A 14px vs 15px distinction is not perceivable. A 14px vs 18px distinction is.
+**Scale design principle:** Judge distinctions through the combination of size, weight, family, spacing, and position in the actual rendering. There is no universal minimum pixel difference between levels. A small size step can work with weight and placement; a larger step can still fail if the composition is confused.
 
 **Common named scale levels for application UI:**
 
 | Level | Typical use | Visual signal |
 |-------|-------------|--------------|
 | Display / Hero | Empty states, major headlines | Largest; sparing use |
-| Heading | Section titles, panel headers | Bold weight, +4–6px over body |
-| Subheading | Group labels, secondary structure | Medium weight, +2px over body |
+| Heading | Section titles, panel headers | Clearly distinguished from body in the composition |
+| Subheading | Group labels, secondary structure | Supporting level distinguished through size, weight, or placement |
 | Body | Primary content, descriptions | Regular weight; most content lives here |
 | Caption / Label | Metadata, timestamps, helper text | Smaller, often muted color |
 | Monospace | Code, paths, terminal output, data | Fixed-width; distinct family |
@@ -196,10 +197,10 @@ A type scale is a constrained set of sizes — typically 5–8 — where each st
 
 Use type attributes in combination to create unambiguous hierarchy within a component:
 
-- **Weight** (bold = primary): bold text draws more attention. Use for the most important element in a group. Using 4+ weight variants creates visual noise, not hierarchy.
-- **Size** (large = heading): size signals structural level. Reserve size differences for structural transitions (section heading vs body), not emphasis within a passage.
-- **Color** (muted = metadata): supporting information (timestamps, metadata, helper text) uses a muted foreground color. Full-contrast text for metadata competes with primary content.
-- **Style** (italic = secondary or cited): italic signals secondary or definitional content. Do not use italic for general emphasis in interfaces — it reduces legibility.
+- **Weight**: use emphasis to support reading priority. Each additional weight should have a clear role rather than adding arbitrary variation.
+- **Size**: distinguish structural levels and consequential content without overwhelming the task.
+- **Color**: supporting information may recede, but timestamps or identifiers can be task-critical. Preserve their legibility and appropriate prominence.
+- **Style**: italics or other forms can distinguish emphasis, definitions, or a product voice. Inspect legibility in the actual font and context rather than banning a style category.
 
 **Practical example — a data table row:**
 - Column header: caption weight bold, muted foreground
@@ -209,7 +210,7 @@ Use type attributes in combination to create unambiguous hierarchy within a comp
 
 ### Interface-specific typography decisions
 
-**Table column headers:** Lower case or sentence case (not ALL CAPS) for legibility. Left-align text columns; right-align numeric columns (so decimal points align). Column header weight: bold or medium, one size smaller than body.
+**Table column headers:** Choose case, size, and weight that keep labels readable and distinct from values. Sentence case is a useful default; compact uppercase or other accepted treatments need rendered checking. Left-align text columns; right-align consistently formatted numbers or align decimal separators when comparison needs it. Headers need not be smaller than body text.
 
 **Label/value pairs:** Label above or to the left of value. Label uses caption size and muted foreground. Value uses body size and full foreground. Gap between label and value must be less than gap between pairs (gestalt proximity).
 
@@ -219,14 +220,11 @@ Use type attributes in combination to create unambiguous hierarchy within a comp
 
 ### Monospace for code, data, and terminal output
 
-Proportional fonts do not align tabular data. Monospace is mandatory for:
-- Code samples and inline code
-- File paths and system commands
-- Terminal output reproduced in a GUI
-- Data tables where column alignment is meaningful (monetary amounts, IP addresses, timestamps)
-- Any content where character-position alignment carries information
+Use monospace where character-position alignment carries information, such as terminal transcripts and preformatted code. It is also a useful convention for commands and paths; check ambiguous glyphs and long strings at their actual size.
 
-Monospace also signals "this is data, not prose" — a reading mode signal that prepares the user for precise scanning rather than flowing reading.
+Numeric columns do not require a wholly monospaced typeface. A proportional family with supported tabular numerals can keep digits at equal widths; CSS exposes this through `font-variant-numeric: tabular-nums`. Column layout and consistent number formatting still matter. Tabular numerals do not make letters or arbitrary strings fixed-width, and a requested font feature must be supported by the chosen font.
+
+For structured logs or tables, compare monospace with aligned fields using suitable type and numeral treatments. Preserve scanability, exact values, and readable messages; do not demote useful identifiers merely because they are metadata.
 
 ---
 
@@ -236,12 +234,12 @@ Spacing is the primary gestalt proximity signal. It groups and separates — wit
 
 ### Spacing scale
 
-Design on a spacing scale, not arbitrary values. A 4px base unit (or 8px) multiplied consistently produces visual rhythm that users can scan:
+Use an intentional spacing system to create rhythm and grouping. Existing product tokens are the starting point. Common scales include:
 
 **4px base:** 4, 8, 12, 16, 24, 32, 48, 64
 **8px base:** 8, 16, 24, 32, 48, 64, 96
 
-Spacing at arbitrary values (7px, 11px, 23px) destroys visual rhythm. Adjacent elements with slightly different spacing look like mistakes, not design.
+These are examples, not required units. Optical alignment, type metrics, borders, and constrained content may justify other values. Inspect whether an exception improves the rendered result while preserving grouping and repeated relationships. Record a reusable exception where needed; avoid both arbitrary drift and mechanically snapping a good optical adjustment back to a grid.
 
 **Internal vs external spacing:** Padding *inside* a container signals "these belong together." Margin *between* containers signals "these are separate groups." The ratio of internal-to-external spacing determines whether the grouping reads clearly. Rule: the space between siblings within a group should be less than the space between different groups.
 
@@ -307,7 +305,7 @@ When assessing iconography quality:
 
 ## Data visualization design
 
-Data visualization for application interfaces is governed by a different set of principles than visualization for marketing (where aesthetics may dominate). The primary principle: **visual elements that do not encode data are noise**.
+Data visualization must preserve truthful comparisons and readable values. Supporting structure and visual character can help, but effects that distort quantities or compete with the data undermine the task.
 
 ### Choosing chart types
 
@@ -333,11 +331,11 @@ When to use tables vs charts:
 - Use **charts** when users need to observe trends, comparisons, or distributions across many data points
 
 **Scannable table design:**
-- Right-align numeric columns so decimal points and digit positions align vertically
+- Align comparable numeric fields consistently; align decimal separators where needed and use tabular digits when stable digit width helps
 - Left-align text columns
 - Use consistent date/time formatting within a column (ISO 8601 for machine-readable; locale-formatted for human reading)
 - Row striping (alternating light/very-light background) aids row tracking in wide tables — use subtle contrast, not high-contrast stripes
-- Column headers: smaller size than body, bold or medium weight, lower case or sentence case
+- Column headers: legible and distinct from values, using the accepted type roles rather than a compulsory size or case
 - Sortable columns: visual indicator of sort state (▲/▼), not just which column sorts
 
 ### The chartjunk principle (Tufte)
@@ -366,7 +364,7 @@ When to use tables vs charts:
 
 ## Motion as communication
 
-Motion in application interfaces must communicate something. Motion that communicates nothing is a cost — it consumes time, competes for attention, and causes vestibular harm in users with motion sensitivity.
+Motion can clarify change, maintain orientation, and express appropriate product character. Give it a purpose and inspect its attention, repetition, accessibility, and interaction costs. An expressive flourish can fit the brief; it must not obscure state or make routine work wait.
 
 ### What motion should communicate
 
@@ -376,26 +374,28 @@ Motion in application interfaces must communicate something. Motion that communi
 
 **Direction:** Slides in from the right = navigating forward. Slides in from the left = navigating back. This directional language must be consistent across the application or the spatial model collapses.
 
-**System status:** A spinner communicates "something is happening." A progress bar communicates "something specific is happening and here is how much remains." A completion animation communicates "the action is done." Remove any motion that does not carry one of these signals.
+**System status:** A spinner communicates "something is happening." A progress bar communicates "something specific is happening and here is how much remains." A completion animation communicates "the action is done." Preserve truthful status independently of its animation.
+
+**Character:** A brief transition or celebratory detail can support an accepted expressive direction. Judge where it appears, how often it repeats, and whether it fits the person's task. Do not turn delight into a quota or ban it for lacking a separate information payload.
 
 ### What motion must not do
 
-**Slow task completion:** An animation that runs while the user waits to interact is a cost, not a feature. A 300ms entry animation on a dropdown that users open hundreds of times per day accumulates to minutes of involuntary waiting per week. Motion that habitual users must wait through on every interaction should have a duration under 150ms or be removed.
+**Slow task completion:** Do not make users wait for nonessential animation before their next action. Keep feedback prompt and routine transitions brief, interruptible where appropriate, and coherent under repeated input. Choose timing for the distance, input, task, and platform; verify it through interaction rather than treating a universal millisecond limit as proof of quality.
 
-**Cause vestibular harm:** Parallax effects, large-scale zooming, and rapid directional movement trigger vestibular disruption (dizziness, nausea) in users with vestibular disorders. WCAG 2.3.3 (Animation from Interactions, AAA) prohibits motion that cannot be disabled. Even at AA level, designing with this constraint produces better interfaces.
+**Disregard motion sensitivity:** Large movement, zoom, and parallax can trigger vestibular symptoms. WCAG 2.3.3 (Animation from Interactions, Level AAA) requires that interaction-triggered motion animation can be disabled unless essential to the functionality or information conveyed. It is not a ban on all animation. Honor reduced-motion preferences as a design practice even when the agreed conformance target is AA.
 
-**Distract from content:** Ambient motion — animations that play continuously without user action — competes with user attention. A progress animation in a sidebar panel distracts from the main content. Motion must be initiated by user action or system-state change, not run continuously.
+**Distract from content:** Continuous peripheral effects can compete with reading and concentrated work. Avoid animating dashboard metrics merely to make them appear live; a clear value/update state may suffice. WCAG 2.2.2 (Level A) requires pause/stop/hide controls for nonessential automatically moving, blinking, or scrolling information that lasts over five seconds alongside other content. Automatic updates alongside other content need pause/stop/hide or frequency control unless essential; they have no five-second exception.
 
 ### Designing for prefers-reduced-motion
 
 `prefers-reduced-motion: reduce` is a user OS setting that should be honored. The behavior must not be: "all animations are removed, the interface breaks." The correct design is:
 
-- All functional information conveyed by motion must also be conveyed statically (state changes must be visible without animation, not communicated only through transition)
-- Transition durations collapse to near-zero (50ms or less) — the element is still "animated" but imperceptibly so
-- Continuous ambient animations are stopped
-- State changes are communicated through immediate visual difference (color, icon, label) rather than through the motion of entering a new state
+- Remove or replace nonessential movement with a stable treatment; simply shortening it is not always an adequate alternative.
+- Preserve state, progress, and outcomes through visible content and suitable non-color cues when motion is removed.
+- Stop nonessential ambient motion and preserve the applicable controls for moving or auto-updating content.
+- If motion is essential to the actual function, such as previewing an animation being edited, explain that dependence and provide appropriate controls instead of falsely promising an equivalent static experience.
 
-**Design rule:** If removing all motion makes the interface lose essential information, the motion is doing work that the visual design should be doing without motion. Fix the static design first; then add motion as enhancement.
+**Design rule:** For ordinary navigation and status feedback, make the stationary states understandable first. Specify the motion and reduced-motion treatments together, then inspect them with actual interaction when available.
 
 ---
 
@@ -475,7 +475,7 @@ Web application interfaces are not the same design problem as web marketing page
 
 **System dark mode requires explicit support:** Unlike desktop native applications where platform controls automatically adapt, web applications must explicitly implement dark mode via CSS `prefers-color-scheme` or equivalent. A web application with no dark mode implementation will have system UI (scrollbars, form controls on some browsers) in dark mode while the application itself remains light — visually incoherent.
 
-**Data-dense web application design:** Information-dense web applications (monitoring dashboards, data tables, analytics views) require different spacing conventions than marketing pages. Dense tables use 4–8px row padding. Cards in a data grid use tighter margins. Using marketing-page spacing conventions (24px+ padding everywhere) in a data-dense interface forces scrolling and hides the global picture.
+**Data-dense web application design:** Monitoring dashboards, data tables, and analytics views often need compact spacing to preserve the global picture. Choose padding for the actual type, content, input targets, and scanning task. Do not copy generous marketing-page spacing into every row when it forces avoidable scrolling and hides relationships.
 
 ---
 
@@ -493,27 +493,27 @@ Fix: reorganize around what users are looking for, not how the system is built.
 
 **3. Inconsistent spacing creating false groupings**
 Diagnostic: can you identify which elements belong together by proximity alone, without reading the content?
-Fix: constrained spacing scale — elements in the same group use smaller gaps than gaps between groups.
+Fix: restore intentional spacing relationships — elements in the same group use smaller gaps than gaps between groups. Preserve optical corrections that improve the rendered grouping.
 
 **4. Decorative icons without labels in non-expert interfaces**
 Diagnostic: would a first-time user recognize every icon without its label?
 Fix: add text labels to navigation and command icons; rely on icon-only only for truly universal symbols after confirming users have learned the vocabulary.
 
-**5. Motion that plays while the user is completing a task**
-Diagnostic: is there any animation running that was not triggered by user action?
-Fix: stop ambient animations; keep interaction-triggered animation under 150ms for habitual flows.
+**5. Motion that competes with the task**
+Diagnostic: does movement distract from reading, block the next action, obscure state, or ignore motion preferences?
+Fix: reduce or remove the competing effect, preserve meaningful feedback, and provide the applicable reduced-motion and pause/update controls. Judge timing through the actual interaction.
 
 **6. Dense data applications using marketing-page spacing**
-Diagnostic: does the data-dense view use ≥24px padding everywhere because "it looks clean"?
-Fix: density appropriate to the user's task; 4–8px padding in data rows, not 24px.
+Diagnostic: does repeated padding hide the context needed for scanning or comparison merely because "it looks clean"?
+Fix: fit density to the task while preserving legibility and input targets; inspect realistic data instead of prescribing one padding value.
 
 **7. Dark mode as color inversion**
 Diagnostic: were the dark mode colors produced by inverting light mode values, or designed independently?
 Fix: design a separate color specification for dark mode; elevation through lightness, not shadow; desaturated status colors.
 
 **8. Chartjunk obscuring data**
-Diagnostic: which visual elements in this chart do not represent data?
-Fix: remove 3D perspective, decorative fills, excessive gridlines, and any visual element that does not encode a data value.
+Diagnostic: which effects obscure comparison, distort values, or compete with meaningful labels and data?
+Fix: remove misleading perspective and distracting fills or grids while retaining useful context and coherent visual character.
 
 **9. Typography decoration over legibility**
 Diagnostic: has this font been tested at its actual rendered size on the target display at actual user distance?
@@ -527,26 +527,28 @@ Fix: visual weight must match task-relevance, not system-organizational-level.
 
 ## AI-Agent Adaptation
 
-Use the tools actually available. Screenshots, browser automation, and color sampling can support rendered checks when provided by the host; without them, limit claims to analytical reasoning about the described design. Do not assume access to target hardware or real-user observations.
+Use the tools actually available. Screenshots, browser automation, terminal captures, and color sampling can support rendered checks when provided by the host. Expert critique of an observed composition is legitimate design evidence; it does not establish actual user preference, emotional response, task success, or complete accessibility conformance. Record the surface, state, size, and observation method. Without rendered access, keep visual judgments provisional. Do not assume access to target hardware or real-user observations.
 
 **Analytical checks available without rendered access:**
-- **Contrast ratio verification:** Given hex/RGB color values, calculate luminance ratio and flag failures against WCAG 4.5:1 and 3:1 thresholds. Deterministic — no visual judgment required.
+- **Contrast ratio verification:** Given resolved foreground/background colors, calculate the ratio against the applicable threshold. Unknown layering, gradients, or theme values remain evidence gaps; a passing pair does not establish whole-interface conformance.
 - **Grayscale test (analytical):** Given a described layout, reason about whether the hierarchy survives without color — if only color distinguishes elements, the hierarchy fails the test.
-- **Spacing scale audit:** Given a list of spacing values, verify they derive from a consistent scale and flag arbitrary values that break rhythm.
-- **Color role audit:** For each color in a described design, ask "what information does this color encode?" and flag decorative colors that compete with semantic ones.
-- **Type scale analysis:** Given a list of font sizes, verify they produce perceptible hierarchy distinctions (adjacent sizes must differ by at least 4px to be distinct).
+- **Spacing system audit:** Check whether recurring relationships use accepted tokens or justified exceptions. A non-multiple alone is not a defect; optical quality requires rendering.
+- **Color role audit:** Check semantic distinctions and whether expressive uses fit the brief without competing with them. Do not require every color to encode information.
+- **Type role analysis:** Check whether size, weight, family, and placement have coherent roles. Numeric sizes alone cannot prove perceptible hierarchy or legibility.
 - **Iconography criteria check:** Verify that specified icons meet the when-to-use conditions.
 - **Gestalt reasoning from layout descriptions:** If told "the form label is 32px below the input field," apply gestalt proximity: the label reads as belonging to the input *above* it, not the input it labels. Spatial relationships described in text are sufficient to apply proximity and common-region principles.
-- **Anti-pattern detection from specification:** If the spec describes "icon-only navigation," apply the iconography failure pattern without seeing the icons. If the spec describes "animations on page load," apply the motion-must-not-slow-task-completion principle. The principles apply to design descriptions, not just rendered artifacts.
+- **Risk identification from specification:** Icon-only navigation or automatic motion warrants checking recognition, control, and task fit. Do not infer a rendered defect solely from the name of a style or technique.
 
-**Checks requiring rendered evidence, target conditions, or human research:**
+**Checks requiring rendered or interactive evidence:**
 - Assessing whether a color palette "feels right" or has the intended emotional register
 - Evaluating visual tension, figure/ground quality, or gestalt grouping in rendered output
-- Verifying that visual hierarchy works in practice across different monitors, zoom levels, and ambient lighting conditions
-- Testing with real users for whether visual hierarchy guides attention correctly
+- Evaluating hierarchy, type, optical alignment, density, and craft at the inspected viewport, zoom, content, and theme; do not generalize to untested target conditions
+- Inspecting motion, interruption, repeated input, and reduced-motion behavior through actual interaction rather than a still image
 - Sampling rendered colors when a capture/color tool is available; otherwise calculate from specified RGB/hex values and disclose that boundary.
 
-**Design decision scope:** An AI agent doing visual interface design produces a visual semantics specification — a set of decisions and their communicative rationale expressed as named token references and precise numeric values (`color.status.error` instead of "make it red"; "16px / 24px line height" instead of "comfortable body text"). It does NOT produce a subjective aesthetic judgment that substitutes for human visual review. Mark visual decisions that depend on rendered evaluation as open design questions if the agent cannot verify them analytically.
+Treat palette character and composition assessments as expert judgments against the accepted brief. Claims about what users prefer, feel, or notice in use need relevant user evidence; a designer's judgment or attractive render does not establish them.
+
+**Design decision scope:** Record consequential visual choices and their rationale in the existing handoff, with named roles/tokens and precise values where implementation needs them. Preserve accepted character as well as semantic meaning. Distinguish inspected results, expert interpretation, assumptions, and unverified checks. Use `visual-art-direction` for developing the direction and `design-validation` for judging its real implementation; neither tool access nor visual polish expands product or implementation authority.
 
 ---
 
@@ -558,7 +560,8 @@ Use the tools actually available. Screenshots, browser automation, and color sam
 - Material Design 3 [m3.material.io] — color roles, tonal palette system, surface elevation in dark mode
 - Apple Human Interface Guidelines [developer.apple.com/design/human-interface-guidelines/] — SF Pro type system, semantic color system, dark mode surface layering
 - GOV.UK Design System [design-system.service.gov.uk] — color-as-functional-signal only, baseline spacing system, line length guidance
-- WCAG 2.2 Success Criteria 1.4.1 (non-text color), 1.4.3 (contrast minimum), 1.4.11 (non-text contrast), 2.3.3 (animation from interactions) — W3C [w3.org/TR/WCAG22/]
+- W3C [WCAG 2.2](https://www.w3.org/TR/WCAG22/) and its Understanding documents: [1.4.1 Use of Color, Level A](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html), [1.4.3 Contrast (Minimum), Level AA](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html), [1.4.11 Non-text Contrast, Level AA](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html), [2.2.2 Pause, Stop, Hide, Level A](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html), and [2.3.3 Animation from Interactions, Level AAA](https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html). Apply each criterion's scope and exceptions; these are not universal style rules.
+- W3C [CSS Fonts Module Level 3, numerical formatting](https://www.w3.org/TR/css-fonts-3/#font-variant-numeric-prop) — supported tabular numerals can align digits without requiring a wholly monospaced family.
 - Wathan, A. & Schoger, S. — *Refactoring UI* (2018) [refactoringui.com] — type scale systems, hierarchy without color, spacing as design tool [partially verified — established professional reference]
 - no-color.org — NO_COLOR convention for CLI environments
 
