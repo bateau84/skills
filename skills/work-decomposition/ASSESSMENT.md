@@ -4,6 +4,9 @@ Domain-specific review guidance for any agent performing assessment. It does not
 
 ## Review criteria
 
+- Substantial product work identifies meaningful intermediate outcomes, their contribution to the parent goal, and acceptance evidence before deriving task groups. Milestones distinguish usable increments from bounded technical risk reduction; neither task completion nor a renamed component phase establishes the outcome.
+- The next increment uses the smallest complete real path consistent with accepted guarantees. Preparation explains its necessity for that outcome or a material dependent risk; later subsystem completeness is not assumed necessary. Local fixes do not acquire milestone ceremony.
+- Near-term groups are executable and verifiable; later outcomes retain obligations, ownership, dependencies and proof/refinement paths without premature task detail or silent scope deferral.
 - Group boundaries follow coherent capabilities/modules rather than file counts. Merge/separate decisions name real ownership, dependency, safety, contract, resource, composition, context-load, reasoning-horizon, or feasibility consequences.
 - Dependencies reflect real semantic/build/integration order and avoid artificial serialization.
 - Parallel groups account for the host's actual coordination facilities, stale reads, and shared mutable state as well as semantic dependencies. Overlap has a proportionate ownership/isolation/re-read/integration arrangement, not an assumed automatic lock guarantee. No blanket serialization is imposed on independent work.
@@ -16,7 +19,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 - Agreed design/architecture/requirements remain inputs; any decision update has explicit authorization and ownership. Ordinary realization is not needlessly escalated, and unresolved product meaning is not delegated implicitly to implementation.
 - Each task has one primary coherent outcome and can state an objective and verification expectation without duplicating sibling work. Its expected working set and reasoning horizon fit one focused execution loop; broad tasks are split when they combine independently useful outcomes, materially separate context areas, discovery that can reshape implementation, or independently meaningful verification.
 - No fixed step/file/token ceiling is used as a substitute for judgment, and tightly coupled work is not fragmented when separation would mainly add handoffs or repeated context loading.
-- The decomposition can be revised when execution reveals materially broader scope while preserving valid completed evidence and contracts.
+- The decomposition can be revised when execution reveals materially broader scope or milestone use changes assumptions. Evidence and earlier capabilities remain valid or are explicitly rechecked; affected later work changes without silently redefining accepted promises.
 - Each accepted assembled scenario lists the groups it needs and its integration/proof owner. Narrower local evidence is not presented as sufficient for the composition; proof ownership need not be a separate task per seam.
 
 ## Review depth

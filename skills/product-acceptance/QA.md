@@ -10,6 +10,7 @@ Adversarial validation for any agent. Assume competent production and conformanc
 - Seek semantic mismatches hidden by a reasonable fake: quota at a later page, duplicate delivery after a timeout, or a failure after an external side effect. Use only perturbations relevant to accepted promises; do not invent provider guarantees.
 - Ask whether final shipping packaging/flags select a different adapter, route, schema, or fallback than the reviewed proof. Seek a representative run of that composition rather than trusting labels.
 - Inspect whether assertions could remain green when the human cannot understand the result or resume the agreed journey. Functional and experience evidence can share the same blind spot.
+- Compare successive milestone claims: could each narrow demonstration pass while their combination breaks an earlier capability or never serves the stated parent goal? Trace the actual product use and preserved guarantees, rather than relying on task completion or milestone labels.
 
 Report the counterexample, affected claim, evidence, and remaining uncertainty. Extra adversarial cases do not become new product requirements by being suggested.
 

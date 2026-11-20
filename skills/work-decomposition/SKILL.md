@@ -1,6 +1,6 @@
 ---
 name: work-decomposition
-description: Find coherent, context-bounded work groups, change surfaces, and dependencies before creating a delivery plan. Use when agreed work admits several splits, oversized execution units, one-task-per-file fragmentation, hidden integration work, or shared-state parallelism risks. Not for inventing product requirements or fixed scheduling policy.
+description: Define useful milestones, coherent context-bounded work groups, change surfaces, and dependencies before creating a delivery plan. Use when agreed work needs intermediate goals or admits several splits, oversized execution units, one-task-per-file fragmentation, hidden integration work, or shared-state parallelism risks. Not for inventing product requirements or fixed scheduling policy.
 ---
 
 # Work Decomposition
@@ -23,6 +23,18 @@ Start from outcomes and guarantees, not a file list. Inventory mandatory require
 Carry accepted consequence analysis, including `technology-impact` conclusions when present, into mitigation outcomes, owners, dependencies and observable checks. A risk acknowledgement is not mitigation. Newly discovered material consequences go to their existing decision owner; do not invent policy or a separate task for each question.
 
 Read-only discovery can extend beyond likely write paths. A likely change surface is not proof that no other consumer matters, nor permission to edit outside scope. Inspect important neighbors before handing off executable work. Request the smallest needed write scope through the host's normal process. Planning-only work may leave exact paths unresolved when the uncertainty and discovery owner are clear.
+
+### Choose the next meaningful milestone
+
+For substantial product work, identify intermediate goals before grouping implementation tasks. Prefer a narrow usable increment through the real product: a person can perform a meaningful task, inspect its result, and learn whether the product serves the overall goal. Reuse agreed milestones when they exist. A local fix or one coherent change does not need an added milestone structure.
+
+A **milestone** is a checkpoint reached through evidence of an outcome. An **increment** is the working addition it demonstrates. A phase may group work toward a goal; a wave only schedules work that can proceed together. These are useful distinctions, not a mandatory hierarchy. Completed tasks or waves alone do not establish a milestone.
+
+For each proposed milestone, state what becomes possible, how it advances the parent goal, the demonstration or other acceptance evidence, and its scope and required guarantees. Identify who assembles the result and who checks the evidence. A controlled demonstration need not be a public release; its acceptance must not imply that later capabilities or release obligations are satisfied.
+
+Choose the smallest complete path that can produce that evidence. A prerequisite earns its place by explaining what would fail in that path, or which material uncertainty would invalidate dependent work, if it were postponed. Preserve real safety, compatibility, migration, and architectural dependencies. Completing an entire subsystem's later capabilities is not automatically a prerequisite to using its narrower capability now. An early technical milestone can instead resolve a decisive uncertainty; name the question, discriminating evidence, and the product outcome it enables, without presenting the experiment as usable product delivery.
+
+Detail the next milestone enough to execute and verify it. Keep later outcomes and accepted obligations visible with owners, proof paths, dependencies, and a point at which to refine them; do not freeze speculative task detail merely to fill a complete graph. A smaller increment changes sequencing, not accepted end-state scope. Changes to product promises or guarantees still belong to their decision owner.
 
 ## 2. Group, then test every proposed separation
 
@@ -70,7 +82,9 @@ A continuation may use earlier conclusions. An independent first assessment inst
 
 Assign each obligation to an outcome, constraint and testable verification, not merely a label. Across groups, name both sides, the shared guarantee, and who integrates and proves it. Keep local verification distinct from whole-product proof. Separate UI and backend tests do not establish that the real UI and backend work together.
 
-For each accepted whole-product scenario, record the required groups and proof owner. The sibling `product-acceptance` is optional guidance when available. Without it, state the accepted claim, meaningful entry, real product-owned stages, where state comes from, external substitutions and their limits, and an externally meaningful assertion. Record evidence or mark the check unexecuted. The [worked example](references/boundaries-and-example.md) illustrates prerequisites and proof ownership. Integration or acceptance can stay in an existing group when coherent. Test an uncertain connection early when its failure could invalidate dependent work, not as a ritual for every group.
+For each accepted assembled scenario, record the required groups, the milestone it supports when applicable, and its proof owner. The sibling `product-acceptance` is optional guidance when available. Without it, state the accepted claim, meaningful entry, real product-owned stages, where state comes from, external substitutions and their limits, and an externally meaningful assertion. Record evidence or mark the check unexecuted. The [worked example](references/boundaries-and-example.md) illustrates milestones, prerequisites and proof ownership. Integration or acceptance can stay in an existing group when coherent. Place proof at the earliest useful increment and at uncertain connections whose failure could invalidate dependent work, not as a ritual for every group.
+
+Review a demonstrated milestone against both its own criteria and the parent goal. Check whether relevant earlier capabilities still work and whether actual use exposes a missing workflow step, confusing behavior, or an assumption that should change later work. Preserve valid results and revise only affected remaining groups, dependencies and proof. Route changes to accepted meaning to their owner. Record what was learned and the next useful outcome in the existing plan or result; no new approval stage or report format is required.
 
 ## 4. Describe safe parallelism without assuming a runtime
 
@@ -80,6 +94,8 @@ Overlap needs coordination, not a blanket ban on parallelism. Use disjoint owner
 
 ## Output: compact candidate groups
 
+For substantial delivery work, lead with the milestone outcomes, their contribution to the overall goal, and the next demonstration and evidence gaps. Keep this readable without task IDs; references can provide the detail. Distinguish an achieved outcome from planned or unexecuted proof.
+
 For each group provide:
 
 - **Outcome and responsibility:** what becomes true, its owner, and exclusions.
@@ -87,7 +103,7 @@ For each group provide:
 - **Depends on / coordination:** prerequisites, shared contracts, shared-state risks, and the available coordination method.
 - **Obligations preserved:** guarantees translated into outcome, constraint and proof; participants and integration owner.
 - **Verification:** testable local and cross-boundary expectations; relevant guidance only where useful.
-- **Assembled scenarios enabled:** accepted outcomes, required peer groups, and proof owner; `none` with a reason where appropriate.
+- **Milestone or scenario enabled:** accepted outcome, required peer groups, and assembly/proof owner; for enabling work, name the dependent outcome or uncertainty it resolves. `None` with a reason is appropriate for work outside an assembled product claim.
 - **Execution fit:** why the task is small and coherent enough; needed context, important uncertainty, retry cost, and the result references the next owner will need.
 - **Boundary reason:** what would break if groups were merged, or `merge candidate`.
 
@@ -95,7 +111,7 @@ Use identifiers and scheduling detail only as requested. Candidate analysis is n
 
 ## References and evaluation
 
-- [Worked boundaries and group template](references/boundaries-and-example.md): endpoint merging, migration separation, and combined proof.
+- [Worked boundaries and group template](references/boundaries-and-example.md): endpoint merging, migration separation, usable increments, and combined proof.
 - [ASSESSMENT.md](ASSESSMENT.md): normal conformance checks.
 - [QA.md](QA.md): residual coupling and false-confidence attacks.
 - [Portable evaluation cases](evals/cases.md): bundled prompts and standalone execution instructions.

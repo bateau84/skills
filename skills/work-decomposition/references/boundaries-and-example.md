@@ -18,21 +18,26 @@ An accepted architecture requires an additive schema/read compatibility change a
 
 If the accepted inputs do not specify transformation semantics or permitted loss, flag that decision for its owner. Choosing query structure or test mechanics within the agreed transformation is ordinary implementation, not a new product decision.
 
-## Example 3: cross-component composition without task explosion
+## Example 3: usable milestones, then coherent tasks
 
 **Accepted outcome:** browser-created configuration leads to persisted decisions that the user can inspect; quota exhaustion preserves eligible work for later resume.
 
 **Illustrative current inspection:** `web/decision-client`, `app/config-api`, `app/decision-api`, `worker/discovery`, and `db/migrations` have been inspected along with their tests. These example paths are not claims about this skills repository.
 
-| Candidate | Outcome / obligations preserved | Surface and boundary | Dependencies / proof |
-| --- | --- | --- | --- |
-| Configuration and decision API | Persist accepted configuration and expose real decision reasons, enforcing accepted auth/schema | API module, migrations, contract tests; coherent server/storage owner | Supplies stable API/schema to UI and worker; owns API/storage conformance |
-| Discovery and durable resume | Use persisted configuration; preserve eligibility across quota and resume according to accepted guarantee | Worker/queue/provider adapter and tests; distinct lifecycle owner | Uses the established storage/contract; owns worker/adapter conformance |
-| User journey and assembled proof | Built UI consumes real details, no product-side mock; agreed status/recovery controls | UI/client tests plus real browser/API/worker proof; coherent consumer responsibility | Needs both server and worker for final proof; owns creation → discovery → explanation and quota → resume scenarios |
+Start with the outcomes to demonstrate, then identify the task groups needed for each:
 
-UI development may proceed against the agreed interface while backend work proceeds, but mocks remain local scaffolding, not final acceptance. Final assembled proof needs all real stages. A shared generated API client or migration file needs an explicit integrator/publication arrangement. A shared temporary database needs isolation or ordered runs even if source files are disjoint.
+| Proposed milestone | Contribution and evidence | Work needed / boundary |
+| --- | --- | --- |
+| Configure discovery and inspect a real decision | Establish the shortest useful explanation journey: create configuration in the built UI, let the real worker produce a decision, and reload its persisted reason through the real API/UI | Real configuration, schema, auth, discovery, persistence and details path for this scenario; no product-side fallback. A genuine external provider fake may supply normal responses. |
+| Resume eligible work after quota exhaustion | Extend the working journey to the accepted recovery promise: exhaust quota, inspect retained work and understandable interruption status, then resume through the product and observe later results | Real defer/resume behavior and controls, plus rechecking the earlier explanation journey. Preserve the accepted no-loss and authority rules throughout. |
 
-This grouping is not universal: shared ownership and small surface might favor a single vertical group; separate delivery/safety responsibilities might justify more. Name the consequence of the boundary rather than preserving this table mechanically.
+These are bounded proof scopes, not permission to ship incomplete recovery or weaken the accepted behavior. If safe execution of the first scenario requires a foundation from the second, bring that prerequisite forward and explain why. Keep unproved recovery visible after the first demonstration.
+
+Within the first milestone, API/storage, worker/adapter, and UI/integration can still be separate tasks when ownership and execution context justify them. Each owns the part needed for the same real journey; do not require the complete future API or worker surface before composing it. The integration owner runs the assembled proof. Small shared scope may instead fit one vertical task. Local mocks can support parallel implementation against an agreed interface, but cannot satisfy the milestone.
+
+Waves schedule the tasks using real dependencies and shared-state constraints. A generated client or migration file needs an integrator/publication arrangement; a temporary database needs isolation or ordered runs. None of these scheduling choices establishes product acceptance by itself.
+
+After the first demonstration, inspect whether the explanation is usable and whether the chosen boundaries compose cleanly. Carry observed gaps into the next milestone, retain valid work and evidence, and revisit only affected remaining detail. Later outcomes keep their owners and proof paths even while their task breakdown remains coarse.
 
 ## Candidate group template
 
@@ -48,7 +53,7 @@ This grouping is not universal: shared ownership and small surface might favor a
 - Obligations preserved: <guarantee → outcome/constraint + proof>
 - Seam participants / integration owner:
 - Local and cross-boundary verification: <falsifiable expectations>
-- Assembled scenarios enabled: <accepted outcome; peer prerequisites; proof owner, or none + why>
+- Milestone or scenario enabled: <accepted outcome; peer prerequisites; assembly/proof owner; or enabling risk and dependent outcome>
 - Execution fit: <why this fits one focused loop; context surface, material reasoning transitions, uncertainty, retry/verification boundary>
 - Boundary reason: <what goes wrong if merged, or merge candidate>
 - Unresolved decision: <exact question + decision owner, or none>
