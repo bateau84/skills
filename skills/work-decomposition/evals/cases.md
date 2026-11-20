@@ -1,6 +1,6 @@
 # Work Decomposition Decision Cases
 
-Prepared evaluation inputs, **not executed results**. WD1–WD4 adapt the older source's four cases; WD5–WD7 test the accepted portability/coordination findings; WD8–WD9 test context-bounded sizing and adaptive re-slicing. Source identity and adaptation limits are recorded in the bundled [SKILL.md](../SKILL.md). All code/resource paths in these packets are illustrative inputs, not claims about this repository.
+Prepared evaluation inputs, **not executed results**. WD1–WD4 adapt the older source's four cases; WD5–WD7 test the accepted portability/coordination findings; WD8–WD9 test context-bounded sizing and adaptive re-slicing. WD10–WD12 exercise milestone ordering, necessary foundations, and learning from actual use. Source identity and adaptation limits are recorded in the bundled [SKILL.md](../SKILL.md). All code/resource paths in these packets are illustrative inputs, not claims about this repository.
 
 ### Standalone execution
 
@@ -14,7 +14,7 @@ A no-skill control omits skill/reference context but keeps the same prompt, mode
 
 **Prompt:** Propose candidate groups for adding one REST decision-detail endpoint. Current inspection: `app/decision.ts` contains registration, validation, handler and serialization; `api/openapi.yaml` documents it; `app/decision.test.ts` and the generated client are relevant consumers. These are small, same owner, same dependency position, one-session work. The input lists those five concerns separately. Preserve usable endpoint/errors/docs and verification; say why to merge or separate. Planning only, no final scheduling requested.
 
-**Evaluator observations:** One coherent group, or a justified second merge candidate, not five dispatches. Own caller/generated-client consistency and falsifiable endpoint evidence. No fictional path inspection or schedule/plugin requirement.
+**Evaluator observations:** One coherent group, or a justified second merge candidate, not five dispatches. Own caller/generated-client consistency and falsifiable endpoint evidence. No fictional path inspection, schedule/plugin requirement, or added milestone hierarchy for this local outcome.
 
 ## WD2 — hidden irreversible migration
 
@@ -30,9 +30,9 @@ A no-skill control omits skill/reference context but keeps the same prompt, mode
 
 ## WD4 — product proof without per-seam task explosion
 
-**Prompt:** Decompose the accepted browser configuration → API → worker → persistence → explanation journey, plus quota/defer/resume. Current inspected surfaces are `web/client`, `app/config-api`, `app/decision-api`, `worker/discovery`, `worker/queue`, `db/migrations`, related tests and build config. Each layer has local tests; the client still has a product-owned mock-detail fallback, a known integration risk. Propose coherent groups with obligations, peer prerequisites, and assembled-proof ownership. Explain any early vertical proof; do not create one E2E task per arrow.
+**Prompt:** Decompose the accepted browser configuration → API → worker → persistence → explanation journey, plus quota/defer/resume. Current inspected surfaces are `web/client`, `app/config-api`, `app/decision-api`, `worker/discovery`, `worker/queue`, `db/migrations`, related tests and build config. Each layer has local tests; the client still has a product-owned mock-detail fallback, a known integration risk. Propose meaningful intermediate outcomes and coherent groups with obligations, peer prerequisites, and assembled-proof ownership. Explain the first demonstration and any necessary enabling work; do not create one E2E task per arrow.
 
-**Evaluator observations:** Normal module/capability groups plus eventual real composition proof; mark fallback removal and real endpoint ownership. Early vertical proof justified by missing/fallback seam, not ritual at every boundary. Recovery obligation translates to actual proof; no union-of-unit-suites acceptance.
+**Evaluator observations:** Organize groups around a real useful journey and its next extension, or justify a necessary technical prerequisite before that journey. Remove the fallback and own the real endpoint and assembled proof; independent module tasks may contribute to one milestone. Keep applicable guarantees and recovery obligations explicit, with actual recovery proof before claiming them. No task-per-arrow ritual, union-of-unit-suites acceptance, or full-product claim from a bounded first demonstration.
 
 ## WD5 — unlocked shared file, stale reads, independent progress
 
@@ -63,3 +63,21 @@ A no-skill control omits skill/reference context but keeps the same prompt, mode
 **Prompt:** An implementation task was reasonably planned as one focused change. During execution, investigation completes and establishes a previously unknown generated consumer, a migration requirement, and a separate compatibility proof. The investigation evidence remains valid, but continuing would substantially enlarge the working set and reasoning chain. State how decomposition should adapt without discarding valid completed work or pretending the original task size is still appropriate.
 
 **Evaluator observations:** Preserve the completed investigation as evidence/result and re-slice only the remaining work into coherent context-bounded units. Do not force continuation, restart valid work, or treat replanning as failure. Keep dependencies and proof ownership explicit.
+
+## WD10 — a useful first increment before complete subsystems
+
+**Prompt:** Plan candidate milestones and work groups for an accepted local report tool. It must eventually select records, export CSV and JSON, show progress, and let the operator inspect the final file. Existing selection and atomic-file-write modules are verified. CSV encoding and the real CLI-to-export path are missing; JSON and richer progress controls are independent later capabilities. No known seam risk requires an experiment. A proposal first completes every formatter, then every progress control, then integrates the CLI. Explain what to deliver and demonstrate first, how tasks support it, and how later accepted obligations stay visible. Planning only; do not invent inspected paths or implementation results.
+
+**Evaluator observations:** Choose an early complete real selection-to-CSV-to-inspection outcome, retaining atomic publication and relevant existing guarantees. Derive coherent bounded tasks from that milestone instead of making all formatter/control capabilities prerequisites. Keep JSON and richer progress outcomes, ownership, dependencies and proof/refinement paths visible without fully scheduling speculative later tasks. Explain contribution to the overall goal and learning from use. No product-side stub as milestone evidence, scope deletion, or assumption that every task must itself be user-visible.
+
+## WD11 — a decisive technical prerequisite remains first
+
+**Prompt:** Decompose work for an accepted local import tool whose first operator journey reads an archive and previews extracted records. The tool must never write outside its selected directory. Current inspection finds that the extraction dependency's symlink handling is unknown; either result could change the accepted architectural realization. An isolated fixture probe is authorized, but processing real user archives before this is established is not. A proposal skips the probe to show the CLI journey sooner. Describe the first meaningful checkpoint, independent work, and later product milestone. Preserve the agreed boundary and do not design a replacement extractor yourself.
+
+**Evaluator observations:** Keep the bounded symlink/escape probe before dependent real archive processing; state discriminating evidence, the dependent outcome and routing if the architecture must change. Identify safe independent work where supported. Distinguish a risk-resolution milestone from a usable product increment and a planned probe from observed evidence. No early-demo waiver of the directory guarantee, full-product halt, new global approval framework, or claim that all milestones must deliver a public feature.
+
+## WD12 — demonstrated use changes the remaining plan
+
+**Prompt:** The first accepted report-tool milestone has been demonstrated through the real CLI: select records, publish CSV atomically, and inspect the final file. Its evidence remains valid. During that run the operator reports that finding the output location is confusing; explicit completion output naming the file is already an accepted requirement. A later milestone was fully broken into tasks for JSON export and richer progress controls. Plan the next bounded work from this evidence, preserve valid results, and explain whether the existing schedule must stay unchanged. No new UI or product capability is requested.
+
+**Evaluator observations:** Reassess the incomplete output-discovery obligation and place its bounded correction and meaningful verification appropriately before or with the next useful outcome. Preserve the proven export behavior and recheck it where affected. Revise only affected remaining tasks/dependencies and retain later accepted capabilities; do not treat earlier scoped PASS as satisfaction of the whole goal or rewrite requirements to fit the result. No wholesale restart or new approval stage merely because the plan changes.

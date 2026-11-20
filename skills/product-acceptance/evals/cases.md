@@ -1,6 +1,6 @@
 # Product Acceptance Decision Cases
 
-Prepared evaluation inputs, **not executed results**. Adapted from the older source's eight product-acceptance cases; fidelity and paired setup/scope cases extend the accepted findings. Source identity and adaptation limits are recorded in the bundled [SKILL.md](../SKILL.md). Evidence packets below are case facts, not claims about this repository.
+Prepared evaluation inputs, **not executed results**. Adapted from the older source's eight product-acceptance cases; fidelity, paired setup/scope, and milestone-review cases extend the accepted findings. Source identity and adaptation limits are recorded in the bundled [SKILL.md](../SKILL.md). Evidence packets below are case facts, not claims about this repository.
 
 ### Standalone execution
 
@@ -63,3 +63,15 @@ A no-skill control omits skill/reference context but keeps the same prompt, mode
 **Prompt:** A run enters the real public API, creates state through the real server/worker/database, and reads a durable result through the real API. Evidence and shipping-equivalence are identified. Assess (a) the accepted API-consumer promise and (b) a proposed claim that the same test proves a browser user can create/read that result. No browser path ran. Explain which scope can pass and which additional evidence is needed.
 
 **Evaluator observations:** Real API evidence can support the API claim without a browser mandate. Browser promise needs its actual client integration/experience proof. Do not promote API proof to browser proof or block the API proof merely for lacking UI.
+
+## PA10 — a milestone proves its bounded contribution
+
+**Prompt:** Review the first milestone toward a local report tool with accepted CSV and JSON export. The agreed milestone covers CSV only. Supplied evidence identifies the shipping-equivalent CLI and real selection, encoding, atomic publication and later file inspection; a run uses production implementations throughout and preserves the relevant failure and overwrite guarantees. JSON is still unimplemented and listed for the next increment. All assertions for the CSV scenario passed. Explain what the milestone establishes, its contribution to the parent goal, and what remains. You have the evidence packet, but did not execute the run yourself.
+
+**Evaluator observations:** Accept the supported bounded CSV contribution without treating missing later JSON as failure of that scope. Do not infer full-product or release acceptance, or personally executed tests. Keep remaining capability and proof explicit; indicate relevant regression checks after later integration changes. A milestone needs the real outcome evidence, not merely completion of its tasks.
+
+## PA11 — milestone feedback exposes an accepted experience gap
+
+**Prompt:** Assess a milestone whose stated outcome is that an operator can create an export and find its result through the CLI. Every assigned implementation task is marked complete. The real path produces the correct file, with identified build, run and assertions. The accepted design requires completion output to name the file, but the final transcript prints only an internal job ID and the operator cannot locate the file without a database query. The next milestone is JSON export. Report the outcome, useful evidence, learning and affected next work. Do not redesign the whole CLI or invent a new requirement.
+
+**Evaluator observations:** Preserve the valid file-production proof while identifying the observed failure of the milestone's accepted discovery/experience criterion. Do not declare milestone PASS from task completion or a correct file alone. Link the gap to the parent goal, route a bounded correction and verification into planning, and retain valid work and later JSON scope. Distinguish the accepted failure from optional polish; no automatic new gate or authority to change the product promise.

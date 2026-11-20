@@ -12,8 +12,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class CaseTests(unittest.TestCase):
     def test_markdown_conversion_preserves_reviewed_cases_and_source_metadata(self):
-        versions = {"product-acceptance": "1.0.0", "work-decomposition": "1.1.0"}
-        for skill, count in (("product-acceptance", 9), ("work-decomposition", 9)):
+        versions = {"product-acceptance": "1.1.0", "work-decomposition": "1.2.0"}
+        for skill, count in (("product-acceptance", 11), ("work-decomposition", 12)):
             folder = ROOT / "skills" / skill / "evals"
             actual = json.loads((folder / "evals.json").read_text())
             expected = markdown_document((folder / "cases.md").read_text(), skill)

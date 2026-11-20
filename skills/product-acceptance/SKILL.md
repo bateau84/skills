@@ -16,7 +16,9 @@ Group accepted criteria into externally meaningful outcomes. Choose the smallest
 
 Useful discriminators include UI → API, command → durable state → later read, scheduler → worker → side effect, policy/auth boundaries, upgrade/migration, and interruption/retry. One scenario may prove several related criteria. A happy path cannot alone prove an agreed no-loss or recovery promise. Keep internal invariants in narrower tests when those are sufficient. A pure local change with unchanged public behavior and adequate contract/regression evidence need not manufacture a new expensive E2E test.
 
-Plan proof when its real components will exist; execute representative final proofs after relevant integration changes. If tools or components are unavailable, specify the executable strategy and mark proof pending rather than substituting a demo. For human-facing outcomes, include current implemented-experience evidence where accepted design materially constrains comprehension, controls, accessibility, or responsive behavior. Functional status alone does not prove that experience.
+When work is organized into milestones, link each scenario to the intermediate outcome and its contribution to the overall product goal. Plan the earliest real proof of that bounded outcome, then revalidate relevant earlier behavior after integration changes. A milestone may demonstrate a usable increment in a controlled environment without being a public release. Later product and release obligations remain explicit; narrowing the proof claim never waives guarantees applicable to the path being exercised.
+
+If tools or components are unavailable, specify the executable strategy and mark proof pending rather than substituting a demo. For human-facing outcomes, include current implemented-experience evidence where accepted design materially constrains comprehension, controls, accessibility, or responsive behavior. Functional status alone does not prove that experience.
 
 ## 2. Draw the boundary before choosing doubles
 
@@ -47,6 +49,12 @@ Tie each scenario to accepted criteria and observe the externally meaningful res
 Record at least: **claim; entry/path; real stages; external substitutions and evidence limits; prerequisite and produced-state provenance; build/configuration; action; expected/observed outcome; failure/recovery checks; evidence location; status and gaps**. See the directly linked [proof template and worked local-green/product-broken example](references/proof-and-example.md) for a reusable record.
 
 Use PASS only for an executed claim supported by this evidence. An observed violated outcome is FAIL; an unavailable, skipped, uncertain, or inconclusive proof is UNPROVEN. Scope statuses to the claim: narrower routing PASS does not imply full-journey PASS. Plans and fixtures are not execution evidence. Keep logs/assertions/screenshots or transcripts with the run identity and reproduction steps; redact secrets and user data.
+
+## 5. Review the milestone against the product goal
+
+For a milestone review, explain what now works, what its evidence establishes, what remains unavailable or unproven, and how the result advances the parent goal. Completed tasks and passing local suites do not establish the assembled outcome. A technical experiment alone does not establish a usable increment.
+
+Use the real scenario to identify learning relevant to the next commitment: misunderstood controls, missing workflow steps, regressions in earlier capabilities, or assumptions contradicted by observed behavior. Separate an accepted criterion that failed from a new improvement suggestion. Give the planning or decision owner the evidence and affected remaining work; preserve sound results and route any proposed change to product meaning through its existing authority. Use the existing plan, review or result record. This is feedback for the next increment, not a new permission or release gate.
 
 ## Supporting perspectives and evaluation
 

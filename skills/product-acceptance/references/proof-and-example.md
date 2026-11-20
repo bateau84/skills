@@ -8,6 +8,7 @@ Use this as a project-adaptable record, not a required report format or approval
 ### <scenario identifier> — <externally meaningful outcome>
 
 - Accepted claim / criterion / exclusions:
+- Milestone and contribution to the parent goal, when applicable:
 - Entry point and consumer or stimulus:
 - Ordered product-owned path (implementation at every stage; all mandatory stages real):
 - External dependencies (real/sandbox/fake; why; semantics preserved; compatibility limits):
@@ -23,6 +24,7 @@ Use this as a project-adaptable record, not a required report format or approval
 - Observed result and evidence locations (logs/assertions/transcript/screenshots; secrets redacted):
 - Status: PASS | FAIL | UNPROVEN, scoped to this claim
 - Remaining gaps / narrower claims supported / relevant later changes requiring revalidation:
+- For a milestone review: earlier capabilities checked; learning and affected next work / decision owner:
 ```
 
 Use identifiers already present or plain-language references. If only planning, leave observed result explicitly **not executed** and status **UNPROVEN**; record the runnable strategy and unavailable prerequisites.
