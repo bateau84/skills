@@ -470,6 +470,9 @@ class MarkdownTests(unittest.TestCase):
 
     def test_complete_selected_suite_parallel_cli_report_has_every_case_iteration(self):
         cases = tuple(c for c in self.context.candidate.discover_cases() if c.project_data["skill"] == "product-acceptance")
+        iterations = 2
+        expected_pairs = len(cases) * iterations
+        expected_invocations = expected_pairs * 2  # Baseline and candidate per pair.
         by_prompt = {c.project_data["prompt"]: c for c in cases}
         def invoke(spec):
             if spec.agent == "eval-judge":
@@ -485,17 +488,17 @@ class MarkdownTests(unittest.TestCase):
                  patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \
                  patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=invoke), \
                  redirect_stdout(stdout), redirect_stderr(stderr):
-                code = main(["--runner-root", str(self.context.runner.root), "--all", "--target", "product-acceptance", "--iterations", "2", "--parallel", "3",
+                code = main(["--runner-root", str(self.context.runner.root), "--all", "--target", "product-acceptance", "--iterations", str(iterations), "--parallel", "3",
                              "--model", "test/model", "--artifact-dir", str(destination), "--json"], report_root=Path(temp))
             self.assertEqual(code, 0, stderr.getvalue())
             text = (destination / "results.md").read_text()
             rows = [line for line in text.splitlines() if line.startswith("| SKILL-")]
-            self.assertEqual(len(rows), len(cases) * 2)
-            self.assertIn("18/18", text)
-            self.assertIn("36 target + 36 judge", text)
+            self.assertEqual(len(rows), expected_pairs)
+            self.assertIn(f"Verified pair artifacts: {expected_pairs}/{expected_pairs}", text)
+            self.assertIn(f"{expected_invocations} target + {expected_invocations} judge", text)
             events = [json.loads(line) for line in stdout.getvalue().splitlines()]
             self.assertEqual(events[-1]["report_path"], str(destination / "results.md"))
-            self.assertEqual(len(events[-1]["pairs"]), 18)
+            self.assertEqual(len(events[-1]["pairs"]), expected_pairs)
             manifest = json.loads((destination / "run.json").read_text())
             for row, job in zip(rows, manifest["jobs"], strict=True):
                 self.assertIn(f"{job['case']} / {job['iteration']}", row)
