@@ -98,7 +98,7 @@ class PinnedIntegrationTests(unittest.TestCase):
             self.assertIsNone(spec.config_root)
             self.assertIsNone(spec.expected_plugin)
             config = strict_json(spec.config.read_text())
-            self.assertEqual(config["plugins"], ["-opencode.skill"])
+            self.assertEqual(config["plugins"], ["-opencode.skill", "-opencode.browser"])
             self.assertNotIn("mcp", config)
             self.assertTrue(spec.workspace.exists())
             if spec.agent == "eval-judge":

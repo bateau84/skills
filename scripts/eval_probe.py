@@ -18,12 +18,36 @@ from eval_runner import build_probe_command
 def effective_agent_matches(actual, expected, plugins):
     if not actual or actual.get("system") != expected["system"]:
         return False
-    # The previously pinned 2.0.23 BrowserConnection.make appended this deny.
-    # Recognize only that exact source-backed rule, never arbitrary extensions.
+    # OpenCode's stock browser plugin appends restrictive rules after the
+    # configured agent rules. Recognize only the exact observed suffixes:
+    # 2.2.2 adds the browser deny, while 2.2.6 also denies its skill entry.
+    # Unknown extensions or effects must remain probe failures.
     suffix = list(expected["permissions"])
+    permissions = actual.get("permissions", [])
+    if not isinstance(permissions, list):
+        return False
     if "opencode.browser" in plugins:
         suffix.append({"action": "browser", "resource": "*", "effect": "deny"})
-    return actual.get("permissions", [])[-len(suffix):] == suffix
+        skill_deny = {"action": "skill", "resource": "browser", "effect": "deny"}
+        if permissions[-(len(suffix) + 1):] == suffix + [skill_deny]:
+            return True
+    return permissions[-len(suffix):] == suffix
+
+
+def isolated_skill_catalog(result: dict, desired_skills: list[str]) -> bool:
+    """Fail closed on stock plugin/skill contamination in every eval phase."""
+    plugins = result["plugins"]
+    unknown = [
+        name for name in plugins
+        if not (name.startswith("opencode.") or name == "eval-runtime-observer")
+    ]
+    return (
+        result["skills"] == desired_skills
+        and not result["workspace_evals"]
+        and not result["loom_seed_exists"]
+        and "opencode.browser" not in plugins
+        and not unknown
+    )
 
 
 PROBE_CODE = r'''
@@ -120,8 +144,7 @@ def probe_configs(root: Path, runner, options, case, record=None):
                                  + json.dumps({"agent_ids": [a["id"] for a in result["agents"]],
                                                "actual_agent": agent, "expected_agent": expected}))
             desired_skills = [case.project_data["skill"]] if mounted else []
-            unknown_plugins = [p for p in result["plugins"] if not (p.startswith("opencode.") or p == "eval-runtime-observer")]
-            if result["skills"] != desired_skills or result["workspace_evals"] or result["loom_seed_exists"] or unknown_plugins:
+            if not isolated_skill_catalog(result, desired_skills):
                 raise ValueError(f"{side}: runtime catalog/config contamination or rubric exposure")
             if not all(value["readable"] and not value["write_bits"] for value in result["files"].values()):
                 raise ValueError("selected practitioner reference is not readable/read-only")

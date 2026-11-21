@@ -153,7 +153,7 @@ class ProviderSecurityTests(unittest.TestCase):
             self.assertEqual(decoded["providers"]["reviewonly"]["name"], payload)
             self.assertEqual(decoded["agents"]["eval-target"]["permissions"], [{"action": "*", "resource": "*", "effect": "deny"}])
             self.assertEqual(decoded["instructions"], [])
-            self.assertEqual(decoded["plugins"], ["-opencode.skill"])
+            self.assertEqual(decoded["plugins"], ["-opencode.skill", "-opencode.browser"])
             self.assertNotIn("{env:", json.dumps(decoded))
 
     def test_noninventoried_forwarding_and_unsafe_or_missing_references_fail_before_startup(self):

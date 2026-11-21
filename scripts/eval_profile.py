@@ -195,9 +195,10 @@ def effective_config(side: str, skill: str, providers: dict, files, *, compariso
     config = {
         "$schema": "https://opencode.ai/config.json", "share": "disabled", "update": "disable",
         "snapshots": False, "warming": False, "instructions": [],
-        # The previously pinned 2.0.23 added opencode/report skills even to an
-        # empty workspace. Remove that content plugin, not loader or scanner.
-        "plugins": ["-opencode.skill"],
+        # Bundled skill content and the separate browser plugin register skills
+        # outside the selected practitioner directory. Disable both, keeping
+        # the native skill scanner/tool for the candidate's explicit skill load.
+        "plugins": ["-opencode.skill", "-opencode.browser"],
         "permissions": [dict(DENY)], "default_agent": agent,
         "agents": {agent: {"mode": "primary", "description": "Disposable evaluation practitioner" if side != "judge" else "Disposable rubric judge",
                            "system": system, "permissions": rules}},
@@ -346,6 +347,12 @@ class SkillsProfile:
             auth=o.auth, database=o.database, models_catalog=o.models_catalog,
             config=config, config_root=None, env_names=tuple(o.env),
             timeout_seconds=o.timeout_seconds, container_timeout=o.container_timeout,
+            claude_config_dir=(
+                Path(o.claude_config_dir) if getattr(o, "claude_config_dir", None)
+                and ((o.judge_model or o.model) if judge else o.model).startswith("claude-agent/")
+                else None
+            ),
+            claude_billing_confirmed=bool(getattr(o, "claude_billing_confirmed", False)),
         )
 
     def target_spec(self, case, prepared):
@@ -476,7 +483,8 @@ class SkillsProfile:
                          "inner_timeout": self.options.timeout_seconds, "outer_timeout": self.options.container_timeout,
                          "transport_retries": self.options.transport_retries,
                          "target_image": self.options.target_image_proof, "judge_image": self.options.judge_image_proof,
-                         "network": self.options.network or "engine-default-live", "sampling": "provider-default/uncontrolled"},
+                         "network": self.options.network or "engine-default-live", "sampling": "provider-default/uncontrolled",
+                          "claude_agent_profile": bool(getattr(self.options, "claude_config_dir", None))},
         }
 
 

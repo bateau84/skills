@@ -1,0 +1,66 @@
+name: Claude Agent zero-inference integration probe
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/eval_profile.py
+      - scripts/eval_probe.py
+      - scripts/eval_runner.py
+      - scripts/run_evals.py
+      - .github/workflows/claude-agent-probe.yml
+  push:
+    branches: [main]
+    paths:
+      - scripts/eval_profile.py
+      - scripts/eval_probe.py
+      - scripts/eval_runner.py
+      - scripts/run_evals.py
+      - .github/workflows/claude-agent-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Verify exact image and effective config without model calls
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout skills
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Fetch exact clean runner revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          runner="$RUNNER_TEMP/opencode-eval-runner"
+          git init -q "$runner"
+          git -C "$runner" remote add origin https://github.com/bateau84/opencode-eval-runner.git
+          git -C "$runner" fetch -q --depth 1 origin 6d89fe466dc585cbfea58fae0f4a0899448af429
+          git -C "$runner" checkout -q --detach FETCH_HEAD
+          test "$(git -C "$runner" rev-parse HEAD)" = 6d89fe466dc585cbfea58fae0f4a0899448af429
+          test -z "$(git -C "$runner" status --porcelain --ignored --untracked-files=all)"
+          echo "SKILLS_EVAL_RUNNER_ROOT=$runner" >> "$GITHUB_ENV"
+      - name: Build native Claude Agent image without login credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -f "$SKILLS_EVAL_RUNNER_ROOT/Containerfile" \
+            --target claude-agent -t skills-claude-agent:probe "$SKILLS_EVAL_RUNNER_ROOT"
+          echo "CLAUDE_IMAGE_ID=$(docker image inspect skills-claude-agent:probe --format '{{.Id}}')" >> "$GITHUB_ENV"
+      - name: Probe baseline, candidate and judge without credentials or inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          # --claude-config-dir selects the exact 2.2.6 image profile during
+          # --probe; the path is intentionally absent, never mounted and never read.
+          test ! -e "$RUNNER_TEMP/nonexistent-claude-profile"
+          python3 -I -B scripts/run_evals.py \
+            --probe \
+            --runner-root "$SKILLS_EVAL_RUNNER_ROOT" \
+            --engine docker \
+            --image "$CLAUDE_IMAGE_ID" \
+            --cases agent-run-audit:RUN-AUDIT-01 \
+            --claude-config-dir "$RUNNER_TEMP/nonexistent-claude-profile"
