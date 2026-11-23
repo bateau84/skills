@@ -1,0 +1,34 @@
+# Adapt then copy into .github/workflows/verify-lockfile.yml.
+# Review the repository's default branch and the extension release pin below.
+# Re-run `gh actions-lock` after introducing this workflow.
+name: Verify GitHub Actions lockfile
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # Weekly check catches unexpected movement of upstream refs between PRs.
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install reviewed gh-actions-lock release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh extension install github/gh-actions-lock --pin v0.4.1
+      - name: Check lockfile and pin provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh actions-lock --verify

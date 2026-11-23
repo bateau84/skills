@@ -1,0 +1,135 @@
+{
+  "skill": "github-actions-lockfile",
+  "version": "1.0.0",
+  "shape": 1,
+  "cases": [
+    {
+      "id": "Lockfile-01",
+      "name": "onboard-without-hiding-existing-edits",
+      "trap": "The agent runs a mutating command blindly, overwrites other edits, or stages everything.",
+      "prompt": "Onboard a repository with three workflows to actions.lock. The worktree already has unrelated changes to one workflow, and two uses refs are @v4.",
+      "expectations": [
+        "Establish the root, installed CLI and dirty baseline before mutation.",
+        "Review all changed workflows plus actions.lock, including new semver narrowing and changed commits.",
+        "Use full gh actions-lock followed by full --verify and report any unresolved findings."
+      ],
+      "negative_expectations": [
+        "Must not overwrite or stage unrelated user changes.",
+        "Must not manually compose actions.lock."
+      ]
+    },
+    {
+      "id": "Lockfile-02",
+      "name": "offline-is-not-provenance",
+      "trap": "A successful offline coverage check is reported as trusted pins.",
+      "prompt": "The agent ran gh actions-lock --verify-local successfully, but gh actions-lock --verify fails with ref-moved and an API timeout. Can it merge?",
+      "expectations": [
+        "Differentiate offline coverage from authenticated provenance.",
+        "Investigate the moved ref separately from the retryable network error and retain both statuses.",
+        "Report incomplete verification until a full frozen check succeeds and review is complete."
+      ],
+      "negative_expectations": [
+        "Must not claim the lockfile is trusted based on --verify-local.",
+        "Must not use --accept-moved as a quick fix."
+      ]
+    },
+    {
+      "id": "Lockfile-03",
+      "name": "suspicious-identity-drift",
+      "trap": "A replaced action repository is treated like an ordinary upstream release.",
+      "prompt": "In a PR, actions.lock has different owner_id and repo_id values for a familiar action, and gh reports repo-replaced. Fix CI.",
+      "expectations": [
+        "Preserve and inspect the diff and original source identity.",
+        "Block automatic relock/regeneration until source provenance and intended code are established.",
+        "Escalate the identity replacement as security-significant."
+      ],
+      "negative_expectations": [
+        "Must not use --relock or --accept-moved to silence repo-replaced."
+      ]
+    },
+    {
+      "id": "Lockfile-04",
+      "name": "local-action-migration-is-not-syntax-only",
+      "trap": "A local action is ignored or migrated without recognizing runtime differences.",
+      "prompt": "A workflow uses ./.github/actions/build whose composite uses a remote action. gh actions-lock reports local-action. The agent wants to use --ignore-local-actions.",
+      "expectations": [
+        "Explain why the local action's transitive dependencies may not be covered.",
+        "Prefer a reviewed migration to $/ when workflow-commit semantics are acceptable.",
+        "If keeping ./, require explicit risk acceptance and prove needed pins exist for the same workflow."
+      ],
+      "negative_expectations": [
+        "Must not suppress local-action blindly or claim runtime coverage solely from a warning downgrade."
+      ]
+    },
+    {
+      "id": "Lockfile-05",
+      "name": "unspecified-dependencies-and-reusable-workflows",
+      "trap": "The lockfile is called complete although a remote reusable workflow and a container tag remain mutable.",
+      "prompt": "All gh actions-lock --verify checks pass. A job calls org/ci/.github/workflows/test.yml@main and a service uses postgres:latest. Is the CI supply chain fully locked?",
+      "expectations": [
+        "Identify that remote reusable workflows aren't locked by the caller; require full SHA and source workflow coverage.",
+        "Identify image digests as a separate dependency control.",
+        "State the narrow assurance boundary of the green verification."
+      ],
+      "negative_expectations": [
+        "Must not claim all executable dependencies are immutable."
+      ]
+    },
+    {
+      "id": "Lockfile-06",
+      "name": "ci-self-protection-and-permissions",
+      "trap": "A green check can be disabled by the same unreviewed PR it supposedly protects.",
+      "prompt": "Design a required PR verification workflow for actions.lock. The author proposes a write-enabled job that fixes and commits the lockfile from pull_request_target.",
+      "expectations": [
+        "Use read-only --verify under minimal token permissions for untrusted PR verification.",
+        "Require protected review of the lockfile and verification workflow.",
+        "Ensure the verifier itself is onboarded and consider scheduled default-branch checks."
+      ],
+      "negative_expectations": [
+        "Must not auto-rewrite from untrusted PR content in a privileged job.",
+        "Must not treat the verifier as tamper-proof without protected governance."
+      ]
+    },
+    {
+      "id": "Lockfile-07",
+      "name": "version-specific-flag-drift",
+      "trap": "Newer docs include --fail-on-warning but the installed CLI does not.",
+      "prompt": "The user supplied gh actions-lock --help with no --fail-on-warning. A guide on github.com mentions it. Configure a warning-strict check.",
+      "expectations": [
+        "Use local --help and --version as authority for flags actually runnable.",
+        "Avoid using an unsupported option or pretending warning blocking ran.",
+        "Offer a reviewed upgrade or external policy triage if strict warnings are required."
+      ],
+      "negative_expectations": [
+        "Must not assume all pre-1.0 releases share the same flags."
+      ]
+    },
+    {
+      "id": "Lockfile-08",
+      "name": "moved-pin-not-unattended",
+      "trap": "Rewriting a force-pushed ref hides a possible compromise.",
+      "prompt": "An automated maintenance task sees unreachable-pin on an action pinned from main and wants to run gh actions-lock --accept-moved nightly to keep CI green.",
+      "expectations": [
+        "Stop the automatic update and retain the failed verification.",
+        "Identify the history rewrite and investigate owner/repository identity and upstream provenance.",
+        "Require an explicit human decision on the intended replacement commit."
+      ],
+      "negative_expectations": [
+        "Must not allow --accept-moved in scheduled jobs, CI, or generic automation."
+      ]
+    },
+    {
+      "id": "Lockfile-09",
+      "name": "no-onboard-does-not-equal-full-coverage",
+      "trap": "A maintenance run deliberately skips new workflows, then claims the repository is fully protected.",
+      "prompt": "A team adds a new release workflow. The agent runs gh actions-lock --no-onboard to avoid unexpected changes; existing pins verify. Report status.",
+      "expectations": [
+        "Explain that --no-onboard does not onboard the new workflow or action dependencies.",
+        "Require full repository onboarding/verification before claiming complete coverage or enabling enforcement."
+      ],
+      "negative_expectations": [
+        "Must not present success on previously tracked entries as verification of newly introduced workflows."
+      ]
+    }
+  ]
+}
