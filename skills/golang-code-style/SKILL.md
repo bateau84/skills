@@ -16,7 +16,7 @@ Style rules that require human judgment — linters handle formatting, this skil
 
 > "Clear is better than clever." — Go Proverbs
 
-Explain consequential deviations in review when useful; do not add noise comments merely to justify a stylistic choice.
+Preserve behavior, public compatibility, and established repository conventions before applying style preferences. For a narrow review, identify concrete readability or correctness problems; do not produce a rewrite merely to demonstrate the skill. Explain consequential deviations when useful without adding noise comments.
 
 ## Line Length & Breaking
 
@@ -36,7 +36,7 @@ mux.HandleFunc("/api/users", func(w http.ResponseWriter, r *http.Request) {
 })
 ```
 
-When a function signature is too long, the real fix is often **fewer parameters** (use an options struct) rather than better line wrapping. For multi-line signatures, put each parameter on its own line.
+Break long signatures for readability. Group parameters only when they form a coherent concept or the call sites are error-prone; line length alone does not justify changing an API. For multi-line signatures, put each parameter on its own line.
 
 Preserve short-circuit semantics when naming complex conditions: never hoist `u.Role` above `u != nil`, an indexed read above a bounds guard, or a conditional side effect into an unconditional boolean assignment.
 
@@ -123,7 +123,7 @@ if debug {
 
 ### Complex Conditions & Init Scope
 
-When an `if` condition has 3+ operands, MUST extract into named booleans — a wall of `||` is unreadable and hides business logic. Keep expensive checks inline for short-circuit benefit. [Details](./references/details.md)
+Name compound conditions when that makes their meaning clearer. Operand count alone is not a reason to rewrite a readable condition. Preserve short-circuit guards, side effects, and expensive checks when extracting expressions. [Details](./references/details.md)
 
 ```go
 // Good — named booleans make intent clear
@@ -161,7 +161,7 @@ default:
 ## Function Design
 
 - Functions SHOULD be **short and focused** — one function, one job.
-- Functions SHOULD have **≤4 parameters**. Each parameter is a token the agent must satisfy from the signature alone; exceeding 4 degrades zero-shot usability and signals that an options struct is overdue (see `golang-design-patterns` skill).
+- Group related parameters when the domain or confusing call sites justify it. A fixed parameter count does not establish a defect or justify an options struct, especially for an established public API.
 - **Parameter order**: `context.Context` first, then inputs, then output destinations.
 - Naked returns help in very short functions (1-3 lines) where return values are obvious, but become confusing when readers must scroll to find what's returned — name returns explicitly in longer functions.
 

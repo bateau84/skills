@@ -13,7 +13,7 @@ metadata:
 
 # Asynchronous Python
 
-`async`/`await` gives concurrency for **I/O-bound** work (HTTP, DB, files) on one thread. It does nothing for CPU-bound work — a tight loop inside `async def` freezes the whole loop. Reach for async when you wait on the network, not when you crunch numbers.
+`async`/`await` supports concurrent **I/O-bound** work on an event loop. A tight CPU loop inside `async def` still blocks that loop. Use async when the application needs concurrent waiting; a small synchronous program does not need an async rewrite. Preserve required ordering and rate limits instead of introducing concurrency merely because work can be expressed as tasks.
 
 ## The cardinal rule: never block the loop
 
@@ -85,7 +85,7 @@ except asyncio.CancelledError:
 
 ## httpx — reuse one client
 
-Create one `AsyncClient` per app/lifespan and share it; a fresh client per request throws away connection pooling and TLS reuse. Always close it (or use it as a context manager).
+Reuse an `AsyncClient` across repeated requests within the owning application or batch, and close it at that boundary. A hot-path helper should accept a client rather than create a new pool each call. A one-shot program can own one context-managed client for its single operation; it does not need a global client, service container, or web-app lifespan.
 
 ```python
 async with httpx.AsyncClient(timeout=30) as client:

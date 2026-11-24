@@ -333,7 +333,7 @@ class LatestReportTests(unittest.TestCase):
                      patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \
                      patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=invoke), \
                      redirect_stdout(stdout), redirect_stderr(stderr):
-                    code = main(["--cases", "product-acceptance:PA3", "--model", "test/model",
+                    code = main(["--cases", "product-acceptance:PA3", "--model", "test/model", "--allow-same-model-judge",
                                  "--runner-root", str(self.context.runner.root), *flags])
                 self.assertEqual(code, 0, stderr.getvalue())
                 self.assertEqual(list(caller.iterdir()), [])
@@ -358,7 +358,7 @@ class LatestReportTests(unittest.TestCase):
             self.run_fixture(root, "previous")
             before = (root / "EVAL-RESULTS.md").read_bytes()
             with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()), patch("run_evals.load_runner") as loader:
-                code = main(["--cases", "unknown:case", "--model", "test/model", "--artifact-dir", str(root / "bad-run")], report_root=root)
+                code = main(["--cases", "unknown:case", "--model", "test/model", "--allow-same-model-judge", "--artifact-dir", str(root / "bad-run")], report_root=root)
             self.assertEqual(code, 2)
             loader.assert_not_called()
             self.assertFalse((root / "bad-run").exists())

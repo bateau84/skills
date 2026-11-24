@@ -17,7 +17,8 @@ from contextlib import contextmanager
 from urllib.parse import quote
 
 from eval_cases import strict_json
-from eval_reporting import EvalReporter, terminal_text
+from eval_quality import axis_text
+from eval_reporting import EvalReporter, console_record, terminal_text
 
 REPORT_NAME = "results.md"
 REPORT_TITLE = "# Skill evaluation results"
@@ -88,7 +89,8 @@ def evidence_link(store, path, label, sanitizer, link_base=None):
 
 def render_report(runner, store, manifest, artifacts, summary, sanitizer, *, incomplete=False, link_base=None):
     md = lambda value, limit=600: markdown_text(value, sanitizer, limit)
-    records = summary["pairs"]
+    records = [console_record(record) for record in summary["pairs"]]
+    records_by_key = {(record["case"], record["iteration"]): record for record in records}
     planned = len(manifest["jobs"])
     errors = summary["orchestration_errors"]
     metadata = manifest.get("project_metadata", {})
@@ -105,7 +107,7 @@ def render_report(runner, store, manifest, artifacts, summary, sanitizer, *, inc
     controls = metadata.get("report_controls", {})
     if controls:
         lines.extend(["", "## Run settings", ""])
-        for key in ("target_transport", "model", "judge_transport", "judge_model", "reasoning", "judge_reasoning",
+        for key in ("target_transport", "model", "judge_transport", "judge_model", "judge_relationship", "reasoning", "judge_reasoning",
                     "parallel", "inner_timeout", "outer_timeout", "transport_retries", "engine", "network", "sampling"):
             if key in controls:
                 value = controls[key]
@@ -120,14 +122,41 @@ def render_report(runner, store, manifest, artifacts, summary, sanitizer, *, inc
                                         "PASS." if summary["all_pass"] else "NOT PASS — behavioral negative, non-evidence, or incomplete pair/comparison proof."),
                   "- FAIL is a behavioral negative; NON-EVIDENCE is unusable/missing proof, not a zero score.",
                   "", "## Paired comparison", "",
-                  "Observed pair policy only (unchanged 10pp/trap threshold), not statistical significance, discovery, or general superiority.",
-                  "Candidate absolute PASS is separate from baseline performance and relative value. Treatment failure prevents attribution."])
+                  "Observed pair policy only (10pp/relevant-trap threshold), not statistical significance, discovery, or general superiority.",
+                  "Typed cases compare outcomes separately from conventions. Unclassified legacy rubrics measure conformance only.",
+                  "Candidate absolute PASS includes every rubric rule; it is separate from outcome PASS and relative value. Treatment failure prevents attribution."])
     values = {}
     for record in records:
         comparison = record["comparison"]
         value = comparison["decision"]["classification"] if comparison["decision"] else "unavailable"
         values[value] = values.get(value, 0) + 1
     lines.append("- " + ("; ".join(f"{md(k)}: {v}" for k, v in sorted(values.items())) or "No verified comparisons."))
+    lines.extend(["", "## Outcome and convention evidence", "",
+                  "Fractions count satisfied criteria, not independent tasks. Each repetition is one observation of the same case.",
+                  "A missing axis is unclassified or untested, never a zero or a pass. Case purpose is authored intent; discrimination remains uncalibrated.",
+                  "Different model selectors alone do not verify different underlying models; same-model judgments require explicit opt-in.",
+                  "", "| Case / iteration | Outcome baseline → candidate | Convention baseline → candidate | Outcome change | Trap baseline / candidate |",
+                  "| --- | --- | --- | --- | --- |"])
+    for artifact in artifacts:
+        decision = records_by_key[(artifact["case"], artifact["iteration"])]["comparison"]["decision"]
+        detail = decision["data"] if decision else {}
+        def axis_label(kind):
+            values = []
+            for side in ("baseline", "candidate"):
+                semantic = artifact["sides"][side]["judge"]["semantic"]
+                axes = semantic["data"].get("scores", {}) if semantic else {}
+                axes = axes if isinstance(axes, dict) else {}
+                values.append(axis_text(axes.get(kind)))
+            return " → ".join(values)
+        delta = detail.get("outcome_delta_pp")
+        usable = detail.get("treatment_integrity") is True
+        change = f"{delta:+.1f} pp" if type(delta) in (int, float) and usable else "unavailable / unattributed"
+        traps = []
+        for side in ("baseline", "candidate"):
+            semantic = artifact["sides"][side]["judge"]["semantic"]
+            trap = semantic["data"]["grade"].get("trap_observed") if semantic else None
+            traps.append(str(trap).lower() if type(trap) is bool else "unavailable")
+        lines.append(f"| {md(artifact['case'])} / {artifact['iteration']} | {md(axis_label('outcome'))} | {md(axis_label('convention'))} | {change} | {md(' / '.join(traps))} |")
     counts = {phase: sum(r["attempts"][s][phase] for r in records for s in ("baseline", "candidate"))
               for phase in ("target", "judge")}
     budget = metadata.get("budget", {})
@@ -155,12 +184,13 @@ def render_report(runner, store, manifest, artifacts, summary, sanitizer, *, inc
             semantic = data["judge"]["semantic"]
             score = f"{semantic['data']['score'] * 100:.0f}%" if semantic else "score unavailable"
             return f"{data['classification'].upper()} {score}"
-        decision = artifact["comparison"]["decision"]
+        decision = records_by_key[key]["comparison"]["decision"]
         observation = "unavailable; non-evidence or invalid comparison"
         if decision:
             observation = decision["classification"]
-            if observation != "unattributed":
-                observation += f" ({decision['data']['delta_pp']:+.1f} pp)"
+            delta = decision["data"].get("delta_pp")
+            if observation not in ("unattributed", "unrecognized-comparison") and type(delta) in (int, float):
+                observation += f" ({delta:+.1f} pp)"
         link = evidence_link(store, store.root / job["artifact"], "paired JSON", sanitizer, link_base)
         lines.append(f"| {name} | {status('baseline')} | {status('candidate')} | {md(observation)} | {link} |")
     lines.extend(["", "## Decisive details and provenance", ""])

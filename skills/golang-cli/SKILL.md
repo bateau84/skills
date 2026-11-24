@@ -20,11 +20,11 @@ metadata:
 
 # Go CLI Best Practices
 
-Use Cobra + Viper as the default stack for Go CLI applications. Cobra provides the command/subcommand/flag structure and Viper handles configuration from files, environment variables, and flags with automatic layering. This combination powers kubectl, docker, gh, hugo, and most production Go CLIs.
+Choose the stack from the command and configuration needs. Cobra is useful for a command tree; Viper is useful when flags, environment variables, and configuration files need layering. They can be used independently. Preserve an existing suitable stack; a small flag-only program does not need either dependency.
 
 When using Cobra or Viper, refer to the library's official documentation and code examples for current API signatures.
 
-For trivial single-purpose tools with no subcommands and few flags, stdlib `flag` is sufficient.
+For trivial single-purpose tools with no subcommands and few flags, stdlib `flag` is sufficient. The sections below are applicable techniques, not a feature checklist: do not add configuration files, output formats, completion infrastructure, or command scaffolding without a task need.
 
 ## Quick Reference
 
@@ -161,7 +161,7 @@ Use the following I/O patterns:
 
 - **stdout vs stderr**: NEVER write diagnostic output to stdout — stdout is for program output (pipeable), stderr for logs/errors/diagnostics
 - **Detecting pipe vs terminal**: check `os.ModeCharDevice` on stdout
-- **Machine-readable output**: support `--output` flag for table/json/plain formats
+- **Machine-readable output**: preserve the accepted output contract; add selectable formats only when callers need them
 - **Colors**: use `fatih/color` which auto-disables when output is not a terminal
 
 ## Signal Handling
@@ -188,10 +188,10 @@ Use `cmd.OutOrStdout()` and `cmd.ErrOrStderr()` in commands (instead of `os.Stdo
 | Missing `viper.SetEnvPrefix` | `PORT` collides with other tools. Use a prefix (`MYAPP_PORT`) to namespace env vars |
 | Logging to stdout | Unix pipes chain stdout — logs corrupt the data stream for the next program. Logs go to stderr |
 | Printing usage on every error | Full help text on every error is noise. Set `SilenceUsage: true`, save full usage for `--help` |
-| Config file required | Users without a config file get a crash. Ignore `viper.ConfigFileNotFoundError` — config should be optional |
-| Not using `PersistentPreRunE` | Config initialization must happen before any subcommand. Use root's `PersistentPreRunE` |
+| Optional config file missing | Ignore only the intended not-found condition for optional discovery; an explicitly required file or malformed configuration still needs an error |
+| Missing required initialization | Wire initialization for commands that need it and account for child persistent-hook overrides |
 | Hardcoded version string | Version gets out of sync with tags. Inject via `ldflags` at build time from git tags |
-| Not supporting `--output` format | Scripts can't parse human-readable output. Add JSON/table/plain for machine consumption |
+| Unstable machine-output contract | Keep the accepted stream format stable; add a format flag only when multiple representations are actually needed |
 
 ## Related Skills
 

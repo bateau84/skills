@@ -9,6 +9,8 @@ Use this skill for substantive behavioral specification. It provides common reas
 
 **Expand the consequences of the anchor, not the scope of the product.** Use lightweight goal refinement and obstacle analysis to produce the smallest coherent set of observable obligations. Thoroughness means covering material meaning, not maximizing artifact count or claiming to exhaust every imaginable case.
 
+Start with the accepted outcomes and the existing place that can express them. A short change may need only a few clauses in one requirement; a clarification may need no new artifact. Add an artifact only when it owns distinct accepted meaning that would otherwise be missing or ambiguous. An unanswered question belongs in the open questions for the affected scope, not in a speculative contract whose guarantees are still undecided.
+
 ## Boundary
 
 Own **what must be observably or semantically true**, not structural realization. Do not choose components, schemas, protocols, storage, libraries, deployment topology, or implementation mechanisms unless accepted external/product authority itself fixes them.
@@ -113,7 +115,7 @@ Choose the artifact whose semantic role is primary:
 
 - **Behavioral Requirement:** one normative observable behavior.
 - **Quality Scenario:** a quality must hold measurably under a meaningful condition/stimulus. Make the QS normative when the obligation exists specifically under a condition, load, degradation, threat, or recovery situation. Add a BR only for a distinct baseline behavior meaningful independently of that scenario.
-- **Obligation Contract:** independently realized parties must share semantic agreement at a correctness-sensitive seam. Make the OC normative for that shared meaning. Add a BR only for a distinct system-level outcome outside the seam contract.
+- **Obligation Contract:** independently realized parties must share semantic agreement at a correctness-sensitive seam. Establish which parties can independently interpret the meaning and what accepted outcome their disagreement would defeat before creating the OC. A user and system, two internal functions, or an architecture flag alone do not establish that need. Make the OC normative for the shared meaning actually required. Add a BR only for a distinct system-level outcome outside the seam contract.
 
 BR, QS, and OC have **equal normative standing when applicable** but cover different dimensions: baseline behavior, quality under meaningful conditions, and shared semantics at independent boundaries. Artifact type is not a precedence rule. Give each guarantee one normative home. Cross-reference related artifacts instead of making BR/QS/OC copies for symmetry or completeness. State what must be observed to prove or falsify the obligation, not implementation-specific test mechanics unless the verification surface is itself authoritative. Keep its basis, applicability, dependencies, and verification intent clear within the existing artifact formats.
 

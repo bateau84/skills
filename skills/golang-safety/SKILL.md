@@ -99,7 +99,7 @@ b := append(a[:len(a):len(a)], 4)
 
 ### Map concurrent access
 
-Maps MUST NOT be accessed concurrently — → see `golang-concurrency` for sync primitives.
+Concurrent access involving writes requires synchronization. A fully initialized, safely published map can be read concurrently when no goroutine mutates it; do not add a mutex or `sync.Map` solely for that case. See the [Go map FAQ](https://go.dev/doc/faq#atomic_maps) and `golang-concurrency` for synchronization choices.
 
 See **[Slice and Map Deep Dive](./references/slice-map-safety.md)** for range pitfalls, subslice memory retention, and `slices.Clone`/`maps.Clone`.
 
@@ -178,7 +178,7 @@ func processOne(path string) error {
 
 ## Immutability & Defensive Copying
 
-Exported functions returning slices/maps SHOULD return defensive copies.
+Match the ownership contract. An accessor promising independent mutable results must copy all mutable state covered by that promise. `slices.Clone` and `maps.Clone` copy elements by assignment: nested slices, maps, and pointers still share their underlying objects. Copy those as needed; a capacity-limited slice alone does not detach existing elements. An explicitly borrowed/read-only API is a different contract. See [slices.Clone](https://pkg.go.dev/slices#Clone).
 
 ### Protecting struct internals
 
@@ -262,7 +262,7 @@ if s, ok := reflect.TypeAssert[string](v); ok {
 | Bare type assertion `v := x.(T)` | Panics on type mismatch, crashing the program. Use `v, ok := x.(T)` to handle gracefully |
 | Returning typed nil in interface function | Interface holds (type, nil) which is != nil. Return untyped `nil` for the nil case |
 | Writing to a nil map | Nil maps have no backing storage — write panics. Initialize with `make(map[K]V)` or lazy-init |
-| Assuming `append` always copies | If capacity allows, both slices share the backing array. Use `s[:len(s):len(s)]` to force a copy |
+| Assuming `append` always copies | Capacity limiting forces a new backing array only when an append exceeds that capacity; it does not copy existing elements by itself |
 | `defer` in a loop | `defer` runs at function exit, not loop iteration — resources accumulate. Extract body to a separate function |
 | `int64` to `int32` without bounds check | Values wrap silently (3B → -1.29B). Check against `math.MaxInt32`/`math.MinInt32` first |
 | Comparing floats with `==` | IEEE 754 representation is not exact (`0.1+0.2 != 0.3`). Use `math.Abs(a-b) < epsilon` |

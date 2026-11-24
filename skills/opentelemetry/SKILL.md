@@ -10,6 +10,8 @@ description: Instrument any app with OpenTelemetry and ship metrics / logs / tra
 
 Vendor-neutral instrumentation pipeline. Apps speak OTLP → Alloy (or direct) → Grafana Cloud (Mimir / Loki / Tempo / Pyroscope).
 
+Start with the requested signal and the actual exporter/protocol/endpoint configuration. Fix the demonstrated boundary before adding collectors, instrumentation, or sampling policy. A failed probe is diagnostic evidence, not proof of a particular root cause; an accepted request is not proof that useful telemetry reached the intended backend.
+
 ## Backends
 
 | Signal | Backend |
@@ -39,13 +41,16 @@ export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic $(printf '%s' "${INSTANCE_ID}:${API_KEY}" | base64 | tr -d '\n')"
 export OTEL_RESOURCE_ATTRIBUTES="service.name=myapp,service.namespace=myteam,deployment.environment=prod"
 
-# 2. Smoke-test creds with a curl POST against the OTLP traces endpoint (empty body)
+# 2. Probe the traces endpoint with a deliberately malformed payload
 curl -s -o /dev/null -w "%{http_code}\n" \
   -X POST -H "Content-Type: application/x-protobuf" \
   -H "Authorization: Basic $(printf '%s' "${INSTANCE_ID}:${API_KEY}" | base64 | tr -d '\n')" \
   "$OTEL_EXPORTER_OTLP_ENDPOINT/v1/traces" --data-binary '\n'
-# Expect 400 (malformed payload) — NOT 401 (auth) or 404 (wrong endpoint).
+# Inspect the response: 401 suggests auth failure; 404 suggests routing/URL mismatch.
+# A 400 is a rejected payload, not proof of credentials or successful export.
 ```
+
+For end-to-end verification, send a valid known trace through the configured SDK, inspect exporter errors, and locate that trace in the intended backend. An empty or malformed request cannot establish this. See the [OTLP response contract](https://opentelemetry.io/docs/specs/otlp/).
 
 ### 2. Auto-instrument a Java app + verify
 

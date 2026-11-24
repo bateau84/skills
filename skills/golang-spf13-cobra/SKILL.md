@@ -74,8 +74,8 @@ PersistentPreRunE → PreRunE → RunE → PostRunE → PersistentPostRunE
 
 Always use `*E` variants — the non-`E` forms cannot return errors. Key rules:
 
-- `PersistentPreRunE` on the root runs before **every** subcommand — use it for config init and auth checks.
-- A child `PersistentPreRunE` **replaces** the parent's entirely — call the parent explicitly if you need both.
+- Use a root `PersistentPreRunE` for shared prerequisites, but account for child overrides and the pinned traversal configuration; it is not guaranteed to run before every child.
+- With `EnableTraverseRunHooks == false` (the default), Cobra executes only the nearest persistent hook; explicitly compose required ancestor work if a child overrides it. With traversal enabled, Cobra already runs persistent pre-hooks from root to child: do not call ancestors again from the child.
 - `PostRunE` runs only if `RunE` succeeded.
 
 For the full lifecycle and inheritance rules, see [commands-and-args.md](references/commands-and-args.md).
@@ -125,12 +125,12 @@ func TestServeCmd(t *testing.T) {
 }
 ```
 
-Cobra accumulates flag state across `Execute()` calls — build a fresh command tree per test. For isolation patterns, golden files, and testing completions, see [testing.md](references/testing.md).
+Cobra accumulates flag state across `Execute()` calls — build a fresh command tree per test with locally owned bound flag variables and injected output writers. A new command that still binds package-global variables is not isolated. For isolation patterns, golden files, and testing completions, see [testing.md](references/testing.md).
 
 ## Best Practices
 
 1. **Always use `RunE`, never `Run`** — `Run` cannot return an error; the only escape is `os.Exit` or panic, bypassing defers.
-2. **Put config initialization in `PersistentPreRunE`** — it runs before every subcommand; the right place for viper binding and auth checks.
+2. **Wire required preconditions explicitly** — persistent hooks can host shared initialization/auth, but a child override must not bypass them. Use Viper only when configuration layering is needed.
 3. **Validate positional args with `Args`, not inside `RunE`** — `Args` gives cobra's standard error messages; `MatchAll` composes validators.
 4. **Use `cmd.OutOrStdout()` / `cmd.ErrOrStderr()` for all output** — direct `os.Stdout` writes cannot be captured by tests.
 5. **Re-create the command tree per test** — cobra accumulates flag state across `Execute()` calls on the same instance.
@@ -142,7 +142,7 @@ Cobra accumulates flag state across `Execute()` calls — build a fresh command 
 | Using `Run` instead of `RunE` | Cannot return an error — only escape is `os.Exit` or panic, bypassing defers | Use `RunE` — return the error, let cobra handle the exit |
 | Writing `len(args)` checks in `RunE` | Bypasses cobra's standard error messages ("accepts 1 arg, received 2") | Declare `Args: cobra.ExactArgs(1)` on the command |
 | Writing to `os.Stdout` directly | Tests cannot capture output — os-level file handles can't be redirected | Use `cmd.OutOrStdout()` / `cmd.ErrOrStderr()` |
-| Child `PersistentPreRunE` silently drops parent's | Cobra does not chain — the child replaces the parent's hook entirely | Call `parent.PersistentPreRunE(cmd, args)` from the child's hook |
+| Missing or duplicated ancestor hooks | Nearest-hook mode skips overridden ancestors; traversal mode already invokes them | Check `EnableTraverseRunHooks`: compose prerequisites only in nearest-hook mode; avoid manual ancestor calls in traversal mode, and test order/counts |
 | Reusing a root command across tests | Cobra accumulates flag state; second `Execute()` sees flags from the first | Build a fresh command tree per test |
 
 ## Further Reading

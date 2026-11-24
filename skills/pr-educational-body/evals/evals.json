@@ -4,95 +4,203 @@
     {
       "id": 1,
       "name": "multi-file-feature-pr-body",
-      "prompt": "I just finished a feature branch with 4 commits adding refresh-token rotation to the auth service. The changes touch auth/session.go, auth/session_test.go, auth/middleware.go, and docs/api-auth.md. Tests pass. Create the PR.",
-      "expected_output": "A PR body with Why, What changed, Review notes, and Verification sections (plus optional Why this approach and/or Follow-ups when useful), where each section contains genuine reasoning that explains WHY the work was done — not just restating the file list or commit titles. What changed groups files by logical concern (auth logic, docs) rather than by commit.",
-      "trap": "Without the skill, the model either creates the PR with an empty body, dumps the commit log as the body, or fills sections with formulaic filler that restates the diff rather than explaining the reasoning.",
+      "prompt": "Draft a PR title and body from this supplied change packet; do not publish or claim repository access. Accepted reason: a refresh token could be reused after a successful refresh, so a copied old token remained useful. The change rotates it atomically and rejects reuse. Reviewed diff excerpts:\n\n```diff\n--- auth/session.go\n- return issueAccessToken(session.UserID)\n+ replacement, err := store.RotateRefresh(ctx, presentedToken)\n+ if err != nil { return TokenPair{}, err }\n+ return issueTokenPair(replacement)\n--- auth/middleware.go\n- return internalError(err)\n+ if errors.Is(err, ErrRefreshReused) { return unauthorized(err) }\n+ return internalError(err)\n```\n\nauth/session_test.go adds successful rotation, old-token rejection, and concurrent-reuse coverage against the test store. docs/api-auth.md tells clients to replace the refresh token after success. Supplied author verification: `go test ./auth/...` exited 0, `ok example.com/app/auth 0.031s`. This is supplied evidence, not a command you ran. No benchmark or production security validation is available.",
+      "expected_output": "A source-grounded reviewer-ready title and body explaining the prior reuse problem, atomic rotation, client impact, review focus, and the exact supplied test evidence.",
+      "trap": "Produces a polished template that invents motivation or verification, or leaves placeholders instead of using the supplied diff and results.",
       "expectations": [
-        "PR body contains Why, What changed, Review notes, and Verification sections",
-        "Why section explains the problem that existed before the change (static tokens, no rotation) and does NOT merely list the files touched",
-        "Why this approach section (when included) explains why this approach was chosen over alternatives, with specific trade-offs mentioned",
-        "What changed section groups files by logical concern (auth logic vs docs) rather than listing each commit separately",
-        "Verification section cites a concrete test command or result and does NOT merely say 'tests pass'"
-      ]
+        "Explains the prior refresh-token reuse problem and the changed accepted behavior rather than merely listing files.",
+        "Connects atomic rotation/reuse rejection and client token replacement to the supplied changes, including the concurrency-sensitive review area.",
+        "Groups the change by useful concern rather than commit or file inventory; headings may differ or be omitted when the information remains clear.",
+        "Cites the supplied go test ./auth/... result as supplied/reported evidence and identifies the absent production validation without claiming new execution."
+      ],
+      "negative_expectations": [
+        "Must not invent additional token policies, benchmark results, alternatives considered, incidents, or guarantees not in the packet.",
+        "Must not claim to have created a PR, inspected the repository, or run the supplied command."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 2,
       "name": "single-file-bugfix-trivial-format",
-      "prompt": "I fixed a one-line bug in utils/parse.go where a missing nil check caused a panic on empty input. Single file changed, tests added in utils/parse_test.go. Create the PR.",
-      "expected_output": "A trivial-format PR body: one-line summary of what and why, one-line Changes description, one-line Verification. No Why, What changed, or Review notes sections because they would each be one sentence restating the same thing.",
-      "trap": "Without the skill, the model either creates a full Why/What changed/Review notes/Verification structure for a trivial change (over-engineering), or creates the PR with no body at all (under-documenting).",
+      "prompt": "Draft a short PR title and body, without publishing. The complete change is a nil guard in utils/parse.go: empty input previously panicked; now it returns the existing ErrEmptyInput sentinel. utils/parse_test.go adds a regression test. Supplied author result: `go test ./utils/...` exited 0. No other behavior changed.",
+      "expected_output": "A concise source-grounded bugfix title and body, with only enough explanation to review the fix.",
+      "trap": "Turns a tiny fix into repetitive template sections or omits the actual failure/verification in pursuit of brevity.",
       "expectations": [
-        "PR body is short (under 5 lines of content) using the trivial format, not the default non-trivial structure",
-        "Body does NOT contain separate Why, What changed, and Review notes sections — they would be redundant for this scope",
-        "Body includes a one-line summary that explains both WHAT was fixed and WHY it matters",
-        "Verification section (even if one line) describes how the fix was checked (e.g. test result or manual confirmation)"
-      ]
+        "Explains the panic and ErrEmptyInput fix briefly without repetitive sections or unrelated background.",
+        "Includes the exact supplied test command/result without claiming to have executed it.",
+        "Accurately identifies the two-file change as one concern rather than inventing further work."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 3,
       "name": "multi-file-refactor-pr-body",
-      "prompt": "I refactored the payment processing module: extracted a shared client interface from three concrete implementations (Stripe, PayPal, Square), moved retry logic into a middleware layer, and added integration tests. Changes span 8 files across payments/ and payments/internal/. No behavior change — purely structural. Create the PR.",
-      "expected_output": "A PR body with Why, What changed, Review notes, and Verification sections where Why explains why the refactor was needed (duplication, testability, etc.), Why this approach explains the specific design choices (middleware vs decorator, interface shape), What changed groups by concern (interface extraction, retry middleware, tests), and Follow-ups notes what is explicitly deferred.",
-      "trap": "Without the skill, the model writes a body that either (a) fails to explain WHY a no-behavior-change refactor was worth doing, or (b) describes it as 'code cleanup' without specific design rationale.",
+      "prompt": "Draft a PR title and body from these reviewed facts; do not publish. Each of three payment adapters previously reimplemented the same accepted retry policy, so a policy correction required three edits. This refactor puts the unchanged retry rule in shared middleware and extracts the client interface callers already use. Provider-specific error translation remains in the adapters. The interface only includes current operations; no future providers are added. Reviewed checks: existing retry contract tests and new integration tests pass under the supplied author run `go test ./payments/...` (exit 0). No follow-up was accepted and no alternatives comparison was recorded.",
+      "expected_output": "Explains the concrete maintenance improvement without manufacturing design history or follow-ups.",
+      "trap": "Invents a rationale such as middleware-versus-decorator deliberation or deferred work solely to fill template sections.",
       "expectations": [
-        "Why section explains the specific problem with the old structure (duplication, tight coupling, hard to test) and does NOT merely say 'the code needed refactoring'",
-        "Why this approach section explains why this particular refactor approach was chosen (e.g. why middleware over decorator, why this interface shape)",
-        "What changed section groups files by concern (interface extraction, retry middleware, test additions) rather than listing all 8 files flat",
-        "Follow-ups section is present and notes what was explicitly deferred or considered but not done"
-      ]
+        "Explains the repeated retry-policy maintenance problem and how the shared owner removes it without changing policy.",
+        "Groups shared interface, retry ownership and verification by concern.",
+        "Names policy preservation and provider-specific error translation as useful review areas.",
+        "Reports the supplied command/result without inventing a personal execution claim."
+      ],
+      "negative_expectations": [
+        "Must not invent alternatives, explicitly deferred work, or a required Follow-ups section when none was supplied."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 4,
       "name": "pr-body-no-internal-workflow-terms",
-      "prompt": "I just finished implementing a new caching layer for the API. Changes touch api/cache.go, api/cache_test.go, and config/config.go. The cache uses Redis with a 5-minute TTL. Create the PR.",
-      "expected_output": "A PR body that is self-contained and uses no internal workflow terminology. No mentions of waves, tasks, sprints, agents, hubs, spokes, dispatches, plans, phases, or any internal protocol vocabulary.",
-      "trap": "Without the skill, the model may reference internal workflow terms like 'this was part of task 3.2' or 'completed in wave 2' or 'dispatched by the hub' — language that is meaningless to an external reviewer.",
+      "prompt": "Draft the PR title/body; do not publish. Accepted change: cache read-only API lookups in the existing Redis deployment, shared by API workers, with a five-minute TTL accepted by the product owner for this endpoint. The observed problem is repeated identical upstream requests; no latency benchmark has been run. The reviewed change is in api/cache.go, api/cache_test.go and config/config.go. A reviewer should focus on cache-key isolation and the agreed freshness limit. Tests were added but no test execution result is supplied.",
+      "expected_output": "Source-grounded PR prose with meaningful reviewer context and honest verification limits.",
+      "trap": "Invents performance measurements or bans ordinary domain words instead of removing irrelevant workflow jargon.",
       "expectations": [
-        "Body contains zero instances of internal workflow terms: wave, task, sprint, agent, hub, spoke, dispatch, plan, phase",
-        "Body is self-contained — a reader with no repo access, no commit history, and no prior conversation can understand it",
-        "Body does NOT reference internal docs, protocols, or paths (no docs/ephemeral-reports/, no shared-protocol.md references)",
-        "Body explains the caching decision in terms the external reviewer can evaluate (performance need, TTL choice, Redis over alternatives)"
-      ]
+        "Explains reduced duplicate upstream requests, shared cache and accepted freshness trade-off from the supplied facts.",
+        "Keeps reviewer context self-contained and omits irrelevant orchestration references; legitimate domain words such as task, agent or plan are not banned.",
+        "Identifies cache-key isolation/freshness as review areas and states test execution is unverified.",
+        "Does not claim a measured latency gain or an undocumented Redis-versus-alternatives decision."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 5,
       "name": "pr-body-explains-why-not-just-what",
-      "prompt": "I changed the API rate limiter from a fixed-window approach to a sliding-window algorithm. Changes in api/ratelimit.go and api/ratelimit_test.go. Both approaches were considered. Create the PR.",
-      "expected_output": "A PR body where Why explains the problem with the old approach and what the new approach achieves, and Why this approach explains WHY sliding-window was chosen over fixed-window with specific trade-offs — not just that the change was made.",
-      "trap": "Without the skill, the model writes a body that describes WHAT changed ('changed rate limiter from fixed to sliding window') but never explains WHY the old approach was insufficient or why this alternative was chosen.",
+      "prompt": "Draft a PR title and body from the reviewed packet; do not publish. The fixed-window API limiter allowed a full allowance immediately before and after a window boundary. The accepted change uses the implemented timestamp-log sliding-window algorithm so the rolling allowance is enforced across that boundary. This keeps more timestamps than the previous counter; that storage cost was accepted for the stricter rolling limit. api/ratelimit_test.go now checks the cross-boundary burst and expiration behavior. Supplied author result: `go test ./api/...` exited 0. No performance benchmark was run.",
+      "expected_output": "A reviewer-ready explanation of the behavioral change and known storage trade-off.",
+      "trap": "Merely restates the algorithm rename, or invents benchmark evidence to justify it.",
       "expectations": [
-        "Why section explains the specific problem with fixed-window rate limiting (burst handling, accuracy at window edges) and does NOT merely say 'the rate limiter was changed'",
-        "Why this approach section compares sliding-window to fixed-window with at least one specific trade-off mentioned (memory, accuracy, implementation complexity)",
-        "Body does NOT merely restate the diff ('changed ratelimit.go to use sliding window') — it adds reasoning the diff alone cannot convey",
-        "What changed section explains what each file's change contributes to the overall goal and does NOT merely list what was modified"
-      ]
+        "Explains the observed boundary burst and how the rolling limit changes it.",
+        "Describes the supplied timestamp-storage trade-off without inventing alternative algorithms or measurements.",
+        "Connects boundary/expiration tests to the behavior and reports the exact supplied command/result.",
+        "Adds useful explanation beyond the file list without requiring particular heading names."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 6,
       "name": "new-pr-trivial-fix-must-have-conventional-title",
-      "prompt": "I fixed a one-line nil-check bug in utils/parse.go and added a regression test in utils/parse_test.go. `go test ./utils/...` passed. Open a PR using my draft title 'Fix parser crash'. Keep its description short because this is a tiny change.",
-      "expected_output": "The created PR has a Conventional Commit-compliant title such as `fix(parser): prevent panic on empty input` and a short, useful trivial-format body. The draft title must not be preserved as-is. Neither a trivial scope nor the user's request for brevity exempts the title.",
-      "trap": "A model may apply the body's trivial-PR escape hatch to the title, retaining 'Fix parser crash', or discuss a suggested compliant title without actually using it for PR creation.",
+      "prompt": "The repository requires Conventional Commit PR titles. Prepare a title and short body for later publication; do not call GitHub. Candidate draft title: Fix parser crash. The accepted fix adds a nil guard to utils/parse.go, returning ErrEmptyInput instead of panicking, plus a regression test in utils/parse_test.go. Supplied author result: `go test ./utils/...` passed. You may correct the candidate title to match repository policy.",
+      "expected_output": "A compliant proposed title and concise body grounded in the supplied change packet.",
+      "trap": "Treats brevity as an excuse to ignore an accepted title contract or claims publication without a tool action.",
       "expectations": [
-        "The PR creation call or resulting PR record uses a title that matches `<type>[optional scope][!]: <description>` with a non-empty meaningful description",
-        "The non-compliant draft title 'Fix parser crash' is not used as the final PR title",
-        "The title specifically summarizes the parser panic fix instead of copying a generic or unrelated commit",
-        "The body uses the concise trivial format and reports only the provided test evidence"
-      ]
+        "The proposed final title complies with the explicitly supplied Conventional Commit policy.",
+        "The title accurately summarizes the parser panic fix.",
+        "The short body explains the failure/fix and reports only the supplied test evidence.",
+        "Does not claim a remote PR was created."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 7,
       "name": "update-existing-pr-title-and-educational-body",
-      "prompt": "PR #42 already exists with title '[WIP] user export changes' and an auto-generated commit-log body. Its branch adds CSV export for administrators and tests that passed with `go test ./...`. Please update the PR so it is ready for a cold reviewer.",
-      "expected_output": "The existing PR is updated with a Conventional Commit-compliant title such as `feat(admin): add CSV user export` and a human-readable body explaining the purpose, conceptual change and verified checks. Merely rewriting the body while leaving '[WIP]' in the PR title does not pass.",
-      "trap": "The model may consider this a body-only skill and preserve the existing non-compliant title, or produce a compliant title in prose without actually updating the PR record.",
+      "prompt": "Prepare replacement title/body text for existing PR #42; do not publish. Repository policy requires Conventional Commit PR titles. Current title: [WIP] user export changes. Current body is a commit-log dump. Reviewed change: administrators can export the currently filtered user list as CSV for the existing offline account-audit workflow. It reuses the existing administrator authorization; no access-policy change is accepted. The branch includes tests and the supplied author command `go test ./...` passed. Replace the current title and body with a useful draft for a cold reviewer.",
+      "expected_output": "A concrete replacement title/body, with both requested parts addressed.",
+      "trap": "Rewrites only the body, invents purpose/access requirements, or claims a remote update from a text-only task.",
       "expectations": [
-        "The PR update call or resulting PR record changes the existing title to valid Conventional Commits syntax",
-        "The updated title accurately reflects the complete CSV export feature, not just a single commit",
-        "No '[WIP]' prefix or alternative non-compliant prefix remains outside the title format",
-        "The updated body explains why administrator CSV export exists and includes actual supplied verification rather than a commit-log dump",
-        "Updating the body alone, without updating the non-compliant title, fails the case"
-      ]
+        "Proposes a replacement title compliant with the supplied repository policy and accurately describing administrator CSV export.",
+        "Replaces the commit-log narrative with the known account-audit purpose and current filtered-list behavior.",
+        "Identifies preserved administrator authorization as review context without claiming a new access policy.",
+        "Reports supplied test evidence and makes no claim that a remote PR was updated."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "name": "missing-verification-is-not-a-pass",
+      "prompt": "Draft a reviewable PR body from this complete handoff, and identify missing evidence without inventing it: adds Redis caching to GET /catalog using a five-minute TTL. The purpose and trade-off decision are not recorded. Files changed: api/catalog.go and api/catalog_test.go. No diff or command result is available here. Do not publish.",
+      "expectations": [
+        "States the known endpoint/cache/TTL change without inventing a performance incident, measured benefit or design decision.",
+        "States that diff inspection and test execution evidence are missing; does not turn tests-added into tests-passed.",
+        "Keeps the usable known draft separate from specific missing facts needed for a final review-ready explanation."
+      ],
+      "negative_expectations": [
+        "Must not fabricate a test command result or copy an example command followed by passed."
+      ],
+      "trap": "Fills the educational template with plausible but ungrounded motivation and verification.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

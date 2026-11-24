@@ -10,6 +10,8 @@ description: Build Grafana dashboards as JSON — panels, `gridPos` 24-column la
 
 Dashboards are JSON. Author once, push via API, share by `uid`.
 
+For an existing dashboard, start from its fetched model and change only the requested fields. Preserve UID, datasource references, other panels, variables, annotations, and relevant version/folder metadata. Follow the deployment's API conflict/version contract; `overwrite: true` alone is not protection against concurrent edits. Distinguish JSON validation, successful storage/readback, and actual rendering with data. Offline drafting requires none of the live deployment prerequisites below and cannot prove those latter checks.
+
 ## Prerequisites
 
 - Grafana stack (OSS, Enterprise, or Cloud) reachable from your machine

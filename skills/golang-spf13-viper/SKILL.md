@@ -61,7 +61,7 @@ if err := viper.ReadInConfig(); err != nil {
 }
 ```
 
-`ConfigFileNotFoundError` must be handled gracefully — config files are usually optional. An unhandled error from a missing file crashes programs that are perfectly valid when run with only flags or env vars.
+Ignore a missing search result only when the file is optional by the application contract. Propagate malformed/unreadable files and failure of an explicitly required path. The presence of defaults or environment values does not make a required configuration file optional.
 
 Viper v1.20+ supports JSON/TOML/YAML in core; HCL, INI and properties require optional encoding codecs. For formats, `MergeInConfig`, and remote KV, see [sources-and-formats.md](references/sources-and-formats.md).
 
@@ -141,10 +141,10 @@ For `t.Setenv` interactions and `Reset()` limitations, see [testing-and-isolatio
 ## Best Practices
 
 1. **Set prefix + key replacer + AutomaticEnv together** — missing any one causes nested env keys to silently not resolve (`database.host` → `DATABASE.HOST` instead of `DATABASE_HOST`).
-2. **Handle `ConfigFileNotFoundError` gracefully** — a missing config file should not crash a service that runs with only flags and env vars.
+2. **Distinguish optional search from required input** — ignore only the optional not-found case; preserve actual read/parse failures and explicit required-file failures.
 3. **Always use `mapstructure` tags on config structs** — implicit mapping silently misses nested and underscore-named fields.
 4. **Use `viper.New()` in tests, never the global** — the global accumulates state across test runs; per-test instances are isolated.
-5. **Bind flags before `Execute()`** — binding in `RunE` is too late; cobra parses flags before `RunE` runs.
+5. **Bind before the first dependent read** — Viper reads bound flag values lazily. Binding after parsing can be correct when no earlier `Get*`/`Unmarshal` depends on it; do not move valid code solely to satisfy a lifecycle-name rule.
 
 ## Common Mistakes
 

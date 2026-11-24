@@ -15,7 +15,7 @@ from pathlib import Path
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from eval_cases import strict_json
-from eval_profile import JUDGE_SCHEMA, SkillsProfile
+from eval_profile import ABSTENTION_SCHEMA, JUDGE_SCHEMA, SkillsProfile
 from eval_runner import load_runner
 from run_evals import execute_pair, parser, run_plan, summarize
 
@@ -54,6 +54,20 @@ class PinnedIntegrationTests(unittest.TestCase):
         with patch.object(self.runner.cli.shutil, "which", return_value=None):
             with self.assertRaises(self.runner.cli.RunnerError):
                 self.runner.cli.resolve_engine("podman")
+
+    def test_judge_abstention_is_non_evidence_without_retry_or_zero_score(self):
+        def invoke(spec):
+            self.calls.append(spec)
+            text = json.dumps({"schema": ABSTENTION_SCHEMA, "reason": "missing-input",
+                               "evidence": "No source diff was supplied."}) if spec.agent == "eval-judge" else None
+            return 0, self.result(spec, text=text)
+        artifact = self.pair(invoke)
+        self.assertEqual(len(self.calls), 4)
+        for side in artifact["sides"].values():
+            self.assertEqual(side["classification"], "non-evidence")
+            self.assertIsNone(side["judge"]["semantic"])
+            self.assertEqual(len(side["judge"]["attempts"]), 1)
+        self.assertEqual(artifact["comparison"]["status"], "non-evidence")
 
     def evidence(self, tool=None, input_value=None, *, ended=True, result_state="available", input_state="available", actor="eval-target"):
         available = lambda value: {"state": "available", "value": value}

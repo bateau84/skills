@@ -1,0 +1,63 @@
+{
+  "skill": "golang-dependency-injection",
+  "version": "1.0.0",
+  "common_instruction": "This is a response-only exercise. Use the supplied scenario and snippets; propose or review the requested work without claiming files were changed, commands ran, or external systems were inspected. State material verification limits. Equivalent solutions that satisfy the stated contract are acceptable.",
+  "cases": [
+    {
+      "id": "GDI-READY-01",
+      "name": "lazy-resolution-does-not-prove-readiness",
+      "prompt": "Review a proposed startup change for a Go API using a generics-based dependency container. The current code explicitly constructs a database client and API before declaring ready. The proposed change registers provider functions, reports ready immediately, and first resolves the API on the first request. The patch forgot to register its Mailer provider. The author says generic provider signatures prove the whole graph at compile time and lazy construction makes startup more reliable. The service contract requires unavailable critical dependencies to fail startup. Recommend a bounded correction; do not choose a new framework.",
+      "expectations": [
+        "Distinguishes type-checked provider signatures from a complete resolvable runtime dependency graph.",
+        "Identifies the missing Mailer registration and requires resolving/validating the critical graph before readiness.",
+        "Retains explicit ownership and cleanup of successfully created resources if later startup construction fails.",
+        "Allows optional lazy components only when their deferred failure does not contradict the stated readiness contract."
+      ],
+      "negative_expectations": [
+        "Must not claim generics alone detect missing registrations or dependency cycles at compile time.",
+        "Must not declare ready before validating required dependencies or pass the container throughout business logic as the fix."
+      ],
+      "trap": "Promote lazy registration and generic signatures into proof that startup dependencies are ready.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GDI-SMALL-02",
+      "name": "manual-wiring-remains-adequate",
+      "prompt": "A Go service has an explicit main function that constructs Config, one shared HTTP client, Store, and Notifier, then injects Store and Notifier into Handler. The wiring is twenty readable lines; tests inject a fake notifier through an existing consumer-owned interface. There is no lifecycle or initialization-order problem. Review a proposal to replace this with a DI container and factory registration for every type. Give a decision and explain what would justify revisiting it.",
+      "expectations": [
+        "Keeps manual constructor wiring for this manageable graph.",
+        "Preserves the existing test boundary and owned shared-client lifetime.",
+        "Identifies concrete wiring or lifecycle friction, rather than an arbitrary service count, as a reason to revisit a container."
+      ],
+      "negative_expectations": [
+        "Must not introduce a container, global registry, or interfaces for every type solely to make the design more scalable.",
+        "Must not claim the current fake requires a DI library."
+      ],
+      "trap": "Replace explicit working composition with a container and blanket abstraction without a problem it solves.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

@@ -14,13 +14,29 @@
         "Removes the confirmed-unused SaveLegacy path once the replacement is in place rather than retaining dead implementation for possible future use.",
         "Surfaces storage errors unchanged or with useful context rather than converting them into false duplicate/success outcomes.",
         "Tests real Store behavior with real input: first insert, duplicate insert preserving the original value, and a genuine storage-error path without mocking SaveIfAbsent itself or hand-injecting its expected output.",
-        "Does not add logging, metrics, tracing, feature flags, compatibility scaffolding, or extensibility merely to make the change look production-grade."
+        "Does not introduce logging, metrics, tracing, feature flags, compatibility scaffolding or extensibility without a current need. Reusing an existing required Store error-reporting contract, or conditionally checking whether one exists, is allowed; speculative instrumentation is not."
       ],
       "negative_expectations": [
         "Must not introduce future-backend abstractions that the accepted change does not require.",
         "Must not retain SaveLegacy merely 'for later' after its lack of callers is established.",
         "Must not accept a green test that bypasses the Store behavior under test or weakens the duplicate-preservation assertion."
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "E5": "outcome",
+          "E6": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "N3": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "SoftwareEngineering-02",

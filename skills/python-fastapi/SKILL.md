@@ -13,11 +13,11 @@ metadata:
 
 # FastAPI
 
-FastAPI derives validation, serialization, and OpenAPI docs from type hints and Pydantic models. The payoff comes from declaring types precisely — a handler annotated with the right models is validated, documented, and serialized for free. Keep handlers thin: parse → call a service → return a model. Business logic lives in `core/`, not in the route.
+FastAPI derives validation, serialization, and OpenAPI docs from declared types. Keep the HTTP boundary clear and follow the project's existing structure. Extract domain logic when it has independent complexity or reuse; a small handler does not need a new service layer or `core/` package. Address the requested route or lifecycle problem before proposing broader changes.
 
 ## Structure with APIRouter
 
-Split routes by resource into modules, each owning an `APIRouter`, then include them on the app.
+Group routes with `APIRouter` when a resource or shared configuration benefits from it. Keep a small existing app in place when a route-level change does not require reorganization.
 
 ```python
 # api/routes/stats.py
@@ -39,7 +39,9 @@ app.include_router(stats.router)
 
 ## Declare request and response models
 
-Annotate the return type *and* set `response_model` so FastAPI validates and filters the output — never leak internal fields by returning a raw dict or ORM object. → See `python-pydantic`.
+Declare the public response shape through a supported return annotation **or** `response_model`. Both can be used; the decorator takes precedence. Returning a dict or ORM object is valid when the response model validates and filters it correctly. Do not expose internal fields. → See `python-pydantic`.
+
+A directly returned `Response`/`JSONResponse` bypasses this automatic conversion and filtering. Construct only the approved public payload yourself on that path, or return ordinary data through the declared response model. Verify actual HTTP output, not only the model declaration.
 
 ```python
 class RuleIn(BaseModel):
@@ -112,17 +114,19 @@ Raise `HTTPException(status_code, detail)` for expected client-facing errors. Fo
 
 | Mistake | Fix |
 | --- | --- |
-| Returning a raw dict/ORM object | Declare `response_model`; let FastAPI validate and filter output. |
+| Exposing internal fields in output | Declare the public response shape and verify filtering; direct `Response` objects need an explicitly safe payload. |
 | Blocking I/O inside `async def` | Make it `await` async I/O, or use a `def` handler (threadpool). |
 | Manual JSON parsing / validation in the handler | Type the param with a Pydantic model; FastAPI validates it. |
 | 200 for a resource creation | Set `status_code=201`. |
 | Resources opened per request | Open once in `lifespan`, share via `app.state`. |
 | `@app.on_event` for startup | Use the `lifespan` context manager. |
-| Business logic in the route | Keep handlers thin; push logic into `core/`. |
+| Complex domain logic mixed with HTTP handling | Extract that logic along existing project boundaries when it improves reuse or clarity. |
 | Undocumented `Depends()` chain | Annotate and docstring each dependency function (see Depends section). |
 
 ## References
 
 - [FastAPI documentation](https://fastapi.tiangolo.com/)
+- [Response models and return types](https://fastapi.tiangolo.com/tutorial/response-model/)
+- [Returning a Response directly](https://fastapi.tiangolo.com/advanced/response-directly/)
 - [FastAPI — Lifespan events](https://fastapi.tiangolo.com/advanced/events/)
 - [Starlette documentation](https://www.starlette.io/)

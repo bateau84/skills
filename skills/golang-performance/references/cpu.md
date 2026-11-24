@@ -34,21 +34,21 @@ go build -gcflags="-m" ./... 2>&1 | grep "inlining call"
 
 Move side effects (logging, metrics) outside hot-path functions or guard them with conditional checks.
 
-### Value receivers enable inlining
+### Receiver choice must preserve semantics
 
-Value receivers allow the compiler to fully inline fluent method chains. Pointer receivers add indirection that blocks inlining:
+Pointer and value receiver methods can both be inlined when the compiler permits it. Inspect diagnostics for the actual build. Choose ownership/mutation semantics first; changing a receiver to chase a claimed speedup can change behavior:
 
 ```go
-// Pointer receiver — indirection prevents inlining, constant overhead per call
+// Pointer receiver — mutates the existing config
 func (c *config) WithTimeout(d time.Duration) *config { c.timeout = d; return c }
 
-// Value receiver — fully inlined, -80% time in fluent chains
+// Value receiver — returns a modified copy
 func (c config) WithTimeout(d time.Duration) config { c.timeout = d; return c }
 ```
 
 ## Cache Locality
 
-**Diagnose:** 1- `go tool pprof` (CPU profile) — look for loops over slices/matrices consuming disproportionate CPU; cache-miss-heavy code shows high `runtime.memmove` or flat time in simple index operations 2- `go test -bench` — benchmark row-first vs column-first traversal; expect 10-50x difference on large matrices purely from cache effects
+**Diagnose:** 1- `go tool pprof` (CPU profile) — look for loops over slices/matrices consuming disproportionate CPU; cache-miss-heavy code shows high `runtime.memmove` or flat time in simple index operations 2- `go test -bench` — benchmark row-first vs column-first traversal on representative dimensions and hardware; measure the difference rather than assuming a multiplier
 
 Modern CPUs fetch data in 64-byte cache lines. Sequential memory access is dramatically faster than random access because the prefetcher can load the next cache line before you need it.
 
@@ -57,14 +57,14 @@ Modern CPUs fetch data in 64-byte cache lines. Sequential memory access is drama
 Go stores 2D arrays in row-major order. Column-first traversal jumps across memory, causing cache misses:
 
 ```go
-// Bad — column-first, jumps across memory (~10M cache misses)
+// Column-first traversal can have poor locality for a row-major matrix
 for col := 0; col < 1024; col++ {
     for row := 0; row < 1024; row++ {
         sum += matrix[row][col]
     }
 }
 
-// Good — row-first, sequential access (~125K cache misses)
+// Row-first traversal follows adjacent elements
 for row := 0; row < 1024; row++ {
     for col := 0; col < 1024; col++ {
         sum += matrix[row][col]
@@ -72,7 +72,7 @@ for row := 0; row < 1024; row++ {
 }
 ```
 
-Performance difference: 10-50x purely from cache effects.
+The effect depends on dimensions, layout, cache hierarchy, compiler, and access pattern; retain benchmark context before claiming an improvement.
 
 ### Contiguous 2D allocation
 
@@ -294,10 +294,10 @@ Source: [Go 1.14 runtime changes](https://go.dev/doc/go1.14#runtime).
 
 ## Reflection and Type Assertions
 
-**Diagnose:** 1- `go tool pprof` (CPU profile) — look for `reflect.Value.*`, `reflect.DeepEqual`, or `fmt.Sprintf` (which uses reflect internally) appearing in hot paths 2- `go test -bench` — compare reflection-based vs typed versions; expect 10-200x difference depending on the reflection operation
+**Diagnose:** 1- `go tool pprof` (CPU profile) — look for `reflect.Value.*`, `reflect.DeepEqual`, or `fmt.Sprintf` (which uses reflect internally) appearing in hot paths 2- `go test -bench` — compare reflection-based and semantically equivalent typed versions for the actual workload
 
-- **`reflect` in hot paths** — 10-100x slower due to type introspection and boxing. Replace with generics or typed code
-- **`reflect.DeepEqual`** — 50-200x slower than typed comparisons. Use `slices.Equal`, `maps.Equal`, `bytes.Equal` (Go 1.21+)
+- **`reflect` in hot paths** — inspect measured introspection/allocation cost; typed code or generics may help without changing the required behavior
+- **`reflect.DeepEqual`** — consider appropriate typed comparisons only after checking equivalence for nil, element equality, and nested values. Benchmark rather than assuming a universal speedup
 - **Type switch vs repeated assertions** — type switch dispatches in one evaluation:
 
 ```go

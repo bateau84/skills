@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from eval_cases import discover, digest, strict_json
 from eval_profile import METADATA_SCHEMA, SkillsComparison, SkillsProfile, compile_provider_settings, reasoning_control, sanitized_environment
+from eval_quality import judge_relationship, public_axes
 from eval_runner import RUNNER_REVISION, load_runner, verify_image
 from eval_reporting import EvalReporter, boundary_error, invocation_return_state, terminal_text
 from eval_markdown import LATEST_NAME, ReportPublicationError, publish_report, read_report_evidence, validate_latest_destination
@@ -46,7 +47,9 @@ def parser():
     p.add_argument("--baseline-skill-root", type=Path, help="Old skills checkout root, required only with --comparison revision")
     p.add_argument("--target-transport", choices=("opencode",), default="opencode")
     p.add_argument("--model", help="Required live target model ID: provider/model (for example openai/gpt-6.1)")
-    p.add_argument("--judge-model", help="Optional judge model ID: provider/model; defaults to --model unchanged")
+    p.add_argument("--judge-model", help="Explicit judge provider/model ID; choose a different underlying model for comparative evidence")
+    p.add_argument("--allow-same-model-judge", action="store_true",
+                   help="Explicitly allow target-model judging for a bounded regression run; does not establish independent judging")
     p.add_argument("--judge-transport", choices=("opencode", "github-copilot-cli"), default="opencode")
     for name in ("reasoning", "target-reasoning", "judge-reasoning"):
         p.add_argument("--" + name)
@@ -117,6 +120,9 @@ def validate_live(options, selected):
     validate_model_id(options.model, "--model")
     if options.judge_model is not None:
         validate_model_id(options.judge_model, "--judge-model")
+    relationship = judge_relationship(options.model, options.judge_model or options.model)
+    if relationship == "same-model-selector" and not options.allow_same_model_judge:
+        raise ValueError("choose a distinct --judge-model provider/model or explicitly use --allow-same-model-judge for regression checks")
     if not selected:
         raise ValueError("empty live selection")
     for name in ("iterations", "parallel", "timeout_seconds"):
@@ -244,6 +250,12 @@ def summarize(runner, artifacts):
                   "checks": {s: sides[s]["deterministic_checks"] for s in sides},
                   "timing": {s: sides[s]["timing"] for s in sides},
                   "attempts": {s: {phase: len(sides[s][phase]["attempts"]) for phase in ("target", "judge")} for s in sides}}
+        # Add independent per-side axes only when the saved semantics contain
+        # them. Legacy artifacts retain their original summary shape on replay.
+        semantics = {s: sides[s]["judge"]["semantic"] for s in sides}
+        if any(value and "scores" in value["data"] for value in semantics.values()):
+            record["scores"] = {s: public_axes(value["data"].get("scores")) if value else {}
+                                for s, value in semantics.items()}
         records.append(record)
     return {"schema": "portable-skills/eval-summary/v1", "pairs": records,
             "complete_pairs": sum(r["complete_pair_evidence"] for r in records),
@@ -278,6 +290,7 @@ def run_plan(root, runner, options, plan, providers, invoker=None, reporter=None
                               "report_controls": {"comparison": options.comparison,
                                    "model": options.model, "target_transport": options.target_transport,
                                   "judge_model": options.judge_model or options.model, "judge_transport": options.judge_transport,
+                                  "judge_relationship": judge_relationship(options.model, options.judge_model or options.model),
                                   "reasoning": reasoning_control(options.model, options.target_reasoning or options.reasoning),
                                   "judge_reasoning": reasoning_control(options.judge_model or options.model, options.judge_reasoning or options.reasoning),
                                   "parallel": options.parallel, "inner_timeout": options.timeout_seconds,

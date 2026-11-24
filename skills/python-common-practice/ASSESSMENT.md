@@ -4,7 +4,9 @@ Domain-specific review guidance for any agent performing assessment. It does not
 
 ## Review criteria
 
-Reviewer checks Python idioms where language dynamism can hide state/lifecycle defects:
+Reviewer checks that verification fits the repository and that Python semantics remain sound:
+
+- configured checks were actually run when claimed; failures were inspected, corrected, and rechecked, with blocked/unrun checks reported separately;
 
 - mutable default arguments/class attributes and late-bound closures do not leak state between calls/instances;
 - iterators/generators are not accidentally consumed twice, retained after resource closure, or mistaken for concrete reusable collections;

@@ -10,14 +10,28 @@
       "expectations": [
         "Identifies the dirty tracked dist/ files as the blocker rather than a conflict",
         "Suggests stopping the file watcher (or otherwise preventing further rewrites) while the rebase runs",
-        "Stashes only the dist/ path (e.g. `git stash push -- dist/`) then runs `git rebase --continue`",
-        "Tells the user to run `git stash pop` after the rebase finishes (not merely as an optional step) and to review or regenerate the dist/ content afterward"
+        "Preserves the tracked dist/ changes in a scoped stash or equivalent recoverable snapshot before continuing the rebase, without folding them into the replayed source commit.",
+        "After the rebase, restores with stash apply/pop or reconciles regenerated output against the saved changes. Keeps the saved copy until recovery and review succeed; rebuilding alone is not proof that the saved changes are unnecessary."
       ],
       "negative_expectations": [
-        "Recommends `git rebase --skip` or `git rebase --abort`",
-        "Recommends `git add -A`/`git add .` to fold dist/ changes into a replayed commit",
-        "Offers `git checkout -- dist`/`git restore dist`/`git reset --hard` as an option at all, or says nothing is lost without telling the user to confirm dist/ is purely generated"
-      ]
+        "Recommends skipping the replayed commit or aborting the rebase as the remedy for this dirty-worktree blocker; explaining why those are inappropriate is allowed.",
+        "Recommends broad staging that mixes generated changes into the replayed commit.",
+        "Recommends discarding dist/ changes or dropping their backup before verifying preservation/reconciliation; warnings about destructive commands are allowed."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "N3": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "GC-CONFIG-01",

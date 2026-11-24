@@ -45,7 +45,7 @@ class ReportingTests(unittest.TestCase):
         output = self.stream.getvalue()
         self.assertIn("SKILL-product-acceptance-PA3#1", output)
         self.assertIn("baseline PASS 100% -> candidate FAIL 0%", output)
-        self.assertIn("observed regression (-100.0 pp)", output)
+        self.assertIn("observed regression (-100.0 pp; unclassified-rubric)", output)
         self.assertIn("not statistical significance", output)
         self.assertIn("1/1 positive criteria unmet", output)
         self.assertIn("E1: Missing provenance", output)
@@ -125,7 +125,7 @@ class ReportingTests(unittest.TestCase):
                      patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \
                      patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=self.context.invoke), \
                      redirect_stdout(stdout), redirect_stderr(stderr):
-                    code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3", "--model", "test/model", "--network", "host",
+                    code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3", "--model", "test/model", "--allow-same-model-judge", "--network", "host",
                                   "--artifact-dir", str(destination), *flags], report_root=Path(temp))
                 self.assertEqual(code, 0, stderr.getvalue())
                 self.assertIn("weakens isolation", stderr.getvalue())
@@ -203,6 +203,29 @@ class ReportingTests(unittest.TestCase):
                     self.assertIn("candidate NON-EVIDENCE", output)
                     self.assertIn("judge_contract_invalid" if failure == "judge" else "evidence_incomplete", output)
 
+    def test_new_comparison_fields_do_not_publish_host_callback_payloads(self):
+        from eval_profile import SkillsComparison
+        secret = "PRIVATE-CALLBACK-STRING\x1b[31m"
+        original = SkillsComparison.compare_pair
+        def hostile(profile, baseline, candidate):
+            decision = original(profile, baseline, candidate)
+            data = {**decision.data, "score_basis": secret, "scores": {
+                "baseline": {secret: {"satisfied": secret, "total": 1, "passed": True}},
+                "candidate": {"outcome": {"satisfied": secret, "total": 1, "passed": True}},
+            }}
+            return self.context.runner.eval_api.ComparisonDecision(decision.classification, secret, data)
+        with patch.object(SkillsComparison, "compare_pair", hostile):
+            artifact = self.context.pair()
+        summary = summarize(self.context.runner, [artifact])
+        self.assertIn("PRIVATE-CALLBACK-STRING", json.dumps(artifact))
+        for json_output in (False, True):
+            stream = io.StringIO()
+            reporter = EvalReporter(json_output=json_output, stream=stream)
+            reporter.pair(self.context.runner, artifact, summary["pairs"][0])
+            reporter.summary(summary, 1, Path("/tmp/synthetic-report"))
+            self.assertNotIn("PRIVATE-CALLBACK-STRING", stream.getvalue())
+            self.assertNotIn("\x1b", stream.getvalue())
+
     def test_observed_retry_counts_not_nominal_budget_and_unredacted_exception_hidden(self):
         from run_evals import call_budget, run_plan
         self.context.options.transport_retries = 1
@@ -261,7 +284,7 @@ class ReportingTests(unittest.TestCase):
                 summary = summarize(self.context.runner, [artifact])
                 self.reporter.pair(self.context.runner, artifact, summary["pairs"][0])
                 output = self.stream.getvalue()
-                self.assertIn("observed material-improvement (+10.0 pp)", output)
+                self.assertIn("observed material-improvement (+10.0 pp; outcome)", output)
                 self.assertIn("not statistical significance", output)
                 self.assertEqual("Trap: fixed in this pair" in output, trap)
 
@@ -439,7 +462,7 @@ class ReportingTests(unittest.TestCase):
                     provider.write_text('{"' + secret + '":1,"' + secret + '":2}')
                     stdout, stderr = io.StringIO(), io.StringIO()
                     with redirect_stdout(stdout), redirect_stderr(stderr), patch("run_evals.load_runner") as loader:
-                        code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3", "--model", "test/model", "--provider-config", str(provider),
+                        code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3", "--model", "test/model", "--allow-same-model-judge", "--provider-config", str(provider),
                                      *(["--probe"] if probe else []), *flags])
                     self.assertEqual(code, 2)
                     loader.assert_not_called()

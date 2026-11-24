@@ -1,0 +1,63 @@
+{
+  "schema": "portable-skills/manual-revision-smoke/v1",
+  "base_revision": "056c9b27da4f03ea7a3495359c4e674a9063f0f3",
+  "arms": {
+    "p7": {
+      "judge_packet": "x9",
+      "source": "base",
+      "practitioner_sha256": {
+        "skills/behavioral-spec/SKILL.md": "2d4937b7e34ba5a29d46b44eddc8ea44b5a82b65f5dede67c9f787a3a1563a1b",
+        "skills/behavioral-spec/references/behavioral-requirement.md": "2933ea7780ff3a29226e3787a97de5f4bd442000d1f72ff815b3c6bc445c8ec8",
+        "skills/behavioral-spec/references/obligation-contract.md": "61e11c03d9cf3cb7a37c9016e58978c97abc5bc0bb6af52e63b1ca95cb469abc",
+        "skills/behavioral-spec/references/quality-scenario.md": "be585a1abf341861cf88f7ed3c01f6233991d01dcfa5dfd96c7e24c7eae2bd58",
+        "skills/github-issue/SKILL.md": "2509e1144d47d543b6751f8fb6cf9b3b2d72fc48f975e49d3a6ab08b4ef66081",
+        "skills/github-issue/references/metadata-and-projects.md": "77259991c7f211cc917a7f51d2691767e419a9281d5115976f36427a3621063a",
+        "skills/golang-project-layout/SKILL.md": "1a0c8b9d5902374f26215bef1cfcbddff9a2729a2a25c4ce91ed72ca0cb3d14a",
+        "skills/golang-project-layout/references/config.md": "61ddb9b4aa0914a3d87ee7a3f1a20e2f7611ae20ec29690575ad6b453deec45c",
+        "skills/golang-project-layout/references/directory-layouts.md": "2712707f8393f88f57091a62a41712b96c0e0a377c6f33903824ef398f4c6b13",
+        "skills/golang-project-layout/references/testing-layout.md": "f56dc749876380f31a0d639131bdd52755afa462835e9cabdd9b99855a32c8a4",
+        "skills/golang-project-layout/references/workspaces.md": "c08ca76fdea638ee2a1890d231135107fcdfc53d441854ac4f677e69e04f2ebb",
+        "skills/python-common-practice/SKILL.md": "8581086d7da52506422b84c9cba53ae3dc0a1bcee442473da1fb098d1f23d887"
+      }
+    },
+    "p2": {
+      "judge_packet": "x4",
+      "source": "working-tree",
+      "practitioner_sha256": {
+        "skills/behavioral-spec/SKILL.md": "5206167dea8519f132b19ea2e7a244156e84dbf1df5225e127fe749a20fe864a",
+        "skills/behavioral-spec/references/behavioral-requirement.md": "2933ea7780ff3a29226e3787a97de5f4bd442000d1f72ff815b3c6bc445c8ec8",
+        "skills/behavioral-spec/references/obligation-contract.md": "d4c35f7ddc4e3dcbb359224501147d30d9b351f052f7b029f88054f0d8731449",
+        "skills/behavioral-spec/references/quality-scenario.md": "be585a1abf341861cf88f7ed3c01f6233991d01dcfa5dfd96c7e24c7eae2bd58",
+        "skills/github-issue/SKILL.md": "097d4215ea78f2dbcf88306c183388654cc95ae209bcf78610e943a0953565a3",
+        "skills/github-issue/references/metadata-and-projects.md": "77259991c7f211cc917a7f51d2691767e419a9281d5115976f36427a3621063a",
+        "skills/golang-project-layout/SKILL.md": "56b4bf41da53e32b1efe7284060765ecc7d1807812c1bd62a4aa900c1941380e",
+        "skills/golang-project-layout/references/config.md": "61ddb9b4aa0914a3d87ee7a3f1a20e2f7611ae20ec29690575ad6b453deec45c",
+        "skills/golang-project-layout/references/directory-layouts.md": "d7ea271138bb9676e4d788cf1910fd7fd0c07147451a40f9a804fc15ad0ed05b",
+        "skills/golang-project-layout/references/testing-layout.md": "f56dc749876380f31a0d639131bdd52755afa462835e9cabdd9b99855a32c8a4",
+        "skills/golang-project-layout/references/workspaces.md": "c08ca76fdea638ee2a1890d231135107fcdfc53d441854ac4f677e69e04f2ebb",
+        "skills/python-common-practice/SKILL.md": "d397d88c400ee7cbb163aa671c326a2559243fe5dc10d94238674955333adec1"
+      }
+    }
+  },
+  "evidence_files": {
+    "inputs/calibration.json": "df2736e0fe0c028bebfe163270ac9c41b3d27528c3476d8895fae552f856b250",
+    "inputs/task-prompts.json": "89d94deca5d1bad867ece2b0e8b1d46f369e27a076d4ace78cb92db22564462f",
+    "inputs/x4.json": "2cc31f58fd39bcb8aabfe9cc47221a23a584b306bd4e23aed7c08d0c0c2972f2",
+    "inputs/x9-initial-input.json": "2917fa68c09cbdefd1fbcc9c8131bb7d165e42ec8b1e43ddb0e846c996a41614",
+    "inputs/x9.json": "0aaea179c82a1276cd3f159d468701ae0074e9cdbaf24cf88dedf4cdfd8ca2ba",
+    "responses/p2-artifacts.json": "8744ad1ce930b770be63f196adbb9efe16d347861c8362afbf98a537a5db6efc",
+    "responses/p2-technical.json": "d5b888c960ec9a3c02a3653f6395ca91d242a0d11fbf14f59b9f29979c59e13d",
+    "responses/p7-artifacts.json": "5cd677b271478b6a122cac4f4d60570ceb94422dddc4e0365b810bb4a6835f33",
+    "responses/p7-technical.json": "271efd077e5d5cb741b483aae778a7f971b38a867e2635521ccfdbeb7e6af410",
+    "judgments/judge-calibration.json": "22c548ccefcc53038a1d28a53596bd2ff6cff34e99a640117ed0f4f02d560575",
+    "judgments/judge-x4.json": "3f8bcb7e20ed9f9d8c1e158faec54db779f5482fc0f7fec6c8b169b44b1f86cb",
+    "judgments/judge-x9-corrected.json": "fbc7ef265ac991bec7a935a8bc0f4cb2ab3e21dd6f169609f31fb6ce37c8b63d",
+    "judgments/judge-x9-initial.json": "31f51312a5ec38d659f5025e250396f9134869554499377fc69ff70d9140d610"
+  },
+  "raw_responses_sha256": {
+    "responses/p2-artifacts.json": "c809d3c6ca4650e5f0f316ebcdd25e29c4bde92a4ae6afbbc50c0a47775ec584",
+    "responses/p2-technical.json": "970e2f15b2851bff55bc25bf88c288e8c16f2bec6d91133777bf04cdf5d23eec",
+    "responses/p7-artifacts.json": "dcc4982d03f00595ed1fb2794b554a5caee3850af86f4c092590f8c3f72cdd87",
+    "responses/p7-technical.json": "8f469375fb42d4700e1c87d01d9385711e7a55596e9753558e831368bea17406"
+  }
+}

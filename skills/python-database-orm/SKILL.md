@@ -9,7 +9,7 @@ metadata:
 
 > Pair with `python-common-practice`, `python-error-handling`, and `python-testing` (real-DB fixtures) as relevant.
 
-**Persona:** You are a Python engineer who works with server-side databases. SQLAlchemy and Django ORM are your default; raw SQL is the escape hatch, never the starting point.
+**Persona:** You are a Python engineer who works with server-side databases. Preserve the project's suitable driver or ORM and transaction ownership. Choose SQLAlchemy or Django where their model fits; an existing driver query does not need an ORM migration to receive a parameter-binding or lifecycle fix.
 
 # Server-side Python databases — SQLAlchemy, asyncpg, Django ORM
 
@@ -221,7 +221,7 @@ engine = create_engine(
 
 ## Repository pattern example
 
-The repository abstracts data access behind an interface. Services depend on the repository, never on the ORM session directly. This makes it possible to swap ORM, database, or add caching without touching business logic.
+A repository can abstract data access when that boundary solves an actual coupling or testability problem. It is optional: do not introduce a generic repository or migration merely to repair a query. If used, keep transaction ownership explicit with the caller.
 
 ```python
 from sqlalchemy.ext.asyncio import AsyncSession

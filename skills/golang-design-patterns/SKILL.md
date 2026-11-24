@@ -14,7 +14,7 @@ metadata:
 
 **Modes:**
 
-- **Design mode** — creating new APIs, packages, or application structure: ask the developer about their architecture preference before proposing patterns; favor the smallest pattern that satisfies the requirement.
+- **Design mode** — creating new APIs, packages, or application structure: preserve accepted architecture and favor the smallest pattern that satisfies the requirement. Ask only when an unresolved consequential choice would change the work.
 - **Review mode** — auditing existing code for design issues: scan for `init()` abuse, unbounded resources, missing timeouts, and implicit global state; report findings before suggesting refactors.
 
 # Go Design Patterns & Idioms
@@ -26,7 +26,7 @@ Idiomatic Go patterns for production-ready code. For error handling details see 
 1. Choose a simple constructor/options struct or **functional options** according to the actual API; adding indirection is not inherently an improvement.
 2. Functional options MUST **return an error** if validation can fail — catch bad config at construction, not at runtime
 3. **Avoid `init()`** — runs implicitly, cannot return errors, makes testing unpredictable. Use explicit constructors
-4. Enums SHOULD **start at 1** (or Unknown sentinel at 0) — Go's zero value silently passes as the first enum member
+4. **Choose enum zero-value semantics deliberately** — use an Unknown sentinel when unset must differ from a valid value; preserve existing persisted and wire values
 5. Error cases MUST be **handled first** with early return — keep happy path flat
 6. **Panic is for bugs, not expected errors** — callers can handle returned errors; panics crash the process
 7. **`defer Close()` immediately after opening** — later code changes can accidentally skip cleanup
@@ -47,7 +47,7 @@ Idiomatic Go patterns for production-ready code. For error handling details see 
 
 ## Constructor Patterns: Functional Options vs Builder
 
-### Functional Options (Preferred)
+### Functional Options (When Options Are Needed)
 
 ```go
 type Server struct { addr string; maxConns int }
@@ -100,9 +100,9 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 }
 ```
 
-### Enums: Start at 1
+### Enums: Choose the Zero Value
 
-Zero values should represent invalid/unset state:
+When a new type must distinguish unset from an accepted state, make zero invalid/unset. Do not renumber an existing persisted or wire contract to apply this convention:
 
 ```go
 type Status int
@@ -211,7 +211,7 @@ Retry logic MUST check `ctx.Err()` between attempts and use exponential/linear b
 
 ## Architecture
 
-Ask the developer which architecture they prefer: clean architecture, hexagonal, DDD, or flat layout. Don't impose complex architecture on a small project.
+Preserve the project's accepted architecture. For an actual unresolved architecture decision, compare suitable options against its constraints; a bounded constructor or helper change does not require an architecture questionnaire. Do not impose complex architecture on a small project.
 
 **Architecture style and navigability:** Consider vertical slices when they keep related feature behavior easier to discover, but preserve useful boundaries and existing repository conventions. Agent involvement alone does not justify changing architecture. Review cohesion as files grow; roughly 500 lines is a heuristic, not a universal limit. The references below describe alternatives and their trade-offs.
 

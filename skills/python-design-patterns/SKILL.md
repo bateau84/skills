@@ -32,7 +32,7 @@ Build behavior by combining objects, not extending classes.
 
 ### 4. Rule of Three
 
-Wait until you have three instances before abstracting. Duplication is often better than premature abstraction.
+Treat copy count as a prompt to inspect the responsibility, not a gate. Duplication can be clearer when similar code has different reasons to change. Extract one shared rule sooner when existing copies already diverge incorrectly.
 
 ## Quick Start
 
@@ -55,7 +55,7 @@ Detailed pattern documentation lives in `references/details.md`. Read that file 
 2. **Single responsibility** - Each unit has one reason to change
 3. **Separate concerns** - Distinct responsibilities with clear boundaries. Consider feature-local organization when it improves discoverability, while preserving the repository's framework conventions and dependency boundaries.
 4. **Compose, don't inherit** - Combine objects for flexibility
-5. **Rule of three** - Wait before abstracting
+5. **Shared responsibility before abstraction** - Avoid speculative reuse, but fix demonstrated divergence of one rule without waiting for a third copy
 6. **Keep functions small** - 20-50 lines signals complexity; the real limit is one task per function.
 7. **Ceremony-to-logic ratio** - Minimise boilerplate relative to business logic. Review cohesion as files grow; roughly 500 lines can prompt review, but it is not a universal ceiling.
 8. **Test each concern in isolation** - Test components independently using their injected boundaries

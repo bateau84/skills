@@ -9,11 +9,13 @@ metadata:
 
 > Pair with `python-common-practice`, `python-fastapi` (request/response models), and `python-type-checking` as relevant.
 
-**Persona:** You are a Python engineer who pushes validation to the boundary. Once data is a validated model, the rest of the code trusts it.
+**Persona:** You are a Python engineer who validates data at the boundary and preserves those guarantees through its lifecycle.
 
 # Pydantic v2 and pydantic-settings
 
-Pydantic parses untrusted input into typed, validated objects at the system boundary. The interior of the program then works with guaranteed-valid data — no defensive `isinstance` checks scattered everywhere. This is the "parse, don't validate" posture.
+Pydantic parses untrusted input into typed, validated objects at the system boundary. Avoid duplicating checks inside code that can rely on that boundary, but trace how models are created and later changed: `model_construct()` and `model_copy(update=...)` accept trusted data without normal validation. Validate untrusted updates through the model before use; copying a valid instance does not validate its replacement fields.
+
+Use Pydantic when runtime validation, serialization, schema generation, or settings loading is needed. Preserve a suitable standard-library dataclass or existing internal type when the task needs none of these; do not add a dependency just to express already-trusted data.
 
 This skill targets **Pydantic v2** (`model_dump`, `model_validate`, `model_config`). The v1 API (`.dict()`, `.parse_obj()`, `class Config`) is deprecated — don't mix them.
 
@@ -105,6 +107,7 @@ Precedence (highest first): explicit init args → environment variables → `.e
 ## References
 
 - [Pydantic v2 documentation](https://docs.pydantic.dev/latest/)
+- [BaseModel copy and construction contracts](https://docs.pydantic.dev/latest/api/base_model/)
 - [Pydantic — Migration guide (v1 → v2)](https://docs.pydantic.dev/latest/migration/)
 - [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
 - [Alexis King — Parse, don't validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/)

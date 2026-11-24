@@ -27,7 +27,7 @@ Go's concurrency model is built on goroutines and channels. Goroutines are cheap
 1. **Every goroutine must have a clear exit** — without a shutdown mechanism (context, done channel, WaitGroup), they leak and accumulate until the process crashes
 2. **Share memory by communicating** — channels transfer ownership explicitly; mutexes protect shared state but make ownership implicit
 3. **Define ownership across channels** — pointers are valid when ownership transfers or shared access is synchronized; copying a struct does not deep-copy maps/slices inside it.
-4. **Only the sender closes a channel** — closing from the receiver side panics if the sender writes after close
+4. **The producer side owns channel closure** — close only after all sends finish; with multiple senders, a coordinator can wait for them and close. An abandoning receiver must not close while sends remain possible
 5. **Specify channel direction** (`chan<-`, `<-chan`) — the compiler prevents misuse at build time
 6. **Default to unbuffered channels** — larger buffers mask backpressure; use them only with measured justification
 7. **Always include `ctx.Done()` in select** — without it, goroutines leak after caller cancellation
@@ -51,7 +51,7 @@ For detailed channel/select code examples, see [Channels and Select Patterns](re
 
 | Need | Use | Why |
 | --- | --- | --- |
-| Wait for goroutines, errors not needed | `sync.WaitGroup` | Fire-and-forget |
+| Wait for goroutines, errors not needed | `sync.WaitGroup` | Owned work with an explicit join |
 | Wait + collect first error | `errgroup.Group` | Error propagation |
 | Wait + cancel siblings on first error | `errgroup.WithContext` | Context cancellation on error |
 | Wait + limit concurrency | `errgroup.SetLimit(n)` | Built-in worker pool |
@@ -101,11 +101,11 @@ When auditing concurrency across a large codebase, cover these applicable indepe
 | Mistake | Fix |
 | --- | --- |
 | Fire-and-forget goroutine | Provide stop mechanism (context, done channel) |
-| Closing channel from receiver | Only the sender closes |
+| Closing channel while sends remain possible | The producer owner/coordinator closes after all senders finish |
 | `time.After` in hot loop | Reuse `time.NewTimer` + `Reset` |
 | Missing `ctx.Done()` in select | Always select on context to allow cancellation |
 | Unbounded goroutine spawning | Use `errgroup.SetLimit(n)` or semaphore |
-| Sharing pointer via channel | Send copies or immutable values |
+| Sharing mutable data without ownership | Transfer ownership, copy the mutable data, or synchronize access; a channel send alone does not make pointed-to data immutable |
 | `wg.Add` inside goroutine | Call `Add` before `go` — `Wait` may return early otherwise |
 | Forgetting `-race` in CI | Always run `go test -race ./...` |
 | Mutex held across I/O | Keep critical sections short |

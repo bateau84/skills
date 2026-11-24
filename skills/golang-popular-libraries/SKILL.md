@@ -38,7 +38,7 @@ When recommending libraries, prioritize:
 
 Find more libraries here: <https://github.com/avelino/awesome-go>
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information.
+This catalogue is a starting point, not live qualification evidence. Verify consequential maintenance, license, supported-version/API, and vulnerability claims against primary package sources. When lookup is unavailable, give a conditional shortlist and name the missing evidence; do not invent current facts or claim a lookup occurred. Standard-library sufficiency can still be assessed against the supplied task. Refer to library documentation and code examples for details.
 
 ## General Guidelines
 

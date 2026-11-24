@@ -87,6 +87,71 @@
         "Must not require a new hierarchy, report schema, or mandatory evaluation harness to use the repaired skill.",
         "Must not blanket-rewrite unrelated technical guidance or remove legitimate task-specific integrations."
       ]
+    },
+    {
+      "id": "Authoring-06",
+      "name": "outcomes-are-not-template-conformance",
+      "prompt": "A skill eval rewards four exact section headings and one correct public error contract. Supplied results: without the skill, an answer uses different headings but preserves the contract; with the skill, it uses all four headings but changes the accepted error to success. The combined score favors the skill. Assess the result and repair the evaluation design without changing the accepted contract.",
+      "expectations": [
+        "Recognizes the candidate outcome regression despite improved heading conformance.",
+        "Separates convention scoring from task outcome obligations, preserving the public error contract as an outcome.",
+        "Avoids claiming general skill improvement from the combined score and proposes contrasting semantic cases rather than exact phrase checks."
+      ],
+      "trap": "Promotes the candidate because formatting points outweigh a real contract violation.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "Authoring-07",
+      "name": "ceiling-and-rare-traps-remain-useful",
+      "prompt": "A benchmark maintainer wants to delete every skill case that the baseline passes 5/5 and every trap that triggers less than 3/5 times. There are already several unrun cases per skill. The original responses and model identities are unavailable; only a pass-count table remains. Recommend a bounded next revision and what claims its new cases can carry.",
+      "expectations": [
+        "Keeps useful ceiling/rare consequential cases as regression coverage; baseline failure frequency is not the definition of a valid requirement.",
+        "Inspects existing unrun boundary cases before manufacturing harder duplicates or a fixed per-skill quota.",
+        "Labels new or changed cases unmeasured and does not reconstruct missing verdicts or claim known model identity."
+      ],
+      "trap": "Optimizes tests solely to make the baseline fail or labels authored cases discriminating without observed evidence.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "Authoring-08",
+      "name": "missing-fixture-and-conditional-warning",
+      "prompt": "Review two judge decisions. Case A asks an agent to edit a repository and prove tests pass, but the workspace contains only the prompt and no repository or execution tools; the judge marks the missing test result as a skill failure. Case B forbids needless regeneration of unchanged generated docs; the answer fixes registration and says only to regenerate after future annotation changes, but a keyword judge fails it for mentioning the command. Recommend precise repairs and preserve each real obligation.",
+      "expectations": [
+        "Treats A as unusable execution evidence; supplies actual fixtures/capabilities for future execution or explicitly rewrites it as a proposal-only task.",
+        "Does not invent executed results or remove the actual verification obligation from an execution test.",
+        "Evaluates B by its conditional recommendation and current fix, not command-word presence; preserves rejection of unnecessary regeneration as the purported fix.",
+        "Calls for an independently scored judge calibration example or human/source review rather than silently changing old verdicts whose evidence is absent."
+      ],
+      "trap": "Tunes skill prose to missing tools or keyword bans instead of fixing setup and semantic judging.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

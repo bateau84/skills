@@ -210,12 +210,12 @@ service = NotificationService(
 
 ## Advanced Patterns
 
-### Pattern 5: Rule of Three
+### Pattern 5: Shared Responsibility Before Abstraction
 
-Wait until you have three instances before abstracting.
+The rule of three is a heuristic, not a minimum count. Similar code with different reasons to change may be clearer separately, even with three copies. If two copies already diverge incorrectly on one accepted business rule, fix the defect and give that rule a small shared owner; do not wait for another copy. Keep caller-specific behavior separate and test the shared rule through both callers.
 
 ```python
-# Two similar functions? Don't abstract yet
+# Similar loop shape alone does not establish one shared rule
 def process_orders(orders: list[Order]) -> list[Result]:
     results = []
     for order in orders:
@@ -236,8 +236,8 @@ def process_returns(returns: list[Return]) -> list[Result]:
 # Different validation, different processing, different errors...
 # Duplication is often better than the wrong abstraction
 
-# Only after a third case, consider if there's a real pattern
-# But even then, sometimes explicit is better than abstract
+# Extract when responsibility and change behavior justify sharing, not by copy count
+# A demonstrated shared-rule defect can justify extraction with only two copies
 ```
 
 ### Pattern 6: Function Size Guidelines

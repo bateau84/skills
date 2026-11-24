@@ -19,6 +19,8 @@ This skill governs both the PR title and its educational, human-readable body. U
 
 **Every new or updated PR title must comply with Conventional Commits**, including trivial and draft PRs. This is a PR-level requirement; `git-commit-discipline` covers individual commit messages, not PR titles.
 
+Apply this convention within the user's task and repository policy. If either explicitly requires another title, preserve that authority rather than silently replacing it with the skill's preference.
+
 Use:
 
 ```text
@@ -70,6 +72,8 @@ git diff main..HEAD
 ```
 
 Use commits for historical intent and the diff for actual behavior. Neither is sufficient alone.
+
+Use supplied excerpts and results when repository access is unavailable, and identify their source. Do not invent a prior incident, alternatives considered, deferred work, or test outcome to complete the template. Draft the supported parts and name the specific missing evidence. Example commands and placeholders are not verification; a proposed body is not a published PR.
 
 ### Step 2 — Identify the conceptual delta
 

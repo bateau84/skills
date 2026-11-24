@@ -14,28 +14,53 @@ Each `*E` hook returns `error`. The non-`*E` variants (`PersistentPreRun`, `PreR
 
 | Hook | Scope | When to use |
 | --- | --- | --- |
-| `PersistentPreRunE` | Parent + all descendants | Config init, auth check, telemetry setup — must run before every subcommand |
+| `PersistentPreRunE` | Inherited; nearest-hook or traversal behavior applies | Shared prerequisites such as config/auth, wired for the actual command path |
 | `PreRunE` | This command only | Validation that runs only for this command before `RunE` |
 | `RunE` | This command only | Main handler — the primary business logic |
 | `PostRunE` | This command only | Cleanup that runs only if `RunE` succeeded |
-| `PersistentPostRunE` | Parent + all descendants | Global cleanup (close connections, flush buffers) |
+| `PersistentPostRunE` | Inherited; nearest-hook or traversal behavior applies | Shared post-success work; not guaranteed cleanup after an earlier hook error |
 
-### Inheritance rules
+### Inheritance and traversal
 
-`PersistentPreRunE` defined on the root command runs before every subcommand. But if a child command defines **its own** `PersistentPreRunE`, it **replaces** (does not chain) the parent's hook. Call the parent explicitly if you need both:
+Check the pinned Cobra version and the application's `EnableTraverseRunHooks`
+setting before composing persistent hooks:
+
+| Setting | Persistent pre-hooks | Persistent post-hooks |
+| --- | --- | --- |
+| `false` (default) | First defined hook found from the executing command toward the root | First defined hook found from the executing command toward the root |
+| `true` | All defined hooks from root to executing command | All defined hooks from executing command to root |
+
+In nearest-hook mode, a child hook hides the root hook. For a direct child that
+needs root authentication followed by its own validation, explicit composition
+can preserve both:
 
 ```go
-var childCmd = &cobra.Command{
-    PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-        // call parent's hook first
-        if err := rootCmd.PersistentPreRunE(cmd, args); err != nil {
-            return err
-        }
-        // child-specific logic
-        return nil
-    },
+// This composition assumes EnableTraverseRunHooks == false.
+childCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+    if err := rootCmd.PersistentPreRunE(cmd, args); err != nil {
+        return err
+    }
+    return validateRegion(cmd, args)
 }
 ```
+
+With traversal already enabled, the child should perform only its own work:
+
+```go
+// EnableTraverseRunHooks == true: Cobra invokes the root hook first.
+childCmd.PersistentPreRunE = validateRegion
+```
+
+Do not combine manual ancestor chaining with traversal: the ancestor executes
+once through Cobra and again through the child. Preserve the application's
+chosen setting unless changing it is part of the task. Test exact hook order and
+invocation counts, plus that a failed ancestor prevents child work and `RunE`.
+The traversal switch is package-global; tests that change it must restore it and
+must not run those setting changes concurrently.
+
+Source: [Cobra execution implementation](https://github.com/spf13/cobra/blob/main/command.go)
+and [official hook documentation](https://github.com/spf13/cobra/blob/main/site/content/user_guide.md#prerun-and-postrun-hooks).
+Check the project's pinned revision when applying this guidance.
 
 ### Execution stops on first error
 

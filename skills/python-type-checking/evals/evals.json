@@ -5,13 +5,22 @@
       "id": 1,
       "name": "modern-hint-syntax",
       "prompt": "Annotate this function for a Python 3.13 codebase. `items` is a list of `User`; the function returns a `User` or nothing.\n\n```python\ndef first_match(items, pattern):\n    for it in items:\n        if it.name == pattern:\n            return it\n    return None\n```",
-      "trap": "Older `typing` aliases (Optional[User], List[User]) are still everywhere in training data and are the natural reach. On a modern target they should be `User | None` and `list[User]`.",
+      "trap": "Adds annotations that falsely exclude the None return or permit arbitrary element types; an appropriate Iterable input is not a failure.",
       "expectations": [
-        "Return type is `User | None`, not Optional[User]",
-        "Parameter uses `list[User]`, not List[User]",
-        "Does NOT import Optional/List/Union from typing for these annotations",
-        "Annotates pattern as str"
-      ]
+        "Return annotation represents User or None and pattern is annotated as str.",
+        "Input annotation accurately accepts User values used only for iteration; list[User], Iterable[User] or an appropriate read-only sequence abstraction are valid.",
+        "Uses modern supported annotation spelling, such as User | None and built-in generic syntax where a concrete list is chosen, instead of legacy Optional/List aliases."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "convention",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 2,
@@ -35,6 +44,29 @@
         "The consuming function depends on the Protocol type",
         "Declares the methods with their signatures"
       ]
+    },
+    {
+      "id": 4,
+      "name": "preserve-accepted-mutable-list-contract",
+      "prompt": "Add annotations to this Python 3.13 function. The accepted public contract requires items: list[User] and returns the removed User. It mutates the supplied list, and callers depend on that side effect.\n\n```python\ndef take_first(items):\n    return items.pop(0)\n```\n\nEmpty input still raises IndexError; no behavior change is authorized.",
+      "expectations": [
+        "Preserves items: list[User] and the User return annotation.",
+        "Preserves in-place removal and existing IndexError behavior without copying the input or adding fallback behavior."
+      ],
+      "negative_expectations": [
+        "Must not replace the accepted mutable-list contract with Iterable or silence the missing pop operation with Any/casts."
+      ],
+      "trap": "Generalizes a contract to a read-only iterable even though mutation and the concrete public annotation are explicitly required.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

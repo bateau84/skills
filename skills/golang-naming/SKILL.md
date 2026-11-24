@@ -42,7 +42,7 @@ To ignore a rule, just add a comment to the code.
 | Variant: in-place | Document mutation; no standard `In` suffix | `slices.Sort`, `slices.Reverse` |
 | Variant: error | `Must` prefix | `MustParse()`, `MustLoadConfig()` |
 | Option func | `With` + field name | `WithPort()`, `WithLogger()` |
-| Enum (iota) | type name prefix, zero-value = unknown | `StatusUnknown` at 0, `StatusReady` |
+| Enum (iota) | deliberate zero-value meaning; preserve existing values | `StatusUnknown` at 0 when unset must be distinct |
 | Named return | descriptive, for docs only | `(n int, err error)` |
 | Error string | lowercase opening unless a proper name/acronym; normally no trailing punctuation | `"image: unknown format"`, `"invalid id"` |
 | Import alias | short, only on collision | `mrand "math/rand"`, `pb "app/proto"` |
@@ -96,7 +96,7 @@ These conventions are correct but non-obvious — they are the most common sourc
 
 **Error strings:** Normally begin with a lowercase word and omit trailing punctuation, but preserve acronyms and proper names (`invalid message ID`). Do not mechanically lowercase domain identifiers. Add package/operation context where it is useful, not to satisfy a universal sentinel-prefix rule.
 
-**Enum zero values:** Always place an explicit `Unknown`/`Invalid` sentinel at iota position 0. A `var s Status` silently becomes 0 — if that maps to a real state like `StatusReady`, code can behave as if a status was deliberately chosen when it wasn't.
+**Enum zero values:** Decide whether zero is a useful valid state or must mean unset. For a new type where unset is distinct, an `Unknown`/`Invalid` sentinel can make that visible. Preserve existing persisted/wire values; inserting a sentinel ahead of existing iota values is a behavioral migration, not a naming cleanup.
 
 **Subtest names:** Table-driven test case names in `t.Run()` should be fully lowercase descriptive phrases: `"valid id"`, `"empty input"` — not `"valid ID"` or `"Valid Input"`.
 
@@ -129,7 +129,7 @@ For complete rules, examples, and rationale, see:
 | `user.NewUser()` constructor | Single primary type uses `New()` — `user.New()` avoids repeating the type name |
 | `connected bool` field | Valid idiomatic adjective; choose names that communicate the invariant |
 | `"invalid message ID"` error | Valid: retain established acronym spelling |
-| `StatusReady` at iota 0 | Zero value should be a sentinel — `StatusUnknown` at 0 catches uninitialized values |
+| Ambiguous enum zero value | Document the accepted meaning; use an unset sentinel for an appropriate new type without renumbering an existing data contract |
 | `"not found"` error string | Sentinel errors should include the package name — `"mypackage: not found"` identifies the origin |
 | `userSlice` type-in-name | Types encode implementation detail — `users` describes what it holds, not how |
 | Inconsistent receiver names | Switching names across methods of the same type confuses readers — use one name consistently |

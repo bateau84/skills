@@ -1,0 +1,65 @@
+{
+  "skill": "golang-performance",
+  "version": "1.0.0",
+  "common_instruction": "This is a response-only exercise. Use the supplied scenario and snippets; propose or review the requested work without claiming files were changed, commands ran, or external systems were inspected. State material verification limits. Equivalent solutions that satisfy the stated contract are acceptable.",
+  "cases": [
+    {
+      "id": "GPERF-ALIAS-01",
+      "name": "allocation-optimization-breaks-returned-data-ownership",
+      "prompt": "Review this proposed Go optimization. Before: Serialize builds a bytes.Buffer and returns a copy of its bytes. After: it gets a *bytes.Buffer from sync.Pool, resets and fills it, stores `out := buf.Bytes()`, puts buf back in the pool, then returns out. Callers retain the returned []byte after Serialize returns. A microbenchmark reports fewer allocations, but no correctness comparison was run. Explain the acceptance decision and the smallest safe direction.",
+      "expectations": [
+        "Rejects returning pooled backing storage after returning the buffer to the pool because later use can overwrite retained results.",
+        "Preserves ownership with a copy, explicit caller-owned buffer, or another lifetime-safe contract; changing the public lifetime contract is not silently assumed.",
+        "Requires output-stability/correctness checks across reuse before accepting performance results.",
+        "Treats the reported allocation reduction as one measurement, not proof of overall improvement or correctness."
+      ],
+      "negative_expectations": [
+        "Must not accept the optimization solely because allocations improve.",
+        "Must not claim sync.Pool guarantees exclusive ownership or stable retained contents after Put."
+      ],
+      "trap": "Accept a lower-allocation benchmark while exposing the returned data to buffer reuse.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GPERF-EXTERNAL-02",
+      "name": "external-latency-does-not-justify-go-microoptimization",
+      "prompt": "A service's export takes eight seconds. Supplied trace measurements attribute 7.7 seconds to a database query and 0.1 seconds to local formatting; the remaining time is transport/other overhead. CPU is mostly idle. A review asks for unsafe string conversions, struct padding, and GC tuning to make the export fast. We can change the query or its access pattern if evidence supports it. Recommend the next focused investigation; no implementation has been measured yet.",
+      "expectations": [
+        "Prioritizes the dominant database/query path and its real end-to-end contribution.",
+        "Defers local unsafe/padding/GC changes because the supplied evidence does not identify them as the bottleneck.",
+        "Proposes a before/after comparison that preserves output correctness and measures total export latency.",
+        "Avoids promising a speedup until the candidate change is measured."
+      ],
+      "negative_expectations": [
+        "Must not prescribe unsafe conversions, GC settings, or memory-layout refactors as the main fix based only on generic optimization rules.",
+        "Must not assert a universal percentage improvement or treat the trace as proof of a particular database root cause."
+      ],
+      "trap": "Use Go optimization techniques on the small measured fraction while ignoring the dominant external wait.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

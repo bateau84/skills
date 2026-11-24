@@ -35,6 +35,27 @@ def strings(value, where, *, nonempty=False):
     return tuple(value)
 
 
+def evaluation_contract(raw, positive, negative, trap, where):
+    """Validate authored intent; never manufacture empirical calibration."""
+    if raw is None:
+        return None  # Historical rubrics remain explicitly unclassified.
+    if not isinstance(raw, dict) or set(raw) != {"mode", "purpose", "criterion_types"}:
+        raise ValueError(f"{where}: evaluation requires mode, purpose and criterion_types")
+    if raw["mode"] != "response":
+        raise ValueError(f"{where}: this profile supports response evidence only; supply task inputs in the prompt")
+    if raw["purpose"] not in ("regression", "contrast", "boundary"):
+        raise ValueError(f"{where}: invalid evaluation purpose (not an empirical calibration label)")
+    expected = {f"E{i + 1}" for i in range(len(positive))} | {f"N{i + 1}" for i in range(len(negative))}
+    if trap:
+        expected.add("T1")
+    types = raw["criterion_types"]
+    if not isinstance(types, dict) or set(types) != expected or any(
+        value not in ("outcome", "convention") for value in types.values()
+    ):
+        raise ValueError(f"{where}: criterion_types must classify every E/N/T rule exactly once as outcome or convention")
+    return {"mode": "response", "purpose": raw["purpose"], "criterion_types": dict(types)}
+
+
 @dataclass(frozen=True)
 class Case:
     id: str
@@ -47,6 +68,7 @@ class Case:
     trap: str
     source: str
     source_sha256: str
+    evaluation: dict | None = None
 
     @property
     def selectors(self):
@@ -59,6 +81,7 @@ class Case:
             "common_instruction": self.common_instruction,
             "expectations": list(self.expectations), "must_not": list(self.negative),
             "trap": self.trap,
+            **({"evaluation": self.evaluation} if self.evaluation is not None else {}),
         }
 
 
@@ -99,11 +122,13 @@ def normalize_document(doc, skill: str, source: str, sha256: str) -> tuple[Case,
         negative = raw.get("negative_expectations", raw.get("must_not", []))
         if negative is None:
             negative = []
+        positive = strings(raw.get("expectations"), source, nonempty=True)
+        negative = strings(negative, source)
+        evaluation = evaluation_contract(raw.get("evaluation"), positive, negative, trap.strip(), f"{source}: {sid}")
         cases.append(Case(
             f"SKILL-{skill}-{sid}", sid, skill, prompt, common,
-            strings(raw.get("expectations"), source, nonempty=True),
-            strings(negative, source),
-            trap.strip(), source, sha256,
+            positive, negative,
+            trap.strip(), source, sha256, evaluation,
         ))
     if len({c.id for c in cases}) != len(cases):
         raise ValueError(f"{source}: duplicate normalized IDs")

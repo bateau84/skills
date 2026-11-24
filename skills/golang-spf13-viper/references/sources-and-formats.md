@@ -36,7 +36,8 @@ if err := viper.ReadInConfig(); err != nil {
     if !errors.As(err, &notFound) {
         return err  // real error (permission denied, malformed YAML, etc.)
     }
-    // not found — continue with flags/env/defaults
+    // Optional search only: continue with flags/env/defaults.
+    // A required or explicitly selected file must not silently fall back.
 }
 
 // After reading, this returns the resolved path:

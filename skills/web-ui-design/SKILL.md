@@ -39,13 +39,21 @@ Web UI design is the only surface discipline where the application does not cont
 
 ### Back button
 
-The back button is used in more than 30% of navigations (usability studies). Users expect it to undo navigation. Design for it, do not fight it.
+Users expect Back to return to a previous navigation state. Design for it and verify the relevant history paths.
 
-**In multi-page apps (MPAs):** The browser manages the navigation stack automatically. Each full page load creates a history entry. Back always works.
+**In multi-page apps (MPAs):** The browser manages session history for ordinary document navigation. Direct entry, redirects and history replacement still affect what Back can return to; a previous entry need not belong to this app.
 
-**In single-page apps (SPAs):** The JavaScript application controls DOM replacement without page loads. The application **must** push to browser history (`pushState`) on every meaningful navigation. Failure mode: the user navigates within the app, presses Back, and is ejected from the app entirely rather than returning to the previous view.
+**In single-page apps (SPAs):** The JavaScript application controls DOM replacement without page loads. New navigable destinations normally push a history entry. Back/Forward traverse existing entries; replacing an entry serves a different purpose and must preserve the intended history. Failure mode: component state changes without usable history, or closing a view pushes its parent and makes Back reopen the view.
 
 Design rule: every route change in an SPA is a design decision. When specifying an SPA, specify which navigation events push a history entry and what URL state they encode.
+
+For a routed detail panel, distinguish opening from an in-app parent and loading
+a shared deep link. Close may traverse back when a known parent entry was
+created by opening the panel; for a direct entry, use a deliberate parent-route
+fallback that does not unexpectedly leave the app. `history.length > 1` does
+not establish that the previous entry is that parent. State the expected URL,
+panel state and subsequent Back behavior for both paths; do not prescribe one
+history call without establishing its precondition.
 
 ### Multi-tab behavior
 

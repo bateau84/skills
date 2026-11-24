@@ -38,6 +38,8 @@ If an existing specification needed for the current change is hard to interpret,
 
 Separate normative contract from examples. Prefer the smallest exact interface that removes material ambiguity.
 
+**Do not fill an authority gap with a permanent default.** An unspecified retention, expiry, reuse, or recovery policy is not permission to require infinite retention, forbid reuse forever, or choose an arbitrary timeout. Preserve the accepted guarantee, state which lifetime or failure boundary remains unsettled, and block only the dependent completeness claim. Do not weaken replay safety to "while the record happens to exist" either. Continue specifying the independent, settled interface details; a clearly labeled proposal can inform the missing decision but cannot become normative through an example or invariant.
+
 ## Durable specification shape
 
 Use the sections that apply:

@@ -1,6 +1,10 @@
 # TUI Project Structure
 
-## Recommended Layout
+## Example for a multi-component application
+
+Use only the boundaries and tooling needed by the current app. A small single-model
+TUI can remain in one root package with co-located tests; this tree is not a starter
+checklist and does not justify restructuring a local bug fix.
 
 ```text
 project/
@@ -48,8 +52,9 @@ use the Go-standard `cmd/<name>/` directory pattern for the entrypoint.
 
 ## Keep main.go Minimal
 
-main.go should only handle flag parsing, dependency creation, and running the program.
-All UI logic lives under `internal/ui/`.
+For a multi-package application, keep the entry point focused on wiring and place
+UI logic behind the chosen package boundary. A small root package can keep its
+model alongside main without introducing `internal/ui/`.
 
 ```go
 package main

@@ -1,0 +1,63 @@
+{
+  "skill": "golang-cli",
+  "version": "1.0.0",
+  "common_instruction": "This is a response-only exercise. Use the supplied scenario and snippets; propose or review the requested work without claiming files were changed, commands ran, or external systems were inspected. State material verification limits. Equivalent solutions that satisfy the stated contract are acceptable.",
+  "cases": [
+    {
+      "id": "GCLI-ERROR-01",
+      "name": "command-error-keeps-pipe-clean-and-cleans-up",
+      "prompt": "Review this Go CLI boundary and show a focused correction. The command emits JSON for scripts. root has SilenceUsage: true and SilenceErrors: true. main calls root.Execute() and, on error, only os.Exit(1). Its RunE currently does:\n\nresource, err := openExport()\nif err != nil { fmt.Println(err); os.Exit(1) }\ndefer resource.Close()\nif err := writeJSON(cmd.OutOrStdout(), resource); err != nil {\n    fmt.Println(\"export failed:\", err)\n    os.Exit(1)\n}\nreturn nil\n\nThe request is predictable output, one diagnostic on failure, and cleanup. No new output formats or configuration system are needed.",
+      "expectations": [
+        "Returns errors from RunE instead of exiting there, allowing its deferred cleanup to run.",
+        "Prints the returned error once at the executable boundary to stderr before a nonzero exit.",
+        "Keeps successful JSON on the command output writer and diagnostics out of stdout.",
+        "Describes a focused check for failing output/open paths, diagnostic count, and cleanup without claiming the checks ran."
+      ],
+      "negative_expectations": [
+        "Must not leave errors silent because SilenceErrors is true.",
+        "Must not print the same error in both RunE and main or put diagnostics in the JSON stream."
+      ],
+      "trap": "Move or retain os.Exit inside command logic, or return errors without restoring the one stderr diagnostic at main.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GCLI-SMALL-02",
+      "name": "single-purpose-tool-needs-no-framework",
+      "prompt": "Choose a structure for a new 140-line Go program that reads CSV from stdin, filters rows, and writes CSV to stdout. It needs two boolean flags, no subcommands, no config files, no environment overrides, and no interactive UI. The repository has no CLI framework. Give the smallest suitable approach and the output/error contract; do not implement unrelated features.",
+      "expectations": [
+        "Selects a small main package and the standard flag package or an equivalently justified minimal existing mechanism.",
+        "Keeps CSV data on stdout and parse/I/O diagnostics on stderr with nonzero failure status.",
+        "Makes adding a richer command/configuration stack contingent on a future concrete need."
+      ],
+      "negative_expectations": [
+        "Must not introduce Cobra plus Viper, multi-command scaffolding, or config-file discovery as required for these stated needs.",
+        "Must not require new JSON/table formats, shell completion infrastructure, or a TUI."
+      ],
+      "trap": "Apply the general CLI stack and feature checklist to a fixed two-flag stream filter.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

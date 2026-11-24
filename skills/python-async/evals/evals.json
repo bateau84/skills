@@ -11,18 +11,42 @@
         "Recommends a shared/reused AsyncClient (per lifespan or injected as dependency)",
         "Notes connection pool or TLS reuse is lost when creating a new client per call",
         "Does NOT suggest leaving the per-call client creation in place"
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 2,
       "name": "taskgroup-vs-gather-orphan",
-      "prompt": "Fetch user data from 3 independent microservices concurrently. If any service raises an exception, the other in-flight calls must be cancelled immediately — don't leave them running to completion wasting quota or connections. Return results only if all three succeed.\n\n```python\nasync def fetch_user_context(user_id: str) -> dict:\n    # TODO: fetch profile, permissions, preferences concurrently\n    # cancel others immediately if any fails\n    ...\n```\n\nImplement this function.",
+      "prompt": "Using Python 3.11 or later, fetch user data from 3 independent microservices concurrently. If any service raises an exception, the other in-flight calls must be cancelled immediately — don't leave them running to completion wasting quota or connections. Return results only if all three succeed.\n\n```python\nasync def fetch_user_context(user_id: str) -> dict:\n    # TODO: fetch profile, permissions, preferences concurrently\n    # cancel others immediately if any fails\n    ...\n```\n\nImplement this function.",
       "trap": "asyncio.gather(*coros) raises on first exception but does NOT cancel the remaining tasks — they continue running as orphaned background tasks. asyncio.TaskGroup (3.11+) cancels sibling tasks when one raises, preventing the leak.",
       "expectations": [
-        "Uses asyncio.TaskGroup (not plain asyncio.gather)",
-        "Creates tasks via tg.create_task() inside the TaskGroup context",
-        "Notes or implies that gather does NOT cancel remaining tasks on failure / leaves them running",
-        "Does NOT use asyncio.gather as the sole mechanism (it orphans siblings on failure)"
+        "Starts the independent requests concurrently and owns their lifecycle, using TaskGroup or correctly implemented cancellation and joining.",
+        "Cancels unfinished siblings when an ordinary request failure occurs and waits for their cleanup before returning/raising.",
+        "Returns results only when all three calls succeed; a bare gather without sibling cancellation is insufficient."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      },
+      "negative_expectations": [
+        "Must not use bare asyncio.gather as the sole error-handling mechanism while claiming it cancels sibling tasks on failure."
       ]
     },
     {
@@ -34,7 +58,63 @@
         "Explains that asyncio.run() raises RuntimeError when another event loop is already running in the same thread; does not claim all synchronous FastAPI functions run on the event-loop thread.",
         "Fixes the async call chain by making process_webhook async, awaiting self.fetch, and awaiting process_webhook from the async route (or gives an equally correct, explicitly justified bridge).",
         "Does not use asyncio.to_thread(self.fetch, ...) as a substitute for awaiting an async function, or retain asyncio.run() on the active event-loop thread."
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "name": "one-shot-client-ownership",
+      "prompt": "A command-line script executes once, awaits one HTTP GET, prints the result and exits. It uses `async with httpx.AsyncClient(timeout=10) as client:` around that operation. There are no repeated helper calls, concurrent requests or web application. Review the client lifetime. Is a shared global client or application lifespan required?",
+      "trap": "Generalizes the hot-loop client-reuse rule into global/service infrastructure for a one-shot operation with correct ownership and cleanup.",
+      "expectations": [
+        "Accepts the context-managed client owned by this one-shot operation and recognizes it is closed at the correct boundary.",
+        "Distinguishes this case from repeated hot-path client construction without requiring a global object or web-app lifecycle."
+      ],
+      "negative_expectations": [
+        "Must not require introducing FastAPI, a global client, scheduler or dependency container for the one-shot request."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "name": "ordered-effects-stay-sequential",
+      "prompt": "An async helper processes a short list of account updates with `for update in updates: await apply(update)`. The accepted contract requires input order, and each update can depend on the state left by its predecessor. A review proposes a TaskGroup plus a semaphore to speed it up. Evaluate that proposal; the current runtime meets the latency target.",
+      "trap": "Treats any sequential await loop as an optimization defect and parallelizes dependent side effects; a semaphore greater than one does not preserve ordering.",
+      "expectations": [
+        "Preserves sequential execution because updates depend on prior state and order is part of the contract.",
+        "Explains why concurrent task creation can change behavior even when concurrency is bounded."
+      ],
+      "negative_expectations": [
+        "Must not prescribe parallel TaskGroup/gather execution for the dependent updates as a required improvement."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

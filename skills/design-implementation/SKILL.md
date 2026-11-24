@@ -46,7 +46,9 @@ Use `web-ui-design` or the relevant surface skill for deeper guidance.
 
 ## Motion and asynchronous feedback
 
-Motion should clarify, guide, or confirm, and respect reduced-motion preferences. Every hover affordance needs a keyboard equivalent. Use optimistic updates only when failure can be detected and state truthfully restored; define pending, rollback, retry, and cancellation behavior. Destructive or irreversible actions may need confirmed completion rather than optimism.
+Motion should clarify, guide, or confirm, and respect reduced-motion preferences. Every hover affordance needs a keyboard equivalent. Use optimistic updates only when failure can be detected and state truthfully restored; define pending, rollback, retry, and cancellation behavior.
+
+For irreversible actions, distinguish immediate feedback from completed effect. Show a prompt pending state, prevent duplicate submission, and announce success only after authoritative confirmation. Restoring a row in a client cache does not undo a server deletion. Use an accepted confirmation or reversible waiting period when the design provides one; never invent a working Undo when the backend cannot restore the data. If a material design choice remains unsettled, identify it and provide the safe pending/error path without presenting a speculative interaction as accepted. A timeout can leave the outcome unknown: reconcile it through the available read path before claiming either success or restoration. Move focus after confirmed removal only when the removed row owned focus; do not steal focus from someone who moved on while the request was pending.
 
 ## Components, tokens, and copy
 

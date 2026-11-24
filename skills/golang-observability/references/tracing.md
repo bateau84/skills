@@ -10,7 +10,7 @@ When a request crosses multiple services, logs from each service are isolated. T
 
 ## OTel SDK Setup
 
-Set up the TracerProvider early in your application. On new projects, do this first — then add spans everywhere incrementally.
+When tracing is part of the accepted observability design, configure the TracerProvider and exporter lifecycle before relying on spans. Add boundaries that answer the actual diagnostic question, accounting for automatic instrumentation; a small logging change does not require a new tracing stack.
 
 ```go
 import (

@@ -6,20 +6,37 @@
     {
       "id": "BehavioralSpec-01",
       "name": "derive-before-downstream-reconciliation",
-      "trap": "Downstream Designer/code behavior is plausible enough that the model quietly promotes it into product truth instead of preserving the clean accepted semantics and surfacing the disagreement.",
+      "trap": "A downstream cancellation mechanism is treated as authority for post-start behavior or as sufficient reason to invent a cross-party obligation contract.",
       "prompt": "You are specifying behavior for a local backup feature. Accepted product authority says: selected files are preserved durably when backup succeeds; the user may cancel before copying starts; failure must be explicit. It does not define cancellation after copying has started. A Designer scenario says pressing Cancel during progress immediately returns to the start screen and reports 'Cancelled'. Current code stops copying midway when a cancel token is observed. Architecture already contains a cancellation flag. Produce the obligation-layer result and reconcile the supplied downstream material. Do not design implementation.",
       "expectations": [
         "Derives the normative baseline from accepted product authority first: successful backup preserves selected files durably, pre-start cancellation is allowed, and failures are explicit.",
         "Does not treat Designer's mid-progress cancellation scenario, the code's cancel-token behavior, or architecture's cancellation flag as semantic authority for what cancellation after copying starts means.",
         "Classifies post-start cancellation meaning as unresolved/conflicting downstream behavior that needs owning semantic authority rather than silently normalizing one existing behavior.",
-        "Uses the smallest relevant artifact set and does not create a Quality Scenario or Obligation Contract merely for symmetry when the supplied semantics do not yet warrant one.",
+        "Covers the accepted outcomes in a compact requirement set without adding speculative shared-party guarantees or a second normative home for the same promise. A single document or several concise requirements are both valid; artifact count, headings and names alone do not determine correctness.",
         "Keeps the obligations implementation-independent and states verification intent in terms of observable backup/cancellation outcomes rather than the cancel token or architecture flag."
       ],
       "negative_expectations": [
         "Must not declare that post-start cancellation necessarily stops midway, rolls back, or completes the current file based only on downstream artifacts.",
         "Must not rewrite product meaning to match the current implementation.",
-        "Must not treat the presence of a cancellation flag as proof that cancellation semantics are settled."
-      ]
+        "Must not treat the presence of a cancellation flag as proof that cancellation semantics are settled.",
+        "Must not infer independently implemented cancellation participants solely from the user/system actor labels or the architecture flag, or promote unresolved post-start meaning into a provisional normative guarantee."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "E5": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "N3": "outcome",
+          "N4": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "BehavioralSpec-02",
@@ -334,6 +351,60 @@
         "No omission of the accepted Designer Scenario merely because BR/QS/OC are internally consistent; no claim that local tests alone prove the composition.",
         "No invented timeout, reconnect policy, storage mechanism, artifact hierarchy, or mandatory new approval/review stage."
       ]
+    },
+    {
+      "id": "BehavioralSpec-12",
+      "name": "private-helper-is-not-a-shared-semantic-contract",
+      "prompt": "Draft the smallest requirement update for this accepted change: the existing BR-004 says a local image export reports success only when the selected image is written, and reports write failures clearly. Add the accepted condition that a destination the user cannot write to produces a failure without replacing an existing file. An architecture sketch splits the executable into Picker and Writer helper functions, both maintained together; no independent client, service, plugin, or external integration is involved. Keep BR-004's existing meaning and identifier. Do not implement code.",
+      "trap": "Two named helpers trigger an invented OC, interface ownership model, or new replacement/rollback guarantee beyond the accepted failure condition.",
+      "expectations": [
+        "Updates BR-004 with the unwritable-destination failure and preservation condition while retaining truthful success and explicit write failure.",
+        "Defines an observable check using an existing destination and denied write access, including checking that the existing file was not replaced.",
+        "Keeps the private helper split outside normative meaning; the update is sufficient without a new cross-party contract or a duplicate requirement."
+      ],
+      "negative_expectations": [
+        "Must not introduce an OC solely because Picker and Writer are named separately.",
+        "Must not invent an atomic replacement algorithm, retry policy, numerical quality target, or general rollback guarantee for all failure conditions."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "BehavioralSpec-13",
+      "name": "already-covered-copy-clarification",
+      "prompt": "Review whether this accepted wording edit needs new behavioral obligations. BR-008 already requires empty search results to show that no items matched and allow the user to revise the query; it has checks for an empty result and successful query revision. The designer is changing the label from 'Empty' to 'No matching items'. Exact wording is owned by the design and no behavior changes are requested. Give the bounded specification disposition, not implementation.",
+      "trap": "Applying the skill causes new requirements, quality scenarios, an obligation contract or a new approval stage for a wording change already covered by accepted behavior.",
+      "expectations": [
+        "Recognizes that BR-008 already covers the accepted behavior and preserves its existing checks.",
+        "Leaves the label choice with the accepted design and explains that no new normative artifact is needed for this change.",
+        "Keeps the disposition short and scoped to the wording change without inventing a specification project."
+      ],
+      "negative_expectations": [
+        "Must not mandate a new BR, QS or OC to restate BR-008.",
+        "Must not reopen the accepted wording choice or introduce new product behavior or approval requirements."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

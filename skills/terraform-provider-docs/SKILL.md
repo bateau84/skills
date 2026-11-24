@@ -8,6 +8,7 @@ description: Create, update, and review Terraform provider documentation for Ter
 ## Follow This Workflow
 
 1. Confirm scope and documentation targets.
+- For a narrow documentation correction, change the existing source and regenerate only through the repository workflow. Do not add templates, provider objects, release work, or a generator upgrade without a current need.
 - Map code changes to the exact doc targets: provider index, resources, data sources, ephemeral resources, list resources, functions, or guides.
 - Decide whether content should come from schema descriptions, templates, or both.
 
@@ -15,7 +16,8 @@ description: Create, update, and review Terraform provider documentation for Ter
 - Add precise user-facing descriptions to schema fields so generated docs stay aligned with behavior.
 - Keep wording specific to argument purpose, constraints, defaults, and computed behavior.
 
-3. Add or update template files in `templates/`.
+3. Add or update template files in `templates/` when custom prose or examples require them.
+- A schema-description correction can use the existing default template; a custom template is not mandatory.
 - Create only files that map to implemented provider objects.
 - Use HashiCorp-recommended template paths:
   - `templates/index.md.tmpl`
@@ -48,7 +50,8 @@ go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --pr
 - Verify examples are valid HCL and reflect current argument/attribute names.
 - Verify required/optional/computed semantics in docs match schema behavior.
 
-6. Apply Registry publication rules before release.
+6. Apply Registry publication rules when release/publication is in scope.
+- A documentation PR alone does not authorize tagging or publishing a release.
 - Use semantic version tags prefixed with `v` (for example `v1.2.3`).
 - Publish the version as a GitHub release (the Registry ingests it through a webhook), and make sure no branch has the same name as the tag (for example a branch named `v1.2.3`).
 - Keep `terraform-registry-manifest.json` in the repository root.
