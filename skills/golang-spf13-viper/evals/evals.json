@@ -33,7 +33,7 @@
       "trap": "AutomaticEnv Get works while Unmarshal enumerates registered AllKeys and drops env-only values.",
       "expectations": [
         "Explains why direct Get and Unmarshal can differ for unregistered keys.",
-        "Registers the expected keys via BindEnv or SetDefault, while retaining prefix/replacer semantics.",
+        "Makes the expected key available to Unmarshal via BindEnv or an appropriate default, or uses an explicitly mapped Get-based configuration path with equivalent values and precedence. Retains the configured prefix/replacer semantics; registration is not the only valid repair.",
         "Proposes a real env-only regression check."
       ],
       "must_not": [

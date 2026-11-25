@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
+import secrets
 import sys
 from pathlib import Path
 
@@ -12,12 +14,14 @@ from pathlib import Path
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from eval_cases import strict_json
+from eval_cases import digest, strict_json
 from eval_profile import ABSTENTION_SCHEMA, JUDGE_SCHEMA, JUDGE_SYSTEM, JudgeAbstention, parse_grade
 
 FIXTURE = Path(__file__).resolve().parents[1] / "evaluations" / "judge-calibration" / "cases.json"
 FIXTURE_SCHEMA = "portable-skills/judge-calibration/v1"
 ABSTENTION_REASONS = ("missing-input", "conflicting-rubric", "unobservable")
+MAPPING_SCHEMA = "portable-skills/private-calibration-map/v1"
+OPAQUE_ID = re.compile(r"c-[0-9a-f]{32}")
 
 
 def exact_object(value, keys, where):
@@ -104,8 +108,8 @@ def load_cases(path=FIXTURE):
     return validate_fixture(strict_json(Path(path).read_text(encoding="utf-8")))
 
 
-def export_packet(cases):
-    """Project only judge inputs; never export the fixture's expected labels."""
+def packet_for_cases(cases):
+    """Build judge inputs from already-blinded case identities."""
     return {
         "system": JUDGE_SYSTEM,
         "instructions": (
@@ -128,6 +132,78 @@ def export_packet(cases):
         "abstention_template": {"schema": ABSTENTION_SCHEMA, "reason": "missing-input",
                                 "evidence": "specific missing input, conflict or unavailable observation"},
     }
+
+
+def identity(value):
+    return digest(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode())
+
+
+def export_packet(cases):
+    """Return a public packet and a separate private, packet-bound ID mapping."""
+    blinded, ids = [], {}
+    for case in cases:
+        opaque = "c-" + secrets.token_hex(16)
+        while opaque in ids:
+            opaque = "c-" + secrets.token_hex(16)
+        ids[opaque] = case["id"]
+        blinded.append({"id": opaque, "case_data": case["case_data"], "response": case["response"]})
+    # Neither source names nor their known fixture order should cue the judge.
+    secrets.SystemRandom().shuffle(blinded)
+    packet = packet_for_cases(blinded)
+    mapping = {"schema": MAPPING_SCHEMA, "fixture_sha256": identity(cases),
+               "packet_sha256": identity(packet), "ids": ids}
+    return packet, mapping
+
+
+def check_blinded_results(cases, document, mapping, packet):
+    exact_object(mapping, ("schema", "fixture_sha256", "packet_sha256", "ids"), "private mapping")
+    if mapping["schema"] != MAPPING_SCHEMA or mapping["fixture_sha256"] != identity(cases):
+        raise ValueError("private mapping does not match the current fixture")
+    if mapping["packet_sha256"] != identity(packet):
+        raise ValueError("private mapping does not match the supplied judge packet")
+    ids, sources = mapping["ids"], {case["id"]: case for case in cases}
+    if (type(ids) is not dict or len(ids) != len(cases)
+            or any(not isinstance(k, str) or not OPAQUE_ID.fullmatch(k)
+                   or not isinstance(v, str) or v not in sources for k, v in ids.items())
+            or len(set(ids.values())) != len(cases)):
+        raise ValueError("private mapping must map every opaque ID to one unique source case")
+    # A hash alone does not detect a mapping whose source IDs were swapped.
+    # Reconstruct the exact packet so each mapping is tied to its actual inputs.
+    if type(packet) is not dict or not isinstance(packet.get("cases"), list):
+        raise ValueError("invalid judge packet")
+    order = [case.get("id") if isinstance(case, dict) else None for case in packet["cases"]]
+    if (len(order) != len(ids) or any(not isinstance(key, str) or key not in ids for key in order)
+            or len(set(order)) != len(ids)):
+        raise ValueError("judge packet IDs do not match the private mapping")
+    expected = packet_for_cases([{"id": key, "case_data": sources[ids[key]]["case_data"],
+                                  "response": sources[ids[key]]["response"]} for key in order])
+    if packet != expected:
+        raise ValueError("judge packet differs from the mapped fixture inputs or instructions")
+    exact_object(document, ("cases",), "results")
+    if not isinstance(document["cases"], list):
+        raise ValueError("results: cases must be an array")
+    translated = []
+    for result in document["cases"]:
+        exact_object(result, ("id", "judgment"), "result case")
+        if not isinstance(result["id"], str) or result["id"] not in ids:
+            raise ValueError("results: unknown opaque case ID")
+        translated.append({"id": ids[result["id"]], "judgment": result["judgment"]})
+    report = check_results(cases, {"cases": translated})
+    reverse = {value: key for key, value in ids.items()}
+    for result in report["cases"]:
+        result["id"] = reverse[result["id"]]
+    by_id = {result["id"]: result for result in report["cases"]}
+    report["cases"] = [by_id[key] for key in order]
+    report["packet_sha256"] = identity(packet)
+    return report
+
+
+def write_private_mapping(path, mapping):
+    # Refuse existing files/symlinks: an old run's map must never be overwritten.
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as stream:
+        json.dump(mapping, stream, ensure_ascii=False, indent=2)
+        stream.write("\n")
 
 
 def check_results(cases, document):
@@ -186,16 +262,33 @@ def main(argv=None):
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--export", action="store_true", help="Print an oracle-free judge packet; no provider calls")
     mode.add_argument("--check", type=Path, metavar="PATH", help="Validate and compare saved judgments; no provider calls")
+    parser.add_argument("--mapping", type=Path, help="Private mapping file; created exclusively on export, required for blinded checks")
+    parser.add_argument("--packet", type=Path, help="Exact exported judge packet, required for blinded checks")
+    parser.add_argument("--legacy-identifiers", action="store_true",
+                        help="Explicitly check historical source-named judgments; does not establish blinded calibration")
     options = parser.parse_args(argv)
     if not sys.flags.isolated:
         parser.error("launch with python3 -I -B; non-isolated imports are not supported")
+    if options.export and (not options.mapping or options.packet or options.legacy_identifiers):
+        parser.error("--export requires --mapping and forbids --packet/--legacy-identifiers")
+    if options.check and (bool(options.mapping) != bool(options.packet)
+                         or options.legacy_identifiers == bool(options.mapping)):
+        parser.error("--check requires both --mapping and --packet, or explicit --legacy-identifiers")
     try:
         cases = load_cases()
         if options.export:
-            print(json.dumps(export_packet(cases), ensure_ascii=False, indent=2))
+            packet, mapping = export_packet(cases)
+            write_private_mapping(options.mapping, mapping)
+            print(json.dumps(packet, ensure_ascii=False, indent=2))
             return 0
         results = strict_json(options.check.read_text(encoding="utf-8"))
-        report = check_results(cases, results)
+        if options.legacy_identifiers:
+            report = check_results(cases, results)
+            report["blinding"] = "legacy source identifiers exposed; not blinded calibration evidence"
+        else:
+            report = check_blinded_results(cases, results,
+                strict_json(options.mapping.read_text(encoding="utf-8")),
+                strict_json(options.packet.read_text(encoding="utf-8")))
     except (OSError, UnicodeError, ValueError) as exc:
         parser.error(str(exc))
     print(json.dumps(report, ensure_ascii=False, indent=2))

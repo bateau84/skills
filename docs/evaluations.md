@@ -649,7 +649,9 @@ stated branch, distinguish warnings from recommendations, and avoid inferring
 execution order from prose order. Candidate text cannot change the rubric. The
 [source-reviewed judge checks](../evaluations/judge-calibration/README.md) cover
 these errors, missing-input abstention, and a polished incorrect answer with an
-embedded instruction to the judge. Exported packets omit expected verdicts.
+embedded instruction to the judge. Exported packets use random opaque IDs and shuffled order, with source IDs and
+expected verdicts withheld. Keep the separate private mapping away from the
+judge; the checker binds it to the exact exported packet and fixture.
 See [evaluation design](../skills/skill-authoring/references/evaluation-design.md)
 and the [2026-11-24 review](skill-eval-improvement-2026-11-24.md) for rationale,
 limits, and retained observations.
@@ -702,7 +704,9 @@ product outcomes.
 Relative comparison uses the outcome axis when present. If only conventions are
 classified, its basis is `convention`; legacy comparison uses
 `unclassified-rubric`. The basis is displayed and the original all-rubric delta
-is retained as a diagnostic. A heading/style gain cannot compensate for an
+is retained as a diagnostic. Aggregate Markdown comparisons are grouped by
+outcome, convention, legacy/unclassified or unknown basis; their improvement
+counts are not pooled into one product-improvement measure. A heading/style gain cannot compensate for an
 outcome regression. Trap effects apply to their declared axis. Within the
 selected axis:
 

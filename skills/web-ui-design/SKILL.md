@@ -63,9 +63,9 @@ Design rule: any link a user might right-click and open in a new tab must produc
 
 ### URL as persistent state
 
-The URL is always visible to the user. It conveys location in the hierarchy, supports bookmarking, and is the primary sharing mechanism for web content. If a user cannot paste a URL into an email and have the recipient arrive at the same view, something is wrong.
+The URL conveys location in the hierarchy and supports bookmarking and sharing. Make meaningful navigation shareable by default, while preserving the accepted product contract. If some view state is intentionally local, explain what sharing and reloading preserve rather than promising that a copied URL reproduces it.
 
-Design rule: every meaningful application state that a user would want to share or return to should have a URL. Transient UI state (which accordion is expanded, which tooltip is open) does not need a URL. Persistent application state (current filter, selected record, active tab within a page) usually does.
+Design rule: give state a URL when the accepted navigation or sharing contract requires it. Transient UI state (which accordion is expanded, which tooltip is open) usually does not need a URL. Current filters, selected records and active tabs often benefit from one; choose deliberately and state the consequences of any local-only alternative. Do not override an established URL contract as a matter of preference.
 
 Concrete example: a filtered data table at `/records?status=active&sort=name-asc` is shareable and bookmarkable. The same table stored as component state is neither.
 
@@ -114,7 +114,7 @@ Multi-step services (checkout, onboarding, complex forms) use document-model con
 
 ### App-model (single-page applications — SPA)
 
-The JavaScript application replaces DOM content without page loads. The URL must still update on every meaningful navigation (pushState). Loading states are the application's responsibility. Focus management after navigation is the application's responsibility — the browser does not auto-scroll or reset focus on client-side navigation.
+The JavaScript application replaces DOM content without page loads. Apply the specified URL/history contract: push new destinations, replace or traverse entries when that is the intended behavior, and distinguish local UI state from navigation. Loading states are the application's responsibility. Focus management after navigation is the application's responsibility — the browser does not auto-scroll or reset focus on client-side navigation.
 
 **User expectations:**
 - Instant or near-instant state changes (the SPA promise)

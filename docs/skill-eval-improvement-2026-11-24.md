@@ -2,6 +2,11 @@
 
 ## Decision and evidence boundary
 
+**Review follow-up:** [PR #39 corrections](../evaluations/2026-11-25-pr39-corrections/README.md)
+address calibration-ID cues, invented rubric obligations, contradictory database
+guidance and mixed-basis aggregate reporting. The original calibration result
+below is historical and cue-confounded, not blind-calibration evidence.
+
 Improve the product a skill helps an agent produce: correct behavior, appropriate
 scope, preserved contracts, useful evidence, and no invented commitments. Skill
 conformance remains useful diagnostic information, but it is not interchangeable
@@ -275,7 +280,7 @@ before making broader causal claims.
 python3 -I -B scripts/run_evals.py --validate
 SKILLS_EVAL_RUNNER_ROOT=/path/to/clean/pinned-runner \
   python3 -I -B scripts/run_evals.py --harness-test
-python3 -I -B scripts/eval_calibration.py --check \
+python3 -I -B scripts/eval_calibration.py --legacy-identifiers --check \
   evaluations/2026-11-24-skill-quality/judgments/judge-calibration.json
 git diff --check
 ```

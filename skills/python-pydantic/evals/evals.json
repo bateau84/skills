@@ -5,12 +5,12 @@
       "id": 1,
       "name": "settings-from-env",
       "prompt": "In an application already using Pydantic v2 and pydantic-settings, load application configuration from environment variables prefixed `SORTARR_`, falling back to a `.env` file and then to code defaults. The config has `api_port` (int) and `compare_distance` (int, which must be between 0 and 100 inclusive). An out-of-range value should make the application fail at startup.",
-      "trap": "Implements a second configuration parser instead of using the existing typed settings boundary, or fails to enforce the configured precedence and range.",
+      "trap": "Fails to enforce the required environment-over-.env-over-default precedence, field types, inclusive range or startup rejection. Choosing another parser API is not itself this outcome trap when the complete contract is preserved.",
       "expectations": [
         "Uses pydantic-settings BaseSettings",
-        "Sets env_prefix = \"SORTARR_\" and reads a .env file",
+        "Loads the SORTARR_-prefixed values with environment variables taking precedence over .env values, then code defaults; equivalent configuration-loading APIs are acceptable.",
         "Expresses the 0–100 bound with Field(ge=0, le=100), not a manual if-check",
-        "Relies on construction-time validation to fail loudly at startup",
+        "Validates api_port and compare_distance as integers and rejects compare_distance outside the inclusive 0–100 range before the application starts; construction-time validation or an equivalent startup boundary is acceptable.",
         "Does NOT read os.environ manually for these values"
       ],
       "evaluation": {

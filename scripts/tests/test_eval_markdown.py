@@ -69,6 +69,34 @@ class MarkdownTests(unittest.TestCase):
             self.assertIn("test/model", text)
             self.assertNotIn("Practical first response", text)
 
+    def test_mixed_comparison_summary_keeps_each_scoring_basis_separate(self):
+        from dataclasses import replace
+        cases = []
+        for kind in ("outcome", "convention", "unclassified-rubric"):
+            data = copy.deepcopy(self.context.case.project_data)
+            if kind != "unclassified-rubric":
+                data["evaluation"] = {"mode": "response", "purpose": "regression", "criterion_types": {"E1": kind}}
+            case_id = self.context.case.id + "-" + kind
+            cases.append(replace(self.context.case, id=case_id, selectors=(case_id,), project_data=data))
+        with tempfile.TemporaryDirectory() as temp:
+            _, _, _, _, text = self.run_fixture(Path(temp) / "run", cases=tuple(cases))
+            section = text.split("## Paired comparison", 1)[1].split("## Outcome and convention evidence", 1)[0]
+            for basis in ("outcome", "convention", "unclassified-rubric"):
+                self.assertIn(f"| {basis} | 0 | 0 | 1 | 0 | 0 | 0 | 0 |", section)
+            self.assertNotIn("neutral: 3", section)
+            self.assertNotIn("| 0 | 0 | 3 |", section)
+        # Absent judgments and historical decisions without a basis stay visibly
+        # unknown; they are not silently credited to outcome or convention.
+        original = SkillsComparison.compare_pair
+        def legacy(instance, baseline, candidate):
+            result = original(instance, baseline, candidate)
+            data = dict(result.data)
+            data.pop("score_basis", None)
+            return instance.api.ComparisonDecision(result.classification, result.summary, data)
+        with tempfile.TemporaryDirectory() as temp, patch.object(SkillsComparison, "compare_pair", legacy):
+            _, _, _, _, text = self.run_fixture(Path(temp) / "run")
+            self.assertIn("| unknown/unavailable | 0 | 0 | 1 | 0 | 0 | 0 | 0 |", text)
+
     def test_compound_negative_and_baseline_fail_candidate_pass_preserve_policy(self):
         for candidate_pass in (False, True):
             with self.subTest(candidate_pass=candidate_pass), tempfile.TemporaryDirectory() as temp:

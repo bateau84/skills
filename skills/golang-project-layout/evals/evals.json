@@ -23,7 +23,7 @@
         "criterion_types": {
           "E1": "outcome",
           "E2": "outcome",
-          "E3": "outcome",
+          "E3": "convention",
           "N1": "outcome",
           "N2": "outcome",
           "N3": "outcome",

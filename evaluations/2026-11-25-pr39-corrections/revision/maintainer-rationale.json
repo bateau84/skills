@@ -1,0 +1,435 @@
+{
+  "purpose": "A fixed, response-only comparison using independently authored product cases. No response has been generated or scored during authoring.",
+  "provenance": {
+    "authoring_inputs": [
+      "The parent task request, including the three required scenario categories and isolation constraints."
+    ],
+    "not_inspected": [
+      "Source skills",
+      "Evaluation files",
+      "Prior experiment fixtures",
+      "Prior experiment responses or summaries",
+      "Expected skill changes"
+    ],
+    "novelty_scope": "All project scenarios, snippets, artifact payloads, identities, and prompts in this taskset were authored in this isolated task. Prior corpora were not inspected, so non-overlap is established by fresh authoring rather than a corpus comparison."
+  },
+  "separation": "Keep prompt and criterion bytes hidden from implementation agents until their changes are fixed. Use these same frozen prompts for both skill variants; keep the maintainer rationale separate from model task inputs.",
+  "scoring_boundaries": [
+    "Assess semantic product outcomes against the supplied facts, not preferred headings, response length, section counts, prose style, or exact naming.",
+    "Accept materially different implementations and command layouts when all applicable product constraints hold.",
+    "Do not infer original-versus-revised expected verdicts; none are assigned in this design.",
+    "A concrete unattended mutation path is allowed or forbidden only according to the policy and authorization facts of its individual task.",
+    "Treat the presented backend contracts as supplied capabilities. Do not demand execution evidence or invented missing services."
+  ],
+  "tasks": [
+    {
+      "opaque_task_id": "c2682d46c3e74011b2abc2578304271a",
+      "skill": "python-database-orm",
+      "exact_authored_facts": [
+        {
+          "id": "f1",
+          "text": "The dock-scheduling service runs Python 3.12, pytest, synchronous SQLAlchemy 2.0.36, psycopg 3, and PostgreSQL 16 with working SAVEPOINT support."
+        },
+        {
+          "id": "f2",
+          "text": "A session-scoped db_engine fixture already supplies an Engine. Before these tests start, a separate setup connection has created and committed the schema. Each worker has a dedicated, initially empty schema, and tests within a worker run sequentially."
+        },
+        {
+          "id": "f3",
+          "text": "Every database operation in the code under test uses the Session passed to it. The service does not open another connection, issue DDL, or manage the physical connection."
+        },
+        {
+          "id": "f4",
+          "text": "The application intentionally commits successful reservations and rolls back a failed reservation before raising the error. Those calls must keep their normal meaning within the test: after the duplicate is rejected, the previously successful reservation must still be visible and another reservation must be possible."
+        },
+        {
+          "id": "f5",
+          "text": "The test fixture must own one physical connection and the final rollback boundary for the whole test. Each test must start with no BayReservation rows left by earlier tests, including when a test raises before finishing."
+        },
+        {
+          "id": "f6",
+          "text": "Production functions cannot be changed, commit and rollback cannot be mocked or replaced, and cleanup cannot delete rows, TRUNCATE tables, recreate the schema, or commit the test data. Primary-key sequence values do not need to reset."
+        },
+        {
+          "id": "f7",
+          "text": "This is a design review: provide proposed fixture code and explain transaction ownership and teardown. Do not run anything or claim that the proposal has been executed or tested."
+        }
+      ],
+      "additional_exact_inputs": {
+        "source_snippet": "```python\n# models.py\nfrom sqlalchemy import String\nfrom sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column\n\nclass Base(DeclarativeBase):\n    pass\n\nclass BayReservation(Base):\n    __tablename__ = \"bay_reservation\"\n    id: Mapped[int] = mapped_column(primary_key=True)\n    job_ref: Mapped[str] = mapped_column(String(40), unique=True)\n    bay_code: Mapped[str] = mapped_column(String(12))\n\n# service.py\nfrom sqlalchemy.exc import IntegrityError\n\ndef reserve_bay(session, job_ref, bay_code):\n    row = BayReservation(job_ref=job_ref, bay_code=bay_code)\n    session.add(row)\n    try:\n        session.commit()\n    except IntegrityError:\n        session.rollback()\n        raise\n    session.refresh(row)\n    return row.id\n\n# conftest.py: current fixture\nimport pytest\nfrom sqlalchemy.orm import Session\n\n@pytest.fixture\ndef db_session(db_engine):\n    with Session(db_engine) as session:\n        with session.begin():\n            yield session\n\n# Representative test body; ordinary imports omitted.\nfirst_id = reserve_bay(db_session, \"job-814\", \"B-07\")\nwith pytest.raises(IntegrityError):\n    reserve_bay(db_session, \"job-814\", \"B-08\")\nsecond_id = reserve_bay(db_session, \"job-815\", \"B-09\")\nassert first_id != second_id\nassert db_session.scalar(select(func.count()).select_from(BayReservation)) == 2\n```"
+      },
+      "criterion_support_and_falsification": [
+        {
+          "criterion_id": "r1",
+          "authored_fact_ids": [
+            "f1",
+            "f2",
+            "f7"
+          ],
+          "what_would_falsify_the_product": "No usable replacement fixture is provided, or the proposal depends on a different runtime or on inventing an engine setup."
+        },
+        {
+          "criterion_id": "r2",
+          "authored_fact_ids": [
+            "f3",
+            "f4",
+            "f5"
+          ],
+          "what_would_falsify_the_product": "An application commit ends or commits the final test-owned transaction, allowing rows to survive teardown."
+        },
+        {
+          "criterion_id": "r3",
+          "authored_fact_ids": [
+            "f4"
+          ],
+          "what_would_falsify_the_product": "Rejecting the duplicate undoes the first successful reservation, leaves the Session unusable, or prevents the second reservation."
+        },
+        {
+          "criterion_id": "r4",
+          "authored_fact_ids": [
+            "f3",
+            "f5"
+          ],
+          "what_would_falsify_the_product": "The yielded Session performs work through a different connection than the one whose final rollback the fixture controls."
+        },
+        {
+          "criterion_id": "r5",
+          "authored_fact_ids": [
+            "f5",
+            "f6"
+          ],
+          "what_would_falsify_the_product": "A failing test skips cleanup, a resource remains checked out, or teardown persists rather than rolls back test data."
+        },
+        {
+          "criterion_id": "r6",
+          "authored_fact_ids": [
+            "f4",
+            "f5"
+          ],
+          "what_would_falsify_the_product": "The explanation treats the application and test transaction lifecycles as interchangeable or fails to account for service transaction termination."
+        },
+        {
+          "criterion_id": "r7",
+          "authored_fact_ids": [
+            "f1",
+            "f4",
+            "f5"
+          ],
+          "what_would_falsify_the_product": "The chosen SQLAlchemy arrangement cannot preserve the required commit/rollback behavior under the specified backend and version."
+        },
+        {
+          "criterion_id": "r8",
+          "authored_fact_ids": [
+            "f6"
+          ],
+          "what_would_falsify_the_product": "The proposal changes forbidden application behavior or relies on forbidden cleanup or sequence-reset behavior."
+        },
+        {
+          "criterion_id": "r9",
+          "authored_fact_ids": [
+            "f7"
+          ],
+          "what_would_falsify_the_product": "The response claims checks were run or reports observed success without execution being authorized or performed."
+        }
+      ],
+      "acceptable_variation": [
+        "Any compatible transaction arrangement that preserves the stated lifecycle and rollback outcomes; no specific SQLAlchemy flag or fixture spelling is required.",
+        "The rubric does not prescribe a preferred answer outline or a target response length."
+      ]
+    },
+    {
+      "opaque_task_id": "e09da2ff97294755812d512b6d1ec62f",
+      "skill": "interaction-design",
+      "exact_authored_facts": [
+        {
+          "id": "f1",
+          "text": "fieldvault is an internal CLI for a coastal survey lab. The dangerous operation permanently erases raw capture bundles. There is no undo or recoverable trash. This release operates on one explicitly selected tenant and project per erase operation; the concrete example is tenant coastwatch-lab, project tideline-east."
+        },
+        {
+          "id": "f2",
+          "text": "A bundle has an immutable bundle ID, a revision, a display name, a byte size, a capture-finished timestamp, and a retention-hold status. Display names are not unique. Operators select a project and a timestamp cutoff, but execution must target the concrete immutable IDs they reviewed."
+        },
+        {
+          "id": "f3",
+          "text": "The lab policy for this release is fixed: every erase requires a present human operator to review the current preview and deliberately confirm in a live terminal. CI, cron, service accounts, saved approvals, and other unattended processes are prohibited from erasing, even if an earlier human approved a plan."
+        },
+        {
+          "id": "f4",
+          "text": "The existing gateway enforces a trusted interactive_operator entitlement for destructive requests. It is never granted to CI, cron, or service accounts. The CLI still has to require the live terminal review and confirmation; a client option cannot grant that entitlement."
+        },
+        {
+          "id": "f5",
+          "text": "Read-only automation is explicitly allowed. A scheduled inventory job with a viewer identity needs to list bundles and generate a JSON erase preview without a terminal or prompts. It may save that preview for an operator to inspect later. Viewing a preview must not erase anything."
+        },
+        {
+          "id": "f6",
+          "text": "A useful preview identifies the authenticated actor, tenant and project, the cutoff with an explicit timezone, the selected immutable IDs and revisions, the selected count and total bytes, and bundles excluded because of a retention hold. It must make permanent loss clear before confirmation."
+        },
+        {
+          "id": "f7",
+          "text": "Capture ingest and retention updates continue while the operator is reading. Newly arrived bundles must never be added silently to an already reviewed target set. If an included bundle changes revision or gains a hold, the existing gateway rejects the whole request before deleting anything and requires a new preview and review. A hold cannot be overridden by this CLI."
+        },
+        {
+          "id": "f8",
+          "text": "After a request is accepted, a storage outage can cause partial deletion. The gateway returns a durable operation ID and per-bundle outcomes; querying that operation is read-only and repeatable. Erase requests carrying the same operation ID cannot erase a bundle twice. Any further mutation still needs the live human review required above."
+        },
+        {
+          "id": "f9",
+          "text": "Operators and inventory automation need distinguishable success, invalid-input or authorization refusal, cancellation or missing confirmation, stale-preview, and partial-failure outcomes. The audit record must identify the human actor, project, reviewed target IDs and revisions, operation ID, and per-bundle outcomes. Do not claim to have implemented or exercised the CLI."
+        }
+      ],
+      "additional_exact_inputs": {},
+      "criterion_support_and_falsification": [
+        {
+          "criterion_id": "r1",
+          "authored_fact_ids": [
+            "f1",
+            "f5",
+            "f9"
+          ],
+          "what_would_falsify_the_product": "The proposal leaves either the erase workflow or the scheduled read-only job without a usable invocation."
+        },
+        {
+          "criterion_id": "r2",
+          "authored_fact_ids": [
+            "f3",
+            "f4",
+            "f8"
+          ],
+          "what_would_falsify_the_product": "Any destructive execution lacks either the supplied entitlement or the required current live human review and confirmation."
+        },
+        {
+          "criterion_id": "r3",
+          "authored_fact_ids": [
+            "f3",
+            "f4"
+          ],
+          "what_would_falsify_the_product": "An unattended process can erase by adding an option, replaying an approval, piping text, or reusing a saved plan."
+        },
+        {
+          "criterion_id": "r4",
+          "authored_fact_ids": [
+            "f5"
+          ],
+          "what_would_falsify_the_product": "A legitimate viewer inventory/preview job needs a terminal or prompt, or preview itself authorizes or performs deletion."
+        },
+        {
+          "criterion_id": "r5",
+          "authored_fact_ids": [
+            "f1",
+            "f2",
+            "f6"
+          ],
+          "what_would_falsify_the_product": "The human cannot determine the precise scope, protected exclusions, or permanent consequence of the proposed mutation."
+        },
+        {
+          "criterion_id": "r6",
+          "authored_fact_ids": [
+            "f2",
+            "f7"
+          ],
+          "what_would_falsify_the_product": "The execution adds unreviewed IDs, selects ambiguously by name, overrides holds, or continues the stale reviewed request."
+        },
+        {
+          "criterion_id": "r7",
+          "authored_fact_ids": [
+            "f3",
+            "f5",
+            "f9"
+          ],
+          "what_would_falsify_the_product": "Cancellation or absent confirmation mutates data, or automation cannot distinguish the required outcome classes."
+        },
+        {
+          "criterion_id": "r8",
+          "authored_fact_ids": [
+            "f8"
+          ],
+          "what_would_falsify_the_product": "Partial failure is hidden, status unexpectedly mutates, or recovery repeats completed deletion or silently enables unattended mutation."
+        },
+        {
+          "criterion_id": "r9",
+          "authored_fact_ids": [
+            "f1",
+            "f9"
+          ],
+          "what_would_falsify_the_product": "The audit cannot identify the specified actor/scope/results, the proposal promises recovery that does not exist, or it fabricates execution claims."
+        }
+      ],
+      "acceptable_variation": [
+        "Any command names, option names, confirmation wording, output layout, and numeric exit codes that satisfy the supplied policy, scope, failure, and automation requirements.",
+        "The rubric does not prescribe a preferred answer outline or a target response length."
+      ]
+    },
+    {
+      "opaque_task_id": "17067d685dc44effbb39efe8d81d00b4",
+      "skill": "interaction-design",
+      "exact_authored_facts": [
+        {
+          "id": "f1",
+          "text": "fieldvault permanently erases raw capture bundles; it has no undo or recoverable trash. The lab security owner explicitly permits unattended erasure by the scheduled retention runner when an authorized human has signed an exact immutable plan. This release must support that policy; a valid scheduled execution has no terminal and must finish without human input."
+        },
+        {
+          "id": "f2",
+          "text": "For this request, the current time is 2026-10-17T02:05:00Z, the authenticated runner is svc:retention-runner, and the requested operation ID is op_20261017_014. The signed approval file is /run/secrets/fieldvault/erase-approval.json. The immutable plan file is /run/fieldvault/erase-plan.json. The plan is the read-only preview the approver reviewed; its two target bundles total 65536 bytes. The held bundle in excluded is outside the approved target set."
+        },
+        {
+          "id": "f3",
+          "text": "The plan digest below is SHA-256 over the UTF-8 compact JSON representation of every plan field except plan_digest, with dictionary keys sorted. The provided digest is already correct. The signature bytes are present in the approval file on disk; do not invent them. The approval JSON shown below is the exact claim set the existing verifier returns for that file in this valid case, not a substitute for verifying the file at execution."
+        },
+        {
+          "id": "f4",
+          "text": "Existing verify_approval(file_path, principal, now) checks the signature, authorized issuer, revocation, principal binding, and approval expiry. It returns verified claims or a typed refusal. The supplied file is authentic, unrevoked, and valid at the supplied time. Plan expiry, action, tenant/project, operation ID, and plan-digest binding must also match before mutation; the gateway enforces those bindings on every destructive request."
+        },
+        {
+          "id": "f5",
+          "text": "The gateway executes only the immutable IDs and revisions in the approved plan. It never expands a selector to include newly arrived bundles. Before accepting deletion it rejects the request without mutation if an included revision has changed or a target is now on retention hold. A hold cannot be overridden. The given valid case has unchanged target revisions and no new hold on either target."
+        },
+        {
+          "id": "f6",
+          "text": "The audit store is available in the valid case. Before accepting any deletion, the gateway durably records operation_id, plan_digest, approval_id, actor, approved_by, tenant_id, project_id, and the approved target IDs and revisions. For every accepted target it durably records the target ID, outcome, and UTC timestamp. If this audit recording cannot be guaranteed, it accepts no deletion. This service behavior already exists; the CLI need not invent an audit service."
+        },
+        {
+          "id": "f7",
+          "text": "A storage failure can still produce partial deletion across the two targets. Read-only status queries by operation ID return durable per-target outcomes. Reusing the same operation ID is idempotent and cannot delete a completed target twice; retrying an unresolved target is permitted only with the same approved target set and an approval that is still valid when the retry is accepted. An expired approval still permits read-only status but cannot authorize more mutation."
+        },
+        {
+          "id": "f8",
+          "text": "Operators also need a read-only way to inspect the plan, approval binding, expiry, exact targets, count, total bytes, exclusions, and irreversible effect before a run. Inspecting or validating artifacts must not execute the plan or consume the approval. The runner needs machine-readable results, distinguishable success/refusal/stale-plan/partial-failure states, and useful recovery information. Approval signature bytes must not be printed in logs. Do not claim to have implemented or run this workflow."
+        }
+      ],
+      "additional_exact_inputs": {
+        "plan": {
+          "schema": "fieldvault.erase-plan/v1",
+          "plan_id": "pln_84c7e2",
+          "tenant_id": "coastwatch-lab",
+          "project_id": "tideline-east",
+          "action": "erase",
+          "created_at": "2026-10-17T01:50:00Z",
+          "expires_at": "2026-10-17T02:20:00Z",
+          "targets": [
+            {
+              "bundle_id": "f2d9d530-fcdf-4e99-8e09-d8bdb487dd83",
+              "revision": 17,
+              "bytes": 24576
+            },
+            {
+              "bundle_id": "2afc76eb-3018-4e4e-b463-f4998ed3bdc0",
+              "revision": 4,
+              "bytes": 40960
+            }
+          ],
+          "excluded": [
+            {
+              "bundle_id": "ab0f3c54-72a8-4a68-8a59-6a16ba0d3186",
+              "reason": "retention_hold"
+            }
+          ],
+          "plan_digest": "sha256:c2a993d7cd8b4e80a9940638cc1fed6187d7e5910926e1fa2705dde47b1fe41d"
+        },
+        "verified_approval_claims": {
+          "approval_id": "apr_6bd4f1",
+          "plan_digest": "sha256:c2a993d7cd8b4e80a9940638cc1fed6187d7e5910926e1fa2705dde47b1fe41d",
+          "tenant_id": "coastwatch-lab",
+          "project_id": "tideline-east",
+          "action": "erase",
+          "execution_principal": "svc:retention-runner",
+          "approved_by": "user:avery.chen",
+          "operation_id": "op_20261017_014",
+          "issued_at": "2026-10-17T01:57:00Z",
+          "expires_at": "2026-10-17T02:15:00Z"
+        }
+      },
+      "criterion_support_and_falsification": [
+        {
+          "criterion_id": "r1",
+          "authored_fact_ids": [
+            "f1",
+            "f2",
+            "f4",
+            "f5",
+            "f6"
+          ],
+          "what_would_falsify_the_product": "The fully valid supplied run still needs a terminal, fresh human action, missing infrastructure, or a policy exception to execute."
+        },
+        {
+          "criterion_id": "r2",
+          "authored_fact_ids": [
+            "f1",
+            "f2",
+            "f3",
+            "f4"
+          ],
+          "what_would_falsify_the_product": "The accepted signed-plan mechanism is rejected categorically or reduced to an unbound confirmation bypass."
+        },
+        {
+          "criterion_id": "r3",
+          "authored_fact_ids": [
+            "f2",
+            "f3",
+            "f4"
+          ],
+          "what_would_falsify_the_product": "Claims are trusted without verification or an artifact with a failed required binding can authorize mutation."
+        },
+        {
+          "criterion_id": "r4",
+          "authored_fact_ids": [
+            "f2",
+            "f5"
+          ],
+          "what_would_falsify_the_product": "The excluded held bundle or a new arrival is added, a changed revision is accepted, or a current hold is overridden."
+        },
+        {
+          "criterion_id": "r5",
+          "authored_fact_ids": [
+            "f6"
+          ],
+          "what_would_falsify_the_product": "Deletion is allowed without the existing durable audit gate or the required identity/scope/result information is lost."
+        },
+        {
+          "criterion_id": "r6",
+          "authored_fact_ids": [
+            "f8"
+          ],
+          "what_would_falsify_the_product": "Review is incomplete or inspecting/validating the artifacts consumes approval, mutates data, or unnecessarily blocks read-only automation."
+        },
+        {
+          "criterion_id": "r7",
+          "authored_fact_ids": [
+            "f7",
+            "f8"
+          ],
+          "what_would_falsify_the_product": "Automation cannot detect the stated result classes or recover the operation ID and per-target results."
+        },
+        {
+          "criterion_id": "r8",
+          "authored_fact_ids": [
+            "f7"
+          ],
+          "what_would_falsify_the_product": "A retry loses operation identity, repeats completed deletion, expands the approved set, or mutates using an expired approval."
+        },
+        {
+          "criterion_id": "r9",
+          "authored_fact_ids": [
+            "f1",
+            "f7"
+          ],
+          "what_would_falsify_the_product": "Expired approval prevents otherwise authorized read-only status, still authorizes mutation, or partial irreversible deletion is presented as undone."
+        },
+        {
+          "criterion_id": "r10",
+          "authored_fact_ids": [
+            "f3",
+            "f4",
+            "f6",
+            "f8"
+          ],
+          "what_would_falsify_the_product": "The proposal leaks signature bytes, invents execution results, or blocks completion pending infrastructure already provided."
+        }
+      ],
+      "acceptable_variation": [
+        "Any command names, option names, confirmation wording, output layout, and numeric exit codes that satisfy the supplied policy, scope, failure, and automation requirements.",
+        "The rubric does not prescribe a preferred answer outline or a target response length."
+      ]
+    }
+  ]
+}

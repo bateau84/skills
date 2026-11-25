@@ -10,7 +10,7 @@
       "expectations": [
         "Places the template at templates/resources/widget.md.tmpl (templates/ directory, no acme_ prefix in the file name)",
         "Template includes the schema placeholder (e.g. {{ .SchemaMarkdown }}) so the generated argument/attribute section still renders",
-        "Places the example at examples/resources/acme_widget/resource.tf (prefix kept for example directories) and pulls it into the template (e.g. via tffile/.HasExample) or relies on the default rendering",
+        "Places a discoverable example under examples/resources/acme_widget/ (provider prefix retained), using resource.tf or a supported resource*.tf variant, and includes it through the template or default example rendering.",
         "States the rendered output is docs/resources/widget.md produced by tfplugindocs generate and should not be hand-edited"
       ],
       "negative_expectations": [
@@ -39,7 +39,7 @@
       "prompt": "Our provider now implements a list resource `acme_server` for terraform query. tfplugindocs generates docs/list-resources/server.md but the page has no example. Where exactly does the example file go and what must it be named?",
       "trap": "List resource examples use the .tfquery.hcl extension, not .tf; agents default to resource.tf or list-resource.tf.",
       "expectations": [
-        "Places the example at examples/list-resources/acme_server/list-resource.tfquery.hcl",
+        "Places the example under examples/list-resources/acme_server/ using list-resource.tfquery.hcl or a supported list-resource*.tfquery.hcl variant, retaining the provider prefix and required query-file extension.",
         "Explains the .tfquery.hcl extension is required for list resource examples",
         "Says to rerun tfplugindocs generate afterwards"
       ],

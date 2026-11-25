@@ -1,0 +1,36 @@
+{
+  "schema": "portable-skills/correction-verification/v1",
+  "fixture_validation": {
+    "command": "python3 -I -B scripts/run_evals.py --validate",
+    "status": "valid",
+    "fixture_cases": 590,
+    "skills": 124,
+    "provider_calls": 0
+  },
+  "harness": {
+    "command": "SKILLS_EVAL_RUNNER_ROOT=<clean pinned checkout> python3 -I -B scripts/run_evals.py --harness-test",
+    "runner_revision": "dbbbf2a0740aee7a9e9035cc14a785a9467b8fb1",
+    "tests_run": 182,
+    "passed": 178,
+    "skipped": 4,
+    "failed": 0,
+    "optional_skips": "MCP SDK dependencies installed by separate reference CI",
+    "test_sources": {
+      "scripts/eval_calibration.py": "775dcfb2c5ec41aa49ce0eeca7dc19b1e95b6d9311286d62b66a36b83edb43bb",
+      "scripts/eval_markdown.py": "53e928e8a7564dd55ce143408d5df3781fd49a27f118153127d483814227abf4",
+      "scripts/tests/test_eval_calibration.py": "f3c5cad109ec3d170784054d5c193e9b7f483f9f147626a86ce8fa0b56421614",
+      "scripts/tests/test_eval_markdown.py": "a3b31e75210f0b8008c6ec60c0e1a60496866533c7f186e328cb38b0eaa1c995"
+    }
+  },
+  "calibration_repeat": {
+    "matched": 6,
+    "total": 6,
+    "report": "calibration/check.json",
+    "private_map": "not in repository"
+  },
+  "response_comparison": {
+    "integrity_check": "revision/check.json",
+    "interpretation": "revision/comparison.json"
+  },
+  "ci": "Final-commit workflow runs are linked from PR #39 after publication."
+}

@@ -1,0 +1,26 @@
+{
+  "schema": "portable-skills/correction-review-summary/v1",
+  "kind": "maintainer summary of separate read-only review context",
+  "reviewed_base": "8e6f6514eccdab14e4cd18bd0be82d1d18ed69e3",
+  "findings": {
+    "MAJOR-01": "closed after opaque export, mapping/packet binding, and retained shuffled report order",
+    "MAJOR-02": "closed after full 45-case semantic audit and independent Pydantic/terraform-docs amendments",
+    "MAJOR-03": "closed after reconciling transaction ownership, session cleanup and run_sync guidance",
+    "MINOR-01": "closed after basis-specific summary and mixed/legacy report tests"
+  },
+  "independently_verified_audit": {
+    "cases": 45,
+    "corrected": 16,
+    "retained": 29,
+    "text_changed": 13,
+    "type_changed": 4,
+    "overlap": 1,
+    "reviewed_and_revised_normalized_hashes": "all matched",
+    "case_set": "exactly the preexisting cases gaining metadata between baseline and reviewed head"
+  },
+  "limits": [
+    "Source and risk-based runtime review, not independent reproduction of every probe.",
+    "The domain reviewer did not read revision-trial materials or private calibration records.",
+    "No general model-performance improvement claim."
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "cases": [
+    {
+      "id": "c-f54c1f524bb6cda63028adef4453d958",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": false,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": false,
+            "evidence": "The response makes status --json and the payload {\"ok\": true} acceptance criteria, although the prompt leaves both the public option and schema undecided."
+          }
+        ],
+        "violations": [
+          {
+            "id": "N1",
+            "violated": true,
+            "evidence": "The title names status --json and the acceptance criteria give that invocation a specific output."
+          }
+        ],
+        "trap_observed": true,
+        "trap_evidence": "The response fixes the flag and schema in the acceptance criteria, then says, 'The owner can adjust these names later.'",
+        "summary": "The draft keeps human output unchanged but turns undecided interface details into acceptance criteria."
+      }
+    },
+    {
+      "id": "c-a7d473efc13fc2ae95b694f1539a7bcd",
+      "judgment": {
+        "schema": "portable-skills/judgment-abstention/v1",
+        "reason": "missing-input",
+        "evidence": "The setup record says 'no repository files or execution tool were supplied to the target or judge.' The repository and test execution environment are essential inputs for applying and verifying the parser change."
+      }
+    },
+    {
+      "id": "c-1092e09cec38cec9c380ad8408eb1d9a",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": true,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": true,
+            "evidence": "The signature specifies items: Iterable[User], pattern: str, and a User | None return type. The loop only iterates over items."
+          }
+        ],
+        "violations": [],
+        "trap_observed": false,
+        "trap_evidence": "The response uses Iterable[User], which the rubric explicitly accepts for the read-only input.",
+        "summary": "The annotations match the function's inputs and its two possible return values."
+      }
+    },
+    {
+      "id": "c-1d1e57a841846216d0274d21b50e6067",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": false,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": false,
+            "evidence": "The Changes section says, 'On a storage error, return false, nil so callers can treat it like a duplicate.' This discards the storage error."
+          },
+          {
+            "id": "E2",
+            "met": true,
+            "evidence": "The response uses Why, Changes, Review, and Verification as headings."
+          }
+        ],
+        "violations": [
+          {
+            "id": "N1",
+            "violated": true,
+            "evidence": "The Changes section explicitly prescribes 'return false, nil' on a storage error."
+          }
+        ],
+        "trap_observed": true,
+        "trap_evidence": "The response uses all four requested headings and calls attention to them in Review while Changes specifies the wrong storage failure behavior.",
+        "summary": "The response follows the preferred format but treats storage failures as duplicates."
+      }
+    },
+    {
+      "id": "c-034d816ca23d51399cf0af1b02fcbd0e",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": true,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": true,
+            "evidence": "The response pairs the blank import of example.com/app/docs with r.GET(\"/swagger/*any\", ginSwagger.WrapHandler(swaggerFiles.Handler))."
+          }
+        ],
+        "violations": [
+          {
+            "id": "N1",
+            "violated": false,
+            "evidence": "The response says, 'Do not rerun swag init for this unchanged generated specification.' It recommends regeneration only if the annotations change later."
+          }
+        ],
+        "trap_observed": false,
+        "trap_evidence": "The specified repair is the generated docs import and Swagger route registration. Regeneration appears only as advice for future annotation changes.",
+        "summary": "The response explains how to register the existing docs package and Swagger route."
+      }
+    },
+    {
+      "id": "c-dd3c5a0e1f7fa83e32c79f602d33f99d",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": true,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": true,
+            "evidence": "The plan says to 'first obtain a failing request and reproduce the observed error,' then trace the cause and only then apply the supported repair. The proposed Decode change is conditional on confirmation."
+          }
+        ],
+        "violations": [
+          {
+            "id": "N1",
+            "violated": false,
+            "evidence": "The response calls the suggested cause a 'hypothesis' and explicitly says it made no change."
+          }
+        ],
+        "trap_observed": false,
+        "trap_evidence": "The opening suggestion is qualified by 'only if the failure confirms mishandled Decode errors.' The execution plan makes reproduction and diagnosis prerequisites to applying a repair.",
+        "summary": "The response proposes a testable diagnosis and keeps the repair conditional on the reproduced failure."
+      }
+    }
+  ]
+}

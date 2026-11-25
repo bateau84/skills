@@ -1,0 +1,550 @@
+{
+  "schema": "portable-skills/reclassified-rubric-audit/v1",
+  "reviewed_head": "8e6f6514eccdab14e4cd18bd0be82d1d18ed69e3",
+  "baseline": "056c9b27da4f03ea7a3495359c4e674a9063f0f3",
+  "scope": "All 45 cases that existed at the baseline and acquired evaluation metadata in reviewed PR #39. New cases and 477 untouched legacy cases are outside this audit. This is a source and counterexample audit, not a model rerun.",
+  "summary": {
+    "cases": 45,
+    "changed_cases": 16,
+    "text_corrected_cases": 13,
+    "criterion_type_changed_cases": 4,
+    "convention_reclassified_cases": 3
+  },
+  "primary_sources": [
+    {
+      "url": "https://fastapi.tiangolo.com/advanced/response-directly/",
+      "supports": "Direct Response is passed through; a correct explicit safe payload can satisfy the field contract without a response model."
+    },
+    {
+      "url": "https://github.com/spf13/viper",
+      "supports": "AutomaticEnv with configured prefix/replacer is read through Get methods; typed Get-based mapping is a valid alternative to unmarshalling."
+    },
+    {
+      "url": "https://pkg.go.dev/fmt#Sprintf",
+      "supports": "Sprintf returns one string, unlike Printf returning count and error."
+    },
+    {
+      "url": "https://github.com/swaggo/swag",
+      "supports": "swag produces both registered Go documentation and standalone JSON/YAML specification artifacts."
+    },
+    {
+      "url": "https://github.com/hashicorp/terraform-plugin-docs#conventional-paths",
+      "supports": "Example discovery supports resource*.tf and list-resource*.tfquery.hcl variants under the resource-specific example directories; bare basenames are valid examples, not exclusive names."
+    }
+  ],
+  "cases": [
+    {
+      "id": "SKILL-agent-file-authoring-ContextPolicy-01",
+      "source": "skills/agent-file-authoring/evals/context-policy.json",
+      "disposition": "retained",
+      "reason": "Independent-first and follow-up context are explicit user requirements; preserving read-only permissions and the existing durable handoff follows supplied charter authority.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "17a16e57df9c476f2458ad42ad907a10cf3136c11db7cfea6d4a819dba2564fc",
+      "revised_case_sha256": "17a16e57df9c476f2458ad42ad907a10cf3136c11db7cfea6d4a819dba2564fc"
+    },
+    {
+      "id": "SKILL-architectural-spec-Spec-01",
+      "source": "skills/architectural-spec/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Transport, canonical identity, durability, replay and timeout semantics are accepted inputs. The rubric keeps unspecified retention open and requires interoperable contract details, not a preferred protocol.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "9ba2f2b66039d0e7451f0bfd63fbdc9638def86752306ccbb915da1de1afb3c2",
+      "revised_case_sha256": "9ba2f2b66039d0e7451f0bfd63fbdc9638def86752306ccbb915da1de1afb3c2"
+    },
+    {
+      "id": "SKILL-behavioral-spec-BehavioralSpec-01",
+      "source": "skills/behavioral-spec/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Accepted backup and pre-start cancellation outcomes govern; downstream code and design do not authorize post-start behavior or additional interface contracts.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "abb8eb4d8dcd9dbbff50e3cc9d5d2f81c17f3c4d4b0f348d56ac0f789e06059a",
+      "revised_case_sha256": "abb8eb4d8dcd9dbbff50e3cc9d5d2f81c17f3c4d4b0f348d56ac0f789e06059a"
+    },
+    {
+      "id": "SKILL-design-implementation-di-01",
+      "source": "skills/design-implementation/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The supplied delete promise and irreversible server action justify pending/success/error distinctions; keyboard focus preservation follows the supplied focusable rows. No confirmation or undo feature is required.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "395c8c4394e091e397374588fc6899a67956db62ef7d40f57707f2c2d5e9c9d5",
+      "revised_case_sha256": "395c8c4394e091e397374588fc6899a67956db62ef7d40f57707f2c2d5e9c9d5"
+    },
+    {
+      "id": "SKILL-git-conflicts-gc-03",
+      "source": "skills/git-conflicts/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The request explicitly requires preserving work while completing the current rebase. Scoped preservation and stopping recurrent writes protect that outcome; recovery methods are alternatives.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "5505219cb2763d1afb92a24005b2a6573547fc0a3975b8348e16231af2a42cd5",
+      "revised_case_sha256": "5505219cb2763d1afb92a24005b2a6573547fc0a3975b8348e16231af2a42cd5"
+    },
+    {
+      "id": "SKILL-github-issue-GI-01",
+      "source": "skills/github-issue/evals/github-issue.json",
+      "disposition": "retained",
+      "reason": "The handoff expressly leaves flag/schema/motivation unresolved and supplies no publication capability. Checks, truthful draft status and existing-output/error-code compatibility derive from those facts.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "fb9d10a710fc948ff0e430bfe19e6e522a54424d537afaa348277b3fc5f2bc30",
+      "revised_case_sha256": "fb9d10a710fc948ff0e430bfe19e6e522a54424d537afaa348277b3fc5f2bc30"
+    },
+    {
+      "id": "SKILL-golang-code-style-GSTYLE-NIL-01",
+      "source": "skills/golang-code-style/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Nil slice/map semantics and the difference between optional internal state and an API array are the requested subject. No universal initialization rule is imposed.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "2a9ed607d211b19fc30535f393b4d312b9450ae7fb117f7672504f6ca26890b9",
+      "revised_case_sha256": "2a9ed607d211b19fc30535f393b4d312b9450ae7fb117f7672504f6ca26890b9"
+    },
+    {
+      "id": "SKILL-golang-project-layout-tiny-cli",
+      "source": "skills/golang-project-layout/evals/evals.json",
+      "disposition": "reclassified-convention",
+      "reason": "Co-located tests are useful preferred engineering practice but not an accepted product or path contract in this small-tool prompt. Reclassify E3 as convention; retain the requested module and proportionate layout outcomes.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {
+        "E3": {
+          "before": "outcome",
+          "after": "convention"
+        }
+      },
+      "reviewed_case_sha256": "47e100693ca37f1366d43a61f8cdf1e39b81007e4f52f8bf8c241933a808155f",
+      "revised_case_sha256": "0d550a66ed143ea3d5cce2a0cd247c55b7b57f7d4428875daf76a433e189d9fb"
+    },
+    {
+      "id": "SKILL-golang-project-layout-GLAYOUT-01",
+      "source": "skills/golang-project-layout/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The prompt asks for minimal valid layouts and explicitly questions mandatory cmd/pkg/workspaces. The rubric presents suitable options rather than requiring a particular directory for every project.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "931d570632ce6b56d6cb49b72bc93b534358b337cc811f310a5ebd48e9f664a2",
+      "revised_case_sha256": "931d570632ce6b56d6cb49b72bc93b534358b337cc811f310a5ebd48e9f664a2"
+    },
+    {
+      "id": "SKILL-golang-spf13-viper-VPR-NOTFOUND-01",
+      "source": "skills/golang-spf13-viper/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Optional missing configuration and genuine malformed/read errors are expressly distinguished by the scenario. Matching the actual Go error type is a correctness condition, with equivalent matches permitted.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "790777afcb234ef2b044ef58d6a7c07e8986167fdfafaebc4d1135132267a97d",
+      "revised_case_sha256": "790777afcb234ef2b044ef58d6a7c07e8986167fdfafaebc4d1135132267a97d"
+    },
+    {
+      "id": "SKILL-golang-spf13-viper-VPR-ENV-01",
+      "source": "skills/golang-spf13-viper/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "Fixing the populated typed configuration does not require BindEnv/SetDefault exclusively. An explicit Get-based mapping is valid when it preserves the supplied prefix, replacer and source precedence.",
+      "changed_criterion_text": [
+        "E2"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "1fa3ede9e46bbae0595b0685a391b2857ce1046807d03980f53addd7f494abf2",
+      "revised_case_sha256": "f9154949225619182b75bc2c127533d6374d55d4acde308d40458df787e890bc"
+    },
+    {
+      "id": "SKILL-golang-swagger-1",
+      "source": "skills/golang-swagger/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "The request requires a working Swagger UI at the given path using an existing specification, not exact handler imports or one route pattern. Permit correct alternative serving, including existing generated schema files; registry import remains necessary only for registry-backed serving.",
+      "changed_criterion_text": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "T1"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "12c5ae5abd2b4c75344169898f1b57b9b6e7f79136fc3019f15f196c4a0cbe15",
+      "revised_case_sha256": "02ba317862067bc21272d0d5e4a8e30707f61787bf2f077423dcd0911d1ed717"
+    },
+    {
+      "id": "SKILL-golang-troubleshooting-1",
+      "source": "skills/golang-troubleshooting/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "Reproduction before speculative repair is an evidence requirement. Requiring an automated test specifically excludes a valid controlled request reproduction; broaden E5 without weakening the evidence boundary.",
+      "changed_criterion_text": [
+        "E5"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "caf95e689d6f801ce868683fad6f3bdc07baf96f6583f46622764eb1c46d3700",
+      "revised_case_sha256": "64bf78f008f38041228d18edc4f8e5c8bd5cf18fd22c7be403507f8e97bcc891"
+    },
+    {
+      "id": "SKILL-golang-tui-GTUI-FOCUS-01",
+      "source": "skills/golang-tui/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The prompt asks to correct clamped bounds; wraparound would change the supplied navigation behavior. Exact clamp semantics are therefore an outcome, not a style preference.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "e2735f1c1c7ec03bf80b79c8e19ffc6dbc2fadb70bbba72096dd00cdf16cff9e",
+      "revised_case_sha256": "e2735f1c1c7ec03bf80b79c8e19ffc6dbc2fadb70bbba72096dd00cdf16cff9e"
+    },
+    {
+      "id": "SKILL-golang-tui-GTUI-CONFIG-01",
+      "source": "skills/golang-tui/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "The prompt permits either an error-return or sane panic pattern. fmt.Sprintf produces a single string and is a valid panic argument; E2 must not require fmt.Errorf as the only formatting path.",
+      "changed_criterion_text": [
+        "E2"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "c0ec9439fbe8075710033ef5afe6ea87162c7249045f2b0b4ccd4feed3d182e3",
+      "revised_case_sha256": "6292a09d7d37bd5a9baeadbc3c4f0c5b07f4bc1d6ad1db56ecd7d31219dd6876"
+    },
+    {
+      "id": "SKILL-interaction-design-IxD-01",
+      "source": "skills/interaction-design/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "The migration CLI has no automated-apply requirement. Accept safe non-interactive refusal, retain non-interactive read/list and explicit confirmation, allow clear list presentations, and leave numeric nonzero mappings unconstrained.",
+      "changed_criterion_text": [
+        "E3",
+        "E4",
+        "E5",
+        "N3"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "8dacdb9391df672d8b84e90886eea71a023c3073dfb1756aad511f5da3c302c5",
+      "revised_case_sha256": "b9abf7a6b01c74e1c19192943d955b28fc438c51604de5113c5bc0a4083e00f8"
+    },
+    {
+      "id": "SKILL-opentelemetry-otel-01",
+      "source": "skills/opentelemetry/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The direct Grafana Cloud route, region and supplied credential shape justify the endpoint/protocol and newline-safe header requirements; successful telemetry is not inferred from a malformed probe response.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "bdeaa43ba192707640dca235033acd1ef5dc5229e168996f3e0653f884e21568",
+      "revised_case_sha256": "bdeaa43ba192707640dca235033acd1ef5dc5229e168996f3e0653f884e21568"
+    },
+    {
+      "id": "SKILL-opentelemetry-otel-02",
+      "source": "skills/opentelemetry/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The requested operator/language/collector topology requires compatible export protocols, webhook certificates and pod-template injection. These are integration dependencies, not additional product features.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "e742e04219d4cebe33f5312dc04876994a3040e0a88d4cf5f9c4e182cb6f176a",
+      "revised_case_sha256": "e742e04219d4cebe33f5312dc04876994a3040e0a88d4cf5f9c4e182cb6f176a"
+    },
+    {
+      "id": "SKILL-opentelemetry-otel-03",
+      "source": "skills/opentelemetry/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The requested sampling guarantees and continued on-call dashboards justify unsampled metric generation before sampling; the rubric permits equivalent metric-generation components.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "a6fc7f322d7ac022418cebdb31cd5eb899ee75f7c5ce62756f57504910358f0a",
+      "revised_case_sha256": "a6fc7f322d7ac022418cebdb31cd5eb899ee75f7c5ce62756f57504910358f0a"
+    },
+    {
+      "id": "SKILL-pr-educational-body-1",
+      "source": "skills/pr-educational-body/evals/evals.json",
+      "disposition": "reclassified-convention",
+      "reason": "Concern grouping is an organizational convention rather than an accepted section/layout contract. Reclassify E3; retain factual security behavior, accepted client requirements and supplied verification as outcomes.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {
+        "E3": {
+          "before": "outcome",
+          "after": "convention"
+        }
+      },
+      "reviewed_case_sha256": "89f5a36303192a1aa25ed25bf7c30492649ab844f0d6506ac302bfae0ecfd089",
+      "revised_case_sha256": "cb45f03a10b2d45c6485c5777e020f9d2efa2642ad777b9b05f757bfe0bdbb80"
+    },
+    {
+      "id": "SKILL-pr-educational-body-2",
+      "source": "skills/pr-educational-body/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The user requests a short draft for a complete two-file fix; concise correct failure/fix and supplied test evidence fulfill that task without prescribed headings.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "4e5456574cfd48f9eb93387abfb32ba496f59f87bb3fa7f65b07f0cf801d4c4d",
+      "revised_case_sha256": "4e5456574cfd48f9eb93387abfb32ba496f59f87bb3fa7f65b07f0cf801d4c4d"
+    },
+    {
+      "id": "SKILL-pr-educational-body-3",
+      "source": "skills/pr-educational-body/evals/evals.json",
+      "disposition": "reclassified-convention",
+      "reason": "Grouping interface/retry/verification by concern is a presentation convention. Reclassify E2; policy preservation, supplied rationale, useful review context and honest verification remain outcomes.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {
+        "E2": {
+          "before": "outcome",
+          "after": "convention"
+        }
+      },
+      "reviewed_case_sha256": "6a8ab4a82edfce8e4cf267860759be7477d145447915f6500b6ef0f8876c2985",
+      "revised_case_sha256": "e65270244b8b79f854949a45f3749df9c50c14c8bbec1942f5e89c9b53c50481"
+    },
+    {
+      "id": "SKILL-pr-educational-body-4",
+      "source": "skills/pr-educational-body/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The cache policy, freshness trade-off and lack of measured validation are expressly supplied. The rubric forbids invented rationale or benchmark results without banning domain vocabulary.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "ea51f08ff491b7fc57e4e6f72246674432031966bb4e258872627a7e08aa42a6",
+      "revised_case_sha256": "ea51f08ff491b7fc57e4e6f72246674432031966bb4e258872627a7e08aa42a6"
+    },
+    {
+      "id": "SKILL-pr-educational-body-5",
+      "source": "skills/pr-educational-body/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The rolling limit, accepted timestamp storage cost and supplied tests are explicit facts. The rubric requires faithful explanation without exact heading names.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "4644d9f4b6b1065c27c7faea815e16cf50d15241552ee9f120f9ca347e00fbb1",
+      "revised_case_sha256": "4644d9f4b6b1065c27c7faea815e16cf50d15241552ee9f120f9ca347e00fbb1"
+    },
+    {
+      "id": "SKILL-pr-educational-body-6",
+      "source": "skills/pr-educational-body/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Conventional Commit formatting is an outcome here because repository policy expressly requires it; this differs from an unstated preferred heading convention.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "b831a5fe4514c7a5e448fdbd255ddbd73ec7d550704d32087e86e15da479e913",
+      "revised_case_sha256": "b831a5fe4514c7a5e448fdbd255ddbd73ec7d550704d32087e86e15da479e913"
+    },
+    {
+      "id": "SKILL-pr-educational-body-7",
+      "source": "skills/pr-educational-body/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The existing PR replacement, title policy, account-audit purpose, current filter and preserved authorization are supplied requirements; no remote write is available.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "342d59c66e1f08b3a37226b0496b56c5dab65605eef231d3d0d39954f42bdc49",
+      "revised_case_sha256": "342d59c66e1f08b3a37226b0496b56c5dab65605eef231d3d0d39954f42bdc49"
+    },
+    {
+      "id": "SKILL-promql-p4",
+      "source": "skills/promql/evals/evals.json",
+      "disposition": "retained",
+      "reason": "No-data rather than healthy zero is an explicitly accepted display policy in this scenario. Denominator filtering or equivalent behavior preserves it.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "e6c6ca8cff4feeb5b43c82a55d06e48d39df4830e2389be2250cb39e9a39e6e6",
+      "revised_case_sha256": "e6c6ca8cff4feeb5b43c82a55d06e48d39df4830e2389be2250cb39e9a39e6e6"
+    },
+    {
+      "id": "SKILL-python-async-1",
+      "source": "skills/python-async/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "Frequent client creation loses pooling, but the scenario does not authorize a universal global-client rule or prove the code inherently incorrect. Scope the recommendation to lifecycle/efficiency and preserve concrete isolation needs.",
+      "changed_criterion_text": [
+        "E1",
+        "E2",
+        "E4",
+        "T1"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "7dc73d966a2cfebf9db98591e2f47fb7295d585fdb58a98b51bfda85427c6ce9",
+      "revised_case_sha256": "5da1129fd09fc1d6c3b99dc1446b6c23100dba1426e21e2da491d62d46641e03"
+    },
+    {
+      "id": "SKILL-python-async-2",
+      "source": "skills/python-async/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Concurrent start, sibling cancellation, cleanup and all-or-nothing results are explicit requirements. TaskGroup and equivalent correct cancellation/join implementations remain valid.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "a2c7604583bc6d5a1456830e72509ff7d8b4b1eb60be1124eea823075258ac63",
+      "revised_case_sha256": "a2c7604583bc6d5a1456830e72509ff7d8b4b1eb60be1124eea823075258ac63"
+    },
+    {
+      "id": "SKILL-python-async-3",
+      "source": "skills/python-async/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The async route directly calls the helper on the running loop; the rubric accepts an async call chain or a justified valid bridge and rejects only incorrect use of asyncio.run/to_thread.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "568c2d4c93f8fa2dc3c9fb5e115e3ca4faacf0a7162787d2ac2bd3b1f95b8ac6",
+      "revised_case_sha256": "568c2d4c93f8fa2dc3c9fb5e115e3ca4faacf0a7162787d2ac2bd3b1f95b8ac6"
+    },
+    {
+      "id": "SKILL-python-common-practice-1",
+      "source": "skills/python-common-practice/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The repository explicitly requires the named uv/Ruff/pytest/mypy commands. Inspecting failures, correcting and rerunning is necessary to support completion; no execution is claimed.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "2d7264b5236248fd9da191481c7a782169d8104f798f3fe0818d69ec1e36a073",
+      "revised_case_sha256": "2d7264b5236248fd9da191481c7a782169d8104f798f3fe0818d69ec1e36a073"
+    },
+    {
+      "id": "SKILL-python-common-practice-2",
+      "source": "skills/python-common-practice/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The supplied repo configures Ruff and pytest only and lacks execution proof. The rubric preserves that toolchain and asks for causal evidence, not new dependencies or simultaneous speculative fixes.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "04808aeea6a653290d57ad40aecc8532a01bd80f1f2ce127e8fa26713239dc77",
+      "revised_case_sha256": "04808aeea6a653290d57ad40aecc8532a01bd80f1f2ce127e8fa26713239dc77"
+    },
+    {
+      "id": "SKILL-python-fastapi-1",
+      "source": "skills/python-fastapi/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "The accepted response contract is a three-field allowlist, not a response_model requirement. Correct direct Responses or explicit safe serialization must be accepted consistently with E3.",
+      "changed_criterion_text": [
+        "E1"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "19ec506c553a601068eaab61ae93de012beb846577340a5bf25e3bd8834c5948",
+      "revised_case_sha256": "f7416aeece85a2e48583a141f19b5a359b497b90259171bf1c9721ec54c22b61"
+    },
+    {
+      "id": "SKILL-python-fastapi-2",
+      "source": "skills/python-fastapi/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "The prompt requires application-owned startup/shutdown resources, not the exact app.state attribute. Broaden E2 to suitable application-owned attachment; lifespan/on_event preferences stay conventions.",
+      "changed_criterion_text": [
+        "E2"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "30329d8455d7e169daeb253bae6f5fbf47e9e0832c4a3938e7d2e2c06e6b40ee",
+      "revised_case_sha256": "0e7401c8d0d38e09b8c6fbbd3e24a38119df6119ef00a8fa6305a0dcb9fae1a0"
+    },
+    {
+      "id": "SKILL-python-fastapi-3",
+      "source": "skills/python-fastapi/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "The missing-client 503 precondition and nonduplicated route logic are explicit requirements. Narrow the trap to duplication and classify it as outcome; Depends remains a separately labeled convention.",
+      "changed_criterion_text": [
+        "T1"
+      ],
+      "changed_criterion_types": {
+        "T1": {
+          "before": "convention",
+          "after": "outcome"
+        }
+      },
+      "reviewed_case_sha256": "9dda1e2575833a1365f067255497d05da05f4dbcd6250a23ba613fcdfe3c1f09",
+      "revised_case_sha256": "c05a8418c2078cb85548bca5093fb65c33bb98df654e5256601d3d4ca62e232a"
+    },
+    {
+      "id": "SKILL-python-pydantic-1",
+      "source": "skills/python-pydantic/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "Prefix, environment-over-.env-over-default precedence, integer types, inclusive range and startup rejection are explicit requirements. E2 and E4 now test those behaviors without requiring an env_prefix setting or construction-time-only validation; T1 tests actual behavior rather than parser/API preference. BaseSettings, Field and direct-env idioms remain conventions. Independent review caught the residual E2/E4 constraints after the initial trap correction.",
+      "changed_criterion_text": [
+        "E2",
+        "E4",
+        "T1"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "d6d872b3df50006e896d84dff02d51d9589067e8612ab9b07623b03469e04cfa",
+      "revised_case_sha256": "ec09068063474dbef7fc4e8f4944c866235b0d724e1c6510de2086fe256663a3"
+    },
+    {
+      "id": "SKILL-python-pydantic-2",
+      "source": "skills/python-pydantic/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Never exposing the API key in diagnostics is explicit. SecretStr is an example, and demonstrated equivalent redaction/exclusion remains valid.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "842e9c5befdda447b9cb904d8ccbcc880ca45f7c7507eaeda44a9a3e79eaae05",
+      "revised_case_sha256": "842e9c5befdda447b9cb904d8ccbcc880ca45f7c7507eaeda44a9a3e79eaae05"
+    },
+    {
+      "id": "SKILL-python-pydantic-3",
+      "source": "skills/python-pydantic/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Allowed values and generated-schema closure are explicit. Literal/Enum spelling remains a convention; unrestricted schema or accepted extra values remains an outcome defect.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "3793680c6c72552f189fca8c5f01c7c455a3534f07fa68d2d646e5fa36c8ba10",
+      "revised_case_sha256": "3793680c6c72552f189fca8c5f01c7c455a3534f07fa68d2d646e5fa36c8ba10"
+    },
+    {
+      "id": "SKILL-python-type-checking-1",
+      "source": "skills/python-type-checking/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Iteration-only input and optional result follow the supplied implementation; valid iterable abstractions pass. Modern spelling is separately classified as convention.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "89bbc96a1c25f60b227610232fb462aab569fcc8ab74ababc795e35dd5b404c9",
+      "revised_case_sha256": "89bbc96a1c25f60b227610232fb462aab569fcc8ab74ababc795e35dd5b404c9"
+    },
+    {
+      "id": "SKILL-software-engineering-SoftwareEngineering-01",
+      "source": "skills/software-engineering/evals/evals.json",
+      "disposition": "retained",
+      "reason": "The scenario supplies a bounded existing Store, exact duplicate/error semantics and a confirmed unused superseded path. The rubric preserves those facts and rejects hypothetical backends rather than any justified abstraction.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "ec4950cf59f157003a017a5c36f918ff2e7c630bfca4c7d99b622dd629f4bbf2",
+      "revised_case_sha256": "ec4950cf59f157003a017a5c36f918ff2e7c630bfca4c7d99b622dd629f4bbf2"
+    },
+    {
+      "id": "SKILL-sqlite-SQLite-01",
+      "source": "skills/sqlite/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Pooling, foreign-key scope and retention of the existing driver/schema are supplied. Multi-connection checks and separate orphan inspection establish the requested repair rather than require a preferred driver.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "13d74050d0594ae80229a439cc70e9c52192f329fa5f90d3353aebdc0c497abc",
+      "revised_case_sha256": "13d74050d0594ae80229a439cc70e9c52192f329fa5f90d3353aebdc0c497abc"
+    },
+    {
+      "id": "SKILL-terraform-module-testing-TFTEST-MOCK-01",
+      "source": "skills/terraform-module-testing/evals/evals.json",
+      "disposition": "retained",
+      "reason": "Pinned Terraform 1.10.5 and fully mocked providers are explicit, so mocked apply is the supported way to materialize the given computed ID. Upgrade-only syntax remains conditional.",
+      "changed_criterion_text": [],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "e9fadbfc49bebc2911fde8f7f78e267f4ccc4cc3af12e9360c3f22b7207a725a",
+      "revised_case_sha256": "e9fadbfc49bebc2911fde8f7f78e267f4ccc4cc3af12e9360c3f22b7207a725a"
+    },
+    {
+      "id": "SKILL-terraform-provider-docs-tpd-01",
+      "source": "skills/terraform-provider-docs/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "Exact template/output paths and generated schema preservation are tool requirements. The original E3 incorrectly restricted examples to resource.tf; supported resource*.tf variants are equally discoverable. Retain the example directory/provider prefix and require actual template inclusion. Found during independent review of the initial retained disposition.",
+      "changed_criterion_text": [
+        "E3"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "9245b122c5b9fc3b068f2163201edd2ad692b36329ebbdd8d82b3eb321bc18a2",
+      "revised_case_sha256": "033ee26d29bdde2541b461b8b1d9d5f8faed90b9914dd0d95197df4fe93c3334"
+    },
+    {
+      "id": "SKILL-terraform-provider-docs-tpd-04",
+      "source": "skills/terraform-provider-docs/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "The example directory/provider prefix and .tfquery.hcl extension are generator requirements. The original E1 incorrectly excluded supported list-resource*.tfquery.hcl variants; allow these without accepting .tf files or manual generated-doc edits. Found during independent review of the initial retained disposition.",
+      "changed_criterion_text": [
+        "E1"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "0f6a9b3e16e4bc405c8b91fe7ffef18158db37846334afd6ff1c5e062968d7f1",
+      "revised_case_sha256": "9a9899473efbdc0842bc8bd4fd236e5a6a4847f986c2d3205a06a73648cbb066"
+    },
+    {
+      "id": "SKILL-web-ui-design-Web-01",
+      "source": "skills/web-ui-design/evals/evals.json",
+      "disposition": "corrected",
+      "reason": "The navigation brief does not mandate shareable tabs or task panels, and N4 already permits an intentional trade-off. Require a coherent explicit URL/history/reload/sharing contract and preserve any accepted one; do not silently demand additional shareability.",
+      "changed_criterion_text": [
+        "E1",
+        "E4",
+        "E5",
+        "E6",
+        "E7"
+      ],
+      "changed_criterion_types": {},
+      "reviewed_case_sha256": "bc82985bcd6c4564cb6a6e42d103179f3d112874dad7e24e63dabe46f39e72b1",
+      "revised_case_sha256": "14d46bfd96b9ba85c3e9f8c2be6e35351bedbb3e362321fe33959d35ae3d86fa"
+    }
+  ]
+}

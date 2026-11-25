@@ -1,0 +1,61 @@
+{
+  "schema": "portable-skills/rubric-counterexample/v1",
+  "case_id": "SKILL-interaction-design-IxD-01",
+  "origin": "Reviewer-supplied valid alternative: noninteractive listing and interactive-only migration application, with safe noninteractive refusal.",
+  "case_data": {
+    "skill": "interaction-design",
+    "source_id": "IxD-01",
+    "prompt": "We're building a CLI tool for database migrations. Users run it before deploying to production. It should show the list of pending migrations, let the user review them, and confirm before applying. Design the interaction for this CLI tool.",
+    "common_instruction": "",
+    "expectations": [
+      "Designer must recognize this is a stateless command-response interaction model, not a web or TUI model — the tool runs, presents output, and exits",
+      "Designer must specify the stdout/stderr contract: which output goes where, how exit codes signal success vs failure",
+      "Documents exit 0 for successful command completion and coherent statuses for declined/refused application and execution failure. Actual migration failure and a refused non-interactive apply return nonzero; no specific nonzero numeric mapping is prescribed.",
+      "Defines behavior without interactive input: listing pending migrations remains usable, and applying either safely refuses with a clear diagnostic/nonzero status or uses an explicitly described confirmation mechanism suitable for automation. A --yes or equivalent bypass is an optional design choice, not a required product capability.",
+      "Specifies a readable list of pending migrations sufficient for review; a numbered list, table or another clear presentation is valid. Machine-readable output is optional unless an accepted consumer contract requires it.",
+      "Designer must specify the feedback model during migration application: what appears on stderr as migrations execute (progress), what appears on stdout when complete",
+      "The confirmation interaction must be specified as a text prompt (Y/N or similar) in interactive mode, not as a modal dialog or button"
+    ],
+    "must_not": [
+      "Designer must not specify modal dialogs, hover states, button labels, or visual affordances that do not exist in a CLI stateless command-response context",
+      "Designer must not omit exit code semantics — exit 0 on migration failure is a named failure mode that breaks pipeline composition",
+      "Must not hang waiting for unavailable interactive input or apply without the confirmation required by the proposed design. Safely rejecting non-interactive application is valid; omitting --yes or a scripting bypass is not itself a violation.",
+      "Designer must not produce a spec that could equally apply to a web UI with terminology substitution — the design must be grounded in CLI-specific interaction constraints"
+    ],
+    "trap": "Designer designs interaction for web and adapts terminology for CLI without addressing the stateless command-response model — produces a CLI spec with visual affordances (hover, persistent state, animations), modal dialogs, or interaction patterns that assume a stateful event loop. The surface model change (from async DOM to stateless command-response) is not addressed.",
+    "evaluation": {
+      "mode": "response",
+      "purpose": "contrast",
+      "criterion_types": {
+        "E1": "outcome",
+        "E2": "outcome",
+        "E3": "outcome",
+        "E4": "outcome",
+        "E5": "outcome",
+        "E6": "outcome",
+        "E7": "outcome",
+        "N1": "outcome",
+        "N2": "outcome",
+        "N3": "outcome",
+        "N4": "outcome",
+        "T1": "outcome"
+      }
+    }
+  },
+  "response": "Use two ordinary commands, each of which prints a result and exits; this is not a full-screen TUI.\n\n`migrate list` is read-only and works without a terminal. It prints a numbered list of pending migration IDs, names and available summaries to stdout so an operator can review the work. An empty list reports that no migrations are pending and exits 0. Discovery failures go to stderr and return 1.\n\n`migrate apply` is deliberately interactive-only. Before any migration is applied, require a usable terminal, show the target database and pending list, and ask `Apply these migrations? [y/N]` on the terminal/stderr channel. Only an affirmative answer applies them; a negative answer or EOF applies nothing, prints that the operation was declined, and returns 2. If interactive confirmation is unavailable, print `Application requires interactive confirmation; run this command in a terminal` to stderr and return 3 without applying anything. There is no --yes or non-interactive application bypass in this design.\n\nWhile confirmed migrations run, write progress and warnings to stderr. After authoritative successful completion, write the completed-migration summary to stdout and exit 0. If execution fails, print the failure and known completed/pending state to stderr and return 1; do not claim everything applied or promise rollback that the migration engine has not confirmed. Leave stdout for list/result data, not diagnostic failures. The numeric status mapping is part of this proposed design and should be documented in help.\n\nThese are proposed interaction semantics; no CLI or database execution was performed.",
+  "source_review": {
+    "expected_positive_rules": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "E7"
+    ],
+    "expected_violations": [],
+    "expected_trap_observed": false,
+    "decisive_reason": "Read/list is usable without interaction, but automated apply was never required. Clear nonzero refusal before mutation satisfies the confirmation requirement. Original E4/N3 would reject this solely for omitting a bypass. Revised E4/N3 accept it while still rejecting hangs or unconfirmed mutation.",
+    "not_a_model_observation": true
+  }
+}

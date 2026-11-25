@@ -7,7 +7,7 @@
       "prompt": "This endpoint returns a User database object that includes `password_hash` and `internal_notes`. The HTTP response must expose only `id`, `email`, and `display_name`.\n\n```python\n@router.get('/users/{id}')\nasync def get_user(id: str):\n    return db.get_user(id)   # returns the full User object\n```",
       "trap": "A raw database object can leak fields when no public serialization boundary is applied. Merely naming a response model does not protect a directly returned JSONResponse.",
       "expectations": [
-        "Declares a public response shape limiting fields to id, email and display_name through a supported return annotation or response_model.",
+        "Defines the public response shape as only id, email and display_name, using a supported return annotation/response_model or an equivalently explicit safe allowlist/serialization boundary. A correctly constructed direct Response is valid.",
         "Ensures password_hash and internal_notes cannot appear in the HTTP response.",
         "Uses a valid filtering/serialization path for the returned object; a direct Response must receive an explicitly safe payload."
       ],
@@ -29,7 +29,7 @@
       "trap": "Creates clients per request or fails to own and close shared application resources across startup and shutdown.",
       "expectations": [
         "Uses the lifespan context manager (asynccontextmanager + FastAPI(lifespan=...))",
-        "Stores the shared resources on app.state and closes/stops them reliably on shutdown.",
+        "Attaches the shared resources to the application, for example on app.state, and closes/stops them reliably on shutdown. Another suitable application-owned attachment is valid.",
         "Does NOT use the deprecated @app.on_event handlers",
         "Opens the httpx client once at startup, not per request"
       ],
@@ -49,7 +49,7 @@
       "id": 3,
       "name": "auth-precondition-dependency",
       "prompt": "Several endpoints require an authenticated YouTube client available at `request.app.state.youtube`, and should return 503 when it is missing. Add this precondition without repeating the check in every route body.",
-      "trap": "The obvious solution copies an `if state.youtube is None: raise HTTPException(503)` into each handler. FastAPI's Depends lets one dependency raise the 503 and short-circuit, declared once and reused.",
+      "trap": "Duplicates the missing-client precondition in each route body instead of sharing it, contrary to the stated task. Depends is one suitable mechanism, not the only valid shared precondition.",
       "expectations": [
         "Returns HTTP 503 before handler work when request.app.state.youtube is missing, and allows the route to use the available client otherwise.",
         "Shares the precondition across routes without duplicating the missing-client check in each route body.",
@@ -62,7 +62,7 @@
           "E1": "outcome",
           "E2": "outcome",
           "E3": "convention",
-          "T1": "convention"
+          "T1": "outcome"
         }
       }
     },

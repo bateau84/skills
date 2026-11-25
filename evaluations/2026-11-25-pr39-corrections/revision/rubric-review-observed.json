@@ -1,0 +1,56 @@
+{
+  "criteria": [
+    {
+      "id": "r1",
+      "status": "aligned",
+      "evidence": "The prompt expressly requires a concrete unattended invocation using the supplied plan and approval files, authenticated runner svc:retention-runner, and operation ID op_20261017_014. It also says that the accepted policy must be supported and that a valid scheduled execution has no terminal and must finish without human input. The criterion tests those requirements without fixing command names, flag spelling, or how the existing authenticated runner context is supplied."
+    },
+    {
+      "id": "r2",
+      "status": "aligned",
+      "evidence": "The prompt authorizes unattended erasure when an authorized human has signed an exact immutable plan. It supplies an existing signed approval and explicitly requires support for that policy. Rejecting a blanket interactive-only rule or an unbound yes/force flag follows that authorization model. The criterion does not prohibit an additional noninteractive acknowledgement flag when actual authorization still comes from the verified signed approval."
+    },
+    {
+      "id": "r3",
+      "status": "aligned",
+      "evidence": "The prompt says the displayed claim set is not a substitute for verifying the file at execution and supplies verify_approval(file_path, principal, now), which checks signature, authorized issuer, revocation, principal binding, and approval expiry. It separately requires plan expiry, action, tenant/project, operation ID, and plan-digest binding before mutation. Its unattended operation and useful machine-readable refusal requirements support noninteractive errors. Read in that context, 'altered artifacts' means artifacts that fail the required authenticity or binding checks, not a legitimately issued replacement approval that passes them."
+    },
+    {
+      "id": "r4",
+      "status": "aligned",
+      "evidence": "The prompt specifies immutable target IDs and revisions, excludes the held bundle from approved scope, forbids expansion to newly arrived bundles, and requires rejection without mutation when an included revision changes or an included target gains a hold. It also requires a distinguishable stale-plan state. The criterion preserves those facts. Its pre-deletion refusal is a rule for the current request; it should not be read as claiming that earlier completed deletions disappear after a later retry is refused."
+    },
+    {
+      "id": "r5",
+      "status": "aligned",
+      "evidence": "The prompt explicitly assigns the durable pre-acceptance audit gate and the listed identity, scope, outcome, and UTC timestamp fields to the existing gateway service. It says no deletion is accepted if audit recording cannot be guaranteed. 'Records or reports ... through the existing service' permits a CLI to rely on that supplied service rather than implement a new audit subsystem, so the criterion accepts the intended architectural alternatives."
+    },
+    {
+      "id": "r6",
+      "status": "ambiguous",
+      "evidence": "The required inspection content and the prohibition on execution or approval consumption directly follow the prompt. The terminal restriction has uncertain scope. The prompt explicitly requires terminal-free scheduled execution, but describes inspection as an operator need and does not explicitly require every optional read-only inspection interface to work without a terminal. If 'without ... requiring a terminal for automation' means that scheduled execution must not depend on an interactive inspection step, it is aligned. If it requires the inspection or validation interface itself to be terminal-free even when optional, it adds a product requirement and could reject a valid design with a terminal-based operator inspector and an independently unattended execution path. Neither supplied response demonstrates this issue, because both offer machine-readable inspection."
+    },
+    {
+      "id": "r7",
+      "status": "aligned",
+      "evidence": "The prompt requires machine-readable results, distinguishable success/refusal/stale-plan/partial-failure states, useful recovery information, and read-only operation-ID status returning durable per-target outcomes. The criterion tests those capabilities and explicitly allows different command names, schemas, and numeric exit codes. A compliant design may expose durable recovery outcomes through its status command rather than manufacture outcomes or timestamps for a local pre-dispatch refusal."
+    },
+    {
+      "id": "r8",
+      "status": "conflicting",
+      "evidence": "The idempotency, operation identity, unchanged target scope, and completed-target protections follow the prompt. The final restriction adds a different requirement: 'only while the same applicable approval remains valid' requires continued validity of the original approval, whereas the prompt permits retry with 'the same approved target set and an approval that is still valid when the retry is accepted.' The prompt binds the target set and operation, not all future retries to one approval identity. A fresh authorized approval for the unchanged plan and operation can satisfy every required verification and binding check after the original approval expires, while the plan remains valid. Anonymous response u-6518734beb6c illustrates that valid alternative exactly: 'If the plan is still current, an authorized human may issue a fresh approval bound to the **same plan digest, scope, execution principal, and operation ID**; the CLI cannot renew or manufacture it.' Anonymous response u-5d02e5b832e7 likewise states exactly: 'A new valid approval may authorize the same operation and unchanged plan while that plan remains valid.' Both distinguish newly authorized mutation from mutation under an expired approval. The literal same-approval restriction can reject these prompt-consistent alternatives."
+    },
+    {
+      "id": "r9",
+      "status": "aligned",
+      "evidence": "The prompt explicitly allows read-only status after approval expiry, prohibits more mutation under an expired approval, says erasure has no undo, and guarantees that idempotent reuse cannot delete an already completed target twice. The criterion follows those requirements. Its reference to falsely describing a deletion as 'safely repeated' concerns repeating the destructive effect; it does not prohibit safe replay of an operation-ID-based request that returns completed outcomes without deleting those targets again. It also does not prohibit a new valid approval for unresolved work."
+    },
+    {
+      "id": "r10",
+      "status": "aligned",
+      "evidence": "The prompt explicitly prohibits logging signature bytes and claiming implementation or execution. It supplies the verifier, gateway enforcement, audit service behavior, durable status, and idempotency, and states that the CLI need not invent an audit service. The criterion appropriately rejects making new infrastructure a prerequisite for capabilities already supplied. It does not forbid proposing ordinary CLI behavior or optional implementation details that preserve those existing capabilities."
+    }
+  ],
+  "comparison_usable": false,
+  "summary": "Eight criteria are aligned with the supplied prompt. r6 has an ambiguous terminal-free requirement that can extend beyond the mandatory unattended execution path. r8 adds a material same-approval restriction where the prompt requires the same approved target set and a currently valid approval. Both anonymous responses explicitly describe a prompt-consistent fresh approval for the same operation and unchanged plan, which the literal r8 restriction can reject. The frozen rubric therefore cannot support an unqualified prompt-faithful comparison as written. This review identifies rubric validity issues only; it does not score or rank the candidate responses."
+}

@@ -5,12 +5,12 @@
       "id": 1,
       "name": "per-request-client",
       "prompt": "A new engineer extracted API calls into helper functions. Review this code for correctness. These helpers are called from FastAPI request handlers — potentially hundreds of times per minute.\n\n```python\n# api_helpers.py\nimport httpx\n\nasync def search_youtube(query: str) -> list:\n    async with httpx.AsyncClient(timeout=30) as client:\n        r = await client.get(\"https://api.youtube.com/search\", params={\"q\": query})\n        return r.json()[\"items\"]\n\nasync def fetch_spotify_track(track_id: str) -> dict:\n    async with httpx.AsyncClient(timeout=30) as client:\n        r = await client.get(f\"https://api.spotify.com/tracks/{track_id}\")\n        return r.json()\n```\n\nIdentify any issues and suggest the correct pattern.",
-      "trap": "Creating `httpx.AsyncClient` inside `async with` per call looks like clean resource management, but destroys the connection pool and TLS session on every call. At high call rates this wastes significant overhead. The skill requires one shared client per service/lifespan, not one per call.",
+      "trap": "Treats per-call cleanup as proof that client lifetime is appropriate for a frequently called path, or replaces it with an unconditional global client without considering ownership and request isolation.",
       "expectations": [
-        "Identifies the per-call AsyncClient creation as an issue",
-        "Recommends a shared/reused AsyncClient (per lifespan or injected as dependency)",
+        "Identifies that per-call AsyncClient creation forfeits connection pooling across these frequently called helpers; distinguishes the efficiency/lifecycle concern from a claim that the async-with code is inherently incorrect.",
+        "Recommends a deliberately scoped reused client, such as an application-lifespan client or injected dependency, while retaining any required configuration or request-isolation boundary.",
         "Notes connection pool or TLS reuse is lost when creating a new client per call",
-        "Does NOT suggest leaving the per-call client creation in place"
+        "Does not dismiss pooling overhead in the supplied hot path; an intentionally shorter client lifetime needs a concrete isolation or lifecycle reason rather than a universal per-call or process-global rule."
       ],
       "evaluation": {
         "mode": "response",

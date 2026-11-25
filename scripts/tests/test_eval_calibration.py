@@ -5,10 +5,12 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from eval_calibration import FIXTURE, check_results, export_packet, load_cases, validate_fixture
+from eval_calibration import (FIXTURE, check_results, check_blinded_results, export_packet,
+                              identity, load_cases, validate_fixture)
 from eval_profile import ABSTENTION_SCHEMA, JUDGE_SCHEMA, JUDGE_SYSTEM, JudgeAbstention, parse_grade
 
 SCRIPT = Path(__file__).resolve().parents[1] / "eval_calibration.py"
@@ -63,20 +65,71 @@ class CalibrationTests(unittest.TestCase):
             with self.subTest(mutation=mutate), self.assertRaises(ValueError):
                 validate_fixture(document)
 
-    def test_export_withholds_oracle_and_preserves_all_judge_inputs(self):
-        packet = export_packet(self.cases)
-        self.assertEqual(packet["system"], JUDGE_SYSTEM)
-        self.assertNotIn('"expected"', json.dumps(packet))
+    def test_export_withholds_source_identifiers_labels_and_original_order(self):
+        # Controlled entropy proves that changing source names or expected labels
+        # cannot change anything the judge sees, including result templates.
+        def export(cases):
+            tokens = [f"{i:032x}" for i in range(len(cases))]
+            with patch("eval_calibration.secrets.token_hex", side_effect=tokens), \
+                 patch("eval_calibration.secrets.SystemRandom") as random:
+                random.return_value.shuffle.side_effect = lambda values: values.reverse()
+                return export_packet(cases)
+        packet, mapping = export(self.cases)
         changed = copy.deepcopy(self.cases)
+        for i, case in enumerate(changed):
+            case["id"] = f"answer-cue-{i}"
         changed[0]["expected"]["met"] = [False]
         changed[3]["expected"]["abstention_reasons"] = ["unobservable"]
-        self.assertEqual(export_packet(changed), packet)
-        for source, exported, template in zip(self.cases, packet["cases"], packet["result_template"]["cases"]):
-            self.assertEqual(exported, {key: source[key] for key in ("id", "case_data", "response")})
-            self.assertEqual(template["id"], source["id"])
+        changed_packet, _ = export(changed)
+        self.assertEqual(changed_packet, packet)
+        serialized = json.dumps(packet)
+        for case in self.cases + changed:
+            self.assertNotIn(case["id"], serialized)
+        self.assertNotIn('"expected"', serialized)
+        self.assertNotIn('"ids"', serialized)
+        self.assertEqual(packet["system"], JUDGE_SYSTEM)
+        self.assertEqual([mapping["ids"][case["id"]] for case in packet["cases"]],
+                         [case["id"] for case in reversed(self.cases)])
+        sources = {case["id"]: case for case in self.cases}
+        for exported, template in zip(packet["cases"], packet["result_template"]["cases"]):
+            source = sources[mapping["ids"][exported["id"]]]
+            self.assertRegex(exported["id"], r"^c-[0-9a-f]{32}$")
+            self.assertEqual(exported["case_data"], source["case_data"])
+            self.assertEqual(exported["response"], source["response"])
+            self.assertEqual(template["id"], exported["id"])
             parse_grade(json.dumps(template["judgment"]), source["case_data"])
         with self.assertRaises(JudgeAbstention):
             parse_grade(json.dumps(packet["abstention_template"]), self.cases[0]["case_data"])
+
+    def test_private_mapping_binds_ids_to_packet_and_frozen_fixture(self):
+        packet, mapping = export_packet(self.cases)
+        reverse = {source: opaque for opaque, source in mapping["ids"].items()}
+        results = copy.deepcopy(self.results)
+        for result in results["cases"]:
+            result["id"] = reverse[result["id"]]
+        report = check_blinded_results(self.cases, results, mapping, packet)
+        self.assertEqual(report["matched"], 6)
+        self.assertEqual(report["packet_sha256"], identity(packet))
+        self.assertEqual({case["id"] for case in report["cases"]}, set(mapping["ids"]))
+        self.assertEqual([case["id"] for case in report["cases"]], [case["id"] for case in packet["cases"]])
+        for mutation in ("swap", "packet", "oracle", "duplicate", "unknown"):
+            with self.subTest(mutation=mutation):
+                cases, result, key, inputs = map(copy.deepcopy, (self.cases, results, mapping, packet))
+                if mutation == "swap":
+                    first, second = list(key["ids"])[:2]
+                    key["ids"][first], key["ids"][second] = key["ids"][second], key["ids"][first]
+                elif mutation == "packet":
+                    inputs["cases"][0]["response"] += " changed"
+                    # Even rebinding the digest must not permit altered inputs.
+                    key["packet_sha256"] = identity(inputs)
+                elif mutation == "oracle":
+                    cases[0]["expected"]["met"] = [False]
+                elif mutation == "duplicate":
+                    result["cases"][-1] = copy.deepcopy(result["cases"][0])
+                else:
+                    result["cases"][0]["id"] = self.cases[0]["id"]
+                with self.assertRaises(ValueError):
+                    check_blinded_results(cases, result, key, inputs)
 
     def test_result_envelope_rejects_missing_duplicate_invalid_and_extra_ids(self):
         for mutate in (
@@ -142,12 +195,24 @@ class CalibrationTests(unittest.TestCase):
             result["judgment"].get("expectations", []).reverse()
         self.assertEqual(check_results(self.cases, self.results), check_results(self.cases, before))
 
-    def test_real_cli_isolated_export_and_check_exit_statuses(self):
+    def test_real_cli_blinded_export_check_and_private_no_clobber_map(self):
         with tempfile.TemporaryDirectory() as temp:
             base = [sys.executable, "-I", "-B", str(SCRIPT)]
-            exported = subprocess.run([*base, "--export"], cwd=temp, capture_output=True, text=True, timeout=10)
+            mapping_path, packet_path = Path(temp) / "private.json", Path(temp) / "packet.json"
+            command = [*base, "--export", "--mapping", str(mapping_path)]
+            exported = subprocess.run(command, cwd=temp, capture_output=True, text=True, timeout=10)
             self.assertEqual(exported.returncode, 0, exported.stderr)
-            self.assertEqual(json.loads(exported.stdout), export_packet(self.cases))
+            packet_path.write_text(exported.stdout, encoding="utf-8")
+            mapping = json.loads(mapping_path.read_text())
+            self.assertEqual(mapping_path.stat().st_mode & 0o777, 0o600)
+            before = mapping_path.read_bytes()
+            again = subprocess.run(command, cwd=temp, capture_output=True, text=True, timeout=10)
+            self.assertEqual(again.returncode, 2)
+            self.assertEqual(again.stdout, "")
+            self.assertEqual(mapping_path.read_bytes(), before)
+            reverse = {source: opaque for opaque, source in mapping["ids"].items()}
+            for result in self.results["cases"]:
+                result["id"] = reverse[result["id"]]
             path = Path(temp) / "observations.json"
             for expected_code in (0, 1, 2):
                 if expected_code == 1:
@@ -155,17 +220,35 @@ class CalibrationTests(unittest.TestCase):
                 elif expected_code == 2:
                     self.results["cases"].pop()
                 path.write_text(json.dumps(self.results), encoding="utf-8")
-                checked = subprocess.run([*base, "--check", str(path)], cwd=temp,
+                checked = subprocess.run([*base, "--check", str(path), "--mapping", str(mapping_path),
+                                          "--packet", str(packet_path)], cwd=temp,
                                          capture_output=True, text=True, timeout=10)
                 self.assertEqual(checked.returncode, expected_code, checked.stderr)
                 if expected_code != 2:
                     self.assertEqual(json.loads(checked.stdout)["status"], "match" if expected_code == 0 else "diff")
                 else:
                     self.assertEqual(checked.stdout, "")
+            for args in (["--export"], ["--check", str(path)],
+                         ["--check", str(path), "--mapping", str(mapping_path)],
+                         ["--export", "--mapping", str(mapping_path), "--legacy-identifiers"]):
+                rejected = subprocess.run([*base, *args], cwd=temp, capture_output=True, text=True, timeout=10)
+                self.assertEqual(rejected.returncode, 2)
+                self.assertEqual(rejected.stdout, "")
             unisolated = subprocess.run([sys.executable, "-B", str(SCRIPT), "--export"], cwd=temp,
                                        capture_output=True, text=True, timeout=10)
             self.assertEqual(unisolated.returncode, 2)
             self.assertIn("python3 -I -B", unisolated.stderr)
+
+    def test_historical_ids_require_an_explicitly_caveated_legacy_check(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "observations.json"
+            path.write_text(json.dumps(self.results))
+            result = subprocess.run([sys.executable, "-I", "-B", str(SCRIPT), "--check", str(path),
+                                     "--legacy-identifiers"], capture_output=True, text=True, timeout=10)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            report = json.loads(result.stdout)
+            self.assertEqual(report["matched"], 6)
+            self.assertIn("not blinded", report["blinding"])
 
     def test_cli_rejects_duplicate_json_keys_and_nonfinite_numbers(self):
         valid = json.dumps(self.results)
@@ -175,7 +258,7 @@ class CalibrationTests(unittest.TestCase):
             with tempfile.TemporaryDirectory() as temp:
                 path = Path(temp) / "invalid.json"
                 path.write_text(text, encoding="utf-8")
-                result = subprocess.run([sys.executable, "-I", "-B", str(SCRIPT), "--check", str(path)],
+                result = subprocess.run([sys.executable, "-I", "-B", str(SCRIPT), "--check", str(path), "--legacy-identifiers"],
                                         capture_output=True, text=True, timeout=10)
                 self.assertEqual(result.returncode, 2, result.stderr)
                 self.assertEqual(result.stdout, "")

@@ -20,6 +20,14 @@ to make grading convenient is not. Split compound criteria when they mix the
 two. Report outcome and convention results separately, with denominators.
 Never let a formatting gain compensate for a correctness regression.
 
+Before marking a criterion as an outcome, try a valid alternative implementation
+and a superficially compliant wrong one. Check that the criterion accepts the
+former and rejects the latter for a reason supplied by the task. Preserve the
+task's quantifiers and authorization boundaries: "a valid approval" does not
+necessarily mean "the original approval," and a CLI does not by itself require
+unattended mutation. Exact API names and filenames need a consumer or tool
+contract that makes alternatives invalid.
+
 ## Make the task answerable
 
 Supply the source files, diff, accepted decisions, tool outputs and environment
@@ -76,6 +84,11 @@ wrong answer to an answerable task. Human/source-based spot checks remain useful
 even when model judges agree. Keep preference and verbosity assessments separate
 from correctness, and do not reward empty brevity.
 
+Calibration packets must also withhold descriptive case IDs and known fixture
+order, not just explicit expected labels. Use opaque IDs and shuffled order,
+keep the packet-bound ID map privately, and test that changing source names or
+expected verdicts cannot change any public judge-input field.
+
 ## Compare revisions without optimizing to a known answer
 
 Freeze a small set of task-local prompts and accepted outcome criteria before
@@ -88,6 +101,12 @@ Retain contrary outcomes and blocked runs. Do not rerun a losing sample until it
 passes or count corrections to one task as independent successes. Repetitions
 measure variation within a case; they do not create new task coverage. Inspect
 both the output and the trajectory when claiming execution quality or cost.
+
+If review discovers that a frozen rubric adds a requirement, or the judge grades
+equivalent behavior differently, retain the original inputs and judgments and mark the
+affected comparison as non-evidence. Do not credit the apparent gain, silently
+rewrite the rubric, or rejudge until the preferred arm wins. A corrected future
+case is a separate observation with its own provenance.
 
 Make the smallest justified method change, preserving positive practices and
 scope. A sound correctness repair can be warranted without a statistically

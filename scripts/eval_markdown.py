@@ -125,12 +125,27 @@ def render_report(runner, store, manifest, artifacts, summary, sanitizer, *, inc
                   "Observed pair policy only (10pp/relevant-trap threshold), not statistical significance, discovery, or general superiority.",
                   "Typed cases compare outcomes separately from conventions. Unclassified legacy rubrics measure conformance only.",
                   "Candidate absolute PASS includes every rubric rule; it is separate from outcome PASS and relative value. Treatment failure prevents attribution."])
-    values = {}
+    classifications = ("material-improvement", "improvement", "neutral", "regression",
+                       "unattributed", "unavailable", "unrecognized-comparison")
+    bases = ("outcome", "convention", "unclassified-rubric", "unknown/unavailable")
+    grouped = {}
     for record in records:
         comparison = record["comparison"]
-        value = comparison["decision"]["classification"] if comparison["decision"] else "unavailable"
-        values[value] = values.get(value, 0) + 1
-    lines.append("- " + ("; ".join(f"{md(k)}: {v}" for k, v in sorted(values.items())) or "No verified comparisons."))
+        decision = comparison["decision"]
+        value = decision["classification"] if decision else "unavailable"
+        basis = decision["data"].get("score_basis") if decision else None
+        basis = basis if basis in bases else "unknown/unavailable"
+        counts = grouped.setdefault(basis, dict.fromkeys(classifications, 0))
+        counts[value] += 1
+    if grouped:
+        lines.extend(["", "Counts below stay separate by scoring basis; they are not a pooled product-improvement total.", "",
+                      "| Scoring basis | " + " | ".join(classifications) + " |",
+                      "| --- | " + " | ".join("---" for _ in classifications) + " |"])
+        for basis in bases:
+            if basis in grouped:
+                lines.append("| " + basis + " | " + " | ".join(str(grouped[basis][key]) for key in classifications) + " |")
+    else:
+        lines.append("- No verified comparisons.")
     lines.extend(["", "## Outcome and convention evidence", "",
                   "Fractions count satisfied criteria, not independent tasks. Each repetition is one observation of the same case.",
                   "A missing axis is unclassified or untested, never a zero or a pass. Case purpose is authored intent; discrimination remains uncalibrated.",

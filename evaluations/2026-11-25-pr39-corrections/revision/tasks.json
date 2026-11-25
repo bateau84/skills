@@ -1,0 +1,137 @@
+{
+  "tasks": [
+    {
+      "opaque_task_id": "c2682d46c3e74011b2abc2578304271a",
+      "skill": "python-database-orm",
+      "prompt": "Please replace the database fixture for this dock-scheduling service. It fails when service functions finish their own transactions, and it must isolate tests without changing those functions.\n\nThe dock-scheduling service runs Python 3.12, pytest, synchronous SQLAlchemy 2.0.36, psycopg 3, and PostgreSQL 16 with working SAVEPOINT support.\n\nA session-scoped db_engine fixture already supplies an Engine. Before these tests start, a separate setup connection has created and committed the schema. Each worker has a dedicated, initially empty schema, and tests within a worker run sequentially.\n\nEvery database operation in the code under test uses the Session passed to it. The service does not open another connection, issue DDL, or manage the physical connection.\n\n```python\n# models.py\nfrom sqlalchemy import String\nfrom sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column\n\nclass Base(DeclarativeBase):\n    pass\n\nclass BayReservation(Base):\n    __tablename__ = \"bay_reservation\"\n    id: Mapped[int] = mapped_column(primary_key=True)\n    job_ref: Mapped[str] = mapped_column(String(40), unique=True)\n    bay_code: Mapped[str] = mapped_column(String(12))\n\n# service.py\nfrom sqlalchemy.exc import IntegrityError\n\ndef reserve_bay(session, job_ref, bay_code):\n    row = BayReservation(job_ref=job_ref, bay_code=bay_code)\n    session.add(row)\n    try:\n        session.commit()\n    except IntegrityError:\n        session.rollback()\n        raise\n    session.refresh(row)\n    return row.id\n\n# conftest.py: current fixture\nimport pytest\nfrom sqlalchemy.orm import Session\n\n@pytest.fixture\ndef db_session(db_engine):\n    with Session(db_engine) as session:\n        with session.begin():\n            yield session\n\n# Representative test body; ordinary imports omitted.\nfirst_id = reserve_bay(db_session, \"job-814\", \"B-07\")\nwith pytest.raises(IntegrityError):\n    reserve_bay(db_session, \"job-814\", \"B-08\")\nsecond_id = reserve_bay(db_session, \"job-815\", \"B-09\")\nassert first_id != second_id\nassert db_session.scalar(select(func.count()).select_from(BayReservation)) == 2\n```\n\nThe application intentionally commits successful reservations and rolls back a failed reservation before raising the error. Those calls must keep their normal meaning within the test: after the duplicate is rejected, the previously successful reservation must still be visible and another reservation must be possible.\n\nThe test fixture must own one physical connection and the final rollback boundary for the whole test. Each test must start with no BayReservation rows left by earlier tests, including when a test raises before finishing.\n\nProduction functions cannot be changed, commit and rollback cannot be mocked or replaced, and cleanup cannot delete rows, TRUNCATE tables, recreate the schema, or commit the test data. Primary-key sequence values do not need to reset.\n\nThis is a design review: provide proposed fixture code and explain transaction ownership and teardown. Do not run anything or claim that the proposal has been executed or tested.",
+      "criteria": [
+        {
+          "id": "r1",
+          "text": "Provides a concrete replacement pytest fixture using the supplied db_engine and synchronous SQLAlchemy APIs, with enough code to identify resource creation, Session configuration, yield, and teardown."
+        },
+        {
+          "id": "r2",
+          "text": "Keeps the test-owned physical transaction and connection alive across application Session.commit() calls; successful application commits cannot commit the outer test boundary."
+        },
+        {
+          "id": "r3",
+          "text": "Preserves the representative test semantics after the handled duplicate: the first successful reservation remains visible, the failed reservation is discarded, and the Session can make the second successful reservation."
+        },
+        {
+          "id": "r4",
+          "text": "Makes all application database work participate in the connection and transaction boundary owned by this test, rather than inadvertently opening an independent engine-bound Session transaction."
+        },
+        {
+          "id": "r5",
+          "text": "Rolls back the complete test-owned boundary and releases Session and connection resources at teardown on both normal completion and an exception from the test; it does not commit test data during cleanup."
+        },
+        {
+          "id": "r6",
+          "text": "Explains why the present Session.begin() scope conflicts with the service ending its Session transaction, and distinguishes the application transaction lifecycle from the test-owned final rollback boundary."
+        },
+        {
+          "id": "r7",
+          "text": "Uses a transaction arrangement compatible with the supplied SQLAlchemy version and PostgreSQL savepoint support. Any correct savepoint or equivalent arrangement is acceptable; a session-only rollback after application commits is insufficient."
+        },
+        {
+          "id": "r8",
+          "text": "Respects the stated boundaries: no production-code changes, mocked transaction methods, row-deletion cleanup, table truncation, schema recreation, or reliance on resetting primary-key sequences."
+        },
+        {
+          "id": "r9",
+          "text": "Presents the work as an unexecuted proposal and does not invent test results, observed database behavior, or an execution history."
+        }
+      ]
+    },
+    {
+      "opaque_task_id": "e09da2ff97294755812d512b6d1ec62f",
+      "skill": "interaction-design",
+      "prompt": "Design the interaction and command surface for fieldvault so that lab operators can safely perform the erase workflow and the inventory job can run unattended. Give concrete example invocations and describe what users see through preview, confirmation, refusal, a stale preview, partial failure, and status reporting. These are the product facts and boundaries:\n\nfieldvault is an internal CLI for a coastal survey lab. The dangerous operation permanently erases raw capture bundles. There is no undo or recoverable trash. This release operates on one explicitly selected tenant and project per erase operation; the concrete example is tenant coastwatch-lab, project tideline-east.\n\nA bundle has an immutable bundle ID, a revision, a display name, a byte size, a capture-finished timestamp, and a retention-hold status. Display names are not unique. Operators select a project and a timestamp cutoff, but execution must target the concrete immutable IDs they reviewed.\n\nThe lab policy for this release is fixed: every erase requires a present human operator to review the current preview and deliberately confirm in a live terminal. CI, cron, service accounts, saved approvals, and other unattended processes are prohibited from erasing, even if an earlier human approved a plan.\n\nThe existing gateway enforces a trusted interactive_operator entitlement for destructive requests. It is never granted to CI, cron, or service accounts. The CLI still has to require the live terminal review and confirmation; a client option cannot grant that entitlement.\n\nRead-only automation is explicitly allowed. A scheduled inventory job with a viewer identity needs to list bundles and generate a JSON erase preview without a terminal or prompts. It may save that preview for an operator to inspect later. Viewing a preview must not erase anything.\n\nA useful preview identifies the authenticated actor, tenant and project, the cutoff with an explicit timezone, the selected immutable IDs and revisions, the selected count and total bytes, and bundles excluded because of a retention hold. It must make permanent loss clear before confirmation.\n\nCapture ingest and retention updates continue while the operator is reading. Newly arrived bundles must never be added silently to an already reviewed target set. If an included bundle changes revision or gains a hold, the existing gateway rejects the whole request before deleting anything and requires a new preview and review. A hold cannot be overridden by this CLI.\n\nAfter a request is accepted, a storage outage can cause partial deletion. The gateway returns a durable operation ID and per-bundle outcomes; querying that operation is read-only and repeatable. Erase requests carrying the same operation ID cannot erase a bundle twice. Any further mutation still needs the live human review required above.\n\nOperators and inventory automation need distinguishable success, invalid-input or authorization refusal, cancellation or missing confirmation, stale-preview, and partial-failure outcomes. The audit record must identify the human actor, project, reviewed target IDs and revisions, operation ID, and per-bundle outcomes. Do not claim to have implemented or exercised the CLI.",
+      "criteria": [
+        {
+          "id": "r1",
+          "text": "Proposes a usable command surface with concrete invocations for the destructive workflow and for read-only preview or inventory automation."
+        },
+        {
+          "id": "r2",
+          "text": "Requires the existing interactive_operator authorization and a live human terminal review and deliberate confirmation for every destructive execution, including subsequent mutations following partial failure."
+        },
+        {
+          "id": "r3",
+          "text": "Provides no unattended erase bypass: flags, environment variables, configuration, piped confirmation, saved plans, approval artifacts, or earlier approval cannot replace the required live review and confirmation. An option called force or yes is not itself disqualifying if it cannot bypass that boundary."
+        },
+        {
+          "id": "r4",
+          "text": "Allows viewer-authorized, noninteractive, prompt-free listing and machine-readable JSON previews. It does not impose the destructive interactive gate on these read-only operations or make saving a preview count as approval to erase."
+        },
+        {
+          "id": "r5",
+          "text": "Makes scope and consequences reviewable before mutation: authenticated actor, tenant/project, timezone-bearing cutoff, concrete immutable IDs and revisions, selected count and total bytes, retention exclusions, and permanent loss are available to the operator."
+        },
+        {
+          "id": "r6",
+          "text": "Keeps execution bound to the reviewed IDs, never silently expands to new arrivals or ambiguous display-name matches, honors holds, and handles a changed included revision or new hold by stopping for a fresh preview and human review."
+        },
+        {
+          "id": "r7",
+          "text": "Handles cancellation and missing terminal or confirmation as refusals with no deletion. It offers distinguishable automation-consumable outcomes for successful preview or erase, validation/authorization refusal, confirmation refusal, stale preview, and partial failure; exact numeric exit-code choices are unrestricted."
+        },
+        {
+          "id": "r8",
+          "text": "Uses the durable operation ID and per-bundle outcomes for partial-failure reporting and read-only status queries. Recovery does not blindly repeat already completed deletions or use status/retry as an unattended mutation back door."
+        },
+        {
+          "id": "r9",
+          "text": "Preserves the requested audit identity, project, reviewed IDs and revisions, operation ID, and outcomes, without claiming an undo path or claiming that the proposal was implemented or exercised."
+        }
+      ]
+    },
+    {
+      "opaque_task_id": "17067d685dc44effbb39efe8d81d00b4",
+      "skill": "interaction-design",
+      "prompt": "Design the interaction and command surface for fieldvault, including a concrete unattended invocation using the supplied artifacts and a useful operator inspection path. Explain valid execution, invalid approval or stale-plan refusal, audit failure, partial completion, and subsequent status or retry behavior. These are the product facts and boundaries:\n\nfieldvault permanently erases raw capture bundles; it has no undo or recoverable trash. The lab security owner explicitly permits unattended erasure by the scheduled retention runner when an authorized human has signed an exact immutable plan. This release must support that policy; a valid scheduled execution has no terminal and must finish without human input.\n\nFor this request, the current time is 2026-10-17T02:05:00Z, the authenticated runner is svc:retention-runner, and the requested operation ID is op_20261017_014. The signed approval file is /run/secrets/fieldvault/erase-approval.json. The immutable plan file is /run/fieldvault/erase-plan.json. The plan is the read-only preview the approver reviewed; its two target bundles total 65536 bytes. The held bundle in excluded is outside the approved target set.\n\nThe plan digest below is SHA-256 over the UTF-8 compact JSON representation of every plan field except plan_digest, with dictionary keys sorted. The provided digest is already correct. The signature bytes are present in the approval file on disk; do not invent them. The approval JSON shown below is the exact claim set the existing verifier returns for that file in this valid case, not a substitute for verifying the file at execution.\n\nContents of /run/fieldvault/erase-plan.json:\n\n```json\n{\n  \"schema\": \"fieldvault.erase-plan/v1\",\n  \"plan_id\": \"pln_84c7e2\",\n  \"tenant_id\": \"coastwatch-lab\",\n  \"project_id\": \"tideline-east\",\n  \"action\": \"erase\",\n  \"created_at\": \"2026-10-17T01:50:00Z\",\n  \"expires_at\": \"2026-10-17T02:20:00Z\",\n  \"targets\": [\n    {\n      \"bundle_id\": \"f2d9d530-fcdf-4e99-8e09-d8bdb487dd83\",\n      \"revision\": 17,\n      \"bytes\": 24576\n    },\n    {\n      \"bundle_id\": \"2afc76eb-3018-4e4e-b463-f4998ed3bdc0\",\n      \"revision\": 4,\n      \"bytes\": 40960\n    }\n  ],\n  \"excluded\": [\n    {\n      \"bundle_id\": \"ab0f3c54-72a8-4a68-8a59-6a16ba0d3186\",\n      \"reason\": \"retention_hold\"\n    }\n  ],\n  \"plan_digest\": \"sha256:c2a993d7cd8b4e80a9940638cc1fed6187d7e5910926e1fa2705dde47b1fe41d\"\n}\n```\n\nVerified claim set for /run/secrets/fieldvault/erase-approval.json:\n\n```json\n{\n  \"approval_id\": \"apr_6bd4f1\",\n  \"plan_digest\": \"sha256:c2a993d7cd8b4e80a9940638cc1fed6187d7e5910926e1fa2705dde47b1fe41d\",\n  \"tenant_id\": \"coastwatch-lab\",\n  \"project_id\": \"tideline-east\",\n  \"action\": \"erase\",\n  \"execution_principal\": \"svc:retention-runner\",\n  \"approved_by\": \"user:avery.chen\",\n  \"operation_id\": \"op_20261017_014\",\n  \"issued_at\": \"2026-10-17T01:57:00Z\",\n  \"expires_at\": \"2026-10-17T02:15:00Z\"\n}\n```\n\nExisting verify_approval(file_path, principal, now) checks the signature, authorized issuer, revocation, principal binding, and approval expiry. It returns verified claims or a typed refusal. The supplied file is authentic, unrevoked, and valid at the supplied time. Plan expiry, action, tenant/project, operation ID, and plan-digest binding must also match before mutation; the gateway enforces those bindings on every destructive request.\n\nThe gateway executes only the immutable IDs and revisions in the approved plan. It never expands a selector to include newly arrived bundles. Before accepting deletion it rejects the request without mutation if an included revision has changed or a target is now on retention hold. A hold cannot be overridden. The given valid case has unchanged target revisions and no new hold on either target.\n\nThe audit store is available in the valid case. Before accepting any deletion, the gateway durably records operation_id, plan_digest, approval_id, actor, approved_by, tenant_id, project_id, and the approved target IDs and revisions. For every accepted target it durably records the target ID, outcome, and UTC timestamp. If this audit recording cannot be guaranteed, it accepts no deletion. This service behavior already exists; the CLI need not invent an audit service.\n\nA storage failure can still produce partial deletion across the two targets. Read-only status queries by operation ID return durable per-target outcomes. Reusing the same operation ID is idempotent and cannot delete a completed target twice; retrying an unresolved target is permitted only with the same approved target set and an approval that is still valid when the retry is accepted. An expired approval still permits read-only status but cannot authorize more mutation.\n\nOperators also need a read-only way to inspect the plan, approval binding, expiry, exact targets, count, total bytes, exclusions, and irreversible effect before a run. Inspecting or validating artifacts must not execute the plan or consume the approval. The runner needs machine-readable results, distinguishable success/refusal/stale-plan/partial-failure states, and useful recovery information. Approval signature bytes must not be printed in logs. Do not claim to have implemented or run this workflow.",
+      "criteria": [
+        {
+          "id": "r1",
+          "text": "Provides a concrete, usable unattended destructive invocation that consumes the supplied plan and approval artifacts with the given runner and operation ID. The valid case can finish without a terminal, prompt, fresh live operator action, or policy change."
+        },
+        {
+          "id": "r2",
+          "text": "Treats the supplied independently signed exact-plan approval as the authorization mechanism for this accepted unattended workflow. It does not impose a blanket interactive-only rule, discard the accepted policy, or replace the supplied authorization with an unbound yes/force flag."
+        },
+        {
+          "id": "r3",
+          "text": "Verifies the actual approval artifact through the supplied verifier and preserves the required principal, expiry, action, tenant/project, operation ID, and plan-digest bindings. Invalid, expired, revoked, mismatched, or altered artifacts refuse mutation with a useful noninteractive error rather than an execution-time approval prompt or bypass."
+        },
+        {
+          "id": "r4",
+          "text": "Binds execution to the two approved immutable target IDs and revisions, excludes the held bundle and new arrivals, and treats a changed included revision or new target hold as a stale-plan refusal before deletion."
+        },
+        {
+          "id": "r5",
+          "text": "Honors the supplied durable audit gate and records or reports the operation, plan and approval identity, runner and approver, tenant/project, target IDs and revisions, and per-target outcomes/timestamps through the existing service. Audit unavailability cannot be bypassed to continue mutation."
+        },
+        {
+          "id": "r6",
+          "text": "Offers a useful read-only inspection or validation path showing scope, approval binding and expiry, targets, count/bytes, exclusions, and irreversible consequences without executing the plan, consuming approval, or requiring a terminal for automation."
+        },
+        {
+          "id": "r7",
+          "text": "Provides machine-readable results with distinguishable success, refusal, stale-plan, and partial-failure states, including the operation ID and durable per-target outcomes needed for recovery. Exact command names, output schemas, and numeric exit codes may vary."
+        },
+        {
+          "id": "r8",
+          "text": "Uses idempotent operation-ID-based status and retry behavior after partial completion, avoids repeating completed targets or widening the plan, and permits further unattended mutation only while the same applicable approval remains valid."
+        },
+        {
+          "id": "r9",
+          "text": "Allows read-only status after approval expiry while refusing further mutation under that expired approval; it does not falsely describe an already completed deletion as rolled back or safely repeated."
+        },
+        {
+          "id": "r10",
+          "text": "Keeps approval signature bytes out of logs, makes no invented execution or implementation claims, and does not require new infrastructure for capabilities explicitly supplied by the task."
+        }
+      ]
+    }
+  ]
+}

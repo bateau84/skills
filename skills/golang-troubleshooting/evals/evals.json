@@ -12,7 +12,7 @@
         "Proposes focused input variations and evidence to distinguish decode, validation and processOrder failures rather than claiming an invented test already reproduces the incident.",
         "Does not assert a root cause or present a speculative rewritten handler as a verified fix from the supplied description alone.",
         "Asks clarifying questions about the error (logs, request bodies, frequency) or proposes to gather evidence",
-        "Mentions running the test to confirm it reproduces the issue before fixing"
+        "Requires observing the representative failure through a focused test or controlled request reproduction before applying the supported repair; a valid reproduction need not begin as an automated test."
       ],
       "evaluation": {
         "mode": "response",

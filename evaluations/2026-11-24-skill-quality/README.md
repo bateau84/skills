@@ -72,6 +72,11 @@ provenance matters.
 
 ## Judge calibration observation
 
+**Correction after review:** the actual packet exposed descriptive source case
+IDs, which could cue the expected verdicts. Its 6/6 agreement is therefore
+cue-confounded and cannot establish blind calibration. The original packet and
+judgments below remain unchanged; see the [correction and repeat](../2026-11-25-pr39-corrections/README.md).
+
 A separate fresh context assessed six source-reviewed synthetic examples,
 without the expected labels. `inputs/calibration.json` is its actual packet;
 `judgments/judge-calibration.json` is its unedited response. The packet used the

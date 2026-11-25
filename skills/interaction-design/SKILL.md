@@ -136,6 +136,8 @@ Nielsen's three limits (Nielsen 1993, confirmed nngroup.com 2014) are grounded i
 | Error | Inline error state, error banner | Non-zero exit code + stderr message | Error overlay, status bar error | Inline error state, error boundary |
 | Confirmation | Modal dialog (for irreversible actions only) | Prompt (`Are you sure? [y/N]`) or `--yes` flag for scripting | Confirmation dialog component | Modal dialog (for irreversible actions only) |
 
+For confirmation-sensitive CLI actions, define what happens without interactive input. Read-only listing can remain scriptable while mutation requires a terminal and refuses safely otherwise. Add an explicit non-interactive confirmation mechanism only when the accepted task or a clearly stated design choice calls for it; automation support is not implied merely by being a CLI. Preserve an existing automation contract when one is supplied.
+
 **CLI-specific feedback discipline:**
 - **stdout**: data output and success messages that downstream commands or scripts consume
 - **stderr**: diagnostic messages, warnings, error messages — never data, always human-readable

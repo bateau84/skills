@@ -11,16 +11,16 @@
       "expectations": [
         "Designer must recognize this is a stateless command-response interaction model, not a web or TUI model — the tool runs, presents output, and exits",
         "Designer must specify the stdout/stderr contract: which output goes where, how exit codes signal success vs failure",
-        "Defines exit 0 as successful completion and coherent documented nonzero outcomes for failure or refusal, allowing any sensible numeric mapping because no existing mapping is supplied.",
-        "Designer must address the non-interactive scripting context: the --yes flag (or equivalent) must be specified for automation contexts where interactive confirmation breaks the script",
-        "Designer must specify how the 'list of pending migrations' is output — as human-readable columnar format, as parseable format for scripting, or both",
+        "Documents exit 0 for successful command completion and coherent statuses for declined/refused application and execution failure. Actual migration failure and a refused non-interactive apply return nonzero; no specific nonzero numeric mapping is prescribed.",
+        "Defines behavior without interactive input: listing pending migrations remains usable, and applying either safely refuses with a clear diagnostic/nonzero status or uses an explicitly described confirmation mechanism suitable for automation. A --yes or equivalent bypass is an optional design choice, not a required product capability.",
+        "Specifies a readable list of pending migrations sufficient for review; a numbered list, table or another clear presentation is valid. Machine-readable output is optional unless an accepted consumer contract requires it.",
         "Designer must specify the feedback model during migration application: what appears on stderr as migrations execute (progress), what appears on stdout when complete",
         "The confirmation interaction must be specified as a text prompt (Y/N or similar) in interactive mode, not as a modal dialog or button"
       ],
       "negative_expectations": [
         "Designer must not specify modal dialogs, hover states, button labels, or visual affordances that do not exist in a CLI stateless command-response context",
         "Designer must not omit exit code semantics — exit 0 on migration failure is a named failure mode that breaks pipeline composition",
-        "Designer must not design a confirmation flow that only works interactively without providing a --yes / --non-interactive flag for scripting contexts",
+        "Must not hang waiting for unavailable interactive input or apply without the confirmation required by the proposed design. Safely rejecting non-interactive application is valid; omitting --yes or a scripting bypass is not itself a violation.",
         "Designer must not produce a spec that could equally apply to a web UI with terminology substitution — the design must be grounded in CLI-specific interaction constraints"
       ],
       "evaluation": {

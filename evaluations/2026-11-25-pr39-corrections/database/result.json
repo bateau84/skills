@@ -1,0 +1,20 @@
+{
+  "schema": "portable-skills/sqlalchemy-transaction-probe/v1",
+  "status": "pass",
+  "environment": {
+    "python": "3.12.14",
+    "sqlalchemy": "2.0.58",
+    "aiosqlite": "0.21.0",
+    "sqlite": "3.53.1",
+    "pool": "NullPool",
+    "transaction_control": "explicit BEGIN events"
+  },
+  "observations": {
+    "normal_begin_exit_then_late_rollback_rows": 1,
+    "run_sync_without_commit_then_session_close_rows": 0,
+    "joined_fixture_rows_after_async_and_sync_application_commits": 2,
+    "fresh_connection_rows_after_outer_teardown": 0,
+    "outer_transaction_remained_active_after_each_application_commit": true
+  },
+  "limits": "SQLite-only SQLAlchemy API check; no PostgreSQL/asyncpg, pytest fixture lifecycle, or agent behavior was executed."
+}

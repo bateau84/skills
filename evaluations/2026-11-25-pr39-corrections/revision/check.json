@@ -1,0 +1,52 @@
+{
+  "status": "artifacts-verified",
+  "tasks": 3,
+  "responses": 6,
+  "scope": "Byte identity and grade-schema verification only; criterion validity is recorded separately in comparison.json.",
+  "prompts_and_rubrics_matched": true,
+  "production_parser_used": true,
+  "results": [
+    {
+      "arm": "p-2bec22be48ed",
+      "task": "c2682d46c3e74011b2abc2578304271a",
+      "passed": true,
+      "criteria_met": 9,
+      "criteria_total": 9
+    },
+    {
+      "arm": "p-2bec22be48ed",
+      "task": "e09da2ff97294755812d512b6d1ec62f",
+      "passed": true,
+      "criteria_met": 9,
+      "criteria_total": 9
+    },
+    {
+      "arm": "p-2bec22be48ed",
+      "task": "17067d685dc44effbb39efe8d81d00b4",
+      "passed": false,
+      "criteria_met": 9,
+      "criteria_total": 10
+    },
+    {
+      "arm": "p-12648b54d6e3",
+      "task": "c2682d46c3e74011b2abc2578304271a",
+      "passed": true,
+      "criteria_met": 9,
+      "criteria_total": 9
+    },
+    {
+      "arm": "p-12648b54d6e3",
+      "task": "e09da2ff97294755812d512b6d1ec62f",
+      "passed": true,
+      "criteria_met": 9,
+      "criteria_total": 9
+    },
+    {
+      "arm": "p-12648b54d6e3",
+      "task": "17067d685dc44effbb39efe8d81d00b4",
+      "passed": true,
+      "criteria_met": 10,
+      "criteria_total": 10
+    }
+  ]
+}

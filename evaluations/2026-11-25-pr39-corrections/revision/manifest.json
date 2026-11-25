@@ -1,0 +1,123 @@
+{
+  "base_revision": "056c9b27da4f03ea7a3495359c4e674a9063f0f3",
+  "reviewed_revision": "8e6f6514eccdab14e4cd18bd0be82d1d18ed69e3",
+  "tasks_sha256": "e7aef8cef0a631a4070ca4dc5ce81cb56bb09d0089f5e7ba859ec732b730948e",
+  "arms": {
+    "p-2bec22be48ed": {
+      "source": "original",
+      "practitioner_sha256": {
+        "skills/interaction-design/SKILL.md": "6261a1bb75cc0f81d243a024eb608d08f43e0e6d3d620a24fe0e2ceac4e27dad",
+        "skills/python-database-orm/SKILL.md": "5fa0de724dc5743c89bb9d519be618813f9c0d870ca68c4cbb4c64e0012d2a36"
+      },
+      "judge_input": "judge-inputs/p-2bec22be48ed.json",
+      "judge_output": "judgments/p-2bec22be48ed.json"
+    },
+    "p-12648b54d6e3": {
+      "source": "revised",
+      "practitioner_sha256": {
+        "skills/interaction-design/SKILL.md": "f03866850cdcab26484efd0c57c21e4e5a05119c67a29f0de8ca36f13f4a62a2",
+        "skills/python-database-orm/SKILL.md": "d7afa490654d21780096bf5fa52f53446fef6fd36b69c70bc57eb0a0e55f36be"
+      },
+      "judge_input": "judge-inputs/p-12648b54d6e3.json",
+      "judge_output": "judgments/p-12648b54d6e3.json"
+    }
+  },
+  "runs": [
+    {
+      "id": "r-2ff23a94455c",
+      "arm": "p-2bec22be48ed",
+      "task": "c2682d46c3e74011b2abc2578304271a",
+      "skill": "python-database-orm",
+      "input": "target-inputs/r-2ff23a94455c.json",
+      "output": "responses/r-2ff23a94455c.json"
+    },
+    {
+      "id": "r-2e333be97212",
+      "arm": "p-2bec22be48ed",
+      "task": "e09da2ff97294755812d512b6d1ec62f",
+      "skill": "interaction-design",
+      "input": "target-inputs/r-2e333be97212.json",
+      "output": "responses/r-2e333be97212.json"
+    },
+    {
+      "id": "r-c7e8cf8bec6b",
+      "arm": "p-2bec22be48ed",
+      "task": "17067d685dc44effbb39efe8d81d00b4",
+      "skill": "interaction-design",
+      "input": "target-inputs/r-c7e8cf8bec6b.json",
+      "output": "responses/r-c7e8cf8bec6b.json"
+    },
+    {
+      "id": "r-10b20584a89e",
+      "arm": "p-12648b54d6e3",
+      "task": "c2682d46c3e74011b2abc2578304271a",
+      "skill": "python-database-orm",
+      "input": "target-inputs/r-10b20584a89e.json",
+      "output": "responses/r-10b20584a89e.json"
+    },
+    {
+      "id": "r-a851d28c1a9b",
+      "arm": "p-12648b54d6e3",
+      "task": "e09da2ff97294755812d512b6d1ec62f",
+      "skill": "interaction-design",
+      "input": "target-inputs/r-a851d28c1a9b.json",
+      "output": "responses/r-a851d28c1a9b.json"
+    },
+    {
+      "id": "r-725f5aaef97c",
+      "arm": "p-12648b54d6e3",
+      "task": "17067d685dc44effbb39efe8d81d00b4",
+      "skill": "interaction-design",
+      "input": "target-inputs/r-725f5aaef97c.json",
+      "output": "responses/r-725f5aaef97c.json"
+    }
+  ],
+  "target_contexts": {
+    "count": 6,
+    "history": "none",
+    "requested_model_override": null,
+    "requested_reasoning_override": null,
+    "resolved_model_identity": "not independently available",
+    "sampling_controls": "inherited; seed and sampling parameters unavailable",
+    "isolation": "instruction-only in shared host and skill catalog; no native skill-load attestation",
+    "one_response_per_task_per_arm": true,
+    "target_reruns": 0
+  },
+  "judge_contexts": {
+    "count": 2,
+    "history": "none",
+    "requested_model": "gpt-6.2-sol",
+    "requested_reasoning": "high",
+    "resolved_model_identity": "not independently attested",
+    "one_arm_per_context": true,
+    "other_arm_or_source_mapping_supplied": false,
+    "input": "complete unchanged task, frozen criteria and unedited response; production judge system/schema",
+    "isolation": "instruction-only in shared environment",
+    "judge_retries": 0
+  },
+  "files": {
+    "comparison.json": "ff95675db11d98cf6a3ac88b458a067a8d0cd4e1264e31cc5df0cb2c0ad68ce0",
+    "freeze-manifest.json": "2fe59b78f1bf604495499480de3788d49b938392691f4e65b527c647632c4fdd",
+    "judge-inputs/p-12648b54d6e3.json": "bfd85dfcb472e0cc7927d095c333dc65989735c251fbef35b24e0634b065758f",
+    "judge-inputs/p-2bec22be48ed.json": "062dd7b36c51e09d32a99ca6ca3ec7700a373deb70820032baaf7be82dd0488a",
+    "judgments/p-12648b54d6e3.json": "41fe507e8c95d541dd8a6e53f0c6e4673ee0d9a6d098cde293821f05a0c3d74f",
+    "judgments/p-2bec22be48ed.json": "5330f9b6620a2029e7fe3a62b53e0b63ad54b099c8e195685f6564f398318a7b",
+    "maintainer-rationale.json": "7512b66a133ab9f5f7c61784eccaab9e5ce623f34ca824ab4fca800d3f13a1eb",
+    "responses/r-10b20584a89e.json": "49943d54abc77734439c6931b8f4d478e1b21d3292d62e197d2dac9659db1935",
+    "responses/r-2e333be97212.json": "89a96c4541e9095f9e587e5fea83935495170fb1427eb08b593ccd3a128eb76f",
+    "responses/r-2ff23a94455c.json": "9b6f58fde38ec3f96b856d18393836401e56331944abb34cf60fdb6824934b37",
+    "responses/r-725f5aaef97c.json": "1dc9e5dd7fc6ff864cd00b9acd9c6b23b0f92c3fd896f7f563480c1e78ef6987",
+    "responses/r-a851d28c1a9b.json": "957509e9bec873a53cde970a113ea6a951277b11f8a3b877acfd7e08d6b5bafb",
+    "responses/r-c7e8cf8bec6b.json": "854679a571e3b9f01dbf9582730b4564f3ce768be34d4dea1fb6681a1f4f2d2f",
+    "rubric-review-input.json": "8ba03da753de805da95306ef585013f41406983dccd7d65390d8415b6ea44517",
+    "rubric-review-observed.json": "7bbc81e15449529e811b37ef24a989e0c3242e3eee55f1efde10631f7b3a8332",
+    "target-inputs/r-10b20584a89e.json": "37d5fa51eb34594cff7d1da9d487d441ce4456bc14a1337ba1b41e37134cfdbb",
+    "target-inputs/r-2e333be97212.json": "c5a7e08c9138e30a0e01c5cc4609ada3f3eb9e0f92d8061b803f900f60fb867c",
+    "target-inputs/r-2ff23a94455c.json": "7bcab84de9dea660090c8e8b2e9b8c488129781d4b8eb9252e6cd9c42f3fda2d",
+    "target-inputs/r-725f5aaef97c.json": "a34dd39d4832c764dca5aded2ad334c4caf415b3277b3dd4d7365d4fc4cf6bae",
+    "target-inputs/r-a851d28c1a9b.json": "77b05f2d6e1c83f72cd1eee9b073467d111092868fd643801891644a1c2a156f",
+    "target-inputs/r-c7e8cf8bec6b.json": "fc32e3c4e870476453cd0939a8198fd350ce9627c5dbafb70c6bef12b32e7341",
+    "tasks.json": "e7aef8cef0a631a4070ca4dc5ce81cb56bb09d0089f5e7ba859ec732b730948e",
+    "verify.py": "ea8320f4631cfe4ba0a59dd833ad001ee29158700b9eb8bc0e89913edd790aac"
+  }
+}

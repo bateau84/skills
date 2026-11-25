@@ -33,7 +33,7 @@
       "trap": "fmt.Printf returns (int,error), neither suitable as a single panic argument.",
       "expectations": [
         "Explains that fmt.Printf returns two values, causing a compile failure in panic.",
-        "Uses fmt.Errorf or returns an error at the API boundary, with useful context."
+        "Supplies a valid single-argument panic with useful context, such as panic(fmt.Errorf(...)) or panic(fmt.Sprintf(...)), or a correctly shaped error-return path. Does not require one formatting helper when another preserves the chosen error contract."
       ],
       "must_not": [
         "Does not keep panic(fmt.Printf(...)) as valid Go."
