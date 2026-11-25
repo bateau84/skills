@@ -33,6 +33,12 @@ When a choice materially changes autonomy, billing, retention, shared meaning, d
 7. **Define falsification.** Name concrete confirmation evidence and the condition that would force reconsideration: benchmark, integration proof, compatibility test, runtime observation, security proof, changed premise, or similar. For an ease-of-change claim, name a representative change, what should become easier, and what observation would contradict that claim. Bound preparation by the accepted enabling outcome; a deferred improvement needs a useful revisit condition, not automatic reopening whenever the code is touched.
 8. Record load-bearing downstream verification requirements in the decision or project's tracking system.
 
+## Definition of Done for the decision work
+
+Connect the decision question to the parent outcome and state what evidence is needed to settle it. Complete the assignment when the in-scope choice is justified against accepted obligations, decisive uncertainty has been checked, consequences and limits are explicit, and the applicable quality baseline is satisfied. If the assignment permits an investigation or recommendation, an evidence-backed finding that no candidate is suitable can complete that investigation; it does not make dependent implementation ready.
+
+Separate evidence needed to choose now from confirmation that requires the eventual implementation. Name the owner of that remaining proof and do not report a planned check as passed. Stop evaluating alternatives once the accepted decision is sufficiently supported. Reopen it only for a changed premise, new material evidence or authorized scope; a time limit or handoff leaves any unmet decision condition visible rather than certifying completion.
+
 ## Durable decision shape
 
 ```markdown

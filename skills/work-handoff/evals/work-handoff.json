@@ -175,6 +175,33 @@
         "Must not invent a root cause, benchmark, threshold or mandatory implementation.",
         "Must not omit evidence limitations to keep the handoff simple."
       ]
+    },
+    {
+      "id": "WH-DONE-01",
+      "name": "handoff-carries-parent-and-return-boundary",
+      "prompt": "Prepare a handoff to finish status --json for a local job CLI. Parent goal: an operator script should read status without parsing formatted text. Accepted criteria: emit job ID and state as JSON; preserve existing text and exit codes. Shared repository quality rules require relevant regression evidence and updated command help. At revision abc123 the JSON and compatibility checks pass in the recorded run, but help is unchanged. A dashboard and metrics were mentioned only as future ideas. The next engineer should finish this bounded work from your handoff, without the chat.",
+      "trap": "A context transfer drops the parent goal, promotes future ideas, or reports already-complete work despite missing required documentation.",
+      "expectations": [
+        "The artifact states the operator purpose and bounded remaining change, preserves existing proof and revision limits, and names help plus any affected recheck as remaining completion conditions.",
+        "Carries the applicable shared quality rules and the evidence-based return boundary without duplicating a large checklist.",
+        "Makes clear that the full assignment remains incomplete until required help and verification are done; optional future ideas do not extend the assignment."
+      ],
+      "negative_expectations": [
+        "Does not require building the dashboard or metrics.",
+        "Does not claim to have run checks or change the accepted JSON/text/exit semantics."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

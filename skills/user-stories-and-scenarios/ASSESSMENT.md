@@ -28,6 +28,7 @@ Scale with consequence, actor diversity, ambiguity of the human goal, and amount
 - Observable outcome makes success/recovery/failure recognizable to the person.
 - Assumptions about user knowledge/context are explicit when consequential.
 - The scenario is distinct from a Quality Scenario and can be reused for design validation/acceptance.
+- The bounded story/scenario outcome remains linked to its parent goal. Authoring readiness does not claim observed product success, and optional additional scenarios are not made blocking after the accepted human goals and material branches are covered.
 
 ### Review depth
 

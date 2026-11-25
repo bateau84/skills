@@ -6,7 +6,7 @@ Review the quality and fidelity of the resulting Anchor against the actual user 
 
 - **Intent fidelity:** Does the Anchor preserve the user's real objective, motivation, audience and important wording without over-interpreting it?
 - **Scope:** Are consequential inclusions, exclusions, commitments and reserved decisions explicit? Has a proposed option been promoted to a mandate without authority?
-- **Observable success:** Could another agent distinguish success from a plausible wrong implementation? Are promised results falsifiable where material?
+- **Completion conditions:** Could another agent distinguish fulfillment of the bounded goal from activity or a plausible wrong implementation? Positive acceptance conditions, applicable shared quality obligations, and evidence expectations remain distinct from exclusions and future ambitions. A complete Anchor is not proof of the product outcome.
 - **Source integrity:** Are user-accepted decisions separated from existing-code observations, third-party facts, agent suggestions and unresolved hypotheses?
 - **Fresh-session usability:** Could an unfamiliar agent independently understand the accepted outcome and relevant boundaries without the original conversation?
 - **Parallel consistency:** Could delegated agents produce incompatible behavior from different reasonable readings of the Anchor? If so, identify the unresolved semantic decision, not an invented technical restriction.

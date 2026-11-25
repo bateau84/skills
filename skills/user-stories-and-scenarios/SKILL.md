@@ -7,6 +7,12 @@ description: Capture small human-centered User Stories and concrete end-to-end d
 
 Two small, implementation-independent design artifacts. A **User Story** states who is trying to achieve what, in what context, and how they know they succeeded. A **Scenario** exercises that intent in a concrete situation, including what happens when it goes wrong. Write a story first when the human goal itself needs to be pinned down; add scenarios when journeys, branches, interruptions, or failures need to be evaluated.
 
+## Completion boundary
+
+Connect each story's outcome to the accepted product goal and bounded change. Observable success supplies story-specific acceptance meaning; the applicable **Definition of Done** supplies shared quality conditions. Neither a list of interface steps nor completion of implementation tasks establishes the person's outcome. Keep system obligations in their owning requirements and refer to them where needed instead of duplicating a universal checklist.
+
+The authoring assignment is done when its accepted human goals, material success/failure situations, provenance and consequential assumptions are clear enough for design and validation, with no unresolved meaning hidden in the claimed ready scope. Finish at that boundary. Additional personas or scenarios need an in-scope consequence or new accepted need. Writing a story or scenario does not prove that the product fulfills it; later validation must observe the actual experience.
+
 ## User Story
 
 Use when a human-facing capability or change needs a durable statement of **who is trying to achieve what, in what context, and how they know they succeeded**.

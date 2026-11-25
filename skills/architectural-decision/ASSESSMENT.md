@@ -13,6 +13,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 - Consequences, migration/operational cost, lock-in, reversibility, and material assumptions are explicit.
 - An evolution-driven choice identifies concrete change pressure, compares useful preparation with the direct path, and includes preparation, review, verification, and migration cost. Immediate benefit is separate from conditional future benefit; preparation has a bounded purpose rather than an open-ended cleanup mandate.
 - Confirmation is falsifiable and states what evidence or changed premise would force reconsideration.
+- Decision completion answers the bounded question with enough evidence for its claimed readiness; it does not confuse a future confirmation plan with an executed result. A supported no-go can finish an investigation while leaving implementation blocked. Further alternatives need a material unresolved question or new evidence, not a search for perfection.
 
 ## Review depth
 

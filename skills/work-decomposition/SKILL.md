@@ -1,6 +1,6 @@
 ---
 name: work-decomposition
-description: Define useful milestones, coherent context-bounded work groups, change surfaces, and dependencies before creating a delivery plan. Use when agreed work needs intermediate goals or admits several splits, oversized execution units, one-task-per-file fragmentation, hidden integration work, or shared-state parallelism risks. Not for inventing product requirements or fixed scheduling policy.
+description: Define useful milestones, completion contracts, coherent context-bounded work groups, change surfaces, and dependencies before creating a delivery plan. Use when agreed work needs a Definition of Done, intermediate goals, task boundaries, or evidence and stopping conditions, including oversized execution units, one-task-per-file fragmentation, hidden integration work, or shared-state parallelism risks. Not for inventing product requirements or fixed scheduling policy.
 ---
 
 # Work Decomposition
@@ -8,6 +8,21 @@ description: Define useful milestones, coherent context-bounded work groups, cha
 **Analyze finely; dispatch coherently.** Keep each task small enough that its owner can understand, perform and verify it without keeping several largely separate problems in mind. Ten concerns may need three tasks, or one broad concern may need several. Task count is not the goal: too many fragments add handoffs; oversized tasks cause repeated reading, lost context and expensive retries.
 
 This skill proposes work groups and dependency/coordination facts for the project's delivery plan; it does not require a planner agent, scheduler, or plugin. Ordinary implementation choices remain within implementation scope. Accepted product meaning, design, architecture, constraints, and exclusions remain inputs: ask their decision owner about unresolved meaning, and do not hide a changed promise inside an implementation task. A decision update needs authorization and a named owner, not just a writable requirements file.
+
+## Define the completion contract
+
+Keep **Definition of Done** and **acceptance criteria** complementary. The Definition of Done is the applicable shared quality baseline for completed work; acceptance criteria describe the particular outcome. Reuse established engineering, compatibility, documentation, review, and verification obligations where they apply. If there is no named DoD document, use the existing applicable obligations; its absence is not a gate. Do not invent universal coverage targets, new approval gates, or stronger product promises to fill a checklist.
+
+For each bounded assignment, preserve a short completion contract in the existing plan or handoff:
+
+- **Purpose and boundary:** what becomes true, how it contributes to the parent goal, and what this assignment does not own.
+- **Acceptance and quality:** observable outcome-specific conditions plus the applicable Definition of Done, with references to their authority.
+- **Evidence:** how the conditions can be checked, at what boundary, and who owns any dependent assembly or proof. A test name alone does not explain the expected result.
+- **Stopping point:** return when the assigned outcome and applicable quality obligations have sufficient current evidence. Identify any permission, unresolved decision, or unavailable prerequisite that would instead require a partial or blocked handoff.
+
+A small fix may express this in a few sentences. A product goal can outlive many completed tasks; state the bounded change, increment, or investigation being completed rather than pretending an evolving product is finished forever. A plan or specification can be complete for its purpose while its proposed implementation remains unbuilt and unproven. Match delivery to the assignment: preparing a reviewable PR does not imply permission to merge or deploy it.
+
+Completion is not a license to ignore a real defect. Address an observed in-scope failure or material risk to the accepted outcome; if relevance is uncertain, choose the smallest check that could change the completion decision. Keep optional improvements advisory. Discovery alone does not authorize more work. Reopen a satisfied condition only when changed requirements, changed relevant artifacts, or new evidence undermine it. A timebox ending, task split, or handoff preserves progress but does not satisfy unmet criteria.
 
 ## 1. Discover the work before drawing task lines
 
@@ -102,7 +117,7 @@ For each group provide:
 - **Grounded change surface:** inspected files, interfaces or resources and evidence; `[unverified]` guesses plus needed discovery. Include authorized write scope for executable work.
 - **Depends on / coordination:** prerequisites, shared contracts, shared-state risks, and the available coordination method.
 - **Obligations preserved:** guarantees translated into outcome, constraint and proof; participants and integration owner.
-- **Verification:** testable local and cross-boundary expectations; relevant guidance only where useful.
+- **Completion:** outcome-specific acceptance, applicable Definition of Done, testable local and cross-boundary evidence, and the point at which the owner should return; identify any known blocker without turning it into an accepted omission.
 - **Milestone or scenario enabled:** accepted outcome, required peer groups, and assembly/proof owner; for enabling work, name the dependent outcome or uncertainty it resolves. `None` with a reason is appropriate for work outside an assembled product claim.
 - **Execution fit:** why the task is small and coherent enough; needed context, important uncertainty, retry cost, and the result references the next owner will need.
 - **Boundary reason:** what would break if groups were merged, or `merge candidate`.
@@ -111,12 +126,14 @@ Use identifiers and scheduling detail only as requested. Candidate analysis is n
 
 ## References and evaluation
 
+- [Completion and evidence](references/completion-and-evidence.md): shared terminology, bounded examples, status distinctions, and primary practice sources.
 - [Worked boundaries and group template](references/boundaries-and-example.md): endpoint merging, migration separation, usable increments, and combined proof.
 - [ASSESSMENT.md](ASSESSMENT.md): normal conformance checks.
 - [QA.md](QA.md): residual coupling and false-confidence attacks.
 - [Portable evaluation cases](evals/cases.md): bundled prompts and standalone execution instructions.
 - [Context and handoff cases](evals/context-and-handoffs.json): task sizing, preserving work, and useful result references. These are fixtures, not executed results.
 - [Preparation cases](evals/strategic-programming.json): coherent local preparation and accepted migration dependencies; these are decision exercises, not executed results.
+- [Completion cases](evals/completion.json): parent-goal links, shared quality, proof ownership, and unfinished work preserved across task splits; fixtures are not executed results.
 
 **Standalone package:** copy this complete directory, including `references/` and `evals/`. No sibling skill is required. Optional collection-only maintenance resources, when using the full library checkout, are `evaluations/selective-enrichment/README.md` (matched comparison protocol) and `evaluations/selective-enrichment/PROVENANCE.md` (baseline identities/adaptation mapping), relative to the collection root. They are not standalone dependencies; without the preserved comparison materials, run the bundled cases as decision exercises rather than claiming a four-variant comparison.
 

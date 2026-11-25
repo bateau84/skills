@@ -40,6 +40,12 @@ Separate normative contract from examples. Prefer the smallest exact interface t
 
 **Do not fill an authority gap with a permanent default.** An unspecified retention, expiry, reuse, or recovery policy is not permission to require infinite retention, forbid reuse forever, or choose an arbitrary timeout. Preserve the accepted guarantee, state which lifetime or failure boundary remains unsettled, and block only the dependent completeness claim. Do not weaken replay safety to "while the record happens to exist" either. Continue specifying the independent, settled interface details; a clearly labeled proposal can inform the missing decision but cannot become normative through an example or invariant.
 
+## Definition of Done for the specification work
+
+Name the bounded interface outcome and the parent capability it enables. The specification is ready when its accepted scope passes the two-implementer test, applicable artifact-quality conditions hold, and its invariants, lifecycle, failures and compatibility rules have decisive conformance checks. No unresolved decision may be hidden inside the scope claimed ready. Identify the implementation or integration work that owns checks which cannot run until both sides exist.
+
+Finish the specification assignment once those conditions and its acceptance criteria are met. A specified conformance test is a future obligation, not an observed pass; a ready specification does not prove interoperating implementations or product acceptance. Report any dependent gap precisely. New accepted scope or evidence of a material ambiguity can reopen the affected contract; hypothetical extensions and optional refinements do not keep it open indefinitely.
+
 ## Durable specification shape
 
 Use the sections that apply:
@@ -56,6 +62,7 @@ Use the sections that apply:
 ## Compatibility and evolution
 ## Security surface
 ## Verification
+## Readiness and remaining proof
 ## Open questions
 ```
 

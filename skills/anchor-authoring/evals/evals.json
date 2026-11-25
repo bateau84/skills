@@ -50,6 +50,33 @@
         "Keeps the original 2026-10-02 acceptance as the sole acceptance evidence for the amended scope",
         "Presents the broadened scope as already accepted"
       ]
+    },
+    {
+      "id": "aa-done-01",
+      "name": "positive-completion-for-a-bounded-version",
+      "prompt": "Write a compact Anchor for the already-authorized first version of a local report tool. Operators need to turn selected accepted records into a CSV file and find that file from the command result. Existing accepted constraints: publish the file atomically; preserve source records; report errors visibly; only local use. JSON output and remote publishing are future possibilities outside this version. The repository quality baseline already requires relevant regression evidence and updated usage documentation. No specific performance target was agreed. The user asks for a durable picture another agent can finish without this chat.",
+      "trap": "The Anchor lists exclusions and activities but never states positive completion conditions, or treats a bounded version as responsibility for all future reports.",
+      "expectations": [
+        "Produces observable completion conditions for selecting records, atomic CSV publication, locating the result, visible errors, and preservation, with proportionate evidence expectations.",
+        "Preserves the operator purpose, version boundary, existing quality baseline, and excluded future capabilities without prescribing architecture.",
+        "Keeps the Anchor artifact and the unbuilt product outcome distinct; does not report delivered or proven functionality."
+      ],
+      "negative_expectations": [
+        "Does not replace done conditions with a file/task list or exclusions alone.",
+        "Does not invent a performance target, require JSON/remote publishing, or demand another approval of the stated settled scope."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

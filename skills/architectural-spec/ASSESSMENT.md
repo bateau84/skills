@@ -14,6 +14,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 - Compatibility, migration, mixed-version behavior, and persisted old/new state are specified where coexistence is possible.
 - Security boundaries specify validation/authorization placement, secret exposure/logging, replay controls, and failure behavior where relevant.
 - Verification hooks cover load-bearing invariants, transitions, failures, compatibility, and real composition rather than only schema syntax.
+- Completion is claimed for the specified interface scope, linked to its parent capability. Artifact readiness is supported by contract checks; runtime conformance remains unproven until its evidence exists. Missing authoritative meaning blocks dependent readiness, while optional extensions and unexecuted downstream implementation tests do not automatically block a complete specification-only assignment.
 
 ## Review depth
 

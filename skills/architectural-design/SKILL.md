@@ -47,6 +47,14 @@ An opaque description of a load-bearing decision needs clarification before depe
 
 Prefer deep modules and small public seams. Exact fields, methods, messages, and schemas belong in `architectural-spec`.
 
+## Definition of Done for the design work
+
+State the bounded outcome this design enables and its contribution to the parent goal. The design assignment is done when its accepted scope has a justified realization, load-bearing obligations have coherent owners and enforcement, material interfaces and failure paths fit together, and the applicable artifact-quality conditions are met. Downstream work must be able to proceed without inventing a reserved product or structural decision. Complete any feasibility check needed to justify the choice now; merely scheduling it does not resolve a blocking uncertainty.
+
+Keep **design readiness** separate from **implemented conformance**. Identify the real evidence that will prove each load-bearing claim, who or which work item owns that proof, and which checks have actually run. Planned integration or recovery checks remain unexecuted. A ready design does not establish a working product, and a design-only assignment need not implement that product to finish.
+
+Finish when the design's acceptance criteria and applicable Definition of Done are satisfied. Reopen affected choices for changed accepted meaning, a failed premise, or credible evidence of a material defect; record optional improvements without making them new completion conditions. Unresolved dependent scope stays incomplete, even after a handoff or time limit.
+
 ## Durable design shape
 
 A substantial Architecture Design should normally make these perspectives explicit; omit one only when genuinely irrelevant and make that obvious:
@@ -64,6 +72,7 @@ A substantial Architecture Design should normally make these perspectives explic
 ## Failure and recovery
 ## Security / trust boundaries
 ## Verification and composition
+## Readiness and remaining proof
 ## Consequences
 ## Open questions
 ```

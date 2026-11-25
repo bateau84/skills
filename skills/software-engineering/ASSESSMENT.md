@@ -2,6 +2,8 @@
 
 Review methodology for implementation work produced with `software-engineering`, usable by any agent performing assessment. Review against agreed behavior, the actual diff, and observed evidence. Do not demand abstractions, telemetry, compatibility, or cleanup that the task does not need.
 
+Assess completion against both the outcome-specific criteria and applicable Definition of Done. A checked task list cannot excuse a known accepted-behavior violation, and missing required proof prevents DONE. Conversely, optional polish does not keep sufficiently evidenced work open. Distinguish a legitimate new counterexample from an unchanged preference before reopening review.
+
 ## Review criteria
 
 1. **Defining behavior is correct.** Reconstruct the smallest set of observable outcomes, failures, edge cases, and compatibility obligations that make the change correct, then verify the implementation and tests cover them.

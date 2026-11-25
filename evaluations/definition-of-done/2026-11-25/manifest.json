@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-25",
+  "method": "Three separate ChatGPT subagent tasks, each started with fork_turns=none; parent inspected outputs and reran local checks.",
+  "model_identity": "Inherited session model; exact model build and sampling configuration not exposed by the collaboration API.",
+  "repository_bases": {
+    "bateau84/agents": "91443fb416a46f9f8401aee7db2ca2b2cc12c8d1",
+    "bateau84/skills": "31da1c1c9d433ee0c371316dc30d6b1226f2c005"
+  },
+  "instruction_inputs": {
+    "architecture": [
+      {
+        "repository": "skills",
+        "path": "skills/architectural-design/SKILL.md",
+        "sha256": "f13b13ce7e3853ddf343cd3d8ecb9c79865f00ef302c4500cf4cfe96f68aa3d3"
+      }
+    ],
+    "export": [
+      {
+        "repository": "agents",
+        "path": "agents/coder.md",
+        "sha256": "d7b83cc9b27c3fb83599fa7e1c8fb706855d32962a98195fdef745757b19a874"
+      }
+    ],
+    "required-proof": [
+      {
+        "repository": "agents",
+        "path": "agents/coder.md",
+        "sha256": "d7b83cc9b27c3fb83599fa7e1c8fb706855d32962a98195fdef745757b19a874"
+      },
+      {
+        "repository": "skills",
+        "path": "skills/software-engineering/SKILL.md",
+        "sha256": "b102df8740dbd0cd21c041a31f422ba4e0bb93df3e94489229cd3f39508e13b4"
+      }
+    ]
+  },
+  "limits": [
+    "Synthetic tasks, not historical production runs or evidence that missing DoD caused prior drift.",
+    "No matched agent baseline, randomized repeated trial, token/cost comparison or native OpenCode/Loom qualification.",
+    "The first coder sample also loaded installed software-engineering, python-how-to and python-common-practice skills; those installed versions were not pinned for comparison.",
+    "Only task inputs, resulting files and parent rerun output are retained; full subagent tool traces are not exported.",
+    "Architecture probe/source-review facts were supplied scenario facts, not independently executed product checks.",
+    "The skipped deployment test is an intentionally unavailable required proof in a synthetic task, not product deployment evidence."
+  ],
+  "files": {
+    "architecture/REQUEST.md": "71b7c1e02112892e9193535ddeb83f174daefd260093a60fb8d9a1ed08fa9828",
+    "architecture/design-handoff.md": "90ca5d93dd885d16639b589d01c0692a95fb9d36fbfea8714109292aabe54ed4",
+    "export/REQUEST.md": "a26b976691cecd8f8bd3229d8c6f58bf61e5b27490705a74a1005264a4f18edd",
+    "export/RESULT.md": "b8217700b7beb6130478f14c853d0fc755909ed138fe353d019e4dc057e86371",
+    "export/cache_policy.py": "d48b847478ccb431fb630902c0ece09b9e2f2b8743287ecd172a70f1770af838",
+    "export/report.before.py": "41617c4fd8c019641456d33f552990368275443b7be5064812b020fa32cd7f8e",
+    "export/report.py": "c1979777d8dbecea6b274fdada20a36a78b8cab8236155fad18a3647bf6158e8",
+    "export/test_report.py": "7c50eba2def3fd5d144f27544032dd85787e3672bc5fc0d1adab727a08ed9b10",
+    "export/verification.txt": "9b0a78b72fa913addf3fd7a9a27e08887f982ca6ecceb5b94af613965006416c",
+    "required-proof/REQUEST.md": "c2583e0a002f7f83466d08dd77a6734e8108b62ae50ff93ef39dd182f92cf8cf",
+    "required-proof/RESULT.md": "b7fb149dfb3c63da4c0ec45f87406aea7dbf0af8c925256c2a8041f4752cd1c3",
+    "required-proof/report.py": "c1979777d8dbecea6b274fdada20a36a78b8cab8236155fad18a3647bf6158e8",
+    "required-proof/test_deployment.py": "09bf60dd7efe6d1023e97b17018e8b78ce1ea3a03e5d8baa856861afe6a67612",
+    "required-proof/test_report.py": "7c50eba2def3fd5d144f27544032dd85787e3672bc5fc0d1adab727a08ed9b10",
+    "required-proof/verification.txt": "9073da3f10e42299bab81dee005412fd7fb4b74df0b4fc466e5b38fa5eda7f0f"
+  }
+}

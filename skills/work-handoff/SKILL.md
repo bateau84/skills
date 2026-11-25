@@ -48,7 +48,7 @@ The second version tells a person what they will see **and** gives an agent a te
    - **Investigation:** the problem or question is clear, but cause, impact, feasibility, or evidence still needs work. Acceptance is a bounded finding and recommendation, not an unapproved fix.
    - **Decision/proposal:** a user-owned scope, product meaning, or risk choice is open. State who should decide and what evidence/options are available; do not frame implementation as already approved.
 6. **Capture the necessary context in plain language.** Describe what happens now, why the request exists, what was agreed, what must remain unchanged, relevant dependencies, and evidence. Start with the human-visible result; add technical details only where needed to implement or check it. Link durable accessible records; include essential facts when a future recipient cannot access a session link or private artifact. Do not paste the chat.
-7. **Define completion at the right boundary.** Use falsifiable, observable acceptance criteria or a clear investigation/decision deliverable. For a feature or bug, cover relevant regression or interaction behavior; for a cross-component dependency, describe what the receiving side must expose to its consumer. Distinguish what remains to verify from what is already proven.
+7. **Define completion at the right boundary.** Preserve the assignment's contribution to the parent goal, outcome-specific acceptance criteria, applicable shared quality Definition of Done, and evidence needed to return. For a feature or bug, cover relevant regression or interaction behavior; for a cross-component dependency, describe what the receiving side must expose to its consumer. Distinguish what remains to verify from current proof. State a bounded finding for investigation work; disproving a hypothesis can satisfy that assignment without delivering the hoped-for feature.
 8. **Surface uncertainty without fabricating closure.** Separate routine implementing-agent choices from genuinely reserved product/architecture decisions. Identify blocking questions, affected owners, and immediate next step where necessary. Avoid turning optional detail into blocking ceremony.
 9. **Run both reader tests.** First, compare the actual sentences and acceptance criteria with accepted user decisions: could a human involved in the discussion spot a misinterpretation, changed promise, missing exclusion, or unexplained term without decoding academic language? Then run the **cold-start test**: can an agent with only the handoff explain the goal, constraints, evidence, unanswered questions and success checks? Repair unclear sections in place without changing the agreed meaning. Then stop; do not execute the work unless separately requested.
 
@@ -63,7 +63,8 @@ Use clear, compact Markdown unless the caller or destination requires another fo
 **For:** <Known repository, team, component or responsibility>
 
 ## What we want
-<What should change or what question should be answered, and why it matters>
+<What should change or what question should be answered, why it matters,
+and which parent outcome this assignment contributes to>
 
 ## Why this is needed
 <What happens today, what we observed, and any important earlier decision>
@@ -73,8 +74,15 @@ Use clear, compact Markdown unless the caller or destination requires another fo
 <Keep exact technical names and MUST/SHOULD/MAY levels where they matter>
 
 ## Done when
-- <Result someone can observe, or a useful investigation/decision result>
-- <Important regression or end-to-end check, when relevant>
+- <Observable acceptance condition or bounded investigation/decision result,
+with evidence that would establish it>
+<Applicable Definition of Done or existing quality obligations; reference rather
+than duplicate the shared baseline.>
+
+## Return boundary
+<Return when these conditions have sufficient evidence. Identify any known
+decision, permission, or missing prerequisite that would require a partial or
+blocked handoff instead; optional improvements do not extend the assignment.>
 
 ## Related work and evidence
 <Useful accessible specs, issues, PRs, examples or observations>
