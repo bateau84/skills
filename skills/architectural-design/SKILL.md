@@ -53,7 +53,7 @@ State the bounded outcome this design enables and its contribution to the parent
 
 Keep **design readiness** separate from **implemented conformance**. Identify the real evidence that will prove each load-bearing claim, who or which work item owns that proof, and which checks have actually run. Planned integration or recovery checks remain unexecuted. A ready design does not establish a working product, and a design-only assignment need not implement that product to finish.
 
-Finish when the design's acceptance criteria and applicable Definition of Done are satisfied. Reopen affected choices for changed accepted meaning, a failed premise, or credible evidence of a material defect; record optional improvements without making them new completion conditions. Unresolved dependent scope stays incomplete, even after a handoff or time limit.
+Finish when the acceptance criteria and quality obligations allocated to the design assignment by the accepted request or plan are satisfied. Mandatory review or conformance proof allocated to another owner remains open at the parent acceptance boundary; completing this assignment neither satisfies nor waives it. Reopen affected choices for changed accepted meaning, a failed premise, or credible evidence of a material defect; record optional improvements without making them new completion conditions. Unresolved dependent scope stays incomplete, even after a handoff or time limit.
 
 ## Durable design shape
 

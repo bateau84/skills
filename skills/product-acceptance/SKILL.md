@@ -12,7 +12,7 @@ This is methodology, not permission or a new approval stage. Use agreed requirem
 
 ## 1. Select claim-appropriate scenarios
 
-State the bounded product or milestone claim, its contribution to the parent goal, its acceptance criteria, and the applicable shared quality **Definition of Done** before selecting proof. Preserve their existing authority and scope. A complete task, accepted architecture document, or finished test plan does not establish that claim.
+State the bounded product or milestone claim, its contribution to the parent goal, its acceptance criteria, and the applicable shared quality **Definition of Done** before selecting proof. Preserve their existing authority and scope. Identify who owns each required obligation and the acceptance boundary where it must be satisfied. An implementation assignment may already be DONE for its allocated work while independent review or composed proof remains mandatory here. A complete task, accepted architecture document, or finished test plan does not establish the product claim.
 
 Group accepted criteria into externally meaningful outcomes. Choose the smallest scenario set whose failures would expose materially different composition defects—not one test per requirement or only paths known to work. Use accepted human scenarios and setup-to-first-result, supported-change, and recovery coverage when relevant; optional lifecycle suggestions do not become requirements.
 
@@ -52,7 +52,7 @@ Record at least: **claim; entry/path; real stages; external substitutions and ev
 
 Use PASS only for an executed claim supported by this evidence. An observed violated outcome is FAIL; an unavailable, skipped, uncertain, or inconclusive proof is UNPROVEN. Scope statuses to the claim: narrower routing PASS does not imply full-journey PASS. Plans and fixtures are not execution evidence. Keep logs/assertions/screenshots or transcripts with the run identity and reproduction steps; redact secrets and user data.
 
-Declare the bounded outcome done only when its accepted criteria and applicable Definition of Done are supported. Required FAIL or UNPROVEN conditions prevent that completion claim even when every implementation task is closed. An acceptance-assessment assignment may still finish with an honest FAIL or UNPROVEN report; state which assignment is complete and which product claim is not. When sufficient evidence supports the outcome, stop broadening the proof. Reopen affected claims for relevant changes or material counterevidence, and keep optional improvement suggestions separate from acceptance blockers.
+Declare the bounded product outcome done only when all accepted criteria and shared quality obligations required at that acceptance boundary are supported, including obligations allocated across different owners. Required FAIL or UNPROVEN conditions prevent that parent completion claim even when every implementation task is closed; local completion neither satisfies nor waives downstream obligations. An acceptance-assessment assignment may still finish with an honest FAIL or UNPROVEN report when it satisfies its allocated assessment conditions; state which assignment is complete and which product claim is not. When sufficient evidence supports the outcome, stop broadening the proof. Reopen affected claims for relevant changes or material counterevidence, and keep optional improvement suggestions separate from acceptance blockers.
 
 ## 5. Review the milestone against the product goal
 

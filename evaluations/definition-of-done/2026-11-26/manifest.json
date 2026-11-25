@@ -1,0 +1,147 @@
+{
+  "date": "2026-11-26",
+  "date_timezone": "Europe/Oslo",
+  "method": "One actual General -> fresh Coder -> fresh Reviewer chain in the ChatGPT collaboration host. Root observed the intermediate state and independently reran the final tests. This is the focused execution counterpart to done-shared-quality-owner-lifecycle, not a run of the full JSON fixture suite.",
+  "model_identity": "Inherited session model; exact model build and sampling configuration were not exposed by the collaboration API.",
+  "repository_bases": {
+    "bateau84/agents": "ceab4e0a9186bf14960baecba9ac39435483a12d",
+    "bateau84/skills": "2df8a5009ecde55deeb109976ff2b5274a00503a"
+  },
+  "reviewed_source_diff_sha256": {
+    "agents": "44b75c0b0b5f6a102d698242a80841ae9bbc964547d93b1dcd8518fdbb4af56d",
+    "skills": "f4010b336b42124d42ee690ce7b27414586d1ad29332f1426aa70be82606ec9a"
+  },
+  "instruction_inputs_available": [
+    {
+      "repository": "agents",
+      "path": "agents/coder.md",
+      "sha256": "6b3413610fdc7c9e2285bb3e443664d0a1c83a5e8e111086ea652b615d7e4ae7"
+    },
+    {
+      "repository": "agents",
+      "path": "agents/general.md",
+      "sha256": "4655da338115900dffe0d9132e945bd4b8d295958e9e4d16346f132913e21bb9"
+    },
+    {
+      "repository": "skills",
+      "path": "skills/product-acceptance/SKILL.md",
+      "sha256": "f5db8c007afe245cb8bc7522158c3ac5f4f215de971ba16c49e15ba6cedced78"
+    },
+    {
+      "repository": "skills",
+      "path": "skills/product-acceptance/references/proof-and-example.md",
+      "sha256": "993bc8abba9585faf07642bf118819e144f5947f978edc822d400d68bd2b81fc"
+    },
+    {
+      "repository": "agents",
+      "path": "agents/reviewer.md",
+      "sha256": "e52b99eaf15933f332a2ee8fbf83b1e0314a9ec2e00bb9c5a5888ffd81ab8dda"
+    },
+    {
+      "repository": "skills",
+      "path": "skills/software-engineering/SKILL.md",
+      "sha256": "3613da3715c1e0b44e2deeed06a41a4bd70149c75cfd1a57447a576cc59b3984"
+    },
+    {
+      "repository": "skills",
+      "path": "skills/work-decomposition/SKILL.md",
+      "sha256": "8ce0a89310e21f05f3a1dc50d666311862c3154300746ad9aaff5572414512ac"
+    },
+    {
+      "repository": "skills",
+      "path": "skills/work-decomposition/references/boundaries-and-example.md",
+      "sha256": "be038e2d084e1a92f32e7dc4dfc64ef90962725e6083b8f828ea6133e4f229d7"
+    },
+    {
+      "repository": "skills",
+      "path": "skills/work-decomposition/references/completion-and-evidence.md",
+      "sha256": "6cadb326179703c98fa8afe24839f2aae9d919ce78ba151bcca6e0a8525ac96a"
+    },
+    {
+      "repository": "skills",
+      "path": "skills/work-handoff/SKILL.md",
+      "sha256": "f0166dad5a2869c7e938ec219e413d34d46a3d7ff18b5a17b15ffc72a94d863a"
+    },
+    {
+      "repository": "skills",
+      "path": "skills/work-handoff/references/cross-component.md",
+      "sha256": "e4e73bfe5d15a5e3846d1b085b440909a76093ab584992e5b691139114f58da8"
+    }
+  ],
+  "reported_instruction_use": {
+    "General": [
+      "agents/agents/general.md"
+    ],
+    "Coder": [
+      "agents/agents/coder.md",
+      "skills/skills/software-engineering/SKILL.md"
+    ],
+    "Reviewer": [
+      "agents/agents/reviewer.md",
+      "skills/skills/software-engineering/SKILL.md",
+      "skills/skills/product-acceptance/SKILL.md",
+      "skills/skills/product-acceptance/references/proof-and-example.md"
+    ]
+  },
+  "unpinned_installed_helper_skills": [
+    "python-how-to",
+    "python-common-practice",
+    "python-testing",
+    "documentation"
+  ],
+  "fixture_base_commit": "4d70b79b6dc3abe14b4f1f05dd6e197eab6fc947",
+  "initial_project_sha256": {
+    ".gitignore": "32dae3052f331ee34d628ef535709b301259a45df7c7522c4d35dcf49873f00b",
+    "CONTRACT.md": "bd1ec3c47a8ddb57b8ab540ed274c9dec34ec2ee74b5d846401cf6586d1c819b",
+    "README.md": "3ca8bd202b279937f48b9b6fd302c9686861191b11025d1a901bb1d296ac6012",
+    "cache_policy.py": "0995c51bed89cd0a2fa0ea4b450f31b4e8296695316e374ca9a78ba086dc3fbc",
+    "report.py": "41617c4fd8c019641456d33f552990368275443b7be5064812b020fa32cd7f8e",
+    "test_report.py": "46b79253c2900a276d6e1278ad82427cb196529e249087fa98c155d0cd071101"
+  },
+  "limits": [
+    "Single synthetic supervised task, not native OpenCode/Loom qualification or a measured improvement over prior instructions.",
+    "The failing baseline is the intentionally faulty CSV module, not a run of the pre-correction agents; the illustrated historical completion deadlock was not reproduced.",
+    "The accepted fixture explicitly allocates responsibilities. This execution does not test every ambiguous, missing-owner, defect-reopening or unavailable-proof path.",
+    "The full new model-backed JSON fixture suite and a matched baseline comparison were not run. Fixture validation alone is not a behavioral pass.",
+    "General received the two supervisor messages retained verbatim in supervisor-messages.json; no preferred review verdict was supplied.",
+    "Parent PARTIAL/DONE states are General-authored observation records, not native Loom task-state transitions. Root observed the distinct Reviewer running before final parent completion.",
+    "Full subagent tool traces were not exported. Exact dispatch records, specialist handbacks, raw test logs, source files and a live supervisor observation are retained; these do not provide a full replay.",
+    "Core candidate charters and completion skills are identified by content hashes. Coder also used four installed helper skills whose versions were not pinned.",
+    "Execution evidence covers the supplied Python 3.12.14 module-to-CSV-reader boundary; no release, deployment, external spreadsheet or other-runtime claim is made."
+  ],
+  "files": {
+    "README.md": "6b6ad59bacbbc458032b1f670137c768721861e2e1efd0e5d749b5691c54a202",
+    "lifecycle/REQUEST.md": "d0dc0af3c81aeceb0ba80d77e7b10878419eab3f265f2209d6f16f0616aa3f09",
+    "lifecycle/before/.gitignore": "32dae3052f331ee34d628ef535709b301259a45df7c7522c4d35dcf49873f00b",
+    "lifecycle/before/CONTRACT.md": "bd1ec3c47a8ddb57b8ab540ed274c9dec34ec2ee74b5d846401cf6586d1c819b",
+    "lifecycle/before/README.md": "3ca8bd202b279937f48b9b6fd302c9686861191b11025d1a901bb1d296ac6012",
+    "lifecycle/before/cache_policy.py": "0995c51bed89cd0a2fa0ea4b450f31b4e8296695316e374ca9a78ba086dc3fbc",
+    "lifecycle/before/report.py": "41617c4fd8c019641456d33f552990368275443b7be5064812b020fa32cd7f8e",
+    "lifecycle/before/test_report.py": "46b79253c2900a276d6e1278ad82427cb196529e249087fa98c155d0cd071101",
+    "lifecycle/project/.gitignore": "32dae3052f331ee34d628ef535709b301259a45df7c7522c4d35dcf49873f00b",
+    "lifecycle/project/CONTRACT.md": "bd1ec3c47a8ddb57b8ab540ed274c9dec34ec2ee74b5d846401cf6586d1c819b",
+    "lifecycle/project/README.md": "7018752298d5b62fd90327e9e4b672827b7ef2803548b6677e313866c02b6f56",
+    "lifecycle/project/cache_policy.py": "0995c51bed89cd0a2fa0ea4b450f31b4e8296695316e374ca9a78ba086dc3fbc",
+    "lifecycle/project/report.py": "e04fa626e9c3dab2170765e0a7d96ac4d83b44351ff8172489a25e227f9cb336",
+    "lifecycle/project/test_report.py": "e19b435223289890d4c592269553a03926ccf1afc90c68f65e51671272bee7d8",
+    "lifecycle/records/CODER.md": "da3f7476033f8cdddfe7bb1d65d4b2cb1d1206a406ccafb9b4a9db5ceda914b3",
+    "lifecycle/records/RESULT.md": "1ef4e8dbd641dad5b7025aa32ac2656adb171d8811f2707ed02211ed695762e0",
+    "lifecycle/records/REVIEWER.md": "4ef4d4838bb128ef02c8f0672e13c96c979a75dbd3b5e86541bca4d510fd7dff",
+    "lifecycle/records/baseline-tests.txt": "7058da0e880a16ec65961b12d29666046053e283913d901a8ee1e99f102ecb9e",
+    "lifecycle/records/coder-dispatch.json": "91fa400280c96467c33758e6466521354e9b8f3bab7f9bbd753084ba7d908ab4",
+    "lifecycle/records/coder-tests.txt": "c7232c0cd2d5c674c390226ea6554c9d04d651bb6a3294f74469de3d0deca874",
+    "lifecycle/records/events.jsonl": "d788daa189d2b505827aae41683579e95b5858d78a58e6755da8abf532064e89",
+    "lifecycle/records/general-dispatch.json": "abe6f86b4fb444c4c84ab5e509203d5da600ba9dcb0a68e23f7e2c1c96cbeac3",
+    "lifecycle/records/reviewer-dispatch.json": "30ef1bc6ef4290392f691b6373b568007522fcf96cfad86cb09bfd6455bd74fc",
+    "lifecycle/records/reviewer-tests.txt": "c7232c0cd2d5c674c390226ea6554c9d04d651bb6a3294f74469de3d0deca874",
+    "lifecycle/records/supervisor-at-review.json": "0a5a84b3c834b166388b3fd370b13d667c2f2c95cd9e2f7d035947c165b71e52",
+    "lifecycle/records/supervisor-messages.json": "57e819b7dc239641eae3aeab0fe4161a333a65935f865649cd7167c09e68568a",
+    "lifecycle/records/supervisor-tests.txt": "387b5eb7a5e772efa8510daf33f54144190009f111a491e48c6e51d0508a562f",
+    "targeted-review.md": "090c82c3583d6a23a34cc054ab385f38ba6478958282d459348a5afda477859f"
+  },
+  "review": {
+    "report": "targeted-review.md",
+    "reviewed_artifact_count": 27,
+    "note": "The report was added after its checks. All 27 reviewed artifacts remain byte-for-byte unchanged."
+  }
+}

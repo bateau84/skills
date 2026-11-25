@@ -57,6 +57,33 @@
           "T1": "outcome"
         }
       }
+    },
+    {
+      "id": "WD-DONE-03",
+      "name": "allocate-shared-quality-across-implementation-and-review",
+      "prompt": "Prepare the completion portion of a delivery plan for a bounded CSV export fix. The shared Definition of Done requires correct escaping, passing regression tests, updated usage documentation and independent review of the changed behavior. The responsible caller assigns implementation, tests and documentation to one implementer, followed by an independent reviewer; the caller owns acceptance of the overall change. Keep this allocation and explain the local and parent states at two points: first, the implementation/tests/docs have current evidence but review has not started; second, independent review has completed with a supported approval and no remaining required finding. No deployment or new feature is authorized. Produce the bounded work-group handoff and the next action at each point.",
+      "trap": "The shared DoD either blocks the implementer from handing off until its downstream review exists, or is weakened into separate personal standards that allow the parent change to finish without review.",
+      "expectations": [
+        "Allocates every shared-quality obligation to its responsible owner and acceptance boundary without changing the baseline; the implementer owns implementation/tests/docs and a different reviewer owns independent assessment.",
+        "At the first point, allows the evidenced implementation assignment to finish and hand off to the reviewer while keeping the parent change incomplete for the pending review.",
+        "At the second point, allows the caller to complete the bounded parent change only after considering the review evidence and all remaining parent conditions; no deployment authority is inferred."
+      ],
+      "negative_expectations": [
+        "Must not make the implementer self-review to satisfy the independent-review condition, wait indefinitely for review before returning its local result, or invent a circular dependency.",
+        "Must not count local DONE or scheduling the reviewer as satisfying or waiving the parent independent-review obligation."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

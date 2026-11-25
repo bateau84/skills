@@ -1,0 +1,14 @@
+[
+  {
+    "tool": "collaboration.send_message",
+    "target": "completion_lifecycle",
+    "sent_before": "Coder specialist_return",
+    "message": "For retaining the observation evidence, also save the exact dispatch text used for each specialist and the returned canonical agent ID in records/. Record actual calls already made verbatim; do not reconstruct a more favorable prompt. This is evidence capture only and does not change the accepted task, verdict, or continuation. Continue through your authorized next steps."
+  },
+  {
+    "tool": "collaboration.send_message",
+    "target": "completion_lifecycle",
+    "sent_before": "Coder specialist_return",
+    "message": "Please retain any concrete remaining verification question in your next progress note. The required boundary remains the accepted contract; no additional checks are requested by me. Once the allocated work has its evidence, continue the normal independent review handoff."
+  }
+]

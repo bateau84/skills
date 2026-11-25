@@ -141,7 +141,7 @@ A handoff is ready only for the scope whose accepted meaning is sufficiently set
 
 Continue and hand off independent, unaffected specification while an authority question is open. Do not declare the dependent portion or whole assignment complete just because its gap has been recorded. Summarize the ready scope, consequential choices, coverage limits, and blockers using the project's existing notes or handoff surface, not a new required artifact. A fresh counterexample or changed anchor reopens affected coverage, not the entire process by default.
 
-Once this bounded coverage and the applicable document-quality conditions are established, finish the specification assignment. More imaginable requirements do not justify continued expansion. A completed requirements bundle defines how product completion will be judged; it is not evidence that the implementation satisfies those requirements. Missing required coverage remains incomplete even when a session ends or its remaining work is handed off.
+Once this bounded coverage and the document-quality conditions allocated to the specification assignment are established, finish that assignment. Required review or proof allocated to another owner by the accepted request or plan stays open at the parent acceptance boundary; local completion neither satisfies nor waives it. More imaginable requirements do not justify continued expansion. A completed requirements bundle defines how product completion will be judged; it is not evidence that the implementation satisfies those requirements. Missing required coverage remains incomplete even when a session ends or its remaining work is handed off.
 
 ## Worked example
 

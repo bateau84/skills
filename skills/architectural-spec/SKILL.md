@@ -44,7 +44,7 @@ Separate normative contract from examples. Prefer the smallest exact interface t
 
 Name the bounded interface outcome and the parent capability it enables. The specification is ready when its accepted scope passes the two-implementer test, applicable artifact-quality conditions hold, and its invariants, lifecycle, failures and compatibility rules have decisive conformance checks. No unresolved decision may be hidden inside the scope claimed ready. Identify the implementation or integration work that owns checks which cannot run until both sides exist.
 
-Finish the specification assignment once those conditions and its acceptance criteria are met. A specified conformance test is a future obligation, not an observed pass; a ready specification does not prove interoperating implementations or product acceptance. Report any dependent gap precisely. New accepted scope or evidence of a material ambiguity can reopen the affected contract; hypothetical extensions and optional refinements do not keep it open indefinitely.
+Finish the specification assignment once its allocated readiness, acceptance and quality conditions are met. Mandatory review or conformance proof allocated elsewhere by the accepted request or plan remains open at its parent acceptance boundary; local completion neither satisfies nor waives it. A specified conformance test is a future obligation, not an observed pass; a ready specification does not prove interoperating implementations or product acceptance. Report any dependent gap precisely. New accepted scope or evidence of a material ambiguity can reopen the affected contract; hypothetical extensions and optional refinements do not keep it open indefinitely.
 
 ## Durable specification shape
 

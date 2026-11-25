@@ -16,9 +16,13 @@ Keep **Definition of Done** and **acceptance criteria** complementary. The Defin
 For each bounded assignment, preserve a short completion contract in the existing plan or handoff:
 
 - **Purpose and boundary:** what becomes true, how it contributes to the parent goal, and what this assignment does not own.
-- **Acceptance and quality:** observable outcome-specific conditions plus the applicable Definition of Done, with references to their authority.
-- **Evidence:** how the conditions can be checked, at what boundary, and who owns any dependent assembly or proof. A test name alone does not explain the expected result.
-- **Stopping point:** return when the assigned outcome and applicable quality obligations have sufficient current evidence. Identify any permission, unresolved decision, or unavailable prerequisite that would instead require a partial or blocked handoff.
+- **Acceptance and quality:** observable outcome-specific conditions and the shared quality obligations allocated to this assignment, with references to their authority.
+- **Evidence and ownership:** how each required condition can be checked, its responsible owner and acceptance boundary, including any mandatory downstream review or assembly proof. A test name alone does not explain the expected result.
+- **Stopping point:** return when the criteria and quality obligations allocated to this assignment have sufficient current evidence. Identify any permission, unresolved decision, or unavailable prerequisite that prevents its own completion.
+
+Allocate obligations through the accepted request, plan or responsible caller. A local assignment is complete when its allocated acceptance criteria and quality obligations are satisfied. Mandatory downstream obligations remain open at the parent acceptance boundary; local completion neither satisfies nor waives them. For example, implementation, regression tests and documentation may belong to one assignment while independent review belongs to a subsequent reviewer. The implementer can return DONE for its work so review can start; the parent outcome remains incomplete until review and every other required parent condition are evidenced.
+
+Do not let an executor move a failed or unavailable check to a follow-up merely to claim completion. A material gap in allocation belongs with the responsible caller or decision owner; continue independent work while clarifying it. Allocation changes who establishes each condition, not the binding guarantees or the need to address a known defect in the assigned outcome.
 
 A small fix may express this in a few sentences. A product goal can outlive many completed tasks; state the bounded change, increment, or investigation being completed rather than pretending an evolving product is finished forever. A plan or specification can be complete for its purpose while its proposed implementation remains unbuilt and unproven. Match delivery to the assignment: preparing a reviewable PR does not imply permission to merge or deploy it.
 
@@ -117,7 +121,7 @@ For each group provide:
 - **Grounded change surface:** inspected files, interfaces or resources and evidence; `[unverified]` guesses plus needed discovery. Include authorized write scope for executable work.
 - **Depends on / coordination:** prerequisites, shared contracts, shared-state risks, and the available coordination method.
 - **Obligations preserved:** guarantees translated into outcome, constraint and proof; participants and integration owner.
-- **Completion:** outcome-specific acceptance, applicable Definition of Done, testable local and cross-boundary evidence, and the point at which the owner should return; identify any known blocker without turning it into an accepted omission.
+- **Completion:** allocated acceptance and shared quality obligations, testable evidence, and the point at which this owner should return; keep mandatory downstream obligations visible with their owner and parent acceptance boundary. Identify any known blocker without turning it into an accepted omission.
 - **Milestone or scenario enabled:** accepted outcome, required peer groups, and assembly/proof owner; for enabling work, name the dependent outcome or uncertainty it resolves. `None` with a reason is appropriate for work outside an assembled product claim.
 - **Execution fit:** why the task is small and coherent enough; needed context, important uncertainty, retry cost, and the result references the next owner will need.
 - **Boundary reason:** what would break if groups were merged, or `merge candidate`.

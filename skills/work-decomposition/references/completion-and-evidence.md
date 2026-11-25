@@ -16,6 +16,14 @@ Together these form a **completion contract**. This is a useful name for existin
 
 Reuse the project's Definition of Done. Its relevant obligations may include verification, compatibility, documentation, maintainability, security, and review, according to the actual project. Work-specific criteria do not replace that baseline; the baseline does not invent a new product feature. Where no named baseline exists, make applicable existing quality obligations explicit. Do not fabricate numeric thresholds or require a new organizational policy before a simple change can proceed.
 
+## Allocate obligations without lowering the shared standard
+
+Use the accepted request, plan or responsible caller to allocate each completion obligation to its owner and acceptance boundary. An assignment is complete when its allocated acceptance criteria and quality obligations are satisfied. Mandatory downstream obligations remain open at the parent boundary. Completing the local assignment neither satisfies nor waives them.
+
+For example, a shared Definition of Done requires correct implementation, passing regression tests, updated documentation and independent review. The plan allocates the first three to the implementer and the last to a reviewer. The implementer returns DONE with its evidence and the pending review identified; the reviewer can then perform independent assessment. The parent owner keeps the overall change incomplete until the review and all other parent conditions are supported. Self-review cannot substitute for a separately required independent review.
+
+This allocates responsibility; it does not create a weaker personal Definition of Done. The executor cannot unilaterally transfer a failed test or missing assigned proof to later work to earn DONE. If an important obligation has no clear owner or boundary, resolve that allocation with the responsible caller while preserving independent progress. An observed defect in the assigned outcome still needs correction even if a later review would also detect it.
+
 ## Keep the claim at its actual level
 
 A task can complete one contribution while the milestone still needs another contribution or integration proof. A milestone can deliver a useful increment while later product capabilities remain. Define completion for the bounded goal or version; ongoing ownership of a product is not an endless task.
@@ -28,15 +36,15 @@ An investigation can finish by disproving a proposed approach. For example, test
 
 The parent goal is to let a scheduled operator script read job state without parsing presentation text. This assignment adds `status --json`; a future monitoring dashboard is outside its scope.
 
-Acceptance is observable: the command returns the agreed fields and exit meanings, and the existing text mode remains compatible. The applicable Definition of Done supplies the existing repository's regression, documentation, and review obligations. Evidence comes from the real command with representative success and failure inputs, relevant compatibility checks, and the changed usage documentation. No universal coverage percentage or live production deployment is implied.
+Acceptance is observable: the command returns the agreed fields and exit meanings, and the existing text mode remains compatible. The applicable Definition of Done supplies the existing repository's regression, documentation, and review obligations. The accepted plan allocates implementation, regression evidence and usage documentation to the implementer, with independent review owned downstream. Local evidence comes from the real command with representative success and failure inputs, relevant compatibility checks, and the changed usage documentation. No universal coverage percentage or live production deployment is implied.
 
-Once those conditions have sufficient current evidence, return the scoped result. A concrete serialization defect remains required work even if a checklist missed it. A speculative dashboard or unrelated naming cleanup is advisory. If a required platform check could not run, identify the missing proof and its effect on completion instead of reporting an unqualified DONE.
+Once the implementer's allocated conditions have sufficient current evidence, return the scoped result and identify the pending independent review. The parent change remains incomplete until that review and every other parent obligation are satisfied. A concrete serialization defect remains required work even if a checklist missed it. A speculative dashboard or unrelated naming cleanup is advisory. If a required platform check allocated to the implementation assignment could not run, its own completion remains partial or blocked; the executor cannot relabel that check as downstream review.
 
 ## Stop, block, and reopen truthfully
 
-- **DONE:** the assigned outcome and applicable quality obligations are supported by sufficient current evidence.
-- **PARTIAL:** useful work is preserved, but some assigned work or required proof remains.
-- **BLOCKED:** a missing prerequisite, permission, or owner decision prevents necessary progress. Preserve independent useful work where possible.
+- **DONE:** the outcome and quality obligations allocated to this assignment are supported by sufficient current evidence; mandatory downstream obligations remain open at their parent boundary.
+- **PARTIAL:** useful work is preserved, but some work or required proof allocated to this assignment remains.
+- **BLOCKED:** a missing prerequisite, permission, or owner decision prevents necessary progress on this assignment. Preserve independent useful work where possible.
 
 Use the host's equivalent states when it has them. Keep these assignment states separate from evidence statuses: PASS supports a particular checked claim, FAIL records a violation, and UNPROVEN records missing or inconclusive proof. An assessment can be complete with a FAIL finding while the assessed product remains incomplete.
 

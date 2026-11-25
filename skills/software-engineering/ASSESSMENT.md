@@ -2,7 +2,7 @@
 
 Review methodology for implementation work produced with `software-engineering`, usable by any agent performing assessment. Review against agreed behavior, the actual diff, and observed evidence. Do not demand abstractions, telemetry, compatibility, or cleanup that the task does not need.
 
-Assess completion against both the outcome-specific criteria and applicable Definition of Done. A checked task list cannot excuse a known accepted-behavior violation, and missing required proof prevents DONE. Conversely, optional polish does not keep sufficiently evidenced work open. Distinguish a legitimate new counterexample from an unchanged preference before reopening review.
+Assess completion against the outcome-specific criteria and shared quality obligations allocated to the claimed boundary. A checked task list cannot excuse a known accepted-behavior violation, and missing proof allocated to the assignment prevents its DONE. Independent review allocated downstream remains mandatory at the parent boundary but need not block a completed implementation handoff. Check that this allocation comes from accepted authority, not an executor moving a failed check to a follow-up. Optional polish does not keep sufficiently evidenced work open. Distinguish a legitimate new counterexample from an unchanged preference before reopening review.
 
 ## Review criteria
 
