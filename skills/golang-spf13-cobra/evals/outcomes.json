@@ -1,0 +1,92 @@
+{
+  "skill": "golang-spf13-cobra",
+  "version": "1.0.0",
+  "common_instruction": "This is a response-only exercise. Use the supplied scenario and snippets; propose or review the requested work without claiming files were changed, commands ran, or external systems were inspected. State material verification limits. Equivalent solutions that satisfy the stated contract are acceptable.",
+  "cases": [
+    {
+      "id": "GCOBRA-HOOK-01",
+      "name": "child-hook-must-not-bypass-root-authentication",
+      "prompt": "Review this Cobra command tree. In the pinned configuration EnableTraverseRunHooks is false. root.PersistentPreRunE performs required authentication. A direct child deploy command defines its own PersistentPreRunE for validating --region and a RunE that performs deployment. The team assumes both hooks run automatically. Give a focused correction that ensures auth then region validation before deployment, with errors stopping execution. Describe a test for the failure boundary; no deployment should run in the exercise.",
+      "expectations": [
+        "Recognizes that the child persistent pre-run hook overrides the ancestor in the supplied configuration.",
+        "Explicitly composes the required auth and region checks or uses a verified hook configuration that preserves their order.",
+        "Propagates either validation error and prevents the deployment RunE from executing on failure.",
+        "Proposes a test using a fake deployment operation to assert auth runs once and failure prevents the side effect."
+      ],
+      "negative_expectations": [
+        "Must not assume every ancestor persistent hook runs automatically under the stated configuration.",
+        "Must not move authentication after deployment or silently enable global traversal without addressing duplicate/order effects."
+      ],
+      "trap": "Add a child hook that silently drops the root security prerequisite.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GCOBRA-STATE-02",
+      "name": "test-isolation-includes-flag-storage",
+      "prompt": "Two tests execute the same global Cobra root. The first supplies --prefix=first; the second omits --prefix and expects the default, but observes first. Handlers write directly with fmt.Println. The flag also binds to a package-level prefix variable. Recommend a small testable design for this existing flag-only CLI. No config-file or environment layering is needed.",
+      "expectations": [
+        "Builds a fresh command tree for each test and keeps bound flag storage local to that tree rather than sharing a package-global variable.",
+        "Uses the command output/error writers so tests can capture output independently.",
+        "Checks the default in the second independent execution without relying on test order."
+      ],
+      "negative_expectations": [
+        "Must not solve the failure primarily by ordering tests or mutating global flags back between parallel tests.",
+        "Must not add Viper, a new configuration system, or a CLI rewrite merely to isolate command tests."
+      ],
+      "trap": "Recreate commands while leaving shared bound variables or direct process output that keeps the tests coupled.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GCOBRA-TRAVERSE-03",
+      "name": "enabled-traversal-must-not-double-root-hook",
+      "prompt": "Review a Cobra CLI whose accepted configuration sets EnableTraverseRunHooks=true. root.PersistentPreRunE authenticates and records one audit event. Its direct child deploy.PersistentPreRunE validates --region, and deploy.RunE performs deployment. A suggested repair manually calls root.PersistentPreRunE from the child before validating the region, based on advice that child hooks replace parent hooks. Keep traversal enabled: other commands intentionally depend on all ancestor hooks. Decide whether to apply this repair and describe focused assertions for successful execution and an authentication failure. No deployment runs in this response exercise.",
+      "expectations": [
+        "Recognizes that enabled traversal already invokes the root persistent pre-hook before the child persistent pre-hook.",
+        "Keeps only child-specific validation in the child hook and avoids manually invoking the root hook again.",
+        "Preserves EnableTraverseRunHooks=true and describes one root/auth audit invocation, one child validation, then one RunE on success.",
+        "Describes a failure check in which root authentication returns an error and neither child validation nor deployment runs."
+      ],
+      "negative_expectations": [
+        "Must not apply unconditional manual parent chaining while traversal remains enabled.",
+        "Must not disable the accepted traversal setting or remove root authentication to avoid the duplicate."
+      ],
+      "trap": "Apply a nearest-hook-mode repair to traversal mode, executing authentication and its audit side effect twice.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

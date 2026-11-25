@@ -1,0 +1,49 @@
+{
+  "schema": "portable-skills/revision-evidence-disposition/v1",
+  "type": "maintainer interpretation of retained first judgments and independent rubric review",
+  "usable_pairs": 2,
+  "original_usable_tasks_passed": 2,
+  "revised_usable_tasks_passed": 2,
+  "general_improvement_established": false,
+  "task_dispositions": [
+    {
+      "task": "c2682d46c3e74011b2abc2578304271a",
+      "status": "limited-non-regression",
+      "original": "pass",
+      "revised": "pass",
+      "reason": "Both commit-safe fixture proposals meet all nine frozen outcome criteria; proposals were not executed."
+    },
+    {
+      "task": "e09da2ff97294755812d512b6d1ec62f",
+      "status": "limited-non-regression",
+      "original": "pass",
+      "revised": "pass",
+      "reason": "Both command designs meet all nine frozen outcome criteria for explicit live-human mutation and unattended reads."
+    },
+    {
+      "task": "17067d685dc44effbb39efe8d81d00b4",
+      "status": "non-evidence",
+      "raw_original": "fail (9/10)",
+      "raw_revised": "pass (10/10)",
+      "reason": "Frozen r8 narrows the prompt from a currently valid approval to the same approval. Both answers allow newly issued valid approval for the same unchanged plan and operation; the judges score that equivalent behavior differently. Independent anonymous source review confirms r8 conflicts with the prompt and r6 is ambiguous about optional inspection. Do not attribute this raw difference to the skill.",
+      "review_input": "rubric-review-input.json",
+      "review_result": "rubric-review-observed.json"
+    }
+  ],
+  "post_hoc_changes": {
+    "task_prompt": false,
+    "frozen_criteria": false,
+    "target_response": false,
+    "raw_judgment": false,
+    "target_rerun": false,
+    "judge_retry": false
+  },
+  "rubric_review_method": {
+    "context": "fresh; no parent history",
+    "requested_model_override": null,
+    "resolved_model_identity": "not independently attested",
+    "inputs": "full prompt, unchanged criteria, both anonymized responses; no grades, arms, practitioner sources or revision mapping",
+    "scope": "criterion validity, not grading or ranking the candidates",
+    "isolation": "instruction-only in shared environment"
+  }
+}

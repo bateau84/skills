@@ -9,7 +9,7 @@ metadata:
 
 > Pair with `python-common-practice`, `python-error-handling`, and `python-testing` (real-DB fixtures) as relevant.
 
-**Persona:** You are a Python engineer who works with server-side databases. SQLAlchemy and Django ORM are your default; raw SQL is the escape hatch, never the starting point.
+**Persona:** You are a Python engineer who works with server-side databases. Preserve the project's suitable driver or ORM and transaction ownership. Choose SQLAlchemy or Django where their model fits; an existing driver query does not need an ORM migration to receive a parameter-binding or lifecycle fix.
 
 # Server-side Python databases — SQLAlchemy, asyncpg, Django ORM
 
@@ -52,7 +52,7 @@ with Session(engine) as session:
     session.commit()
 ```
 
-The `select()` construct replaces the legacy `session.query()` API. Always prefer `session.execute(select(Model).where(...))` — it is the standard in 2.x and aligns with the async API. Transactions are implicit within `Session`: `commit()` ends the transaction; an exception before commit triggers automatic rollback when used as a context manager. For explicit control, use `session.begin()` as a nested context. Schema metadata lives on `Base.metadata` — use it for programmatic inspection, but prefer Alembic for production migrations.
+The `select()` construct replaces the legacy `session.query()` API. Always prefer `session.execute(select(Model).where(...))` — it is the standard in 2.x and aligns with the async API. A `Session` begins transactions as needed. Its context manager closes the session and rolls back any still-active transaction; it cannot undo an earlier commit. A `session.begin()` transaction context commits on successful exit and rolls back on exception. Keep that boundary with the owning caller. Schema metadata lives on `Base.metadata` — use it for programmatic inspection, but prefer Alembic for production migrations.
 
 ## SQLAlchemy 2.x async
 
@@ -74,11 +74,13 @@ async def get_user(user_id: int) -> User:
 
 **Key lifecycle rules:**
 
-- Always use `async with session.begin()` for writes — it commits on success and rolls back on exception, keeping the session state clean.
-- For reads that don't modify data, `async with session() as session:` (without `begin()`) is fine — it auto-rolls-back on exception.
+- When this layer owns the transaction, `async with session.begin()` commits on success and rolls back on exception. Preserve an existing caller-owned boundary rather than opening or committing a competing transaction.
+- `async with async_session() as session:` scopes session cleanup without committing on exit. Closing rolls back any still-active transaction, including one opened by a read; it cannot undo a completed commit.
 - Set `expire_on_commit=False` on the session factory if you access attributes after commit — otherwise you get lazy-load errors in async context.
 
-**`AsyncSession.run_sync`** — run synchronous code inside an async session. Essential for testing with transactional rollback: wrap your test in `async with session.begin()`, do work, then call `await session.run_sync(sync_fn)` for synchronous ORM operations. Also useful for Alembic migrations called from async code.
+**`AsyncSession.run_sync`** — adapt a synchronous SQLAlchemy callable to the async session, passing it a synchronous-style `Session`. It uses the same session and transaction ownership; it does not create a rollback boundary or make a test isolated. Use it when synchronous ORM code needs that bridge, not as a prerequisite for async tests. Synchronous connection-level work, such as `Base.metadata.create_all`, uses `AsyncConnection.run_sync` instead. See the [session API](https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#sqlalchemy.ext.asyncio.AsyncSession.run_sync) and [connection API](https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#sqlalchemy.ext.asyncio.AsyncConnection.run_sync).
+
+**Rollback-based tests:** a successful `session.begin()` block commits, and a later session rollback cannot undo that commit. If application code calls `session.commit()`, use the connection-owned outer transaction and savepoint arrangement in [Real-DB testing](#real-db-testing), or another isolation design that protects the same boundary. Verify cleanup after an actual application commit.
 
 **The "async detector" footgun:** SQLAlchemy's async sessions raise a cryptic error if you access a lazy-loaded relationship synchronously (e.g., `user.profile` without `await`). This happens when code that works in sync mode is copy-pasted into an async path. The fix is `selectinload` or `joinedload` in your query, or setting `lazy="selectin"` on the relationship. Always eager-load relationships you know you'll access.
 
@@ -221,7 +223,7 @@ engine = create_engine(
 
 ## Repository pattern example
 
-The repository abstracts data access behind an interface. Services depend on the repository, never on the ORM session directly. This makes it possible to swap ORM, database, or add caching without touching business logic.
+A repository can abstract data access when that boundary solves an actual coupling or testability problem. It is optional: do not introduce a generic repository or migration merely to repair a query. If used, keep transaction ownership explicit with the caller.
 
 ```python
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -329,4 +331,4 @@ async def session(engine):
             await outer.rollback()
 ```
 
-**Commit-safe isolation:** the connection owns an outer transaction; each Session transaction uses a savepoint. A `session.commit()` inside the code under test does not commit that outer transaction. This requires proper backend/driver savepoint support; test a real commit followed by teardown and a fresh read. Connections opened independently by application code bypass this fixture. Configure pytest-asyncio fixtures/loop scope to match the engine lifetime. See [SQLAlchemy external transactions](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites).
+**Commit-safe isolation:** the connection owns an outer transaction; each Session transaction uses a savepoint. A `session.commit()` inside the code under test does not commit that outer transaction. The fixture closes the session before explicitly rolling back the outer transaction in teardown. This isolation comes from connection ownership and `join_transaction_mode="create_savepoint"`, not from `run_sync()` or an ordinary `session.begin()` block. It requires proper backend/driver savepoint support; test a real commit followed by teardown and a fresh read. Connections opened independently by application code bypass this fixture. Configure pytest-asyncio fixtures/loop scope to match the engine lifetime. See [SQLAlchemy external transactions](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites).

@@ -60,10 +60,28 @@ When discovery, structure, behavioral guidance, or eval design is load-bearing, 
 11. Treat companion files as optional perspectives any agent can use, not role-exclusive permissions.
 12. Keep orchestration and execution policy in the host or project instructions rather than embedding a workflow engine in a skill.
 13. Replace framework-specific routing, tool calls, fixed namespaces, and approval choreography with portable methods. State real external dependencies and provide a file-based fallback when appropriate. Audit what a practitioner must actually do, not just vocabulary: trace linked references and adjacent guidance for hidden loader, service, lock, snapshot, or agent assumptions.
-14. Make verification concrete. Evals should resemble real work, name the trap being prevented, include positive and negative expectations, and prefer produced artifacts or observed actions over transcript self-report when those are the claimed outputs.
+14. Make verification concrete. Evals should resemble real work, name the failure being prevented, include positive and negative expectations, and prefer produced artifacts or observed actions over transcript self-report when those are the claimed outputs. Separate useful outcomes from skill-specific conventions; neither a required heading nor a higher combined pass rate proves better work.
 15. Preserve licenses and attribution for copied third-party material. Curate sources deliberately: keep the generalizable principle, record meaningful lineage, and discard obsolete workflow mechanics rather than copying them for historical symmetry.
 16. Keep external dependencies explicit; do not assume a CLI/service is installed.
 17. If a skill changes behavioral decisions rather than merely technical method, add or update a realistic eval for that decision boundary. Prefer real incidents and observed work as scenario sources. Record what was actually exercised; do not imply an evaluation ran because a fixture exists.
+
+## Improve a skill from evaluations
+
+First check whether the failure belongs to the work, the rubric, missing inputs,
+or the judge. Inspect the actual prompt, output and available evidence where
+possible; a report excerpt is a lead, not a replay. Correct an invalid test
+without weakening the domain obligation it was intended to protect.
+
+Pair changed guidance with a nearby contrast: a small task where extra work is
+unhelpful, an accepted constraint that must be preserved, or a situation where
+the stronger intervention really is needed. Do not make brevity, a particular
+command, or one artifact count the goal. Preserve the smallest complete product.
+
+Keep easy regression cases and rare consequential traps. Label new cases as
+unmeasured; baseline success alone does not make a case useless, and baseline
+failure alone does not make its criteria correct. Read
+[Evaluation design](references/evaluation-design.md) when designing cases,
+judges, revision comparisons or claims of improvement.
 
 ## Companion quality tests
 
@@ -84,4 +102,5 @@ Its companions explain normal review and attacks on residual confidence. None re
 ## Portable references
 
 - [Portable authoring principles](references/authoring-principles.md) — discovery/retrieval, progressive disclosure, skill shapes, risk-matched specificity, composability, durable-vs-volatile knowledge, RED grounding, source curation, and eval design.
+- [Evaluation design](references/evaluation-design.md) — outcome/convention separation, fixtures, judge calibration, negative space and bounded revision evidence.
 - Local `evals/` fixtures, when present, describe realistic requests and expected observations; adapt execution to the available environment.

@@ -6,18 +6,30 @@
       "id": "tiny-cli",
       "name": "right-size-tiny-cli",
       "prompt": "Create a Go command-line tool, module github.com/jdoe/csvsum, that reads CSV from stdin and prints the sum of each numeric column. Expected size is about 150 lines. Give me every file with its path.",
-      "trap": "Strong models tend to over-architect: handler/service/repository layers, interfaces for a single implementation, DI containers, pkg/ or cmd/ + internal/ directories, Makefiles for a trivial tool.",
+      "trap": "Adds package layers, DI or build/lint scaffolding for hypothetical growth rather than the needs of a small single-command tool.",
       "expectations": [
-        "All Go code is in package main at the module root (main.go plus main_test.go, optionally one extra root file); no cmd/ or internal/ directories.",
-        "go.mod declares module github.com/jdoe/csvsum",
-        "Includes a co-located _test.go file for the summing logic"
+        "Uses one coherent main package for the small tool; a root main.go with co-located tests is sufficient.",
+        "Declares module github.com/jdoe/csvsum.",
+        "Includes focused co-located tests for the summing behavior."
       ],
       "negative_expectations": [
-        "Creates cmd/ or internal/ for a ~150-line tool",
-        "Introduces separate handler/service/repository (or similar layered) packages",
-        "Uses a DI framework such as wire, fx or dig",
-        "Creates a pkg/ directory or a go.work file"
-      ]
+        "Adds empty or unnecessary handler/service/repository packages or DI machinery without a current responsibility requiring them.",
+        "Adds a multi-module workspace or public pkg wrapper without reuse or separate-module needs.",
+        "Adds Makefile, linter, CI or similar tooling merely as starter boilerplate; an existing repository convention or a concrete repeated workflow would justify it."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "convention",
+          "N1": "outcome",
+          "N2": "outcome",
+          "N3": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "GLAYOUT-01",
@@ -31,7 +43,43 @@
       ],
       "must_not": [
         "Does not claim all main packages or libraries must be under cmd/ or pkg/."
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GLAYOUT-LOCAL-01",
+      "name": "preserve-working-small-layout",
+      "prompt": "A maintained module contains go.mod, main.go and main_test.go. Its 160-line command reads a local CSV and writes a report; there is one binary and no reusable public API. The requested change is one more output column. A proposed patch moves code into cmd/report, internal/service and internal/repository, adds a DI interface, and introduces a Makefile plus a linter configuration. Review the structural changes and state the smallest suitable patch scope.",
+      "trap": "Approves a conventional-looking starter architecture without any present reuse, package boundary or build problem.",
+      "expectations": [
+        "Keeps the established main package and co-located tests unless a concrete current need for another boundary is demonstrated.",
+        "Separates the output-column behavior and its focused verification from unrelated structural/tooling adoption."
+      ],
+      "negative_expectations": [
+        "Must not demand architecture or DI selection from the user before this bounded change can proceed.",
+        "Must not treat cmd/, internal/, Makefile or a linter config as required for every Go project."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

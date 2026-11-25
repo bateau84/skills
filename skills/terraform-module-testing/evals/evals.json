@@ -6,15 +6,25 @@
     {
       "id": "TFTEST-MOCK-01",
       "name": "Mock computed ID at plan",
-      "prompt": "A terraform test uses mock_provider for AWS. It asserts a mocked resource's generated id equals a literal, but the run is command = plan and the assertion is unknown. How should it test that computed ID while avoiding real cloud changes?",
+      "prompt": "A terraform test uses mock_provider for AWS. It asserts a mocked resource's generated id equals a literal, but the run is command = plan and the assertion is unknown. How should it test that computed ID while avoiding real cloud changes?\n\nTerraform is pinned to 1.10.5. All provider instances used in the run are mocked; the ID default is supplied by mock_resource. Give a response-level repair using that supported version, with no cloud calls or claimed execution.",
       "trap": "Assumes mock-generated computed IDs are known during plan or that mocked apply creates real infrastructure.",
       "expectations": [
-        "Uses mocked command = apply or an explicitly supported plan-time override, with the correct version constraint.",
-        "Explains unknown computed values in plan and preserves no-real-provider behavior."
+        "Uses mocked command = apply to materialize the computed ID on the supplied Terraform 1.10.5, without treating apply through these fully mocked providers as cloud provisioning.",
+        "Explains that computed mock values are normally unknown at plan; any mention of override_during = plan is conditional on an explicit upgrade to Terraform 1.11+ rather than offered as working on 1.10.5."
       ],
       "must_not": [
         "Does not claim mocked apply necessarily provisions real cloud infrastructure."
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "TFTEST-FILTER-01",
@@ -28,6 +38,29 @@
       "must_not": [
         "Does not claim -filter=unit_test finds matching run blocks."
       ]
+    },
+    {
+      "id": "TFTEST-MOCK-PLAN-01",
+      "name": "supported-plan-override-and-provider-scope",
+      "prompt": "Terraform is pinned to 1.11.4. This test is intentionally plan-only, and all relevant AWS provider instances are mocked. Its assertion needs a supplied mock_resource computed id during plan. Show the smallest supported adjustment and explain why a separate run using an unmocked provider would need its own effect assessment. Do not run anything.",
+      "expectations": [
+        "Uses override_during = plan at an appropriate mock/override scope for the supported version and preserves the plan-only requirement.",
+        "Does not equate one mock_provider block with a guarantee that all other provider aliases or runs are effect-free."
+      ],
+      "negative_expectations": [
+        "Must not require mocked apply when the accepted plan-only contract and supported override can satisfy the assertion."
+      ],
+      "trap": "Turns a fallback for older Terraform into a universal command requirement or ignores unmocked provider paths.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

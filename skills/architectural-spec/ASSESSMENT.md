@@ -10,6 +10,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 - For identity-sensitive idempotency/deduplication, the request-equivalence rule is deterministic and traceable to accepted parent authority (or the missing rule is surfaced rather than invented), the claim/commit boundary preserves the accepted invariant, simultaneous equivalent/conflicting contenders have defined arbitration, and every contender has a defined observable result/caller inference.
 - Two independent competent implementers could build interoperable sides of the contract without guessing the same unstated rule.
 - Failure/lifecycle semantics are as precise as the happy path and remain consistent with accepted authority.
+- Missing retention/expiry/reuse authority is visible without silently becoming infinite retention, a temporary TTL, or a weaker replay promise. Settled interface work remains usable; only claims depending on the missing decision remain open.
 - Compatibility, migration, mixed-version behavior, and persisted old/new state are specified where coexistence is possible.
 - Security boundaries specify validation/authorization placement, secret exposure/logging, replay controls, and failure behavior where relevant.
 - Verification hooks cover load-bearing invariants, transitions, failures, compatibility, and real composition rather than only schema syntax.

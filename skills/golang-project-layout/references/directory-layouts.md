@@ -15,7 +15,7 @@ project/
 │       └── main.go
 │   └── worker/            # Main application #5
 │       └── main.go
-├── internal/              # Private application code (`internal/` MUST be used for non-exported packages)
+├── internal/              # Private import boundaries when needed
 │   ├── app/              # Application initialization
 │   ├── config/           # Configuration loading
 │   ├── handler/          # HTTP/request handlers
@@ -40,48 +40,33 @@ project/
 
 ## Small Projects (Single Binary)
 
-For simple tools a root `main.go` is sufficient; the following optional `cmd/` layout is useful if additional commands are expected:
+Start with one package for a small standalone command:
 
 ```
 my-tool/
-├── cmd/
-│   └── my-tool/
-│       └── main.go        # Single main package
-├── internal/
-│   └── core.go            # Application logic
 ├── go.mod
-├── Makefile               # Build automation (optional but recommended)
-├── .gitignore             # Git ignore patterns
-├── .golangci.yml          # Linter configuration (optional)
-├── LICENSE                # License file (recommended)
-└── README.md
+├── main.go
+└── main_test.go
 ```
+
+Add another root Go file when it improves cohesion. A Makefile, lint config,
+`cmd/`, `internal/`, and dependency injection are optional responses to real
+needs, not a starter kit. Preserve a repository's established layout when fixing
+an existing small tool rather than relocating it for symmetry.
 
 ## Libraries (Reusable Code)
 
+A small public library can expose its package at the module root:
+
 ```
 my-library/
-├── example/               # Example
-├── logger/                # Public package
-│   ├── logger.go
-│   └── logger_test.go
-├── internal/
-│   └── impl/              # Private implementation details
-│       └── core.go
 ├── go.mod
-├── go.sum
-├── Makefile               # Build automation
-├── .gitignore             # Git ignore patterns
-├── .golangci.yml          # Linter configuration
-├── LICENSE                # License file
-└── README.md
+├── library.go
+└── library_test.go
 ```
 
-**Key points for libraries:**
-
-- Put public API in root-level directories (e.g., `logger/`)
-- Use `internal/` for private implementation
-- Don't use `cmd/` (unless you have example binaries)
+Add root-level subpackages for separate public capabilities and `internal/` for
+private import boundaries when needed. A `pkg/` wrapper is not required.
 
 ## The cmd/ Directory Convention
 
@@ -126,26 +111,11 @@ go build ./cmd/server     # Build specific binary
 
 ## Common Mistakes to Avoid
 
-### Don't Do This
+- Treating `cmd/`, `pkg/`, `internal/`, or a multi-module workspace as universal requirements.
+- Adding empty handler/service/repository layers or tooling for hypothetical growth.
+- Moving a working root command merely because a larger example uses `cmd/`.
+- Replacing meaningful package names with catch-all `utils`, `helpers`, or `common`.
 
-```
-myproject/
-├── src/              # Go doesn't use /src (Java pattern)
-├── main.go           # Don't put main at root
-├── utils/            # Generic package name
-├── helpers/          # Generic package name
-└── common/           # Generic package name
-```
-
-### Do This Instead
-
-```
-myproject/
-├── cmd/
-│   └── myapp/
-│       └── main.go   # Main in cmd/
-├── internal/
-│   ├── util/         # Specific utility names
-│   └── format/       # Or domain-specific names
-└── pkg/              # Only if useful to others
-```
+The [Go module layout guide](https://go.dev/doc/modules/layout) explicitly permits
+small root command and library packages. Use larger examples only when their
+boundaries solve a current problem.

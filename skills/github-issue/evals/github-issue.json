@@ -8,16 +8,30 @@
       "id": "GI-01",
       "name": "publish-prepared-handoff",
       "trap": "GitHub publication rewrites already-accepted semantics or invents metadata.",
-      "prompt": "A complete work-handoff says add JSON output to the status command, preserve current output and error codes, and test both. User asks to create an issue in acme/cli. Repository has existing labels enhancement and documentation; no assignee chosen. Describe the issue creation and verification.",
+      "prompt": "A complete work-handoff says add JSON output to the status command, preserve current output and error codes, and test both. User wants an issue in acme/cli. Repository has existing labels enhancement and documentation; no assignee was chosen. The command invocation for selecting JSON output and the output schema have not been agreed, and no specific user motivation was supplied. No GitHub tool is available for this case. Draft the title and body, then briefly describe the checks needed before publication and verification afterward.",
       "expectations": [
-        "Uses the handoff's accepted outcome, constraints and acceptance in the issue body.",
-        "Checks existing issues/PRs and repo conventions before writing.",
-        "Uses only intended existing metadata; verifies created URL and persisted body."
+        "Preserves the accepted JSON output outcome, existing-output/error-code compatibility, and checks for both modes in the drafted body.",
+        "Keeps the JSON selection syntax and schema undecided and does not invent a binary name or claimed user problem to make the example concrete.",
+        "Describes checking existing issues/PRs and relevant repository conventions before creating the issue, then re-reading the persisted body and URL if publication is later authorized and available.",
+        "Leaves metadata unset or proposes only relevant existing labels as proposals; does not assign an owner or claim a publication result."
       ],
       "negative_expectations": [
-        "Must not invent a new requirement, assignee or priority.",
+        "Must not turn an unsupplied flag such as --json, an invented command name, schema, motivation, assignee or priority into accepted requirements. A clearly separated optional interface proposal is not itself a violation.",
         "Must not claim publication happened without an authorized tool result."
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "GI-02",
@@ -354,6 +368,35 @@
         "Must not claim a root cause or require an unverified path.",
         "Must not equate a passing unit test with complete user-facing acceptance without checking behavior."
       ]
+    },
+    {
+      "id": "GI-24",
+      "name": "accepted-interface-details-must-survive-publication",
+      "prompt": "Draft an issue title and body only; no GitHub tool is available. Accepted handoff: add exactly `atlas status --format=json` for the inventory automation; do not introduce `--json`; default text and existing error exit codes stay unchanged; JSON includes the already accepted fields `state` and `checked_at`. Verify JSON output and the preserved text/error behavior. No implementation mechanism or ownership was agreed.",
+      "trap": "Avoiding invented interface choices becomes vagueness that drops accepted flag spelling, purpose, fields or compatibility, or the familiar --json example replaces the accepted option.",
+      "expectations": [
+        "Preserves atlas status --format=json and the state/checked_at fields as accepted details in a clear title/body or acceptance checks.",
+        "Explains the supplied inventory automation purpose without adding a different problem narrative.",
+        "Makes preserved default text and error exit codes independently checkable and verifies the JSON behavior.",
+        "Keeps unaccepted mechanisms and ownership out of the issue and accurately treats the response as a draft."
+      ],
+      "negative_expectations": [
+        "Must not substitute or add --json, rename accepted fields, or weaken unchanged default/error behavior.",
+        "Must not claim the issue exists or invent an assignee, priority or implementation plan."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

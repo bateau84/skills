@@ -71,7 +71,7 @@ class CliTests(unittest.TestCase):
 
     def test_selection_intersection_and_call_caps(self):
         options = parser().parse_args(["--skills", "product-acceptance", "--cases", "product-acceptance:PA1",
-                                      "--model", "p/m", "--iterations", "2", "--transport-retries", "1"])
+                                      "--model", "p/m", "--judge-model", "p/j", "--iterations", "2", "--transport-retries", "1"])
         selected = select(discover(ROOT), options)
         validate_live(options, selected)
         self.assertEqual(len(selected), 1)
@@ -96,6 +96,15 @@ class CliTests(unittest.TestCase):
                                        "fixture/fixture/model"])
         validate_live(options, select(cases, options))
 
+    def test_same_model_judge_requires_explicit_regression_opt_in(self):
+        cases = discover(ROOT)
+        for extra in ([], ["--judge-model", "proxy/model"], ["--judge-model", "test/model#high"]):
+            options = parser().parse_args(["--cases", "product-acceptance:PA1", "--model", "test/model", *extra])
+            with self.assertRaisesRegex(ValueError, "allow-same-model-judge"):
+                validate_live(options, select(cases, options))
+            options.allow_same_model_judge = True
+            validate_live(options, select(cases, options))
+
     def test_missing_explicit_or_environment_catalog_has_safe_actionable_error(self):
         with tempfile.TemporaryDirectory() as temp:
             missing = str(Path(temp) / "private-missing-catalog.json")
@@ -112,7 +121,7 @@ class CliTests(unittest.TestCase):
         for argv in (["--judge-transport", "github-copilot-cli"], ["--container-timeout", "240"],
                      ["--parallel", "0"], ["--iterations", "0"], ["--transport-retries", "6"],
                      ["--model", "p/m#high", "--reasoning", "low"]):
-            options = parser().parse_args(["--model", "p/m", "--cases", "product-acceptance:PA1", *argv])
+            options = parser().parse_args(["--model", "p/m", "--allow-same-model-judge", "--cases", "product-acceptance:PA1", *argv])
             with self.assertRaises(ValueError):
                 validate_live(options, select(discover(ROOT), options))
 
@@ -133,14 +142,14 @@ class CliTests(unittest.TestCase):
             path = Path(temp)
             (path / "skills").mkdir()
             options = parser().parse_args(["--cases", "software-engineering:SoftwareEngineering-09",
-                                           "--model", "test/model", "--comparison", "revision",
+                                           "--model", "test/model", "--judge-model", "test/judge", "--comparison", "revision",
                                            "--baseline-skill-root", str(path)])
             validate_comparison(options)
             validate_live(options, select(discover(ROOT), options))
         for mode in ("skill", "assessment", "qa"):
             options = parser().parse_args(["--model", "test/model", "--cases",
                                            "software-engineering:SoftwareEngineering-10",
-                                           "--comparison", mode])
+                                           "--comparison", mode, "--judge-model", "test/judge"])
             validate_live(options, select(discover(ROOT), options))
 
 

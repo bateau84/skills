@@ -1,0 +1,32 @@
+{
+  "status": "match",
+  "matched": 6,
+  "total": 6,
+  "cases": [
+    {
+      "id": "c-f54c1f524bb6cda63028adef4453d958",
+      "status": "match"
+    },
+    {
+      "id": "c-a7d473efc13fc2ae95b694f1539a7bcd",
+      "status": "match"
+    },
+    {
+      "id": "c-1092e09cec38cec9c380ad8408eb1d9a",
+      "status": "match"
+    },
+    {
+      "id": "c-1d1e57a841846216d0274d21b50e6067",
+      "status": "match"
+    },
+    {
+      "id": "c-034d816ca23d51399cf0af1b02fcbd0e",
+      "status": "match"
+    },
+    {
+      "id": "c-dd3c5a0e1f7fa83e32c79f602d33f99d",
+      "status": "match"
+    }
+  ],
+  "packet_sha256": "34aee1cd1ef2bea27ae76e21eb1feb49c4d3af89d1232e474c23f71c1e3387f5"
+}

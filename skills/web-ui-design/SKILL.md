@@ -39,13 +39,21 @@ Web UI design is the only surface discipline where the application does not cont
 
 ### Back button
 
-The back button is used in more than 30% of navigations (usability studies). Users expect it to undo navigation. Design for it, do not fight it.
+Users expect Back to return to a previous navigation state. Design for it and verify the relevant history paths.
 
-**In multi-page apps (MPAs):** The browser manages the navigation stack automatically. Each full page load creates a history entry. Back always works.
+**In multi-page apps (MPAs):** The browser manages session history for ordinary document navigation. Direct entry, redirects and history replacement still affect what Back can return to; a previous entry need not belong to this app.
 
-**In single-page apps (SPAs):** The JavaScript application controls DOM replacement without page loads. The application **must** push to browser history (`pushState`) on every meaningful navigation. Failure mode: the user navigates within the app, presses Back, and is ejected from the app entirely rather than returning to the previous view.
+**In single-page apps (SPAs):** The JavaScript application controls DOM replacement without page loads. New navigable destinations normally push a history entry. Back/Forward traverse existing entries; replacing an entry serves a different purpose and must preserve the intended history. Failure mode: component state changes without usable history, or closing a view pushes its parent and makes Back reopen the view.
 
 Design rule: every route change in an SPA is a design decision. When specifying an SPA, specify which navigation events push a history entry and what URL state they encode.
+
+For a routed detail panel, distinguish opening from an in-app parent and loading
+a shared deep link. Close may traverse back when a known parent entry was
+created by opening the panel; for a direct entry, use a deliberate parent-route
+fallback that does not unexpectedly leave the app. `history.length > 1` does
+not establish that the previous entry is that parent. State the expected URL,
+panel state and subsequent Back behavior for both paths; do not prescribe one
+history call without establishing its precondition.
 
 ### Multi-tab behavior
 
@@ -55,9 +63,9 @@ Design rule: any link a user might right-click and open in a new tab must produc
 
 ### URL as persistent state
 
-The URL is always visible to the user. It conveys location in the hierarchy, supports bookmarking, and is the primary sharing mechanism for web content. If a user cannot paste a URL into an email and have the recipient arrive at the same view, something is wrong.
+The URL conveys location in the hierarchy and supports bookmarking and sharing. Make meaningful navigation shareable by default, while preserving the accepted product contract. If some view state is intentionally local, explain what sharing and reloading preserve rather than promising that a copied URL reproduces it.
 
-Design rule: every meaningful application state that a user would want to share or return to should have a URL. Transient UI state (which accordion is expanded, which tooltip is open) does not need a URL. Persistent application state (current filter, selected record, active tab within a page) usually does.
+Design rule: give state a URL when the accepted navigation or sharing contract requires it. Transient UI state (which accordion is expanded, which tooltip is open) usually does not need a URL. Current filters, selected records and active tabs often benefit from one; choose deliberately and state the consequences of any local-only alternative. Do not override an established URL contract as a matter of preference.
 
 Concrete example: a filtered data table at `/records?status=active&sort=name-asc` is shareable and bookmarkable. The same table stored as component state is neither.
 
@@ -106,7 +114,7 @@ Multi-step services (checkout, onboarding, complex forms) use document-model con
 
 ### App-model (single-page applications — SPA)
 
-The JavaScript application replaces DOM content without page loads. The URL must still update on every meaningful navigation (pushState). Loading states are the application's responsibility. Focus management after navigation is the application's responsibility — the browser does not auto-scroll or reset focus on client-side navigation.
+The JavaScript application replaces DOM content without page loads. Apply the specified URL/history contract: push new destinations, replace or traverse entries when that is the intended behavior, and distinguish local UI state from navigation. Loading states are the application's responsibility. Focus management after navigation is the application's responsibility — the browser does not auto-scroll or reset focus on client-side navigation.
 
 **User expectations:**
 - Instant or near-instant state changes (the SPA promise)

@@ -1,0 +1,63 @@
+{
+  "skill": "golang-concurrency",
+  "version": "1.0.0",
+  "common_instruction": "This is a response-only exercise. Use the supplied scenario and snippets; propose or review the requested work without claiming files were changed, commands ran, or external systems were inspected. State material verification limits. Equivalent solutions that satisfy the stated contract are acceptable.",
+  "cases": [
+    {
+      "id": "GCON-CANCEL-01",
+      "name": "producer-blocked-after-consumer-cancels",
+      "prompt": "This function leaks when a caller reads one item, cancels ctx, and stops receiving. Assume calculate is synchronous and always returns promptly. Explain the cause and show a bounded fix preserving a streaming channel result.\n\nfunc Stream(ctx context.Context, jobs []int) <-chan int {\n    out := make(chan int)\n    go func() {\n        defer close(out)\n        for _, job := range jobs { out <- calculate(job) }\n    }()\n    return out\n}\n\nDescribe how a test could establish producer termination after cancellation without relying on an arbitrary sleep or resuming/draining the abandoned output.",
+      "expectations": [
+        "Identifies the blocking send as the path that ignores cancellation after the consumer stops.",
+        "Makes the send cancellation-aware, with the producer exiting when ctx is canceled.",
+        "Keeps closure with the producer after its sends finish and does not require the abandoning consumer to close the channel.",
+        "Proposes a bounded observation of producer exit while the output stays abandoned, using a producer-owned completion signal/test seam or a leak detector tied to this goroutine. Draining the finite output until it closes or running only the race detector does not prove this cancellation behavior."
+      ],
+      "negative_expectations": [
+        "Must not replace the unbuffered channel with a larger buffer as the complete leak fix.",
+        "Must not have the receiver close out while a sender may still send, or spawn detached work just to unblock the send.",
+        "Must not resume receiving from or drain the abandoned output as the evidence that cancellation stopped the producer; that would also let the original finite producer finish."
+      ],
+      "trap": "Hide blocked sends behind buffering or close the channel from the receiver instead of giving the producer an exit path.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome",
+          "N3": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GCON-SEQUENTIAL-02",
+      "name": "cheap-local-loop-does-not-need-workers",
+      "prompt": "A Go helper validates twelve in-memory records sequentially in about 20 microseconds total. It is called once at startup, preserves input order, and has no I/O. There is no startup latency complaint. A review suggests one goroutine per record, a channel, and a worker pool because the application has spare CPUs. Decide whether to make that change and give a focused reason.",
+      "expectations": [
+        "Keeps the simple sequential implementation for the stated workload absent a demonstrated need.",
+        "Connects the decision to lifecycle/coordination cost and the tiny noncritical workload.",
+        "Names measurement or a changed workload as a reason to revisit concurrency without claiming a measured speedup or slowdown."
+      ],
+      "negative_expectations": [
+        "Must not add a worker pool, goroutines, cancellation plumbing, or shared-state synchronization merely because CPUs are available."
+      ],
+      "trap": "Treat concurrency guidance as a requirement to parallelize every loop.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

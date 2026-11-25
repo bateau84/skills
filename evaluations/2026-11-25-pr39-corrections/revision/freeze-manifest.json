@@ -1,0 +1,39 @@
+{
+  "frozen_at_utc": "2026-11-25T07:34:34.022646+00:00",
+  "task_count": 3,
+  "task_metadata": [
+    {
+      "opaque_task_id": "c2682d46c3e74011b2abc2578304271a",
+      "skill": "python-database-orm",
+      "criterion_count": 9
+    },
+    {
+      "opaque_task_id": "e09da2ff97294755812d512b6d1ec62f",
+      "skill": "interaction-design",
+      "criterion_count": 9
+    },
+    {
+      "opaque_task_id": "17067d685dc44effbb39efe8d81d00b4",
+      "skill": "interaction-design",
+      "criterion_count": 10
+    }
+  ],
+  "files": [
+    {
+      "name": "tasks.json",
+      "sha256": "e7aef8cef0a631a4070ca4dc5ce81cb56bb09d0089f5e7ba859ec732b730948e",
+      "bytes": 20371
+    },
+    {
+      "name": "maintainer-rationale.json",
+      "sha256": "7512b66a133ab9f5f7c61784eccaab9e5ce623f34ca824ab4fca800d3f13a1eb",
+      "bytes": 24290
+    }
+  ],
+  "constraints": {
+    "responses_generated": false,
+    "experiments_run": false,
+    "source_skills_or_prior_experiments_inspected": false,
+    "git_mutations_performed": false
+  }
+}

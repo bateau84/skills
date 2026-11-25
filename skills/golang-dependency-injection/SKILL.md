@@ -46,7 +46,7 @@ For interface-based design foundations (accept interfaces, return structs), see 
 | Testing requires real databases, APIs | Pass mock implementations in tests |
 | Changing one component breaks others | Loose coupling via interfaces — components don't know each other's internals |
 | Services initialized everywhere | Centralized container manages lifecycle (singleton, factory, lazy) |
-| All services loaded at startup | Lazy loading — services created only when first requested |
+| Optional expensive components created unnecessarily | Deliberate lazy construction, while critical dependencies are validated before readiness |
 | Global state and `init()` functions | Explicit wiring at startup — predictable, debuggable |
 
 DI shines in applications with many interconnected services — HTTP servers, microservices, CLI tools with plugins. For a small script with 2-3 functions, manual wiring is fine. Don't over-engineer.
@@ -166,7 +166,7 @@ The [pinned test](../../examples/reference-go/reference_test.go) verifies both c
 
 | Signal | Action |
 | --- | --- |
-| < 10 services, simple dependencies | Stay with manual constructor injection |
+| Manageable dependency graph and lifecycle | Stay with manual constructor injection; service count is not a decision threshold |
 | Repeated wiring/lifecycle friction | Compare manual wiring with a maintained DI library against actual change and ownership costs; count alone is not a decision rule |
 | Significant lifecycle coordination | Consider supported lifecycle tooling such as Fx or an explicit owner; do not prefer unmaintained Wire for new work or claim generics prove a complete graph |
 | Need health checks, graceful shutdown | Use a library with built-in lifecycle support |

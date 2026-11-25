@@ -1,5 +1,7 @@
 # Real User Monitoring (RUM) and Product Observability
 
+Use this reference only when user-experience or product-analytics measurement is in scope. A backend change does not by itself justify collecting user events or adding an analytics service.
+
 ## What RUM Is
 
 Backend observability (logs, metrics, traces, profiles) tells you how your **system** behaves. RUM tells you how your **users** experience it. While frontend SDKs capture browser-side signals, the Go backend plays a critical role: tracking server-side business events, feeding Customer Data Platforms, and correlating user sessions with backend traces.
@@ -23,7 +25,7 @@ posthogClient.Enqueue(posthog.Capture{
     Event:      "order_completed",
 })
 
-// ✓ Good — user_id is immutable, stable, and not PII
+// Stable opaque ID instead of email; still treat linkable identifiers as sensitive
 posthogClient.Enqueue(posthog.Capture{
     DistinctId: user.ID, // "usr_a1b2c3" — never changes, always the same user
     Event:      "order_completed",
@@ -37,7 +39,7 @@ posthogClient.Enqueue(posthog.Capture{
 - **Non-unique across systems** — the same email might belong to different accounts in different services or environments.
 - **Leaks into third-party systems** — the distinct_id is sent to your analytics platform (PostHog, Segment, etc.). If it's an email, you've shared PII with every vendor in your analytics pipeline.
 
-Use `user_id` as the identity key everywhere: PostHog `DistinctId`, Segment `UserId`, Amplitude `user_id`. Store email as a user property if needed for display, never as the primary key.
+Choose a stable opaque identity only when the accepted analytics contract needs user-level correlation. Linkable identifiers still require the project's privacy controls; do not add email or other user properties merely because the SDK supports them.
 
 ## Backend Role in RUM
 

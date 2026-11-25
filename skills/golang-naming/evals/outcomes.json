@@ -1,0 +1,61 @@
+{
+  "skill": "golang-naming",
+  "version": "1.0.0",
+  "common_instruction": "This is a response-only exercise. Use the supplied scenario and snippets; propose or review the requested work without claiming files were changed, commands ran, or external systems were inspected. State material verification limits. Equivalent solutions that satisfy the stated contract are acceptable.",
+  "cases": [
+    {
+      "id": "GNAME-CALLSITE-01",
+      "name": "public-name-communicates-specific-operation",
+      "prompt": "Choose names and a short doc comment for a new public function in package quota. It checks whether an order's requested amount fits within the account's currently available amount and returns a domain error otherwise; it does not reserve or deduct funds. The draft is `func V(x Amount, y Amount) error`. Also rename a new field `callbackUrl string` idiomatically. The API is new, so no compatibility migration is needed. Keep the answer to these names and their meaning.",
+      "expectations": [
+        "Proposes a function name, parameter names, and/or short comment that distinguish checking available amount from reserving or charging funds.",
+        "Uses idiomatic URL acronym casing for the new field and avoids needless repetition of the quota package name.",
+        "Keeps the supplied behavior unchanged and does not make the naming exercise into an implementation or architecture change."
+      ],
+      "negative_expectations": [
+        "Must not use a name/comment that implies reservation, deduction, authorization, or another behavior absent from the contract.",
+        "Must not justify new telemetry, interfaces, or a package split merely to improve these identifiers."
+      ],
+      "trap": "Apply short-local-variable naming to a public API or invent behavior through a more impressive name.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "convention",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GNAME-WIRE-02",
+      "name": "naming-rule-does-not-renumber-wire-values",
+      "prompt": "A released Go API encodes `StatusReady = 0` and `StatusBusy = 1` in persisted records and on the wire. Consumers rely on those exact values. A naming review proposes inserting `StatusUnknown = iota` at the start and moving Ready/Busy to 1/2 because zero must always mean unknown. No protocol migration is authorized. Decide how to handle this review comment and what can safely be documented now.",
+      "expectations": [
+        "Rejects renumbering the existing statuses because it changes persisted/wire meaning.",
+        "Treats zero-as-unknown as a design choice for an applicable new type, not a reason to break this accepted contract.",
+        "Documents the established values and zero-value semantics; any future migration or additional sentinel is explicitly separate and requires a compatible design."
+      ],
+      "negative_expectations": [
+        "Must not insert a leading iota sentinel that silently changes Ready or Busy values.",
+        "Must not call the change cosmetic or compatible merely because exported names remain the same."
+      ],
+      "trap": "Enforce a naming/zero-value convention by breaking an existing data contract.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

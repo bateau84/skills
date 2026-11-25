@@ -14,14 +14,33 @@
         "Carries the accepted request-identity rule exactly: RFC 8785 canonicalize the opaque `job` value, compute its SHA-256 identity digest, and use digest equality for same-key/same-request replay versus same-key/different-request conflict; does not invent a competing equality rule.",
         "Defines caller-safe behavior after transport timeout/uncertain response and makes retry/idempotency guarantees precise rather than treating timeout as ordinary failure.",
         "Defines deterministic arbitration and observable outcomes for simultaneous requests using the same idempotency key, covering both equivalent requests and conflicting requests so every contender knows whether it receives the committed job or a conflict.",
-        "Separates normative contract from examples and names conformance evidence that exercises retries, crashes/uncertain responses, conflicts, and at least one real client/server composition path rather than only one-sided or schema-level checks."
+        "Separates normative contract from examples and names conformance evidence that exercises retries, crashes/uncertain responses, conflicts, and at least one real client/server composition path rather than only one-sided or schema-level checks.",
+        "Identifies missing retention/expiry/key-reuse authority as a limit on the dependent lifetime contract, preserves the accepted same-key replay guarantee, and continues defining settled transport details without asserting a fully settled lifecycle."
       ],
       "negative_expectations": [
         "Must not stop at a JSON schema and 200/400 examples while leaving duplicate/concurrent/timeout behavior implicit.",
         "Must not invent a second queue, store, or protocol mechanism outside the settled parent architecture.",
         "Must not allow two implementations to choose incompatible meanings for same-request comparison while both claiming conformance.",
-        "Must not invent idempotency-key expiry/retention or post-expiry key-reuse semantics that accepted authority did not define."
-      ]
+        "Must not invent idempotency-key expiry, indefinite retention, permanent non-reuse or post-expiry reuse semantics. Conditional proposals explicitly left undecided are allowed; they must not appear as normative invariants or silently narrow the accepted replay promise to whatever records happen to remain."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "E5": "outcome",
+          "E6": "outcome",
+          "E7": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "N3": "outcome",
+          "N4": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "Spec-02",
@@ -41,6 +60,35 @@
         "Must not silently discard or coerce an unknown event type into a known/default type.",
         "Must not create a new message bus, persistence engine, or migration service that the parent architecture did not authorize."
       ]
+    },
+    {
+      "id": "Spec-03",
+      "name": "accepted-retention-policy-is-not-an-open-question",
+      "prompt": "Specify only the retention portion of this already accepted idempotent submission interface. Accepted authority: the idempotency binding remains for the full lifetime of the job; the retention clock begins when the job reaches its accepted terminal state; the binding is retained for at least 30 days after that terminal time; job deletion cannot shorten that period; once the binding expires, reusing its key is rejected as expired and never creates a new job. Retrying a still-retained key with the same accepted request identity returns the original job identity. Do not redesign transport, request identity, storage or job states. Write a concise contract and boundary checks.",
+      "trap": "A rule against inventing retention becomes a blanket refusal to carry an explicitly accepted lifecycle policy, or the spec replaces the accepted retention origin with request creation time.",
+      "expectations": [
+        "Carries the full job-lifetime and at-least-30-days-after-terminal retention conditions, including the rule that job deletion cannot shorten them.",
+        "Preserves replay of the original identity for retained bindings and explicit rejection of reused expired keys without creating a new job.",
+        "Defines checks before termination, just before the minimum terminal retention boundary, after accepted expiry, and deletion during retention without inventing an exact cleanup schedule.",
+        "Treats the supplied retention meaning as accepted and specifies the bounded slice rather than reopening it or expanding the whole interface."
+      ],
+      "negative_expectations": [
+        "Must not change the retention clock to first submission, require infinite retention, or allow an expired key to create a new job.",
+        "Must not choose a new datastore or invent a tombstone implementation; exact cleanup scheduling is not an accepted product promise."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

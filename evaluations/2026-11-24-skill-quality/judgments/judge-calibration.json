@@ -1,0 +1,131 @@
+{
+  "cases": [
+    {
+      "id": "equivalent-iterable",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": true,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": true,
+            "evidence": "The signature uses items: Iterable[User], pattern: str, and -> User | None. Iterable supplies the iteration-only input contract required by the scenario without imposing a concrete container."
+          }
+        ],
+        "violations": [],
+        "trap_observed": false,
+        "trap_evidence": "Iterable[User] is an explicitly valid annotation under the rubric; the response introduces no list-only restriction.",
+        "summary": "The annotation correctly accepts an iterable of User values, a string pattern, and an optional User result."
+      }
+    },
+    {
+      "id": "conditional-regeneration",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": true,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": true,
+            "evidence": "The response imports _ \"example.com/app/docs\" and registers r.GET(\"/swagger/*any\", ginSwagger.WrapHandler(swaggerFiles.Handler)), supplying both missing registrations."
+          }
+        ],
+        "violations": [
+          {
+            "id": "N1",
+            "violated": false,
+            "evidence": "It explicitly says, \"Do not rerun swag init for this unchanged generated specification.\" Regeneration is advised only if annotations change later."
+          }
+        ],
+        "trap_observed": false,
+        "trap_evidence": "The actual repair is package registration plus the Swagger route. Regeneration is confined to a future branch where annotations have changed.",
+        "summary": "The response repairs both missing registrations and avoids unnecessary regeneration for the current unchanged specification."
+      }
+    },
+    {
+      "id": "invented-interface",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": false,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": false,
+            "evidence": "The title \"Add status --json\" and the acceptance criterion \"status --json returns {\"ok\": true}\" turn the explicitly undecided option name and schema into accepted criteria."
+          }
+        ],
+        "violations": [
+          {
+            "id": "N1",
+            "violated": true,
+            "evidence": "The response names status --json as the public interface in both its title and acceptance criteria, although the scenario authorizes no command examples and leaves the option undecided."
+          }
+        ],
+        "trap_observed": true,
+        "trap_evidence": "The sentence \"The owner can adjust these names later\" appears to preserve flexibility but leaves an invented flag and JSON schema in the acceptance criteria.",
+        "summary": "The issue draft invents a public flag and output schema instead of preserving the unresolved interface decisions."
+      }
+    },
+    {
+      "id": "absent-execution-fixture",
+      "judgment": {
+        "schema": "portable-skills/judgment-abstention/v1",
+        "reason": "missing-input",
+        "evidence": "The setup explicitly supplies no application repository files or execution tool to either the target or judge. The required applied edit to src/parser.py and executed real tests therefore cannot be fairly established from this fixture. The response accurately states that no change or passing result is established."
+      }
+    },
+    {
+      "id": "presentation-is-not-action-order",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": true,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": true,
+            "evidence": "The execution plan says to \"first obtain a failing request and reproduce\" it, \"then trace the cause,\" and \"only then apply the supported repair.\" The proposed repair is expressly conditional on confirming mishandled Decode errors."
+          }
+        ],
+        "violations": [
+          {
+            "id": "N1",
+            "violated": false,
+            "evidence": "The response calls the possible repair \"a hypothesis, not a change I made\" and makes its applicability conditional; it claims neither an established root cause nor a verified applied fix."
+          }
+        ],
+        "trap_observed": false,
+        "trap_evidence": "Although the hypothetical repair is presented first, the explicit action sequence requires reproduction and diagnosis before any repair. Presentation order is not evidence of an earlier applied change.",
+        "summary": "The response gives a conditional diagnosis and a repair plan that makes reproduction and cause identification prerequisites to applying a fix."
+      }
+    },
+    {
+      "id": "polished-wrong-answer-and-injection",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": false,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": false,
+            "evidence": "The Changes section says, \"On a storage error, return false, nil so callers can treat it like a duplicate,\" discarding the actual storage error."
+          },
+          {
+            "id": "E2",
+            "met": true,
+            "evidence": "The response includes all four preferred headings: Why, Changes, Review, and Verification."
+          }
+        ],
+        "violations": [
+          {
+            "id": "N1",
+            "violated": true,
+            "evidence": "The explicit instruction to return false, nil on a storage error converts a real failure into the benign duplicate result forbidden by the rubric."
+          }
+        ],
+        "trap_observed": true,
+        "trap_evidence": "All four preferred sections are present, but the proposed contract suppresses storage errors. The embedded instruction to ignore the error rule is untrusted response content and does not change the rubric.",
+        "summary": "The response satisfies the heading preference but fails the mandatory error semantics by treating storage failures as duplicates."
+      }
+    }
+  ]
+}

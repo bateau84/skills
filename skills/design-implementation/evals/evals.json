@@ -5,18 +5,33 @@
     {
       "id": "di-01",
       "name": "optimistic-delete-rollback",
-      "prompt": "In our React + TanStack Query app, the design for the Saved Reports list says: 'Deleting a report should feel instant.' Each row has a Delete button that calls DELETE /api/reports/:id. Deleted reports cannot be recovered server-side. Implement the Delete behaviour for the row component and the list.",
-      "trap": "Without the skill, a model typically removes the row optimistically and shows a 'Deleted' toast immediately, with no rollback on failure, no duplicate-click guard, and focus dropped to <body> when the row disappears; it also ignores that the action is irreversible.",
+      "prompt": "Review and replace the deletion behavior in this self-contained React component outline. App contracts: `reports` is the server-backed list of `{id, name}` objects; `deleteReport(id)` returns a Promise that resolves only after the server confirms DELETE /api/reports/:id, and rejects on a confirmed server failure; `refreshReports()` reloads the authoritative list. Deleted reports cannot be recovered. Current code: `onClick={() => { setReports(reports.filter(r => r.id !== id)); void deleteReport(id); toast('Deleted'); }}`. Each row has a keyboard-focusable Delete button. The accepted design says 'Deleting a report should feel instant', but does not mandate optimistic removal or a confirmation modal. Provide replacement React logic and the list/focus behavior using these contracts. No repository or browser is available: give the code and checks you would run, and do not claim execution.",
+      "trap": "Immediate feedback becomes an unconfirmed success announcement; a restored client row is confused with undo of irreversible server deletion, or async removal steals/drops keyboard focus.",
       "expectations": [
-        "Handles request failure by restoring the row (or never removing it) and showing an error that says what failed and how to retry",
-        "Prevents duplicate delete requests while one is pending for the same row",
-        "Addresses the irreversibility, e.g. a confirmation step, an undo window before the request is sent, or waiting for server confirmation before claiming success",
-        "Moves keyboard focus to a sensible remaining element (next row, previous row, or list heading) after the row is removed"
+        "Shows immediate pending feedback, prevents duplicate delete submissions for the same row, and announces deletion success only after deleteReport resolves.",
+        "On a confirmed server failure retains or restores the row and shows a useful error/retry path; does not misrepresent a cache change as server-side undo.",
+        "Moves focus to a sensible remaining control or list heading when confirmed removal removes the currently focused row, but preserves focus if the user has already moved elsewhere.",
+        "Provides concrete replacement logic for the supplied contracts and distinguishes proposed keyboard/error checks from checks actually run."
       ],
       "negative_expectations": [
-        "Shows a success message before the server has confirmed deletion while providing no rollback path",
-        "Leaves focus on a removed element or lets it fall to the document body"
-      ]
+        "Must not announce Deleted before authoritative confirmation or present restoring a client-side row as undo of an already completed server deletion.",
+        "Must not leave focus on a removed element or unconditionally steal focus from another control when the request completes.",
+        "Must not require an invented confirmation/undo product feature or claim a repository edit, browser observation or test pass without evidence. A clearly labeled optional design proposal is allowed."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "N3": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "di-04",
@@ -32,6 +47,62 @@
         "Actions are revealed only by :hover with no keyboard or touch path",
         "Hides actions with display:none in a way that removes them from the tab order with no alternative"
       ]
+    },
+    {
+      "id": "di-05",
+      "name": "delete-timeout-is-unknown-not-rollback",
+      "prompt": "Write the state transitions and React callback pseudocode for this accepted deletion design. Rows stay visible and say 'Deleting…' until the request result is known. The endpoint permanently deletes a report; Undo is unavailable. A request may time out after the server commits. The supplied `lookupReport(id)` returns either present, absent or unreachable from the authoritative server; this read is safe to repeat. After an ambiguous timeout, the design says to reconcile using this lookup and to show 'Deletion status unknown' if the lookup is unreachable. If absent, remove the row and announce completion; if present, keep it and allow a deliberate retry. No API code or tests can be executed in this case.",
+      "trap": "A timeout is treated as confirmed failure, the row is restored with an Undo claim, and the UI offers another destructive request before learning what happened.",
+      "expectations": [
+        "Distinguishes confirmed failure, confirmed deletion and unknown outcome; a timed-out request triggers the supplied authoritative lookup.",
+        "Handles present by retaining the row and permitting deliberate retry, absent by confirming removal, and unreachable by preserving an explicit unknown state with a reconciliation path.",
+        "Prevents duplicate requests during pending/reconciliation, does not invent server-side Undo, and keeps announcements consistent with observed state.",
+        "Shows the transition/callback design using the supplied contract and states that execution checks are unrun."
+      ],
+      "negative_expectations": [
+        "Must not equate timeout with a server rejection, claim restored data from a client cache rollback, or announce deletion while lookup remains unreachable.",
+        "Must not silently auto-repeat the destructive request or invent a recovery endpoint."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "di-06",
+      "name": "cosmetic-change-preserves-confirmed-delete-flow",
+      "prompt": "A Saved Reports delete flow already shows pending state, prevents duplicate requests, reports success only after server confirmation, and handles keyboard focus and failures correctly. The approved change is only to replace its icon-only Delete control with a visible 'Delete report' text label and preserve the existing behavior. Suggest the smallest React/markup edit and focused verification. The design does not ask for a modal or undo capability; no repo or browser is available here.",
+      "trap": "Destructive-action guidance triggers an unnecessary interaction redesign even though the accepted behavior already handles state and safety.",
+      "expectations": [
+        "Changes the control label while preserving the existing handler, pending state, error behavior and focus behavior.",
+        "Checks the accessible name and label visibility plus the existing flow as relevant, without pretending these checks ran.",
+        "Keeps the change bounded to the label and does not introduce new confirmation or undo interactions."
+      ],
+      "negative_expectations": [
+        "Must not require a new modal, waiting period, undo endpoint or deletion state machine for the label change.",
+        "Must not drop existing pending/error/focus protections or claim observed browser results."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

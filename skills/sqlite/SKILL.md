@@ -100,6 +100,8 @@ Use the actual application runtime and a real disposable database. For file, WAL
 
 Report what changed, the runtime and workload used, what was verified, and any remaining limitation. If execution is unavailable, deliver the concrete SQL/configuration and verification steps as unexecuted proposals.
 
+When the driver is unknown, separate SQLite's verified semantics from proposed driver-specific DSN or connection-hook syntax. Inspect that driver's supported initialization path before presenting an application patch as ready to use; a plausible snippet is not evidence it compiled or ran.
+
 ## Leave useful room for growth
 
 Keep migrations reproducible, IDs stable, data types consistent, queries bounded and access patterns visible. Preserve existing tenant boundaries when they exist; do not add tenant/shard routing for a hypothetical deployment.

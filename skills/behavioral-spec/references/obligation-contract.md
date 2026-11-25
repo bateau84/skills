@@ -16,6 +16,8 @@ Scan for seams where independently realized parties must agree on one or more of
 
 Do not create an OC for ordinary private helper boundaries merely because values cross them.
 
+Before drafting, name the independent interpretations the contract must reconcile and the accepted outcome that could fail if they differ. Ordinary actor labels or an implementation mechanism do not establish independent realization. If existing BR/QS wording already owns all the required meaning and no independent agreement needs to be made, keep that home. A missing product decision is an open question, not a reason to fill an OC with provisional guarantees.
+
 ## Method
 
 1. Name semantic participants by responsibility, not packages/services unless structure is already authoritative.

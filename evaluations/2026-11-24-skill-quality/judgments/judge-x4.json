@@ -1,0 +1,91 @@
+{
+  "cases": [
+    {
+      "id": "work-1",
+      "scorable": true,
+      "criteria": [
+        {
+          "id": "E1",
+          "met": true,
+          "evidence": "Acceptance criterion 1 requires a user to initiate withdrawal while queued and successful handling to remove the request with scheduler confirmation. Criterion 2 says the exporter must never run after withdrawal takes effect before processing starts. Criterion 4 allows Withdrawn only after confirmation for that particular request. The verification section also explicitly rejects an implementation that never completes withdrawals."
+        },
+        {
+          "id": "E2",
+          "met": true,
+          "evidence": "Criteria 3 and 5 preserve existing behavior when processing begins first or has already begun. The implementation-planning note leaves the processing-start boundary and removal mechanism for the pending investigation and explicitly selects no locking, transaction, storage, or helper-interface design."
+        },
+        {
+          "id": "E3",
+          "met": true,
+          "evidence": "The response expresses the capability, ordering guarantee, truthful UI state, and scope as one behavioral requirement with useful acceptance criteria. It recognizes that the supplied single-service/private-helper context does not establish an independently implemented contract boundary and does not add a duplicate quality scenario. Matching confirmation to a request and consistently resolving competing withdrawal/start actions are necessary consequences of the accepted guarantees, not additional product policy."
+        }
+      ],
+      "outcome_pass": true,
+      "notes": "The supplied task and response are sufficient to judge. The response preserves the accepted behavior and leaves implementation selection open."
+    },
+    {
+      "id": "work-2",
+      "scorable": true,
+      "criteria": [
+        {
+          "id": "E1",
+          "met": true,
+          "evidence": "Both What we want and the Done when checklist require machine-readable status output while preserving the existing human-readable output."
+        },
+        {
+          "id": "E2",
+          "met": true,
+          "evidence": "The response states that the public option name and output schema have not been decided, and explicitly defers command/output examples until both decisions are made. It supplies no invented flag, schema, example, motivation, assignee, priority, issue number, implementation result, or publication claim. The repository label repeats owner/tooling from the prompt."
+        },
+        {
+          "id": "E3",
+          "met": true,
+          "evidence": "It supplies the draft title Support machine-readable output for the status command, a usable issue body describing the requested change and completion conditions, and a Decisions still needed section listing the option name and output schema."
+        }
+      ],
+      "outcome_pass": true,
+      "notes": "The supplied task and response are sufficient to judge. The issue remains a draft with the two unresolved decisions clearly identified."
+    },
+    {
+      "id": "work-3",
+      "scorable": true,
+      "criteria": [
+        {
+          "id": "E1",
+          "met": true,
+          "evidence": "The proposed initial layout is a root main package containing go.mod, main.go, and main_test.go. Argument handling, file access, formatting helpers, and stdout output can remain in main.go. It requires no extra package layers, command hierarchy, or build infrastructure, and gives a usable go run invocation."
+        },
+        {
+          "id": "E2",
+          "met": true,
+          "evidence": "Expansion is tied to concrete needs: distinct formatting responsibility, file-based fixtures, a second executable, shared private logic or a meaningful package boundary, external API consumers, and cumbersome repeated workflows. It explicitly says line count does not automatically require more packages. Suggested cmd, internal, public-package, and tooling changes are conditional on those needs."
+        }
+      ],
+      "outcome_pass": true,
+      "notes": "The supplied task and response are sufficient to judge. The adjacent test file is a low-cost convention compatible with the requested minimal scope."
+    },
+    {
+      "id": "work-4",
+      "scorable": true,
+      "criteria": [
+        {
+          "id": "E1",
+          "met": true,
+          "evidence": "The opening states that the change is not ready because lint fails and empty-input behavior violates the accepted requirement. The evidence table identifies F401 in src/parser.py and the ValueError-versus-None test failure, while stating that formatting and type-check passes do not resolve either failure."
+        },
+        {
+          "id": "E2",
+          "met": true,
+          "evidence": "The next actions call for inspecting the changed branch, existing test, and traceback; reproducing the empty-input failure; restoring None in the implementation; retaining the existing test expectation; correcting the unused import; and rerunning verification."
+        },
+        {
+          "id": "E3",
+          "met": true,
+          "evidence": "The response retains Python 3.13, uv, and the configured Ruff, mypy, and pytest commands. Its focused test is an intermediate diagnostic within tests/parser, followed by the exact configured uv run pytest tests/parser suite. It requires the Ruff rerun to match the final code state and says supplied outputs are the only current evidence, no fixes or post-fix checks have occurred, and the repository was not executed here."
+        }
+      ],
+      "outcome_pass": true,
+      "notes": "The supplied task and response are sufficient to judge. The proposed reruns are future actions, not claimed execution. Passing verification remains explicitly outstanding."
+    }
+  ]
+}

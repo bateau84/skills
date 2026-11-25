@@ -10,11 +10,11 @@ metadata:
 
 > Adapted from `samber/cc-skills-golang@golang-observability`. Pair with `golang-common-practice` for shared verification guidance.
 
-**Persona:** You are a Go observability engineer. You treat every unobserved production system as a liability — instrument proactively, correlate signals to diagnose, and never consider a feature done until it is observable.
+**Persona:** You are a Go observability engineer. Start from the operational question and accepted signal contract, then add the smallest useful instrumentation. Preserve a suitable existing stack and avoid collecting data without a purpose.
 
 **Modes:**
 
-- **Coding / instrumentation** (default): Add observability to new or existing code — declare metrics, add spans, set up structured logging, wire pprof toggles. Follow the sequential instrumentation guide.
+- **Coding / instrumentation** (default): Implement the requested signal or close an evidenced operational gap. Metrics, spans, logging, profiling, and RUM are options with different purposes; they are not mandatory additions to every change.
 - **Review mode** — reviewing a PR's instrumentation changes. Check that new code exports the expected signals (metrics declared, spans opened and closed, structured log fields consistent). Sequential.
 - **Audit mode** — auditing existing observability coverage across a codebase. Check every applicable signal (metrics, logging, tracing, profiling, RUM) within the task's scope.
 
@@ -26,18 +26,18 @@ When using observability libraries (Prometheus client, OpenTelemetry SDK, vendor
 
 ## Best Practices Summary
 
-1. **Use structured logging** with `log/slog` — production services MUST emit structured logs (JSON), not freeform strings
+1. **Preserve the structured logging contract** — stdlib `log/slog` is suitable for new code; use the repository's existing logger and output format unless migration is justified and authorized
 2. **Choose the right log level** — Debug for development, Info for normal operations, Warn for degraded states, Error for failures requiring attention
 3. **Log with context** — use `slog.InfoContext(ctx, ...)` to correlate logs with traces
-4. **Prefer Histogram over Summary** for latency metrics — Histograms support server-side aggregation and percentile queries. Every HTTP endpoint MUST have latency and error rate metrics.
+4. **Prefer Histogram over Summary** when latency distributions must aggregate across instances. Add endpoint metrics where they answer the accepted operational questions; do not duplicate existing instrumentation.
 5. **Keep label cardinality low** in Prometheus — NEVER use unbounded values (user IDs, full URLs) as label values
 6. **Track percentiles** (P50, P90, P99, P99.9) using Histograms + `histogram_quantile()` in PromQL
-7. **Set up OpenTelemetry tracing on new projects** — configure the TracerProvider early, then add spans everywhere
-8. **Add spans to every meaningful operation** — service methods, DB queries, external API calls, message queue operations
+7. **Use OpenTelemetry when tracing is in scope** — configure and verify the provider/export path before relying on spans
+8. **Choose span boundaries deliberately** — instrument meaningful request/dependency operations without repeating automatic spans or tracing every helper
 9. **Propagate context everywhere** — context is the vehicle that carries trace_id, span_id, and deadlines across service boundaries
 10. **Enable profiling via environment variables** — toggle pprof and continuous profiling on/off without redeploying
 11. **Correlate signals** — inject trace_id into logs, use exemplars to link metrics to traces
-12. **A feature is not done until it is observable** — declare metrics, add proper logging, create spans
+12. **Verify the changed signal against its purpose** — a logging field change need not introduce metrics, tracing, RUM, or another backend
 13. **[awesome-prometheus-alerts](https://samber.github.io/awesome-prometheus-alerts/) provides ~500 ready-to-use alerting rules** organized by technology for infrastructure and dependency monitoring
 
 ## Cross-References
@@ -191,40 +191,23 @@ ctx = otel.GetTextMapPropagator().Extract(ctx, amqpHeaderCarrier(msg.Headers))
 
 ---
 
-### Audit log implementation
+### Audit logs: derive the contract from the system
 
-| Decision | Choice | Rationale |
-|---|---|---|
-| Storage | Azure Immutable Blob Storage, **Compliance mode** | Cannot be overridden even by subscription owner. Governance mode is not acceptable — allows admin override under pressure. |
-| Retention | 12 months minimum (SAQ A-EP baseline) | Revisit if PCI-DSS scope assessment changes. |
-| Tamper evidence | Compliance mode (storage-enforced) | Sufficient for current SAQ A-EP scope; add hash chaining if scope changes to full PCI. |
-| Actor identity / PII | Hash + pepper at write time | `actor.id = SHA256(user_id + secret_pepper)`. Pepper lives in Azure Key Vault. Plaintext mapping table stored separately — deletable on GDPR erasure request without touching audit records. |
-| Write mode | Synchronous — no in-memory buffering | Unflushed buffer before crash = lost evidence. Audit writes must block until durable. |
-| Pipeline | Separate from operational logs | Backpressure on operational pipeline must never shed audit records. Separate AMQP connection, separate sink. |
+When audit logging is in scope, establish the events, actors, access controls,
+durability, retention, and tamper-evidence requirements from accepted product and
+operational constraints. Keep audit and diagnostic logging lifecycles distinct
+where their guarantees differ. Verify behavior under write failure and backpressure.
 
-**PCI-DSS scope:** Braintree handles card data; this service handles tokens only (SAQ A-EP). Raw card numbers must never appear in any log. Braintree tokens (`tok_...`) may appear in audit records as `resource.id`.
-
-**Mandatory audit record shape:**
-```json
-{
-  "@timestamp": "2026-06-30T14:23:01.542Z",
-  "event.action":  "payment.authorised",
-  "event.outcome": "success",
-  "actor.id":      "SHA256(user_id+pepper)",
-  "actor.type":    "user",
-  "resource.type": "payment",
-  "resource.id":   "tok_4xSjF...",
-  "source.ip":     "203.0.113.12",
-  "request_id":    "req_01J3QMNT",
-  "service.name":  "payment-api"
-}
-```
+This portable skill does not establish a payment provider, compliance scope,
+cloud storage product, retention period, or legal sufficiency. Do not copy those
+policies from an unrelated project or call a storage setting compliance proof.
+Treat record shape and sensitive identifiers as explicit design decisions.
 
 ---
 
 ### HTTP status log level convention
 
-Always emit `http.status` as a structured field regardless of level — lets Prometheus track error rates without elevating user mistakes to alerts.
+When recording HTTP outcomes, keep status as a structured field regardless of level so logs can be queried and correlated with request metrics. Logging a field alone does not create a Prometheus metric.
 
 | Status | System state | Level |
 |---|---|---|
@@ -253,13 +236,13 @@ For an authorized migration, compare slog with the existing logger's performance
 
 ## Definition of Done for Observability
 
-A feature is not production-ready until it is observable. Before marking a feature as done, verify:
+For the instrumentation actually in scope, verify the applicable items below. This checklist does not authorize additional backends, product analytics, logging migrations, or feature scope:
 
-- [ ] **Metrics declared** — counters for operations/errors, histograms for latencies, gauges for saturation. Each metric var has PromQL queries and alert rules as comments above its declaration.
-- [ ] **Logging is proper** — structured key-value pairs with `slog`, context variants used (`slog.InfoContext`), no PII in logs, errors MUST be either logged OR returned (NEVER both).
-- [ ] **Spans created** — every service method, DB query, and external API call has a span with relevant attributes, errors recorded with `span.RecordError()`.
-- [ ] **Dashboards and alerts exist** — the PromQL from your metric comments is wired into Grafana dashboards and Prometheus alerting rules. Ready-to-use alert rules for common infrastructure dependencies are available at [awesome-prometheus-alerts](https://samber.github.io/awesome-prometheus-alerts/).
-- [ ] **RUM events tracked** — key business events tracked server-side (PostHog/Segment), identity key is `user_id` (not email), consent checked before tracking.
+- [ ] **Metrics, when changed** — verify bounded labels, units, counting semantics, and the consuming query. Add alerts only for an actionable requirement.
+- [ ] **Logging, when changed** — preserve the established logger/output contract, retain relevant correlation, exclude secrets and unnecessary sensitive fields, and avoid duplicate error reporting.
+- [ ] **Tracing, when changed** — verify intended boundaries, context propagation, error handling, export, and shutdown; do not claim stored traces from span creation alone.
+- [ ] **Consumers, when in scope** — verify the dashboard/alert uses the actual signal and produces meaningful results, including missing-data behavior.
+- [ ] **RUM, only when requested** — establish the measurement purpose and accepted identity/data-collection policy before adding events or a vendor integration.
 
 ## Common Mistakes
 

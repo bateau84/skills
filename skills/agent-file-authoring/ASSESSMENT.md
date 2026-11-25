@@ -12,6 +12,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 - **Permission/prose parity:** capabilities neither exceed nor contradict written responsibility; mutation boundaries remain explicit.
 - **Control-plane coherence:** prompts do not recreate workflow state, bypass gates, or narrate mechanically enforced checks as a second state machine.
 - **Independent-gate neutrality:** producer/coordinator wording cannot bias Reviewer, Acceptance, or Critic verdicts.
+- **Context evidence:** a fresh session or changed persona is not proof of independence. Check the actual inherited and automatically supplied context; where isolation is unavailable or unknown, the handoff names that limit and preserves useful prior findings and existing permissions.
 - **Completion truth:** role instructions do not permit knowingly incomplete work to be represented as complete.
 - **Eval quality:** cases discriminate professional decisions/outcomes and important negative space rather than phrases or one repository-specific implementation.
 - **Portability:** directives do not depend on source-repository-local IDs, paths, languages, or tools as universal authority.

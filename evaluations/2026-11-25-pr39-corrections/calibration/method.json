@@ -1,0 +1,18 @@
+{
+  "schema": "portable-skills/calibration-observation-method/v1",
+  "source_reviewed_head": "8e6f6514eccdab14e4cd18bd0be82d1d18ed69e3",
+  "cases": 6,
+  "first_observation_retained": true,
+  "target_execution": false,
+  "requested_model": "gpt-6.2-sol",
+  "requested_reasoning": "high",
+  "inherited_history": "none",
+  "resolved_model_identity": "not independently attested",
+  "runner_invocation": "manual fresh subagent using the packet; production parser used for checking",
+  "isolation": "instructions to read only supplied packet; shared host, not enforced filesystem isolation",
+  "private_mapping": "retained separately by maintainer; absent from repository and judge inputs",
+  "oracle_and_source_ids_supplied_to_judge": false,
+  "canonical_packet_sha256": "34aee1cd1ef2bea27ae76e21eb1feb49c4d3af89d1232e474c23f71c1e3387f5",
+  "checker_source_sha256": "775dcfb2c5ec41aa49ce0eeca7dc19b1e95b6d9311286d62b66a36b83edb43bb",
+  "judge_profile_source_sha256": "c23e6bdcb66add9b90775bb2180229783cbb0fb97daa5b12ae1c46e276c80aa0"
+}

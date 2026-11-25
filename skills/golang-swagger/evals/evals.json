@@ -3,15 +3,28 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "I've already run `swag init` and the docs/ folder was generated. Now wire up the Swagger UI in my Gin server so the docs actually show up at /swagger/index.html. Here's my main.go:\n\n```go\npackage main\n\nimport \"github.com/gin-gonic/gin\"\n\nfunc main() {\n    r := gin.Default()  \n    r.GET(\"/api/users\", getUsers)\n    r.Run(\":8080\")\n}\n```",
+      "prompt": "I've already run `swag init` and the docs/ folder was generated. Now wire up the Swagger UI in my Gin server so the docs actually show up at /swagger/index.html. Here's my main.go:\n\n```go\npackage main\n\nimport \"github.com/gin-gonic/gin\"\n\nfunc main() {\n    r := gin.Default()  \n    r.GET(\"/api/users\", getUsers)\n    r.Run(\":8080\")\n}\n```\n\nThe module is example.com/reporting. The generated package example.com/reporting/docs already exists and its annotations are unchanged. Return the code change and a verification plan; no repository execution is available.",
       "expected_output": "Adds the blank import `_ \"yourmodule/docs\"` AND wires the ginSwagger endpoint. The blank import is the trap — without it the UI loads empty even if the route is registered.",
       "expectations": [
-        "Adds a blank import of the docs package (e.g., `_ \"<module>/docs\"`)",
-        "Imports github.com/swaggo/gin-swagger",
-        "Imports github.com/swaggo/files",
-        "Registers a GET route matching /swagger/*any using ginSwagger.WrapHandler",
-        "Does not suggest running swag init again (it was already done)"
-      ]
+        "Makes the existing generated specification available to the UI. A registry-backed handler needs the generated package import for registration, e.g. `_ \"example.com/reporting/docs\"`; correctly serving the existing generated specification file is also valid without that registry import.",
+        "Integrates a working Swagger UI handler with Gin; gin-swagger is a suitable implementation, and an equivalent correctly wired handler is valid.",
+        "Provides the UI assets and specification-serving integration needed for the page to load, for example through github.com/swaggo/files; equivalent working asset serving is valid.",
+        "Registers routes that make /swagger/index.html and its supporting UI/specification resources available, for example /swagger/*any with ginSwagger.WrapHandler; an equivalent route arrangement is valid.",
+        "Repairs the missing UI/specification wiring without treating regeneration as the remedy for unchanged, already-generated annotations. Registry-backed serving includes package registration; warnings or conditional regeneration after future annotation changes are allowed."
+      ],
+      "trap": "Repeats generation as the fix while leaving the UI disconnected from the existing generated specification; for registry-backed serving this includes omitting the generated-package registration.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "E5": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 2,

@@ -24,7 +24,7 @@ Read the relevant reference file when the user asks about mocking, CI/CD integra
 - **Run block**: A single test scenario with optional variables, providers, and assertions
 - **Assert block**: Conditions that must be true for the test to pass
 - **Mock provider**: Simulates provider behavior without real infrastructure (Terraform 1.7.0+)
-- **Test modes**: `apply` (default, creates real resources) or `plan` (validates logic only)
+- **Test modes**: `apply` (default; real providers can create resources, fully mocked providers do not) or `plan` (planning; computed values may remain unknown)
 
 ## File Structure
 
@@ -423,7 +423,7 @@ terraform test -verbose                              # detailed output
 
 1. **Naming**: `*_unit_test.tftest.hcl` for plan mode, `*_integration_test.tftest.hcl` for apply mode
 2. **Test naming**: Use descriptive run block names that explain the scenario being tested
-3. **Choose plan or apply from the assertion:** use `plan` for known configuration/invariants; mocked computed attributes are normally generated at `apply` (which stays mock-only) unless `override_during = plan` is explicitly configured.
+3. **Choose plan or apply from the assertion:** use `plan` for known configuration/invariants; mocked computed attributes are normally generated at `apply`. Plan-time overrides require Terraform 1.11+; check the supported version before using `override_during = plan`. Verify every relevant provider/alias is mocked before describing apply as cloud-free (see `references/MOCK_PROVIDERS.md`).
 4. **Use mocks** for external dependencies — faster and no credentials needed (see `references/MOCK_PROVIDERS.md`)
 5. **Error messages**: Make them specific enough to diagnose failures without running the test again
 6. **Negative tests**: Use `expect_failures` to verify validation rules reject bad inputs

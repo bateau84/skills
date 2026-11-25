@@ -134,7 +134,9 @@ Nielsen's three limits (Nielsen 1993, confirmed nngroup.com 2014) are grounded i
 | Progress | Progress bar, percentage, spinner | Progress bar (`=====>`), percentage to stderr | Progress component in render loop | Progress bar, skeleton loading |
 | Completion | State transition to success | Exit code 0 + stdout message | Status bar success message + state change | Success state, toast notification |
 | Error | Inline error state, error banner | Non-zero exit code + stderr message | Error overlay, status bar error | Inline error state, error boundary |
-| Confirmation | Modal dialog (for irreversible actions only) | Prompt (`Are you sure? [y/N]`) or `--yes` flag for scripting | Confirmation dialog component | Modal dialog (for irreversible actions only) |
+| Confirmation | Modal dialog (for irreversible actions only) | Prompt when live confirmation is required; explicit non-interactive mechanism when unattended execution is supported | Confirmation dialog component | Modal dialog (for irreversible actions only) |
+
+For confirmation-sensitive CLI actions, define what happens without interactive input. Read-only listing can remain scriptable while mutation requires a terminal and refuses safely otherwise. Add an explicit non-interactive confirmation mechanism only when the accepted task or a clearly stated design choice consistent with its constraints calls for it; automation support is not implied merely by being a CLI. Preserve an existing automation contract when one is supplied.
 
 **CLI-specific feedback discipline:**
 - **stdout**: data output and success messages that downstream commands or scripts consume
@@ -279,7 +281,7 @@ Design decisions for reversibility:
 - **Undo/redo**: available for every non-trivial destructive or transformative action; scope (local to component vs global) is a design decision
 - **Optimistic UI**: perform the action immediately and show the result; provide undo if the action can be reversed; rollback if the server rejects it
 - **Trash vs permanent delete**: a two-stage delete (move to trash, then permanently delete) is a reversibility pattern, not just an engineering convention — it is a design decision
-- **CLI destructive commands**: `--dry-run` flag for previewing destructive changes; explicit confirmation prompt for irreversible operations; no silent destructive defaults
+- **CLI destructive commands**: `--dry-run` flag for previewing destructive changes; confirmation or authorization appropriate to the accepted interactive or unattended execution policy; no silent destructive defaults
 
 ### Confirmation Pattern Design
 
@@ -292,7 +294,7 @@ Confirmation dialogs are a last resort, not a default. Use only when both condit
 - When the user explicitly chose a destructive action from a clearly labeled "Danger Zone" section (they already confirmed by navigating there)
 - When confirmation is being added to make engineers feel safer, not because accidental triggering is a real risk
 
-**CLI confirmation pattern:** `--yes` / `--force` flag for scripted contexts (confirmation prompts break non-interactive scripts); interactive prompt for human-facing operations. Design the flag name and the default behavior explicitly — the safe default is always "do not proceed without confirmation."
+**CLI confirmation pattern:** Follow the accepted product's confirmation and authorization requirements. For interactive-only mutation, require live confirmation and refuse safely with a clear diagnostic and non-zero exit when it is unavailable. Where unattended execution is supported, define an explicit mechanism that satisfies that policy, such as `--yes` when sufficient or a separately authorized plan, and avoid prompting on a valid automated path. A flag does not replace authorization or override a required live review. Design the mechanism and defaults explicitly; do not proceed when required confirmation or authorization is absent.
 
 ---
 
@@ -365,9 +367,9 @@ Design obligations:
 - **Gulf of Evaluation**: output is the only feedback channel. Design stdout and stderr as explicit, disciplined contracts. Silence is not success — a command that exits 0 with no output is ambiguous
 - **Exit codes as machine-readable feedback**: 0 = success, non-zero = failure. Define which non-zero codes mean which failure class. Exit code discipline is an interaction design decision
 - **Pipeline composition**: design output format to be usable as input to the next command. Column alignment is a human affordance; tab-delimited or JSON output is a machine affordance. These are distinct output modes — design both when the command will be used in scripts
-- **Interactive mode vs batch mode**: design the interface boundary explicitly. A command that prompts for confirmation must have a `--yes` / `--non-interactive` flag for automation contexts
+- **Interactive mode vs batch mode**: design the interface boundary from the accepted product requirements. Preserve required automation without prompts; document safe non-interactive refusal for operations that require live confirmation. Keep scriptable read-only operations usable independently of that mutation policy.
 
-**The anti-pattern:** Designing "confirm with Y/N prompt" without providing a `--yes` flag. This traps the command in interactive mode and breaks scripts that call it. Interactive confirmation is a feature for humans; `--yes` is the machine affordance for the same decision.
+**The anti-pattern:** Leaving non-interactive behavior undefined, hanging for unavailable input, or requiring a prompt in a workflow that must run unattended. Silently bypassing required live confirmation is also a failure. Omitting `--yes` is valid when mutation is intentionally interactive-only and non-interactive attempts receive a clear refusal and non-zero exit.
 
 ### TUI: Stateful Event Loop
 

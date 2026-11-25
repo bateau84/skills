@@ -5,36 +5,118 @@
       "id": 1,
       "name": "response-model-filters-output",
       "prompt": "This endpoint returns a User database object that includes `password_hash` and `internal_notes`. The HTTP response must expose only `id`, `email`, and `display_name`.\n\n```python\n@router.get('/users/{id}')\nasync def get_user(id: str):\n    return db.get_user(id)   # returns the full User object\n```",
-      "trap": "Returning the raw object works and serializes fine, so the model may leave it — silently leaking the password hash and internal notes. A response_model restricts the output to declared fields.",
+      "trap": "A raw database object can leak fields when no public serialization boundary is applied. Merely naming a response model does not protect a directly returned JSONResponse.",
       "expectations": [
-        "Declares a response_model (a Pydantic output model) limiting the fields",
-        "The response excludes password_hash and internal_notes",
-        "Does NOT return the raw db object/dict without a response_model"
-      ]
+        "Defines the public response shape as only id, email and display_name, using a supported return annotation/response_model or an equivalently explicit safe allowlist/serialization boundary. A correctly constructed direct Response is valid.",
+        "Ensures password_hash and internal_notes cannot appear in the HTTP response.",
+        "Uses a valid filtering/serialization path for the returned object; a direct Response must receive an explicitly safe payload."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 2,
       "name": "lifespan-not-on-event",
       "prompt": "Open a shared httpx.AsyncClient and start an APScheduler when the app boots, and close/stop them on shutdown, attaching them to the application.",
-      "trap": "`@app.on_event(\"startup\")`/`(\"shutdown\")` is widely shown in older tutorials and is the natural reach, but it is deprecated. The current mechanism is the lifespan context manager, and the client must be opened once (not per request).",
+      "trap": "Creates clients per request or fails to own and close shared application resources across startup and shutdown.",
       "expectations": [
         "Uses the lifespan context manager (asynccontextmanager + FastAPI(lifespan=...))",
-        "Stores resources on app.state and closes/stops them after yield",
+        "Attaches the shared resources to the application, for example on app.state, and closes/stops them reliably on shutdown. Another suitable application-owned attachment is valid.",
         "Does NOT use the deprecated @app.on_event handlers",
         "Opens the httpx client once at startup, not per request"
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "convention",
+          "E2": "outcome",
+          "E3": "convention",
+          "E4": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 3,
       "name": "auth-precondition-dependency",
       "prompt": "Several endpoints require an authenticated YouTube client available at `request.app.state.youtube`, and should return 503 when it is missing. Add this precondition without repeating the check in every route body.",
-      "trap": "The obvious solution copies an `if state.youtube is None: raise HTTPException(503)` into each handler. FastAPI's Depends lets one dependency raise the 503 and short-circuit, declared once and reused.",
+      "trap": "Duplicates the missing-client precondition in each route body instead of sharing it, contrary to the stated task. Depends is one suitable mechanism, not the only valid shared precondition.",
       "expectations": [
-        "Implements a dependency (Depends) that raises HTTPException(503) when unauthenticated",
-        "Routes declare the dependency instead of each checking inline",
-        "Accesses shared app.state via a dependency",
-        "Does NOT duplicate the precondition check in every handler body"
-      ]
+        "Returns HTTP 503 before handler work when request.app.state.youtube is missing, and allows the route to use the available client otherwise.",
+        "Shares the precondition across routes without duplicating the missing-client check in each route body.",
+        "Uses FastAPI Depends to make the shared client/precondition dependency explicit."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "convention",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "name": "direct-response-bypasses-filter",
+      "prompt": "Review this FastAPI endpoint. UserOut has only id and email; user is a dict with id, email and password_hash.\n\n```python\n@router.get(\"/me\", response_model=UserOut)\ndef me():\n    user = load_user()\n    return JSONResponse(content=user)\n```\n\nThe author says response_model strips password_hash. Is that true? Give the smallest safe correction and one HTTP-level check.",
+      "trap": "Treats response_model as protection even though directly returning JSONResponse bypasses normal model conversion and filtering.",
+      "expectations": [
+        "Identifies that JSONResponse returns the supplied payload directly and can expose password_hash.",
+        "Corrects the endpoint by returning data through UserOut filtering or explicitly constructing and serializing only the approved public payload.",
+        "Checks actual HTTP JSON for absence of password_hash, not merely the declared schema."
+      ],
+      "negative_expectations": [
+        "Must not claim the response_model declaration alone filters an already constructed JSONResponse.",
+        "Must not replace the application architecture to repair this local serialization boundary."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "name": "health-route-needs-no-service-layer",
+      "prompt": "This app has one health route in app.py: `@app.get(\"/health\")` followed by `def health() -> dict[str, str]: return {\"status\": \"ok\"}`. There are no secrets, dependencies or side effects. The requested change is to return {\"status\": \"ready\"} and retain HTTP 200. Show the necessary patch and explain whether new files or abstractions are needed.",
+      "trap": "Applies resource routers, service/core layers, dependency injection or a new model to a constant-response edit without a need.",
+      "expectations": [
+        "Changes the requested status value while preserving the path, HTTP status and valid return shape.",
+        "Keeps the existing app structure and explains that this local change does not require new abstractions."
+      ],
+      "negative_expectations": [
+        "Must not require a new APIRouter, service package, dependency or Pydantic class solely for the one-value change.",
+        "Must not claim returning a typed dict is inherently invalid FastAPI behavior."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

@@ -26,9 +26,9 @@ metadata:
 
 ## Core Philosophy
 
-1. **Profile before optimizing** — intuition about bottlenecks is wrong ~80% of the time. Use pprof to find actual hot spots (→ See `golang-troubleshooting` skill)
-2. **Allocation reduction yields the biggest ROI** — Go's GC is fast but not free. Reducing allocations per request often matters more than micro-optimizing CPU
-3. **Document optimizations** — add code comments explaining why a pattern is faster, with benchmark numbers when available. Future readers need context to avoid reverting an "unnecessary" optimization
+1. **Profile before optimizing** — use evidence from the actual workload to locate hot spots (→ See `golang-troubleshooting` skill)
+2. **Match the change to the measured bottleneck** — reducing allocations can help when allocation/GC work is material; it does not fix dominant external latency
+3. **Preserve correctness and document measured trade-offs** — retain output, ownership, and concurrency contracts before comparing speed or allocation results. Record the workload/toolchain when quoting measurements; do not project a universal multiplier
 
 ## Rule Out External Bottlenecks First
 
@@ -42,16 +42,25 @@ Before optimizing Go code, verify the bottleneck is in your process — if 90% o
 
 ### The cycle: Define Goals → Benchmark → Diagnose → Improve → Benchmark
 
+Create an owned directory inside the task's shell script or subshell, with cleanup
+on exit. Preserve the relevant comparison in the agreed evidence location before
+that shell scope exits:
+
+```bash
+task_bench_dir="$(mktemp -d "${TMPDIR:-/tmp}/go-bench.XXXXXXXX")" || exit 1
+trap 'rm -rf -- "$task_bench_dir"' EXIT
+```
+
 1. **Define your metric** — latency, throughput, memory, or CPU? Without a target, optimizations are random
 2. **Write an atomic benchmark** — isolate one function per benchmark to avoid result contamination (→ See `golang-benchmark` skill)
-3. **Measure baseline** — `go test -bench=BenchmarkMyFunc -benchmem -count=6 ./pkg/... | tee /tmp/report-1.txt`
+3. **Measure baseline** — `go test -bench=BenchmarkMyFunc -benchmem -count=6 ./pkg/... | tee "$task_bench_dir/before.txt"`
 4. **Diagnose** — use the **Diagnose** lines in each deep-dive section to pick the right tool
 5. **Improve** — apply ONE optimization at a time with an explanatory comment
-6. **Compare** — `benchstat /tmp/report-1.txt /tmp/report-2.txt` to confirm statistical significance
+6. **Compare** — after the change, repeat the same benchmark into `"$task_bench_dir/after.txt"`, then run `benchstat "$task_bench_dir/before.txt" "$task_bench_dir/after.txt"`; inspect the comparison and uncertainty
 7. **Commit** — paste the benchstat output in the commit body so reviewers and future readers see the exact improvement; follow the `perf(scope): summary` commit type
-8. **Repeat** — increment report number, tackle next bottleneck
+8. **Repeat** — retain the relevant comparison before reusing filenames, then tackle the next measured bottleneck
 
-Refer to library documentation for known patterns before inventing custom solutions. Keep all `/tmp/report-*.txt` files as an audit trail.
+Refer to library documentation for known patterns before inventing custom solutions. Use a task-owned temporary directory for measurements, retain the relevant comparison in the agreed evidence location, and clean up temporary work. A pooled buffer must not be returned to the pool while a caller still owns a view of its contents.
 
 ## Decision Tree: Where Is Time Spent?
 
@@ -70,13 +79,13 @@ Refer to library documentation for known patterns before inventing custom soluti
 
 | Mistake | Fix |
 | --- | --- |
-| Optimizing without profiling | Profile with pprof first — intuition is wrong ~80% of the time |
+| Optimizing without profiling | Locate the actual bottleneck before choosing a technique |
 | Default `http.Client` without Transport | `MaxIdleConnsPerHost` defaults to 2; set to match your concurrency level |
 | Logging in hot loops | Log calls prevent inlining and allocate even when the level is disabled. Use `slog.LogAttrs` |
 | `panic`/`recover` as control flow | panic allocates a stack trace and unwinds the stack; use error returns |
-| `unsafe` without benchmark proof | Only justified when profiling shows >10% improvement in a verified hot path |
-| No GC tuning in containers | Set `GOMEMLIMIT` to 80-90% of container memory to prevent OOM kills |
-| `reflect.DeepEqual` in production | 50-200x slower than typed comparison; use `slices.Equal`, `maps.Equal`, `bytes.Equal` |
+| `unsafe` without a demonstrated need and correctness argument | Consider only after safer alternatives, with lifetime/aliasing proof and representative measured benefit; no percentage threshold makes it safe |
+| Assuming a memory-limit percentage guarantees safety | Measure runtime and non-runtime memory, leave appropriate headroom, and verify load behavior before selecting `GOMEMLIMIT` |
+| Replacing reflection without checking semantics | Compare appropriate typed operations on the measured hot path, preserving nil, element, and nested-value behavior |
 
 ## Deep Dives
 

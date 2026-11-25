@@ -105,19 +105,14 @@ conn, err := grpc.NewClient("dns:///user-service:50051",
         "loadBalancingPolicy": "round_robin",
         "methodConfig": [{
             "name": [{"service": ""}],
-            "timeout": "5s",
-            "retryPolicy": {
-                "maxAttempts": 3,
-                "initialBackoff": "0.1s",
-                "maxBackoff": "1s",
-                "backoffMultiplier": 2,
-                "retryableStatusCodes": ["UNAVAILABLE"]
-            }
+            "timeout": "5s"
         }]
     }`),
 )
 client := pb.NewUserServiceClient(conn)
 ```
+
+Configure application retries per method only after establishing that repeating the operation is safe. `Unavailable` can leave a non-idempotent side effect ambiguous; a retry count or deadline does not prevent duplication. Require an accepted idempotency/deduplication or reconciliation contract where needed. This is separate from gRPC's limited transparent retries before application processing. See the official [retry guide](https://grpc.io/docs/guides/retry/) and [status-code guidance](https://grpc.io/docs/guides/status-codes/).
 
 ## Error Handling
 
@@ -132,7 +127,7 @@ Always return gRPC errors using `status.Error` with a specific code — a raw `e
 | `Unauthenticated`    | Missing or invalid token                    |
 | `FailedPrecondition` | System not in required state                |
 | `ResourceExhausted`  | Rate limit or quota exceeded                |
-| `Unavailable`        | Transient issue, safe to retry              |
+| `Unavailable`        | Service unavailable; retry only when the operation contract makes repetition safe |
 | `Internal`           | Unexpected bug                              |
 | `DeadlineExceeded`   | Timeout                                     |
 
@@ -202,7 +197,7 @@ Most services do not need connection pooling — profile before adding complexit
 | No deadline on client calls | Slow upstream hangs indefinitely. Always `context.WithTimeout` |
 | New connection per request | Wastes TCP/TLS handshakes. Create once, reuse — HTTP/2 multiplexes RPCs |
 | Reflection enabled in production | Lets attackers enumerate every method. Enable only in dev/staging |
-| `codes.Internal` for all errors | Wrong codes break client retry logic. `Unavailable` triggers retry; `InvalidArgument` does not |
+| `codes.Internal` for all errors | Wrong codes break client retry logic. A status alone does not establish retry safety; preserve method-specific semantics |
 | Bare types as RPC arguments | Can't add fields to `string`. Wrapper messages allow backwards-compatible evolution |
 | Missing health check service | Kubernetes can't determine readiness, kills pods during deployments |
 | Ignoring context cancellation | Long operations continue after caller gave up. Check `ctx.Err()` |

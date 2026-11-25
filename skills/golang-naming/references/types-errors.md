@@ -106,7 +106,7 @@ const (
 )
 ```
 
-**Always protect the zero value.** A `var s Status` will silently be 0 — if that maps to a real state like `StatusReady`, code can behave as if a status was deliberately chosen when it wasn't. Either place an explicit `Unknown` sentinel at iota 0, or start at `iota + 1`. This is not optional — uninitialized enums are a common source of silent bugs.
+**Choose the zero value deliberately.** These examples fit a new type where unset must differ from valid states. A useful zero value is also legitimate. Preserve existing persisted and wire meanings: inserting a leading sentinel that renumbers values requires an explicit compatible migration, not a naming-only edit.
 
 ## Errors
 

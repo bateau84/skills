@@ -20,7 +20,7 @@ metadata:
 
 ## AI Agent Rule: Ask Before Adding Dependencies
 
-**Before running `go get` to add any new dependency, AI agents MUST ask the user for confirmation.** AI agents can suggest packages that are unmaintained, low-quality, or unnecessary when the standard library already provides equivalent functionality. Updating an existing dependency is still a behavioral change: use the authorized version range, inspect transitive changes and test before claiming compatibility. `go get -u` is not inherently safe.
+**Before adding a new dependency, establish that it is within the authorized scope.** An explicit prior authorization is sufficient; do not ask again for the same approved addition. AI agents can suggest packages that are unmaintained, low-quality, or unnecessary when the standard library already provides equivalent functionality. Updating an existing dependency is still a behavioral change: use the authorized version range, inspect transitive changes and test before claiming compatibility. `go get -u` is not inherently safe.
 
 Before proposing a dependency, evaluate:
 
@@ -77,7 +77,7 @@ go get -u=patch ./...      # Upgrade to latest patch only (safer)
 go get github.com/pkg@v1.5 # Upgrade specific package
 ```
 
-**Prefer `go get -u=patch`** for routine updates. Patch and minor updates are usually lower risk than major upgrades, but still require review. For dependency updates, run:
+**Prefer a targeted `go get module@version` for a targeted fix.** A graph-wide `go get -u=patch ./...` is appropriate only when the update scope includes that graph. Patch and minor updates still require compatibility and transitive-diff review; they are not automatically safe. For an authorized graph-wide routine update, the sequence is:
 
 ```bash
 go get -u=patch ./...

@@ -5,16 +5,48 @@
     {
       "id": "p4",
       "name": "zero-traffic-ratio",
-      "prompt": "Our 'error %' stat panel for the canary service shows NaN every night when it gets zero requests:\n\nsum(rate(errors_total{svc=\"canary\"}[5m])) / sum(rate(requests_total{svc=\"canary\"}[5m]))\n\nGive me a version that never yields NaN or +Inf, and say what the panel will show during zero-traffic periods with your version.",
+      "prompt": "Our 'error %' stat panel for the canary service shows NaN every night when it gets zero requests:\n\nsum(rate(errors_total{svc=\"canary\"}[5m])) / sum(rate(requests_total{svc=\"canary\"}[5m]))\n\nGive me a version that never yields NaN or +Inf, and say what the panel will show during zero-traffic periods with your version.\n\nThe accepted dashboard policy distinguishes no traffic from a measured 0% error rate: show No data when traffic is zero or absent. Preserve that meaning; query execution is unavailable in this exercise.",
       "trap": "Model wraps everything in `or vector(0)` (reporting healthy 0% when nothing is measured) or adds a tiny epsilon to the denominator without explaining the semantics.",
       "expectations": [
         "Guards the denominator so zero is excluded, e.g. (sum(rate(requests_total{...}[5m])) > 0) or an equivalent filter.",
         "States that during zero traffic the guarded query returns no data (empty result) rather than a number."
       ],
       "negative_expectations": [
-        "Does not claim the guarded query returns 0 during zero traffic.",
+        "Must not recommend replacing the required no-traffic state with healthy 0%; explaining a differently configured display policy as an unselected alternative is not a violation.",
         "Does not rely solely on `or vector(0)` as the fix."
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "p-idle-display",
+      "name": "accepted-idle-zero-is-display-policy",
+      "prompt": "The accepted overview-panel design shows 0 when the denominator request rate is zero, with a separate traffic-presence panel that distinguishes idle/missing telemetry from measured zero errors. Explain how to implement the numeric fallback after filtering nonpositive denominators, and the limits of that display. Do not change the accepted display policy or claim to query a live service.",
+      "expectations": [
+        "Allows an explicitly chosen zero display after a denominator filter rather than rejecting all numeric fallbacks.",
+        "Distinguishes a displayed default from a measured zero error rate, and preserves the separate traffic-presence signal.",
+        "Explains that a set-union fallback for an absent vector does not itself replace an existing NaN sample."
+      ],
+      "trap": "Either rejects the accepted display policy categorically or mistakes an absent-series fallback for a NaN sanitizer.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

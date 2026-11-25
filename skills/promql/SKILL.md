@@ -61,6 +61,14 @@ sum(rate(http_requests_total{status_code=~"5.."}[5m]))
   / (sum(rate(http_requests_total[5m])) > 0)
 ```
 
+The comparison filters out a zero denominator: the result is absent during
+zero traffic, not a measured zero error rate. Preserve that distinction by
+default. An explicit display policy may map absence to zero, but state that it
+is a presentation choice and keep missing traffic distinguishable when it
+matters. `or vector(0)` supplies a missing series; it does not replace a NaN
+sample already present. Verify positive traffic, zero traffic and missing
+series separately. See [operator semantics](https://prometheus.io/docs/prometheus/latest/querying/operators/).
+
 Full library (recording rules, SLO burn-rate, offsets, cardinality hunt, native histograms): [`references/patterns.md`](references/patterns.md).
 
 ### 3. Convert a slow dashboard query into a recording rule

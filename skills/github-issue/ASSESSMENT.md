@@ -5,7 +5,7 @@ Review a GitHub issue operation for correctness of **tracking state**, not merel
 ## Review criteria
 
 1. **Correct target and record:** Owner/repo, issue identity and actual current body/state were verified, and likely duplicate or completed work was checked before creating a new issue.
-2. **Intent preserved:** A provided work handoff or existing issue contract was represented without inventing acceptance, owner, priority or required architecture.
+2. **Intent preserved:** A provided work handoff or existing issue contract was represented without inventing acceptance, owner, priority, motivation, interface spelling or required architecture. Concrete examples and titles carry only accepted details; optional proposals remain visibly outside the agreed criteria.
 3. **Human-readable issue:** Title and body explain the need, desired result, limits and observable checks in everyday words. A person can compare these against the accepted request without deciphering internal jargon. Exact technical details remain correct throughout the body, not just in its summary.
 4. **Right tracking construct:** Checkboxes, sub-issues, blockers, organization issue type, repository labels/milestones, organization issue fields, Project membership and local Project fields remain distinct; hierarchy is not treated as sequencing.
 5. **Meaningful granularity:** Children have their own outcome and acceptance; trivial task bullets have not been turned into a swarm of issues or a hierarchy for its own sake.

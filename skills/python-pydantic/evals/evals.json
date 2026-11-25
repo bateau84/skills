@@ -4,37 +4,121 @@
     {
       "id": 1,
       "name": "settings-from-env",
-      "prompt": "Load application configuration from environment variables prefixed `SORTARR_`, falling back to a `.env` file and then to code defaults. The config has `api_port` (int) and `compare_distance` (int, which must be between 0 and 100 inclusive). An out-of-range value should make the application fail at startup.",
-      "trap": "The natural approach reads os.environ directly, casts with int(), and validates the range with a manual if-check. The skill wants pydantic-settings BaseSettings with env_prefix and Field bounds so validation happens at construction.",
+      "prompt": "In an application already using Pydantic v2 and pydantic-settings, load application configuration from environment variables prefixed `SORTARR_`, falling back to a `.env` file and then to code defaults. The config has `api_port` (int) and `compare_distance` (int, which must be between 0 and 100 inclusive). An out-of-range value should make the application fail at startup.",
+      "trap": "Fails to enforce the required environment-over-.env-over-default precedence, field types, inclusive range or startup rejection. Choosing another parser API is not itself this outcome trap when the complete contract is preserved.",
       "expectations": [
         "Uses pydantic-settings BaseSettings",
-        "Sets env_prefix = \"SORTARR_\" and reads a .env file",
+        "Loads the SORTARR_-prefixed values with environment variables taking precedence over .env values, then code defaults; equivalent configuration-loading APIs are acceptable.",
         "Expresses the 0–100 bound with Field(ge=0, le=100), not a manual if-check",
-        "Relies on construction-time validation to fail loudly at startup",
+        "Validates api_port and compare_distance as integers and rejects compare_distance outside the inclusive 0–100 range before the application starts; construction-time validation or an equivalent startup boundary is acceptable.",
         "Does NOT read os.environ manually for these values"
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "convention",
+          "E2": "outcome",
+          "E3": "convention",
+          "E4": "outcome",
+          "E5": "convention",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 2,
       "name": "secret-str-api-key",
-      "prompt": "Add an `api_key` field to the Settings class. The API key comes from the `SORTARR_API_KEY` environment variable. It must never appear in application logs, in debug output, or when the settings object is printed or serialized for diagnostics.",
-      "trap": "A plain `str` field is the obvious type. But plain str exposes the value in repr(), model_dump(), and any logger that serializes the object. Pydantic v2's `SecretStr` type redacts the value in those outputs. The skill explicitly says: 'For files use SecretStr so they don't print in logs/model_dump()'.",
+      "prompt": "In a Pydantic v2 pydantic-settings application, add an `api_key` field to the Settings class. The API key comes from the `SORTARR_API_KEY` environment variable. It must never appear in application logs, in debug output, or when the settings object is printed or serialized for diagnostics.",
+      "trap": "Uses a plain secret string or unwraps a SecretStr in diagnostic serialization, leaking the credential despite apparent type protection.",
       "expectations": [
-        "Declares api_key as SecretStr (not plain str)",
-        "Notes or implies that plain str would expose the secret in logs/repr/model_dump",
-        "Does NOT use a plain str field for the api_key"
-      ]
+        "Protects api_key with SecretStr or an equivalently demonstrated redaction/exclusion design while loading SORTARR_API_KEY.",
+        "Keeps the secret absent from repr, logs and diagnostic serialization without unwrapping it for those paths.",
+        "Does not treat a plain str or a custom serializer that returns get_secret_value() as safe for diagnostics."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 3,
       "name": "closed-set-field",
-      "prompt": "The `action` field of a model accepts only the values 'allow' or 'deny'. It is currently a `str` checked by hand. Model it so invalid values are rejected at parse time and the allowed set appears in the generated OpenAPI schema.",
-      "trap": "A free `str` plus a `field_validator` membership check works but duplicates what the type system can express. Literal (or Enum) makes it a closed set that documents itself in the schema.",
+      "prompt": "In a Pydantic v2 model, the `action` field of a model accepts only the values 'allow' or 'deny'. It is currently a `str` checked by hand. Model it so invalid values are rejected at parse time and the allowed set appears in the generated OpenAPI schema.",
+      "trap": "Rejects invalid values only through a custom runtime check while the generated schema still describes an unrestricted string.",
       "expectations": [
-        "Uses Literal[\"allow\", \"deny\"] (or an Enum) for the field",
-        "Removes the manual if/validator membership check",
-        "Does NOT keep a plain `str` with a hand-written check"
+        "Accepts only allow/deny at validation and exposes that closed set in the generated JSON/OpenAPI schema.",
+        "Uses Literal or Enum to express the set without a redundant membership validator."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "convention",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      },
+      "negative_expectations": [
+        "Must not accept other string values or leave the generated schema unrestricted."
       ]
+    },
+    {
+      "id": 4,
+      "name": "untrusted-copy-update",
+      "prompt": "A Pydantic v2 model is `class Limit(BaseModel): count: int = Field(ge=1, le=10)`. A valid stored instance has count=4. A JSON request body is parsed into `patch = {\"count\": -20}` and applied using `stored.model_copy(update=patch)`. The team says the original model was validated, so the result is safe. Explain what happens and give a bounded replacement that validates updates.",
+      "trap": "Assumes a valid original instance or copying it automatically validates newly supplied fields.",
+      "expectations": [
+        "Explains that model_copy(update=...) does not validate the updated value and can produce count=-20.",
+        "Validates the merged field data through Limit construction/model_validate or an equivalent full validated update, rejecting -20.",
+        "Preserves validation at the update boundary rather than scattering redundant checks through downstream code."
+      ],
+      "negative_expectations": [
+        "Must not claim deep=True makes model_copy validate the update.",
+        "Must not use model_construct as a validator for the untrusted patch."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "name": "internal-dataclass-does-not-need-migration",
+      "prompt": "An internal Python helper uses a standard-library dataclass `Point(x: float, y: float)`. All callers pass values already computed as floats; there is no user input, configuration loading, serialization or schema generation here. The task is to add a distance_from_origin method. Should this introduce Pydantic? Provide the small implementation.",
+      "trap": "Introduces a runtime validation dependency and model migration where the accepted task has no boundary-validation or serialization need.",
+      "expectations": [
+        "Keeps the dataclass and implements the distance calculation using a suitable standard-library method.",
+        "Explains that Pydantic is not required for the stated trusted internal calculation."
+      ],
+      "negative_expectations": [
+        "Must not require replacing Point with BaseModel or adding settings, validators or a new dependency for this task."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

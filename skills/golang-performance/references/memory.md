@@ -1,6 +1,6 @@
 # Memory Optimization
 
-Allocation reduction is the single highest-ROI optimization in most Go programs. Every allocation eventually requires garbage collection — reducing allocation count and size directly reduces GC pauses and CPU overhead.
+Allocation reduction can help a measured allocation/GC bottleneck. Check CPU, retained memory, latency, and correctness together; fewer allocations alone do not establish a better result.
 
 ## Allocation Patterns
 
@@ -141,7 +141,7 @@ func compact(old map[string]Data) map[string]Data {
 
 **Diagnose:** 1- `go tool pprof -alloc_objects` — identify hot allocation sites creating the same object type repeatedly (e.g., `[]byte` buffers, temp structs); expect one site with thousands of allocs/s that can be pooled
 
-`sync.Pool` recycles objects across GC cycles, reducing allocation pressure. Use it for frequently allocated, short-lived objects in hot paths (HTTP handlers, serialization, logging):
+`sync.Pool` may reuse temporary objects, but entries may disappear at any time; it does not guarantee retention across GC or bound resource count. Use it only for suitable measured allocation hot spots. After Put, a caller must not retain a mutable view of the pooled object. See the [sync.Pool contract](https://pkg.go.dev/sync#Pool).
 
 ```go
 var bufPool = sync.Pool{
@@ -168,7 +168,7 @@ func handleRequest(data []byte) []byte {
 
 - Reset state before `Put()` — clear references to avoid retaining large object graphs across GC cycles
 - Return copies, not pooled buffers — callers must not hold references to pooled memory
-- Don't pool objects >32KB — large allocations bypass the pool's size classes and GC already handles them efficiently
+- Bound retained buffer sizes from the workload and memory budget; sync.Pool has no universal 32KB object-size rule
 - Don't pool infrequently used objects — pool overhead exceeds benefit when allocations are rare
 
 → See `golang-concurrency` skill for `sync.Pool` API reference and basic usage patterns.

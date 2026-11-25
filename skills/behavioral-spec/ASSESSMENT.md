@@ -13,6 +13,7 @@ Cross-artifact review guidance for any agent performing assessment. Artifact-spe
 - Environmental and dependency assumptions have an explicit basis and scope. Unaccepted assumptions do not erase accepted adverse conditions, transfer obligations to unspecified actors, or quietly weaken guarantees.
 - Invariants hold over the applicable transitions, including failure and recovery. Useful execution/progress is preserved under accepted conditions without inventing unconditional eventual success, automatic recovery, or numeric targets.
 - BR/QS/OC selection is proportional; each guarantee has one normative home and related artifacts cross-reference it rather than duplicating it for ceremony.
+- An added artifact owns distinct necessary meaning. In particular, an OC identifies independently interpreted obligations and a concrete disagreement that could defeat accepted behavior; actor names, a code boundary, or an unresolved product question alone do not justify it. Do not grade a fixed artifact count or reject a compact document that covers the same obligations clearly.
 - The obligation layer and accepted Designer User Stories/Scenarios are semantically compatible where they overlap.
 - Normative language is architecture-independent unless structure is itself authoritative.
 - Meaning-bearing terms, quantifiers, ordering, temporal language, defaults, exceptions, and triggering conditions admit one falsifiable interpretation. Verification addresses the actual obligation, not merely a neighboring behavior.

@@ -29,7 +29,9 @@ uv run pytest
 uv run mypy .   # or pyright / ty when configured
 ```
 
-Do not assume every project uses every tool. Read `pyproject.toml` and current repository guidance first.
+Do not assume every project uses every tool. Read `pyproject.toml` and current repository guidance first. The commands above illustrate a configured toolchain; they are not a reason to adopt missing tools.
+
+Read each check's output. If a check fails, diagnose the finding, make the smallest justified correction, inspect any formatter or auto-fixer diff, and rerun the failing check plus checks affected by the correction. A command list or a tool's ability to apply fixes is not a completed feedback loop. If a check cannot run, report the limitation instead of treating it as passed.
 
 A domain skill may require stronger checks such as coverage, async tests, security scanning, or profiling. Treat those as verification expectations when relevant.
 

@@ -15,6 +15,7 @@ import unicodedata
 from pathlib import Path
 
 from eval_cases import strict_json
+from eval_quality import axis_text, public_axes
 
 
 # Host check/contract/comparison messages are created AFTER the result sanitizer.
@@ -52,6 +53,7 @@ def boundary_error(exc):
         "empty live selection",
         "transport-retries must be 0–5", "outer timeout must be >=300 and at least inner timeout +60 seconds",
         "cross-transport judge requires explicit --judge-model", "target model#variant conflicts with explicit reasoning",
+        "choose a distinct --judge-model provider/model or explicitly use --allow-same-model-judge for regression checks",
         "judge model#variant conflicts with explicit reasoning", "output must not contaminate skill directories or historical evidence",
         "launch with python3 -I -B (or the Bun aliases); non-isolated imports are not supported",
         "--probe verifies OpenCode configuration only; Copilot runtime proof is separate",
@@ -120,7 +122,45 @@ def console_record(record):
     """Non-mutating JSON projection: retain field contracts/verdicts, not host payloads."""
     safe = {**record, "checks": {side: [console_check(check, side) for check in checks]
                                 for side, checks in record["checks"].items()}}
+    if "scores" in record:
+        axes = record["scores"] if isinstance(record["scores"], dict) else {}
+        safe["scores"] = {side: public_axes(axes.get(side)) for side in ("baseline", "candidate")}
     comparison = record["comparison"]
+    if comparison.get("decision"):
+        decision = comparison["decision"]
+        raw = decision.get("data", {})
+        raw = raw if isinstance(raw, dict) else {}
+        data = {}
+        for key in ("baseline_score", "candidate_score", "threshold_pp", "delta_pp", "rubric_delta_pp",
+                    "outcome_delta_pp", "convention_delta_pp"):
+            if key in raw and (raw[key] is None or type(raw[key]) in (int, float)):
+                data[key] = raw[key]
+        for key in ("candidate_absolute_pass", "treatment_integrity", "trap_fixed", "trap_regression"):
+            if type(raw.get(key)) is bool:
+                data[key] = raw[key]
+        for key, allowed in (("schema", ("portable-skills/comparison/v1",)),
+                             ("statistical_significance", ("not-claimed",)),
+                             ("score_basis", ("outcome", "convention", "unclassified-rubric"))):
+            if raw.get(key) in allowed:
+                data[key] = raw[key]
+        # These are host callback fields, outside the runner's result sanitizer.
+        # Only the known numeric axis contract is fit for console publication.
+        axes = raw.get("scores", {})
+        if isinstance(axes, dict):
+            safe_axes = {side: public_axes(axes.get(side)) for side in ("baseline", "candidate")}
+            if safe_axes:
+                data["scores"] = safe_axes
+        known_classifications = ("improvement", "material-improvement", "neutral", "regression", "unattributed")
+        classification = decision.get("classification")
+        if classification not in known_classifications:
+            classification = "unrecognized-comparison"
+        summaries = ("Treatment integrity failed; answer scores do not establish skill value",
+                     "Paired first-attempt behavioral comparison (policy, not significance)",
+                     *("Paired " + basis + " comparison (policy, not significance or general quality proof)"
+                       for basis in ("outcome", "convention", "unclassified-rubric")))
+        summary = decision.get("summary")
+        safe["comparison"] = {**comparison, "decision": {"classification": classification,
+                              "summary": summary if summary in summaries else PRIVATE_DIAGNOSTIC, "data": data}}
     failure = comparison["failure"]
     if failure:
         code = failure["code"]
@@ -132,7 +172,7 @@ def console_record(record):
         else:
             code = code if code in {"comparison_input_invalid", "comparison_output_invalid"} else "comparison_invalid"
             message = PRIVATE_DIAGNOSTIC
-        safe["comparison"] = {**comparison, "failure": {"code": code, "message": message}}
+        safe["comparison"] = {**safe.get("comparison", comparison), "failure": {"code": code, "message": message}}
     return safe
 
 
@@ -268,17 +308,22 @@ class EvalReporter:
             return label + (f" {semantic['data']['score'] * 100:.0f}%" if semantic else " (score unavailable)")
         lines = [f"{terminal_text(artifact['case'], 180)}#{artifact['iteration']} "
                  f"baseline {status('baseline')} -> candidate {status('candidate')}"]
-        decision = artifact["comparison"]["decision"]
+        decision = console_record(record)["comparison"]["decision"]
         if decision:
             data = decision["data"]
             value = decision["classification"]
             if value == "unattributed":
                 lines.append("  Comparison unattributed: treatment integrity failed; scores do not establish skill value.")
+            elif value == "unrecognized-comparison" or type(data.get("delta_pp")) not in (int, float):
+                lines.append("  Comparison details withheld: unrecognized host callback fields.")
             else:
-                lines.append(f"  Paired observation: observed {value} ({data['delta_pp']:+.1f} pp); "
-                             "policy, not statistical significance.")
-                if data["trap_fixed"] or data["trap_regression"]:
-                    lines.append("  Trap: " + ("fixed in this pair." if data["trap_fixed"] else "regressed in this pair."))
+                basis = data.get("score_basis")
+                if basis not in ("outcome", "convention", "unclassified-rubric"):
+                    basis = "legacy mixed rubric"
+                lines.append(f"  Paired observation: observed {value} ({data['delta_pp']:+.1f} pp; {basis}); "
+                             "policy, not statistical significance or general product quality.")
+                if data.get("trap_fixed") is True or data.get("trap_regression") is True:
+                    lines.append("  Trap: " + ("fixed in this pair." if data.get("trap_fixed") is True else "regressed in this pair."))
         else:
             if artifact["comparison"]["status"] == "invalid":
                 failure = console_record(record)["comparison"]["failure"]
@@ -286,6 +331,13 @@ class EvalReporter:
             else:
                 lines.append("  Comparison unavailable: non-evidence; no attributed improvement/regression.")
         for name, side in sides.items():
+            semantic = side["judge"]["semantic"]
+            axes = semantic["data"].get("scores", {}) if semantic else {}
+            if isinstance(axes, dict):
+                labels = [f"{kind} {axis_text(axes.get(kind))}" for kind in ("outcome", "convention", "unclassified")
+                          if axis_text(axes.get(kind)) != "unavailable"]
+                if labels:
+                    lines.append(f"  {name}: " + "; ".join(labels) + ".")
             lines.extend(self._side_details(name, side))
         self._lines(lines)
 

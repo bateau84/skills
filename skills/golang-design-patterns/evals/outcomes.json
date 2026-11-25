@@ -1,0 +1,63 @@
+{
+  "skill": "golang-design-patterns",
+  "version": "1.0.0",
+  "common_instruction": "This is a response-only exercise. Use the supplied scenario and snippets; propose or review the requested work without claiming files were changed, commands ran, or external systems were inspected. State material verification limits. Equivalent solutions that satisfy the stated contract are acceptable.",
+  "cases": [
+    {
+      "id": "GDP-CLOSE-01",
+      "name": "successful-write-can-fail-on-close",
+      "prompt": "Review this Go helper. The supplied writer contract says Close flushes buffered output and can return a storage error; callers must receive a failure if writing or flushing fails. The helper owns the writer.\n\nfunc Save(open func() (io.WriteCloser, error), data []byte) error {\n    w, err := open()\n    if err != nil { return err }\n    defer w.Close()\n    _, err = w.Write(data)\n    return err\n}\n\nShow a small correction and identify the essential checks. No atomic-replacement or crash-durability guarantee is requested.",
+      "expectations": [
+        "Reports a Close/flush error when Write succeeds instead of returning nil.",
+        "Still closes the owned writer after a write failure and preserves the write error; retaining both errors is acceptable.",
+        "Handles a short write with no reported error, or explicitly accounts for the io.Writer contract when explaining the correction.",
+        "Names focused success, write-failure, and close-failure checks without claiming execution."
+      ],
+      "negative_expectations": [
+        "Must not discard the write error in favor of a later successful Close.",
+        "Must not introduce finalizers, background cleanup, a storage framework, or an unrequested durability contract as the solution."
+      ],
+      "trap": "Apply defer Close as a ritual while silently losing the failure that determines whether output was saved.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GDP-CONSTRUCTOR-02",
+      "name": "fixed-constructor-does-not-need-pattern-stack",
+      "prompt": "A private Go package needs a constructor for a formatter with one required immutable prefix string. It has one caller and no optional configuration. Existing code uses simple constructors. A proposal adds a Builder, a functional Option type, an interface, and a registry so future formats can plug in. Recommend the smallest implementation direction. The owner already chose the package structure; do not ask them to select an architecture.",
+      "expectations": [
+        "Uses a plain constructor or direct value construction consistent with the existing package.",
+        "Validates the required prefix only if the supplied contract needs validation, rather than inventing constraints.",
+        "Explains that future optional configuration or genuine interchangeability can motivate a later abstraction."
+      ],
+      "negative_expectations": [
+        "Must not add a builder, option framework, registry, or otherwise unused interface for speculative extensibility.",
+        "Must not block this bounded decision on a new architecture questionnaire."
+      ],
+      "trap": "Apply constructor and architecture patterns without a present variation point.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

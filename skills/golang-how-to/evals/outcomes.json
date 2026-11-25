@@ -1,0 +1,61 @@
+{
+  "skill": "golang-how-to",
+  "version": "1.0.0",
+  "common_instruction": "This is a response-only exercise. Use the supplied scenario and snippets; propose or review the requested work without claiming files were changed, commands ran, or external systems were inspected. State material verification limits. Equivalent solutions that satisfy the stated contract are acceptable.",
+  "cases": [
+    {
+      "id": "GHOW-ROUTE-01",
+      "name": "select-guidance-for-observed-blocked-send",
+      "prompt": "Select the smallest useful set of local Go skills for this task; provide a short routing rationale only. An existing Go test intermittently hangs. Its captured goroutine stack points at a channel send in a producer after the consumer returns early. We need to diagnose and fix that lifecycle bug within the current package. This is not a new service, API redesign, database issue, or broad repository audit. The available family includes golang-common-practice, golang-troubleshooting, golang-concurrency, golang-context, golang-performance, golang-observability, and golang-design-patterns.",
+      "expectations": [
+        "Includes golang-common-practice as the family base and names troubleshooting/concurrency as the relevant diagnosis and implementation guidance.",
+        "Adds context guidance only if cancellation propagation is part of the fix, or explains that relevance directly.",
+        "Keeps the investigation focused on the captured lifecycle failure rather than treating a hang as a generic CPU optimization problem."
+      ],
+      "negative_expectations": [
+        "Must not select the entire Go skill family or require new tracing, dashboards, service architecture, or a runtime upgrade.",
+        "Must not claim the routing response itself diagnosed the full cause or executed a fix."
+      ],
+      "trap": "Load every adjacent skill and expand a concrete goroutine lifecycle bug into an observability or architecture project.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "convention",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GHOW-REVIEW-02",
+      "name": "routing-does-not-authorize-project-policy-edit",
+      "prompt": "For this review-only task, tell me which local Go guidance to use for improving the name of one new exported function. Repository policy edits are not requested. A colleague suggests invoking golang-how-to Configure mode and adding every golang-* skill to AGENTS.md first, so future agents always load the whole family. Give the minimal routing decision and assess that suggestion.",
+      "expectations": [
+        "Selects naming guidance with the family base rather than a broad implementation bundle.",
+        "Rejects an automatic AGENTS.md edit or mandatory all-family load for this review-only task.",
+        "Explains that Configure mode belongs to an authorized repository-guidance change, not ordinary skill selection."
+      ],
+      "negative_expectations": [
+        "Must not produce or claim a repository-policy modification as a prerequisite for the naming review.",
+        "Must not invent an absolute skill-installation path or require delegation to use the selected guidance."
+      ],
+      "trap": "Turn an on-demand routing decision into unrequested persistent repository policy.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "convention",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

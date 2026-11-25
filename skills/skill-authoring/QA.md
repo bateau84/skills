@@ -13,6 +13,8 @@ Adversarial validation for any agent. Assume competent production and conformanc
 - Attack **ungrounded rule accretion**: did a behavioral rule enter the skill without an observed failure or evidence, making folklore permanent and difficult to falsify?
 - Attack **authority laundering**: can reusable guidance quietly create semantics, permissions, destructive actions, credentials, or user decisions?
 - Attack **self-confirming evaluation**: can the candidate, its wording, or a synthetic scenario make the eval pass without exercising the real decision boundary or observable output?
+- Attack **convention masking**: can a more polished answer win the combined score while violating an accepted user obligation? Can the judge confuse a warning with a recommendation, invent unavailable evidence, or prefer its own writing style?
+- Attack **calibration leakage**: were the supposed holdouts edited after seeing answers, were unsuccessful samples silently rerun, or do repeated sessions count as independent tasks? Can a fresh session still receive the old verdict automatically?
 - Attack **source/provenance erosion**: did migration or compression preserve the sentence while losing why it exists, what evidence supported it, or which obsolete mechanics were intentionally rejected?
 - Test whether ASSESSMENT and QA offer distinct conformance and residual-confidence methods or merely duplicate checklists with different severity words. Different files or personas do not establish reviewer independence; probe shared context and assumptions when that claim matters.
 

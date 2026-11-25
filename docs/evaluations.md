@@ -161,15 +161,18 @@ git worktree add --detach ../skills-before-comment-policy 890173154ac7672eab848f
 python3 -I -B scripts/run_evals.py --comparison revision \
   --baseline-skill-root ../skills-before-comment-policy \
   --cases software-engineering:SoftwareEngineering-09,software-engineering:SoftwareEngineering-10,software-engineering:SoftwareEngineering-11,software-engineering:SoftwareEngineering-12 \
-  --model "$EVAL_MODEL" --engine podman --image "$OPENCODE_IMAGE_ID"
+  --model "$EVAL_MODEL" --judge-model "$EVAL_JUDGE_MODEL" \
+  --engine podman --image "$OPENCODE_IMAGE_ID"
 
 python3 -I -B scripts/run_evals.py --comparison assessment \
   --cases software-engineering:SoftwareEngineering-10 \
-  --model "$EVAL_MODEL" --engine podman --image "$OPENCODE_IMAGE_ID"
+  --model "$EVAL_MODEL" --judge-model "$EVAL_JUDGE_MODEL" \
+  --engine podman --image "$OPENCODE_IMAGE_ID"
 
 python3 -I -B scripts/run_evals.py --comparison qa \
   --cases software-engineering:SoftwareEngineering-13 \
-  --model "$EVAL_MODEL" --engine podman --image "$OPENCODE_IMAGE_ID"
+  --model "$EVAL_MODEL" --judge-model "$EVAL_JUDGE_MODEL" \
+  --engine podman --image "$OPENCODE_IMAGE_ID"
 ```
 
 `--baseline-skill-root` is required **only** for `revision` and points to
@@ -192,7 +195,8 @@ explicit selection and an explicitly chosen model. A small first trial is:
 ```sh
 # Paid/live example: only run after explicitly choosing model and spend.
 bun run eval:live -- \
-  --cases product-acceptance:PA3 --model openai/gpt-6.1 \
+  --cases product-acceptance:PA3 --model "$EVAL_MODEL" \
+  --judge-model "$EVAL_JUDGE_MODEL" \
   --engine podman --image "$OPENCODE_IMAGE_ID" \
   --artifact-dir /path/to/new-single-run-directory
 ```
@@ -206,20 +210,30 @@ execution. `--all` is an explicit whole-suite choice (or all cases of selected
 targets); **do not blindly run the entire case corpus**. Merely passing
 `--target-kind skill` does not authorize selecting everything.
 
-Live `--model` and optional `--judge-model` values must be explicit
-`provider/model` identifiers (for example `openai/gpt-6.1` or
-`anthropic/claude-sonnet-4`). The wrapper passes each identifier unchanged to
-the runner; it never supplies or infers a provider. `--judge-model` defaults to
-the exact qualified `--model` value. The `opencode` transport label describes
-the invocation mechanism, not the provider/model identity. List, validate,
-harness-test and provider-free probe behavior is unchanged.
+Live `--model` and `--judge-model` values must be explicit `provider/model`
+identifiers. Choose the target and judge models deliberately. A distinct judge
+selector is required by default; for an intentionally same-model regression run,
+pass `--allow-same-model-judge`. With that opt-in alone, the judge uses the exact
+target identifier. Changing only provider aliases or reasoning variants does not
+pass the same-model check. The wrapper rejects these configuration mistakes
+before inference.
+
+This is a conservative selector check, **not verified model independence**:
+different deployment names can still resolve to the same model, and different
+models can share biases. Run metadata records `same-model-selector` or
+`different-selectors-unverified`. Preserve actual resolved identities when the
+provider exposes them; do not advertise cross-model validation from a different
+transport label. The wrapper passes qualified identifiers unchanged to the
+runner and never infers a provider. List, validate, harness-test and provider-free
+probe behavior is unchanged.
 
 | Control                                   | Default / semantics                                                                                                                                                                                        |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--iterations N`                          | 1 repetition per selected case; positive integer                                                                                                                                                           |
 | `--parallel N`                            | 1 concurrent pair; positive bounded number, not “unlimited”                                                                                                                                                |
 | `--model`                                 | Required live; qualified `provider/model`; native OpenCode transport target                                                                                                                                 |
-| `--judge-model`                           | Optional qualified `provider/model`; exact target ID by default; explicit when using a cross-transport judge                                                                                               |
+| `--judge-model`                           | Required distinct qualified selector by default; different selectors do not prove independence |
+| `--allow-same-model-judge`                 | Explicitly permits a same-model regression judge; omitted judge defaults to the target only with this opt-in |
 | `--judge-transport`                       | `opencode`, or `github-copilot-cli` with explicit model and `--copilot-image`                                                                                                                              |
 | `--reasoning LEVEL`                       | Common target/judge reasoning; omitted means provider default                                                                                                                                              |
 | `--target-reasoning`, `--judge-reasoning` | Phase overrides; target control is identical in baseline and candidate                                                                                                                                     |
@@ -593,6 +607,55 @@ by the real runner from the forwarded env, including when the resolved header
 adds a `Bearer ` prefix. No hardcoded user credential or replacement sanitizer
 is required. Existing auth/database/catalogue seed handling remains runner-owned.
 
+## Authoring response cases
+
+The current target treatment produces a response from supplied facts. It does
+not execute the scenario application. A fixture that requires an actual edit,
+upload, deployment, or test run must supply an appropriate execution environment
+through a separate artifact exercise; prose assertions cannot prove those acts.
+For a response case, supply the snippets, accepted contracts, relevant versions,
+and observed results needed to assess the requested diagnosis, draft, or plan.
+
+Reviewed cases can add this optional, strictly validated metadata:
+
+```json
+"evaluation": {
+  "mode": "response",
+  "purpose": "boundary",
+  "criterion_types": {
+    "E1": "outcome",
+    "E2": "convention",
+    "N1": "outcome",
+    "T1": "outcome"
+  }
+}
+```
+
+`criterion_types` must name every positive/negative rule exactly once, plus
+`T1` only when a trap is declared. Unknown keys, partial classifications, and
+unsupported execution modes are rejected. An outcome is contextual: an exact
+schema or exit code is an outcome when an accepted consumer contract requires
+it; otherwise a preferred spelling, heading, or routine phrase is a convention.
+
+`purpose` is `regression`, `contrast`, or `boundary`. It records author intent,
+**not measured discrimination**. Metadata records calibration as unmeasured.
+Keep valuable baseline-ceiling and rare-failure regression cases; add contrasts
+where useful instead of making every baseline fail. Test legitimate complexity
+alongside cases that should stay small. Existing unclassified fixtures remain
+compatible and should be reviewed before adding classifications.
+
+Judges must accept equivalent valid solutions, assess conditional advice in its
+stated branch, distinguish warnings from recommendations, and avoid inferring
+execution order from prose order. Candidate text cannot change the rubric. The
+[source-reviewed judge checks](../evaluations/judge-calibration/README.md) cover
+these errors, missing-input abstention, and a polished incorrect answer with an
+embedded instruction to the judge. Exported packets use random opaque IDs and shuffled order, with source IDs and
+expected verdicts withheld. Keep the separate private mapping away from the
+judge; the checker binds it to the exact exported packet and fixture.
+See [evaluation design](../skills/skill-authoring/references/evaluation-design.md)
+and the [2026-11-24 review](skill-eval-improvement-2026-11-24.md) for rationale,
+limits, and retained observations.
+
 ## Evidence, scoring and exit status
 
 The project requires canonical `runtime_evidence` with complete native and Code
@@ -612,18 +675,50 @@ Booleans, cited evidence, trap assessment, and a consistent overall `passed`.
 Missing, duplicate, conflicting, unknown or malformed results are non-evidence,
 not a successful grade or an invented zero score.
 
-Behavior score is the fraction of satisfied positive rules, avoided forbidden
-rules, and—when declared—avoided trap. Candidate absolute PASS requires every
-rule plus treatment integrity. Relative skill value is separate:
+A judge can explicitly abstain when the fixture prevents a fair assessment:
 
-- regression if a trap regresses or score delta is negative;
-- material improvement if a trap is fixed or the delta is at least **10pp**;
+```json
+{
+  "schema": "portable-skills/judgment-abstention/v1",
+  "reason": "missing-input",
+  "evidence": "The task requires an applied repository edit, but no repository was supplied."
+}
+```
+
+The other allowed reasons are `conflicting-rubric` and `unobservable`. A wrong or
+incomplete answer to an answerable task is a failure, not an abstention. The
+pinned runner records this separate contract as **NON-EVIDENCE** using its
+existing `judge_contract_invalid` status; it is never a zero, PASS, or a reason
+for automatic retry/regrading. The exact reason and rationale remain in the
+private judge attempt. Missing inputs should be fixed before a new explicit run.
+
+The legacy all-rubric behavior score remains the fraction of satisfied positive
+rules, avoided forbidden rules, and—when declared—avoided trap. Candidate
+absolute PASS still requires every rule plus treatment integrity. New reviewed
+cases additionally declare every criterion as an **outcome** or **convention**.
+Reports show both scores and per-axis PASS separately, preserving a valid side's
+absolute scores even when its counterpart has no usable judgment. Legacy cases
+remain visibly **unclassified**; their conformance scores are not relabeled as
+product outcomes.
+
+Relative comparison uses the outcome axis when present. If only conventions are
+classified, its basis is `convention`; legacy comparison uses
+`unclassified-rubric`. The basis is displayed and the original all-rubric delta
+is retained as a diagnostic. Aggregate Markdown comparisons are grouped by
+outcome, convention, legacy/unclassified or unknown basis; their improvement
+counts are not pooled into one product-improvement measure. A heading/style gain cannot compensate for an
+outcome regression. Trap effects apply to their declared axis. Within the
+selected axis:
+
+- regression if its trap regresses or score delta is negative;
+- material improvement if its trap is fixed or the delta is at least **10pp**;
 - smaller positive delta: improvement; zero: neutral.
 
 The threshold uses exact Boolean fractions, not floating-point rounding. It is
 a **policy**, not statistical significance. Treatment integrity failure prevents
 attributed improvement even if answer scores are available; a higher score is
-not candidate absolute PASS.
+not candidate absolute PASS. Per-axis observations do not establish case
+calibration or corpus-wide skill value.
 
 | Exit | Meaning                                                                      |
 | ---- | ---------------------------------------------------------------------------- |
@@ -643,7 +738,12 @@ a skill-loading prerequisite.
 
 ## Corpus, history and source lineage
 
-With the strategic-programming cases, the corpus normalizes to
+The 2026-11-24 revision normalizes to **590 cases across all 124 skills**.
+The baseline for that review had 522 cases across 107 skills; the new count adds
+68 cases, including coverage for all 17 previously uncovered directories.
+These are authored response fixtures, not 590 executed behavioral results.
+
+The earlier strategic-programming snapshot normalized to
 **367 cases across 56 skills**: 343 cases outside the two Markdown-backed skill
 directories (including 20 `code-analysis` cases), 9 `product-acceptance` cases,
 and 15 `work-decomposition` cases (9 WD cases, 4 context-and-handoff cases,

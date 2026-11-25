@@ -45,7 +45,7 @@ class ReportRepairTests(unittest.TestCase):
                          patch.object(self.context.runner.cli, "default_database_path", return_value=base / "absent-db"), \
                          patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=self.context.invoke), \
                          redirect_stdout(stdout), redirect_stderr(stderr):
-                        code = main(["--cases", "product-acceptance:PA3", "--model", "test/model",
+                        code = main(["--cases", "product-acceptance:PA3", "--model", "test/model", "--allow-same-model-judge",
                                       "--runner-root", str(self.context.runner.root), "--models-catalog",
                                       str(self.context.runner.root / "tests/fixtures/models-catalog.json"), alias, "reports/run", *flags])
                     self.assertEqual(code, 0, stderr.getvalue())
@@ -127,7 +127,7 @@ class ReportRepairTests(unittest.TestCase):
                  patch("eval_markdown.os.fsync", side_effect=synced), \
                  patch("eval_markdown.os.replace", side_effect=replaced), \
                  redirect_stdout(stdout), redirect_stderr(stderr):
-                code = main(["--cases", "product-acceptance:PA3", "--model", "test/model",
+                code = main(["--cases", "product-acceptance:PA3", "--model", "test/model", "--allow-same-model-judge",
                               "--runner-root", str(self.context.runner.root), "--models-catalog",
                               str(self.context.runner.root / "tests/fixtures/models-catalog.json"), "--output", "reports/run", *flags])
             self.assertEqual(code, 2)

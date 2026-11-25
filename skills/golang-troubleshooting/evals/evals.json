@@ -4,16 +4,28 @@
     {
       "id": 1,
       "name": "reproduce-before-fix-failing-test-first",
-      "description": "Tests Golden Rule #2: model must write a failing test before proposing any fix, not jump to code changes",
-      "prompt": "My Go HTTP handler returns 500 for some requests but I can't figure out which ones. The handler parses a JSON body with `json.NewDecoder(r.Body).Decode(&req)` and then calls `processOrder(req)`. Some users report getting 500 errors. Can you fix this?",
-      "trap": "Model jumps directly to adding nil checks or error handling in the handler code without first writing a test that reproduces the failure",
+      "description": "Reproduction and evidence gate before applying an ungrounded fix; response order is not execution order.",
+      "prompt": "My Go HTTP handler returns 500 for some requests but I can't figure out which ones. The handler parses a JSON body with `json.NewDecoder(r.Body).Decode(&req)` and then calls `processOrder(req)`. Some users report getting 500 errors. Can you fix this?\n\nYou have only this description, not the handler source or a failing request. Give the bounded diagnosis and repair plan; distinguish hypotheses from findings and do not claim to have run tests.",
+      "trap": "Applies or declares a speculative fix without obtaining failure evidence; the order of paragraphs alone is not evidence of action order.",
       "expectations": [
-        "Writes a failing test (or proposes writing one) BEFORE suggesting any code fix",
-        "Test covers multiple input variations to identify which inputs trigger the 500",
-        "Does NOT propose a fix without first understanding/reproducing the root cause",
+        "Makes reproducing and understanding a representative failure a prerequisite to applying a proposed repair; a conditional hypothesis may appear earlier in the explanation.",
+        "Proposes focused input variations and evidence to distinguish decode, validation and processOrder failures rather than claiming an invented test already reproduces the incident.",
+        "Does not assert a root cause or present a speculative rewritten handler as a verified fix from the supplied description alone.",
         "Asks clarifying questions about the error (logs, request bodies, frequency) or proposes to gather evidence",
-        "Mentions running the test to confirm it reproduces the issue before fixing"
-      ]
+        "Requires observing the representative failure through a focused test or controlled request reproduction before applying the supported repair; a valid reproduction need not begin as an automated test."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "E5": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 2,

@@ -14,7 +14,17 @@
       ],
       "must_not": [
         "Does not swallow every ReadInConfig error or declare the file mandatory."
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "VPR-ENV-01",
@@ -23,12 +33,71 @@
       "trap": "AutomaticEnv Get works while Unmarshal enumerates registered AllKeys and drops env-only values.",
       "expectations": [
         "Explains why direct Get and Unmarshal can differ for unregistered keys.",
-        "Registers the expected keys via BindEnv or SetDefault, while retaining prefix/replacer semantics.",
+        "Makes the expected key available to Unmarshal via BindEnv or an appropriate default, or uses an explicitly mapped Get-based configuration path with equivalent values and precedence. Retains the configured prefix/replacer semantics; registration is not the only valid repair.",
         "Proposes a real env-only regression check."
       ],
       "must_not": [
         "Does not claim AutomaticEnv automatically adds arbitrary environment keys to Unmarshal."
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "VPR-REQUIRED-01",
+      "name": "required-file-does-not-fall-back",
+      "prompt": "A Go service using Viper accepts --config /etc/acme/prod.yaml. Its accepted startup contract says an explicitly selected file is required; defaults apply only when no path was selected. The loader calls SetConfigFile on that path, then ReadInConfig returns an error because the file is missing. A patch proposes swallowing it and continuing from environment values. Review that patch and state the error-handling rule.",
+      "trap": "Generalizes optional default-path search to every missing configuration file, silently ignoring the explicitly required input.",
+      "expectations": [
+        "Rejects silently ignoring failure of the explicitly selected required path.",
+        "Separates optional search not-found behavior from required-file, parse and permission errors, without relying on one guessed concrete missing-file error type."
+      ],
+      "negative_expectations": [
+        "Must not allow successful startup solely because environment values or defaults exist when the required file is unavailable."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "VPR-TIMING-01",
+      "name": "binding-after-parse-before-read",
+      "prompt": "In a Go command, pflag parsing completes before RunE. RunE first calls v.BindPFlag(\"port\", cmd.Flags().Lookup(\"port\")), checks the error, then calls v.GetInt(\"port\"). There are no earlier Viper reads and no other command binds this key. A reviewer says the binding is necessarily too late because parsing already happened. Is that a bug? Explain the actual boundary.",
+      "trap": "Applies a before-Execute lifecycle rule even though Viper reads the bound flag lazily and all dependent reads happen after binding.",
+      "expectations": [
+        "Recognizes this sequence can be correct: BindPFlag establishes the binding before the first GetInt that consumes it.",
+        "Explains that the relevant risks are an earlier dependent read or conflicting binding, neither of which is present in the supplied task."
+      ],
+      "negative_expectations": [
+        "Must not require moving binding to init or before Execute solely because flags have already been parsed.",
+        "Must not introduce additional config sources or hot reload to solve this review question."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

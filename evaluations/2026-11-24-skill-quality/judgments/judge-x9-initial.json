@@ -1,0 +1,91 @@
+{
+  "cases": [
+    {
+      "id": "work-1",
+      "scorable": true,
+      "criteria": [
+        {
+          "id": "E1",
+          "met": true,
+          "evidence": "BR-001 requires a working path that completes scheduler removal while the request remains queued, and explicitly rejects always-refused or perpetually unresolved withdrawal. BR-002 forbids any exporter invocation after successful pre-processing withdrawal, including pending scheduling actions. BR-003 requires confirmation for removal of the same request before displaying Withdrawn and requires displaying confirmed withdrawal."
+        },
+        {
+          "id": "E2",
+          "met": true,
+          "evidence": "The response explicitly says behavior after processing begins remains unchanged and excludes cancellation or termination of processing underway. The planning handoff leaves investigation of how removal and processing start uphold the guarantee atomically pending, without selecting an implementation."
+        },
+        {
+          "id": "E3",
+          "met": true,
+          "evidence": "The three behavioral requirements separately specify usable withdrawal, prevention of later exporter execution, and truthful UI confirmation. Each contributes distinct acceptance and verification meaning. The response recognizes that private helpers within one service do not establish an independently governed boundary, creates no separate contract or duplicate quality artifact, and does not prescribe interim statuses, deadlines, retry policies, or new availability targets."
+        }
+      ],
+      "outcome_pass": true,
+      "notes": "The task is fully scorable from the supplied response. The concurrency and request-identity details operationalize the stated guarantees without selecting the pending architecture."
+    },
+    {
+      "id": "work-2",
+      "scorable": true,
+      "criteria": [
+        {
+          "id": "E1",
+          "met": true,
+          "evidence": "The draft requests machine-readable output from status, and both its requirements and completion checklist explicitly preserve the existing human-readable output."
+        },
+        {
+          "id": "E2",
+          "met": true,
+          "evidence": "The body leaves the public option name and output schema as open decisions and expressly defers examples until both are decided. It supplies no flag spelling, example output, failure history, assignee, priority, design, or test result. Programmatic consumption describes the requested capability rather than asserting an unsupported incident or user history. It presents an unpublished draft and makes no claim that an issue was created or published."
+        },
+        {
+          "id": "E3",
+          "met": true,
+          "evidence": "The response provides a concrete draft title and a usable issue body with the requested capability, compatibility requirement, completion conditions, and separate questions for the unresolved option name and schema."
+        }
+      ],
+      "outcome_pass": true,
+      "notes": "The sentence saying the issue has not been published is consistent with the requested draft status; it is not evidence of a publication operation. The Files consulted assertions are not verified or credited as execution evidence."
+    },
+    {
+      "id": "work-3",
+      "scorable": true,
+      "criteria": [
+        {
+          "id": "E1",
+          "met": true,
+          "evidence": "The recommended initial structure is one module with root go.mod, main.go, and a focused main_test.go. The implementation stays in ordinary functions in package main. README and gitignore additions are described as useful when putting the command in Git; no application layers, DI framework, workspace, multiple modules, or build automation are required."
+        },
+        {
+          "id": "E2",
+          "met": true,
+          "evidence": "Expansion is tied to concrete needs: navigation difficulty leads to another file in package main; representative log fixtures lead to testdata; a second executable leads to cmd directories; actual external consumers lead to public-package design; repetitive commands lead to automation. The response explicitly rejects line-count thresholds."
+        }
+      ],
+      "outcome_pass": true,
+      "notes": "The lightweight formatting-test convention does not undermine the minimal starting layout. The suggested expansions carry explicit need-based conditions rather than being immediate requirements."
+    },
+    {
+      "id": "work-4",
+      "scorable": true,
+      "criteria": [
+        {
+          "id": "E1",
+          "met": true,
+          "evidence": "The opening states verification is failing because of both the unused-import lint issue and the regression from accepted None behavior to ValueError. It expressly says passing formatting and type checking does not resolve those failures."
+        },
+        {
+          "id": "E2",
+          "met": true,
+          "evidence": "The response proposes inspecting the empty-input branch and traceback, restoring an empty-input return value of None, preserving the test expectation, inspecting and resolving the unused import, and rerunning the checks after correction. It does not recommend weakening the accepted-behavior test."
+        },
+        {
+          "id": "E3",
+          "met": true,
+          "evidence": "It retains the configured Python 3.13 and uv toolchain and reproduces all four exact commands for final verification, including uv run pytest tests/parser. The additional focused pytest invocation stays within tests/parser and does not replace the configured final scope. It labels the results as supplied, explicitly says no fixes or reruns have occurred, and limits any future success report to the four configured checks rather than the repository's entire test suite."
+        }
+      ],
+      "outcome_pass": true,
+      "notes": "The source filename src/parser.py, test name test_empty_input, and numeric exit codes are not supplied in the task. Their presentation as supplied details is unsupported; they should be removed or labeled as examples, and a focused rerun should use the actual reported test identifier. These assertions are not accepted as evidence of execution. The listed criteria concerning the failures, accepted behavior, configured final scope, and nonexecution status are otherwise satisfied."
+    }
+  ]
+}

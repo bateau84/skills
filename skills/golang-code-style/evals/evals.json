@@ -14,7 +14,65 @@
       ],
       "must_not": [
         "Does not demand non-nil slices for every use."
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GSTYLE-GUARD-01",
+      "name": "readability-preserves-guard-evaluation",
+      "prompt": "Review this proposed style-only Go refactor. Before: `if u != nil && u.Active && allowed(u.ID) { serve(u) }`. After: `isActive := u.Active; canServe := allowed(u.ID); if u != nil && isActive && canServe { serve(u) }`. allowed records an audit event and should run only for active users. Explain whether the rewrite is safe and give the smallest correction.",
+      "trap": "Extracts named booleans solely because a condition has several operands, moving dereferences and side effects ahead of their guards.",
+      "expectations": [
+        "Identifies the nil dereference and the newly unconditional allowed call.",
+        "Preserves the nil guard and active-user short circuit, by retaining the original condition or equivalent guarded control flow."
+      ],
+      "negative_expectations": [
+        "Must not approve eager evaluation as a harmless readability-only change.",
+        "Must not require extraction of every condition merely because there are three operands."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GSTYLE-API-01",
+      "name": "five-parameters-not-a-defect",
+      "prompt": "A public Go function is `func CopyRange(ctx context.Context, dst io.Writer, src io.Reader, offset int64, length int64) (int64, error)`. Its names and call sites are clear, it is already used by consumers, and no behavior change is requested. A style review says any function with more than four parameters must become an options struct. Assess that finding.",
+      "trap": "Converts a parameter-count preference into a mandatory public API change without a readability or domain problem.",
+      "expectations": [
+        "Recognizes that the parameter count alone does not establish a defect or justify changing this public API.",
+        "Weighs readability and compatibility; keeps the signature unless a concrete problem or accepted migration requirement is shown."
+      ],
+      "negative_expectations": [
+        "Must not demand an options struct solely to meet a numerical parameter limit."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

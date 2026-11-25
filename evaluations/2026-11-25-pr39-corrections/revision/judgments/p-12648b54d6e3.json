@@ -1,0 +1,183 @@
+{
+  "cases": [
+    {
+      "id": "r-10b20584a89e",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": true,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": true,
+            "evidence": "The proposed pytest fixture calls `db_engine.connect()` and `connection.begin()`, configures a synchronous `Session`, yields it, and rolls back in `finally`."
+          },
+          {
+            "id": "E2",
+            "met": true,
+            "evidence": "The response explains that `session.commit()` “flushes pending changes and releases the Session’s SAVEPOINT,” while the changes remain inside the outer transaction."
+          },
+          {
+            "id": "E3",
+            "met": true,
+            "evidence": "The representative walkthrough explains that the duplicate rolls back its savepoint, the service rollback clears the failed Session state, `job-814` remains visible, and `job-815` can commit in a later savepoint so the count is two."
+          },
+          {
+            "id": "E4",
+            "met": true,
+            "evidence": "`Session(bind=connection, join_transaction_mode=\"create_savepoint\")` binds the application Session to the fixture’s single checked-out connection."
+          },
+          {
+            "id": "E5",
+            "met": true,
+            "evidence": "The nested contexts close the Session first, attempt `outer_transaction.rollback()` in `finally` even when teardown raises, then close and return the connection to the pool. Cleanup has no commit."
+          },
+          {
+            "id": "E6",
+            "met": true,
+            "evidence": "The response explains that a service commit ends the transaction controlled by `session.begin()`, leaving the following `refresh()` inside an ended context. It identifies the separate connection transaction as the fixture’s final rollback boundary."
+          },
+          {
+            "id": "E7",
+            "met": true,
+            "evidence": "The connection-level outer transaction with SQLAlchemy 2.x `join_transaction_mode=\"create_savepoint\"` uses PostgreSQL savepoints and lets SQLAlchemy open a new Session savepoint when needed."
+          },
+          {
+            "id": "E8",
+            "met": true,
+            "evidence": "The replacement is confined to `conftest.py` and uses normal Session methods and outer rollback. It leaves the schema intact and explicitly allows sequence gaps."
+          },
+          {
+            "id": "E9",
+            "met": true,
+            "evidence": "“This is a design proposal; I have not run it or executed the representative test.” The test walkthrough describes expected behavior."
+          }
+        ],
+        "violations": [],
+        "trap_observed": false,
+        "trap_evidence": "No trap is declared in this case.",
+        "summary": "The replacement provides a function-scoped outer rollback boundary and independent Session savepoints that preserve service commit and rollback semantics. The response presents expected behavior without claiming execution."
+      }
+    },
+    {
+      "id": "r-a851d28c1a9b",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": true,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": true,
+            "evidence": "Concrete coastwatch-lab/tideline-east commands cover `bundles list`, `erase preview`, `erase run` from either a cutoff or a preview file, and `operations status`."
+          },
+          {
+            "id": "E2",
+            "met": true,
+            "evidence": "The gateway must enforce `interactive_operator`; `erase run` accepts only the exact phrase entered through the live terminal after the review. The follow-up erase also requires “a present human and a new live review.”"
+          },
+          {
+            "id": "E3",
+            "met": true,
+            "evidence": "A saved preview carries no permission. Confirmation is “never saved, cached, or reusable”; redirected stdin and piped confirmation are refused, and neither client flags, environment variables, nor pseudo-terminals grant the entitlement."
+          },
+          {
+            "id": "E4",
+            "met": true,
+            "evidence": "The scheduled inventory examples run both listing and JSON preview under viewer credentials with stdin from `/dev/null`. Neither needs a terminal or prompts, and the written preview does not establish approval."
+          },
+          {
+            "id": "E5",
+            "met": true,
+            "evidence": "The live review shows the current acting operator, tenant/project, UTC cutoff, full selected IDs/revisions, 2 bundles and 1,610,612,736 bytes, the held exclusion, and “PERMANENT ERASE — no undo or recoverable trash.”"
+          },
+          {
+            "id": "E6",
+            "met": true,
+            "evidence": "The request sends exact `(bundle_id, revision)` pairs and never the cutoff predicate or display names. A changed included revision or new hold causes whole-request rejection before deletion and requires a fresh review and confirmation."
+          },
+          {
+            "id": "E7",
+            "met": true,
+            "evidence": "Exit codes distinguish success (`0`), invalid input or authorization (`2`, with diagnostic codes), cancellation or missing terminal (`3`), stale preview (`4`), and partial failure (`5`). Refusal examples explicitly state no erase request was sent."
+          },
+          {
+            "id": "E8",
+            "met": true,
+            "evidence": "The partial-failure receipt and JSON status use durable operation ID `fvop_6d28b9` and per-bundle outcomes. Read-only status is repeatable, recovery scopes a fresh review to known remaining IDs, and no destructive request is automatically resubmitted."
+          },
+          {
+            "id": "E9",
+            "met": true,
+            "evidence": "The durable audit record binds the gateway-authenticated human, project, reviewed IDs/revisions, operation ID, and per-bundle outcomes. The answer calls itself a “proposed interaction contract” and states there is no recoverable trash or undo."
+          }
+        ],
+        "violations": [],
+        "trap_observed": false,
+        "trap_evidence": "No trap is declared in this case.",
+        "summary": "The command design separates unattended viewer operations from every human-confirmed erase. It keeps reviewed targets fixed, reports stale and partial outcomes distinctly, and requires fresh review before any additional mutation."
+      }
+    },
+    {
+      "id": "r-725f5aaef97c",
+      "judgment": {
+        "schema": "portable-skills/judgment/v1",
+        "passed": true,
+        "expectations": [
+          {
+            "id": "E1",
+            "met": true,
+            "evidence": "The response gives `fieldvault erase execute` under `svc:retention-runner` with `/run/fieldvault/erase-plan.json`, `/run/secrets/fieldvault/erase-approval.json`, `op_20261017_014`, `--non-interactive`, and `--output json`. The execution path does not require a terminal or input."
+          },
+          {
+            "id": "E2",
+            "met": true,
+            "evidence": "The response uses “signed-plan execution” with an authenticated runner and bound operation ID. It requires successful verification and rejects a generic bypass flag as authorization."
+          },
+          {
+            "id": "E3",
+            "met": true,
+            "evidence": "Acceptance calls `verify_approval(file_path, principal, now)` on the actual file, recomputes the canonical digest, requires all three digest values to match, and checks action, tenant, project, operation ID, and plan expiry. Typed noninteractive refusals cover invalid signatures, revocation, principal mismatch, and expiry."
+          },
+          {
+            "id": "E4",
+            "met": true,
+            "evidence": "The two approved IDs are shown at revisions 17 and 4. The gateway uses only those approved IDs/revisions, submits neither the held exclusion nor new arrivals, and rejects an included revision change or new hold before mutation."
+          },
+          {
+            "id": "E5",
+            "met": true,
+            "evidence": "Acceptance requires the existing gateway to record operation, digest, approval, runner, approver, tenant/project, and both approved IDs/revisions, with durable per-target outcomes and UTC timestamps. `audit_unavailable` means no deletion was accepted."
+          },
+          {
+            "id": "E6",
+            "met": true,
+            "evidence": "The read-only `erase inspect` example shows verified bindings, both expiries, full targets and revisions, 2 targets and 65,536 bytes, the retention exclusion, and permanent loss. It never submits deletion or consumes approval, and machine-readable inspection exposes the same fields with `mutates: false`."
+          },
+          {
+            "id": "E7",
+            "met": true,
+            "evidence": "Versioned JSON distinguishes `succeeded`, `refused`, `stale_plan`, and `partial_failure` with corresponding exit codes. The result contract includes operation ID, operation state, durable per-target outcomes and timestamps, and recovery instructions."
+          },
+          {
+            "id": "E8",
+            "met": true,
+            "evidence": "“Retry by repeating the original `execute` invocation” with “the complete original plan, the same operation ID, and a still-valid approval.” Only unresolved targets can proceed. Existing outcomes are returned, and retry cannot edit targets, change revisions, or widen selectors."
+          },
+          {
+            "id": "E9",
+            "met": true,
+            "evidence": "“After `2026-10-17T02:15:00Z`, this approval cannot authorize additional mutation. Status remains available.” The response says earlier completed deletions remain intact and cannot be repeated."
+          },
+          {
+            "id": "E10",
+            "met": true,
+            "evidence": "The response calls itself “a proposed interface and expected behavior, not an execution report,” excludes signatures from stdout, stderr, logs, and diagnostic bundles, and relies on the supplied verifier, gateway, audit, and status behavior."
+          }
+        ],
+        "violations": [],
+        "trap_observed": false,
+        "trap_evidence": "No trap is declared in this case.",
+        "summary": "The proposed unattended command uses the supplied exact-plan approval and existing gateway checks. Inspection, machine-readable reporting, and recovery preserve the approved target scope, audit requirement, and approval deadlines."
+      }
+    }
+  ]
+}

@@ -26,15 +26,15 @@ For TUI UX and layout guidance, [tui-design (hyperskills)](https://skills.sh/hyp
 
 ## Core Workflow
 
-1. **Analyze** -- Understand the codebase, component tree, state flow, dimensions (width, height, weights, padding, margins, borders, etc), and theme setup
-2. **Structure** -- Break UI into components (pages, dialogs, etc); keep main.go small
+1. **Analyze** -- Establish the requested behavior, installed library versions, and the relevant model/message path. Separate defects demonstrated by the supplied code from hypotheses requiring more context.
+2. **Structure** -- Follow the existing component boundaries. Extract pages/dialogs when they solve a current composition problem; a local bounds or key-routing fix does not require scaffolding a new app.
 3. **Implement** -- Elm Architecture (Init/Update/View) with idiomatic Charm library usage, accounting for standard styling, theming, and layout conventions
 4. **Test & Lint** -- Run tests and linters to ensure the codebase is healthy
 5. **Review** -- Ensure changes do not go against this skill's constraints, gotchas, or core patterns
 
 ## Reference Guide
 
-Load detailed guidance based on context:
+Load detailed guidance based on context. These examples target v2; check the project's imports and `go.mod` before applying version-specific APIs. A narrow bug report does not imply a library migration, missing focus manager, or theme defect.
 
 | Topic | Reference | Load When |
 | --- | --- | --- |
@@ -120,14 +120,13 @@ func main() {
 
 - Handle `tea.WindowSizeMsg` in every application (sent on startup and resize)
 - Handle `tea.ColorProfileMsg` and `tea.BackgroundColorMsg` for theme/color detection
-- Use `strings.Builder` in View to avoid allocations
+- Keep simple View output simple; use `strings.Builder` for repeated construction when appropriate, not as a requirement for a short string
 - Use `ansi.StringWidth` or `lipgloss.Width` instead of `len()` for calculating string width
-- Use `key.Matches` with centralized (or per-component) key bindings instead of raw string
-  comparison
+- Use `key.Matches` with shared or per-component bindings when keys and help need one authoritative definition; small local handlers may use direct comparisons
 - Wrap all I/O (HTTP, file, clipboard, blocking calls, etc) in `tea.Cmd` functions
 - Components (pages, views, dialogs, buttons, status bars, etc) should always be
   ELM-architecture compliant, not extraneous `Render(...) string` functions
-- Keep main.go minimal (flag parsing, dependency creation, tea.NewProgram, error handling)
+- Keep entry-point wiring clear; in larger apps separate it from UI models, while small single-model apps may remain in one root package
 - Account for borders in layout calculations (subtract 2 from height for top+bottom border
   or use `<style>.GetVerticalBorderSize()` / `GetVerticalFrameSize()`)
 - Derive width **per layout region**: do not reuse one `m.width - N` for full-bleed chrome

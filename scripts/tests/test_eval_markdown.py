@@ -69,6 +69,34 @@ class MarkdownTests(unittest.TestCase):
             self.assertIn("test/model", text)
             self.assertNotIn("Practical first response", text)
 
+    def test_mixed_comparison_summary_keeps_each_scoring_basis_separate(self):
+        from dataclasses import replace
+        cases = []
+        for kind in ("outcome", "convention", "unclassified-rubric"):
+            data = copy.deepcopy(self.context.case.project_data)
+            if kind != "unclassified-rubric":
+                data["evaluation"] = {"mode": "response", "purpose": "regression", "criterion_types": {"E1": kind}}
+            case_id = self.context.case.id + "-" + kind
+            cases.append(replace(self.context.case, id=case_id, selectors=(case_id,), project_data=data))
+        with tempfile.TemporaryDirectory() as temp:
+            _, _, _, _, text = self.run_fixture(Path(temp) / "run", cases=tuple(cases))
+            section = text.split("## Paired comparison", 1)[1].split("## Outcome and convention evidence", 1)[0]
+            for basis in ("outcome", "convention", "unclassified-rubric"):
+                self.assertIn(f"| {basis} | 0 | 0 | 1 | 0 | 0 | 0 | 0 |", section)
+            self.assertNotIn("neutral: 3", section)
+            self.assertNotIn("| 0 | 0 | 3 |", section)
+        # Absent judgments and historical decisions without a basis stay visibly
+        # unknown; they are not silently credited to outcome or convention.
+        original = SkillsComparison.compare_pair
+        def legacy(instance, baseline, candidate):
+            result = original(instance, baseline, candidate)
+            data = dict(result.data)
+            data.pop("score_basis", None)
+            return instance.api.ComparisonDecision(result.classification, result.summary, data)
+        with tempfile.TemporaryDirectory() as temp, patch.object(SkillsComparison, "compare_pair", legacy):
+            _, _, _, _, text = self.run_fixture(Path(temp) / "run")
+            self.assertIn("| unknown/unavailable | 0 | 0 | 1 | 0 | 0 | 0 | 0 |", text)
+
     def test_compound_negative_and_baseline_fail_candidate_pass_preserve_policy(self):
         for candidate_pass in (False, True):
             with self.subTest(candidate_pass=candidate_pass), tempfile.TemporaryDirectory() as temp:
@@ -144,13 +172,70 @@ class MarkdownTests(unittest.TestCase):
             code, summary, _, _, text = self.run_fixture(Path(temp) / "run", invoke, (first, second), parallel=2)
             self.assertEqual(code, 2)
             self.assertEqual(len(summary["pairs"]), 1)
-            rows = [line for line in text.splitlines() if line.startswith("| SKILL-")]
+            case_table = text.split("## Cases (plan order)", 1)[1].split("## Decisive details", 1)[0]
+            rows = [line for line in case_table.splitlines() if line.startswith("| SKILL-")]
             self.assertIn("PA3", rows[0])
             self.assertIn("unavailable | unavailable", rows[0])
             self.assertIn("PA4", rows[1])
             self.assertIn("PASS 100%", rows[1])
             self.assertIn("partial; failed jobs may have additional", text)
             self.assertNotIn("PRIVATE ORCHESTRATION", text)
+
+    def test_one_judge_abstention_preserves_the_other_sides_absolute_axes(self):
+        from dataclasses import replace
+        from eval_profile import ABSTENTION_SCHEMA
+        data = copy.deepcopy(self.context.case.project_data)
+        data["evaluation"] = {"mode": "response", "purpose": "contrast", "criterion_types": {"E1": "outcome"}}
+        self.context.case = replace(self.context.case, project_data=data)
+        for abstaining_judge in (1, 2):
+            judges = 0
+            def invoke(spec):
+                nonlocal judges
+                if spec.agent == "eval-judge":
+                    judges += 1
+                    if judges == abstaining_judge:
+                        return 0, self.context.result(spec, text=json.dumps({"schema": ABSTENTION_SCHEMA,
+                            "reason": "missing-input", "evidence": "Missing input in this synthetic setup."}))
+                return self.context.invoke(spec)
+            with self.subTest(abstaining_judge=abstaining_judge), tempfile.TemporaryDirectory() as temp:
+                output = io.StringIO()
+                reporter = EvalReporter(json_output=True, stream=output)
+                _, summary, _, _, text = self.run_fixture(Path(temp) / "run", invoke, reporter=reporter)
+                reporter.summary(summary, 1, Path(temp) / "run")
+                axes = html.unescape(text.split("## Outcome and convention evidence", 1)[1].split("## Execution and coverage", 1)[0])
+                self.assertIn("unavailable → 1/1 (PASS)" if abstaining_judge == 1 else "1/1 (PASS) → unavailable", axes)
+                self.assertIn("unavailable / unattributed", axes)
+                events = [json.loads(line) for line in output.getvalue().splitlines()]
+                pair = next(event for event in events if event["event"] == "verified-pair")
+                final_pair = next(event for event in events if event["event"] == "verified-summary")["pairs"][0]
+                for record in (pair, final_pair):
+                    available = "candidate" if abstaining_judge == 1 else "baseline"
+                    unavailable = "baseline" if abstaining_judge == 1 else "candidate"
+                    self.assertEqual(record["scores"][available]["outcome"],
+                                     {"satisfied": 1, "total": 1, "score": 1, "passed": True})
+                    self.assertEqual(record["scores"][unavailable], {})
+                    self.assertIsNone(record["comparison"]["decision"])
+
+    def test_unrecognized_callback_classification_is_private_in_both_markdown_reports(self):
+        secret = "PRIVATECALLBACKCLASSIFICATION85679"
+        original = SkillsComparison.compare_pair
+        def compare(instance, baseline, candidate):
+            result = original(instance, baseline, candidate)
+            return instance.api.ComparisonDecision(secret, result.summary, result.data)
+        with tempfile.TemporaryDirectory() as temp, patch.object(SkillsComparison, "compare_pair", compare):
+            output = io.StringIO()
+            reporter = EvalReporter(json_output=True, stream=output)
+            _, summary, store, identities, text = self.run_fixture(Path(temp) / "run", reporter=reporter)
+            reporter.summary(summary, 1, Path(temp) / "run")
+            artifact = store.read_paired_job_artifact(identities[0])
+            self.assertIn(secret, json.dumps(artifact))
+            for report in (text, (Path(temp) / "EVAL-RESULTS.md").read_text()):
+                self.assertNotIn(secret, html.unescape(report))
+                self.assertIn("unrecognized-comparison", report)
+            self.assertNotIn(secret, output.getvalue())
+            human = io.StringIO()
+            EvalReporter(stream=human).pair(self.context.runner, artifact, summary["pairs"][0])
+            self.assertNotIn(secret, human.getvalue())
 
     def test_pre_execution_profile_failure_after_ownership_reports_incomplete(self):
         for json_output in (False, True):
@@ -291,7 +376,8 @@ class MarkdownTests(unittest.TestCase):
             self.assertNotIn("# Fake PASS", text)
             self.assertNotIn("<img", text)
             self.assertNotIn("[link]", text)
-            rows = [line for line in text.splitlines() if line.startswith("| case")]
+            case_table = text.split("## Cases (plan order)", 1)[1].split("## Decisive details", 1)[0]
+            rows = [line for line in case_table.splitlines() if line.startswith("| case")]
             self.assertEqual(len(rows), 1)
             self.assertEqual(rows[0].count("|"), 6)
             for destination in re.findall(r"\]\(([^)]+)\)", text):
@@ -321,7 +407,8 @@ class MarkdownTests(unittest.TestCase):
             self.assertNotIn("# Forged", text)
             self.assertNotIn("<script>", text)
             self.assertNotIn("[click]", text)
-            self.assertEqual(text.count("| Case / iteration |"), 1)
+            self.assertEqual(text.count("## Cases (plan order)"), 1)
+            self.assertEqual(text.count("## Outcome and convention evidence"), 1)
 
     def test_publication_is_deterministic_and_links_resolve_to_actual_json(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -370,7 +457,7 @@ class MarkdownTests(unittest.TestCase):
                                                   "SKILLS_EVAL_RUNNER_ROOT": str(self.context.runner.root)}, clear=True), \
                          boundary, redirect_stdout(stdout), redirect_stderr(stderr):
                         code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3",
-                                     "--model", "test/model"], report_root=Path(temp))
+                                     "--model", "test/model", "--allow-same-model-judge"], report_root=Path(temp))
 
                 self.assertEqual(code, 2, stderr.getvalue())
                 self.assertIn({"git-unavailable": "install Git and verify --runner-root",
@@ -460,7 +547,7 @@ class MarkdownTests(unittest.TestCase):
                  patch.object(self.context.runner.eval_execute, "invoke_once") as invoke, \
                  redirect_stdout(stdout), redirect_stderr(stderr):
                 code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3",
-                             "--model", "test/model", "--artifact-dir", str(destination)], report_root=Path(temp))
+                             "--model", "test/model", "--allow-same-model-judge", "--artifact-dir", str(destination)], report_root=Path(temp))
             self.assertEqual(code, 2)
             self.assertIn("model catalog acquisition or validation failed", stderr.getvalue())
             self.assertNotIn("PRIVATE", stdout.getvalue() + stderr.getvalue())
@@ -489,10 +576,11 @@ class MarkdownTests(unittest.TestCase):
                  patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=invoke), \
                  redirect_stdout(stdout), redirect_stderr(stderr):
                 code = main(["--runner-root", str(self.context.runner.root), "--all", "--target", "product-acceptance", "--iterations", str(iterations), "--parallel", "3",
-                             "--model", "test/model", "--artifact-dir", str(destination), "--json"], report_root=Path(temp))
+                             "--model", "test/model", "--allow-same-model-judge", "--artifact-dir", str(destination), "--json"], report_root=Path(temp))
             self.assertEqual(code, 0, stderr.getvalue())
             text = (destination / "results.md").read_text()
-            rows = [line for line in text.splitlines() if line.startswith("| SKILL-")]
+            case_table = text.split("## Cases (plan order)", 1)[1].split("## Decisive details", 1)[0]
+            rows = [line for line in case_table.splitlines() if line.startswith("| SKILL-")]
             self.assertEqual(len(rows), expected_pairs)
             self.assertIn(f"Verified pair artifacts: {expected_pairs}/{expected_pairs}", text)
             self.assertIn(f"{expected_invocations} target + {expected_invocations} judge", text)
@@ -521,7 +609,7 @@ class MarkdownTests(unittest.TestCase):
                          patch.object(self.context.runner.cli, "resolve_engine", return_value="podman"), \
                          patch.object(self.context.runner.eval_execute, "invoke_once", side_effect=invoke), \
                          redirect_stdout(stdout), redirect_stderr(stderr):
-                        code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3", "--model", "test/model", "--artifact-dir", str(destination), *flags], report_root=Path(temp))
+                        code = main(["--runner-root", str(self.context.runner.root), "--cases", "product-acceptance:PA3", "--model", "test/model", "--allow-same-model-judge", "--artifact-dir", str(destination), *flags], report_root=Path(temp))
                     self.assertEqual(code, expected, stderr.getvalue())
                     self.assertTrue((destination / "results.md").is_file())
                     self.assertNotIn("PRIVATE ORCHESTRATION", (destination / "results.md").read_text())

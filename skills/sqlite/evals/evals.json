@@ -7,7 +7,7 @@
       "id": "SQLite-01",
       "name": "foreign-keys-follow-physical-connections",
       "trap": "One successful startup PRAGMA and a single-connection test conceal unenforced foreign keys on later pool connections.",
-      "prompt": "A Go service stores a 600 MB SQLite file. Startup runs db.Exec('PRAGMA foreign_keys=ON') once, then the pool grows to eight connections. Orders.customer_id references customers.id, but orphan orders occasionally appear. Write the repair plan and the decisive regression check. Keep the existing driver and schema unless evidence requires a change.",
+      "prompt": "A Go service stores a 600 MB SQLite file. Startup runs db.Exec('PRAGMA foreign_keys=ON') once, then the pool grows to eight connections. Orders.customer_id references customers.id, but orphan orders occasionally appear. Write the repair plan and the decisive regression check. Keep the existing driver and schema unless evidence requires a change.\n\nThe driver name and version are not supplied, and no code or database execution is available here. Keep driver syntax conditional and report the proposed checks as unexecuted.",
       "expectations": [
         "Identifies the physical-connection scope and proposes the driver's supported per-connection initialization or equivalent verified connection handling.",
         "Applies and reads back foreign_keys outside an active transaction; inspects existing orphans separately from preventing new ones.",
@@ -18,7 +18,21 @@
         "Must not claim another single startup Exec initializes all future pool connections.",
         "Must not treat integrity_check returning ok as proof that existing foreign-key violations are absent.",
         "Must not change databases or remove the foreign key merely to suppress the symptom."
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "N3": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "SQLite-02",
@@ -85,6 +99,31 @@
         "Must not assume enabling WAL shares a plain :memory: database.",
         "Must not claim the single-connection test proves pool correctness."
       ]
+    },
+    {
+      "id": "SQLite-DRIVER-01",
+      "name": "engine-facts-do-not-verify-driver-syntax",
+      "prompt": "Review this proposed fix: `sql.Open(\"sqlite\", \"file:app.db?_foreign_keys=on\")` followed by a claim that all pooled connections are now protected. The service driver name and version are unknown; no code was compiled and no connection was inspected. What can be concluded, and what minimal evidence is still needed?",
+      "expectations": [
+        "Distinguishes SQLite per-connection foreign-key enforcement from whether the unknown driver supports that DSN parameter.",
+        "Requires checking the actual driver initialization path and observing fresh distinct physical connections before claiming enforcement.",
+        "Labels the proposed patch unverified and keeps the real-database regression focused on rejected orphan inserts."
+      ],
+      "negative_expectations": [
+        "Must not declare the DSN correct for every SQLite driver or claim successful execution."
+      ],
+      "trap": "Treats familiar-looking driver syntax as portable proof of applied enforcement.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

@@ -2,7 +2,7 @@
 
 ## Extract Complex Conditions
 
-When `if` conditions span multiple operands, extract into named booleans:
+Extract named booleans when they clarify intent without changing evaluation. Do not hoist a dereference or index read above its guard, or turn conditional work into an unconditional call. A readable compound condition can stay as it is:
 
 ```go
 // Good — self-documenting

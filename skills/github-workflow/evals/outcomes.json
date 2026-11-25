@@ -1,0 +1,63 @@
+{
+  "skill": "github-workflow",
+  "version": "1.0.0",
+  "common_instruction": "This is a response-only exercise. Use the supplied scenario and snippets; propose or review the requested work without claiming files were changed, commands ran, or external systems were inspected. State material verification limits. Equivalent solutions that satisfy the stated contract are acceptable.",
+  "cases": [
+    {
+      "id": "GWF-ARTIFACT-01",
+      "name": "privileged-followup-trusts-pr-artifact",
+      "prompt": "Review this proposed release flow and recommend the smallest safe change. A public repository runs `PR checks` on `pull_request`, including forks. That workflow uploads a `release-bundle` artifact containing a binary and `publish.sh`, both built from the PR head. A second workflow runs on `workflow_run` completion, checks only `conclusion == success`, has `permissions: {contents: write}`, downloads that artifact, and executes `bash publish.sh` with a registry token from repository secrets. It does not check out the PR in the privileged workflow. The maintainer believes that avoids privileged execution of untrusted code. Releases are intended only for reviewed changes merged to main.",
+      "expectations": [
+        "Identifies execution of the PR-produced script or binary as the privileged trust crossing even without a PR checkout.",
+        "Explains that successful checks and artifact storage do not make fork-controlled executable content trusted.",
+        "Keeps untrusted PR testing separate from publication and proposes a trusted merged-ref build or a comparably justified release input boundary.",
+        "Scopes write credentials to the actual publishing path and identifies the provenance/ref check needed before consuming release inputs."
+      ],
+      "negative_expectations": [
+        "Must not call the existing flow safe merely because no privileged checkout occurs.",
+        "Must not repair only token permissions or artifact names while continuing to execute fork-produced code with publication credentials."
+      ],
+      "trap": "Approve a workflow_run artifact as trusted because its producer passed tests and the privileged workflow never checks out the PR.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GWF-TIMEOUT-02",
+      "name": "bounded-timeout-change-preserves-fork-ci",
+      "prompt": "A public repo already runs a single `test` job on pull_request using a GitHub-hosted runner, contents: read, reviewed commit-pinned actions, and no secrets or publish step. Fork PRs must continue to run. The job occasionally hangs. The sole requested change is to stop it after 15 minutes. Provide the YAML addition and any focused verification needed; no deployment work is in scope.",
+      "expectations": [
+        "Adds `timeout-minutes: 15` at the existing job level.",
+        "Preserves pull_request coverage for forks and the existing read-only permissions.",
+        "Limits verification to the placement/effective timeout and relevant cancellation or cleanup behavior."
+      ],
+      "negative_expectations": [
+        "Must not switch the trigger to pull_request_target, exclude forks, or increase token authority.",
+        "Must not add deployment environments, OIDC credentials, release jobs, or a reusable-workflow framework as prerequisites for this timeout."
+      ],
+      "trap": "Expand a small timeout fix into a privileged workflow redesign or disable the untrusted event path.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

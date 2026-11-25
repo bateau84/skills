@@ -23,19 +23,15 @@ Not for choosing between specific libraries or frameworks (→ See `golang-popul
 
 # Go Project Layout
 
-## Architecture Decision: Ask First
+## Choose structure from the current job
 
-When starting a new project, **ask the developer** what software architecture they prefer (clean architecture, hexagonal, DDD, flat structure, etc.). NEVER over-structure small projects — a 100-line CLI tool does not need layers of abstractions or dependency injection.
+Follow the existing repository layout and accepted architecture. For a new small command, start with a root `main` package and co-located tests. Add package boundaries for actual reuse, separate binaries, or ownership needs; possible future growth alone does not require them. A 100-line CLI does not need architecture selection or dependency-injection machinery.
 
-→ See `golang-design-patterns` skill for detailed architecture guides with file trees and code examples.
-
-## Dependency Injection: Ask Next
-
-After settling on the architecture, **ask the developer** which dependency injection approach they want: manual constructor injection, a DI library, or none. See the `golang-dependency-injection` skill for a full comparison and decision table.
+Ask about architecture only when an unresolved choice materially affects the requested product. Use manual parameter or constructor passing when collaborators need substitution; consider a DI library only when the actual wiring problem warrants it. See `golang-design-patterns` or `golang-dependency-injection` for those larger decisions.
 
 ## 12-Factor App
 
-For applications, follow [12-Factor App](https://12factor.net/) conventions: env-var config, stdout logging, stateless processes, and graceful shutdown.
+For deployed services, apply relevant [12-Factor App](https://12factor.net/) conventions such as external config and graceful shutdown. Do not add service infrastructure to a standalone tool that does not need it.
 
 ## Quick Start: Choose Your Project Type
 
@@ -75,13 +71,13 @@ A vertical layout can keep related feature behavior close together and reduce cr
 
 **File consolidation:** Keep related behavior discoverable without excessive fragmentation. Large files can also obscure boundaries; roughly 500 lines of business logic can prompt a cohesion review, but it is a heuristic, not a universal ceiling. Follow existing package conventions and treat generated/test files according to their purpose.
 
-## Essential Configuration Files
+## Add tooling when it serves a current need
 
-Every Go project should include at the root:
+A minimal Go module does not require a Makefile, linter configuration, CI, or other scaffolding. Preserve existing tooling; add new files only for a requested or demonstrated workflow.
 
-- **Makefile** — optional build automation; mirror the project's actual build, test, and lint commands.
-- **.gitignore** — ignore generated binaries, coverage output, and local secrets according to repository conventions; retain intentional source artifacts.
-- **.golangci.yml** — linter config. See the `golang-lint` skill for the recommended configuration
+- **Makefile** — useful for repeated multi-step commands; direct `go build` / `go test` may be sufficient.
+- **.gitignore** — add patterns for actual local outputs or secrets; retain intentional source artifacts and vendored dependencies.
+- **.golangci.yml** — add when the project adopts or customizes that linter. See `golang-lint` when relevant.
 
 For application configuration with Cobra + Viper, see [config reference](references/config.md).
 
@@ -97,8 +93,8 @@ Use `go.work` when developing multiple related modules in a monorepo. See [works
 
 When starting a new Go project:
 
-- [ ] **Ask the developer** their preferred software architecture (clean, hexagonal, DDD, flat, etc.)
-- [ ] **Ask the developer** their preferred DI approach — see `golang-dependency-injection` skill
+- [ ] Check accepted scope and existing conventions; resolve only material unknown choices
+- [ ] Add dependency-injection structure only for actual collaborators and substitution needs
 - [ ] Decide project type (CLI, library, service, monorepo)
 - [ ] Right-size the structure to the project scope
 - [ ] Consider vertical slices where they improve locality for representative changes
@@ -108,7 +104,7 @@ When starting a new Go project:
 - [ ] Use `internal/` for private import boundaries when needed; public APIs may live at the module root
 - [ ] For actual multi-module workspaces: decide whether a `go.work` is needed; a monorepo can be one module
 - [ ] Run `gofmt -w .` to ensure formatting
-- [ ] Add `.gitignore` with `/vendor/` and binary patterns
+- [ ] Add tooling/ignore files only for actual needs; do not ignore intentionally vendored dependencies
 
 ## Related Skills
 

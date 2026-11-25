@@ -6,18 +6,32 @@
       "id": "tpd-01",
       "name": "custom-resource-template-placement",
       "prompt": "My Plugin Framework provider lives in repo terraform-provider-acme and uses tfplugindocs via go generate. For the resource `acme_widget` I want the Registry page to start with a hand-written overview paragraph and a usage example, but still show the generated argument/attribute reference. Tell me exactly which files to create (full repo-relative paths and names), what the template must contain so the schema section still renders, and how the output ends up in the repo.",
-      "trap": "Agents (and the current skill) put the .md.tmpl under docs/, keep the provider prefix in the template file name, or write a template that drops the generated schema block.",
+      "trap": "Places a template under generated docs/, uses the provider prefix in its name, or drops the generated schema block.",
       "expectations": [
         "Places the template at templates/resources/widget.md.tmpl (templates/ directory, no acme_ prefix in the file name)",
         "Template includes the schema placeholder (e.g. {{ .SchemaMarkdown }}) so the generated argument/attribute section still renders",
-        "Places the example at examples/resources/acme_widget/resource.tf (prefix kept for example directories) and pulls it into the template (e.g. via tffile/.HasExample) or relies on the default rendering",
+        "Places a discoverable example under examples/resources/acme_widget/ (provider prefix retained), using resource.tf or a supported resource*.tf variant, and includes it through the template or default example rendering.",
         "States the rendered output is docs/resources/widget.md produced by tfplugindocs generate and should not be hand-edited"
       ],
       "negative_expectations": [
         "Puts the .md.tmpl file inside docs/",
         "Names the template acme_widget.md.tmpl",
         "Copies the argument reference by hand into the template instead of using the generated schema"
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "N3": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": "tpd-04",
@@ -25,14 +39,53 @@
       "prompt": "Our provider now implements a list resource `acme_server` for terraform query. tfplugindocs generates docs/list-resources/server.md but the page has no example. Where exactly does the example file go and what must it be named?",
       "trap": "List resource examples use the .tfquery.hcl extension, not .tf; agents default to resource.tf or list-resource.tf.",
       "expectations": [
-        "Places the example at examples/list-resources/acme_server/list-resource.tfquery.hcl",
+        "Places the example under examples/list-resources/acme_server/ using list-resource.tfquery.hcl or a supported list-resource*.tfquery.hcl variant, retaining the provider prefix and required query-file extension.",
         "Explains the .tfquery.hcl extension is required for list resource examples",
         "Says to rerun tfplugindocs generate afterwards"
       ],
       "negative_expectations": [
         "Names the example list-resource.tf or resource.tf",
         "Edits docs/list-resources/server.md by hand to add the example"
-      ]
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "tpd-local-description",
+      "name": "fix-generator-input-without-release",
+      "prompt": "The provider already runs tfplugindocs through `go generate ./...`. docs/resources/widget.md contains the generated description \"Maximum retries is 3\". The corresponding schema field has Description: \"Maximum retries is 3\" but its unchanged implemented maximum is 5. The resource uses the default template and the task is to fix that sentence in a documentation PR. Explain exactly what to change and how to verify it. No tool execution is available here.",
+      "trap": "Hand-edits generated output or creates a new template/release workflow for a correction already owned by the schema description.",
+      "expectations": [
+        "Corrects the schema Description to match the existing maximum of 5 and regenerates docs through the configured command.",
+        "Checks the regenerated resource page and diff for the accurate limit without changing the provider behavior.",
+        "Treats generation as a proposed check, not an observed successful run."
+      ],
+      "negative_expectations": [
+        "Must not leave the incorrect source description while changing only docs/resources/widget.md.",
+        "Must not require a custom template, generator upgrade, tag or release to make this narrow documentation correction."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

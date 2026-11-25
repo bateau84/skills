@@ -17,6 +17,8 @@ Domain-specific review guidance for any agent performing assessment. It does not
 - **ASSESSMENT.md**, when present, is domain-specific Reviewer methodology rather than generic correctness prose.
 - **QA.md**, when present, contains residual-confidence attacks distinct from normal review.
 - **Evaluation discrimination:** traps and negative expectations fail when defining behavior is ignored; phrase presence and model self-report alone are not behavioral proof.
+- **Product evidence:** outcome obligations are separated from conventions; fixtures support the claimed evidence mode, equivalent correct solutions remain valid, and missing setup is not scored as poor work. New cases have no inherited discrimination claim.
+- **Proportionality contrast:** revised steering preserves both the small sufficient solution and the situation that actually needs a stronger boundary. Easy regression and rare consequential cases are retained when useful.
 - **Source integrity:** consequential version/API/tool claims and imported methodology retain enough provenance to verify or refresh them; obsolete AOS workflow mechanics are not revived as portable rules.
 
 ## Review depth

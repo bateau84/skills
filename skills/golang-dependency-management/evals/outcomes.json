@@ -1,0 +1,63 @@
+{
+  "skill": "golang-dependency-management",
+  "version": "1.0.0",
+  "common_instruction": "This is a response-only exercise. Use the supplied scenario and snippets; propose or review the requested work without claiming files were changed, commands ran, or external systems were inspected. State material verification limits. Equivalent solutions that satisfy the stated contract are acceptable.",
+  "cases": [
+    {
+      "id": "GDEP-PATCH-01",
+      "name": "authorized-update-is-not-a-graph-wide-upgrade",
+      "prompt": "Plan an already authorized dependency fix. This Go module directly requires example.com/acme/client v1.4.2 and example.com/acme/queue v2.8.1. The owner approved updating client to v1.4.7 only, with any necessary transitive changes reviewed. A helper suggests `go get -u=patch ./...` followed by committing go.mod because patch releases are safe. The repository commits go.sum and has build, test, and vet checks. These are fictional fixture module names; no remote lookup or command execution is available. Give the scoped command sequence and review criteria.",
+      "expectations": [
+        "Uses a targeted update to example.com/acme/client@v1.4.7 rather than a graph-wide patch upgrade.",
+        "Reviews direct and transitive changes in both go.mod and go.sum and investigates changes outside the authorized range.",
+        "Includes tidying and relevant build/test/static checks, distinguishing planned from observed results.",
+        "Treats patch-version compatibility as something to verify, not a guarantee."
+      ],
+      "negative_expectations": [
+        "Must not update queue or all dependencies merely because their changes are patch releases.",
+        "Must not discard go.sum or claim fictional module commands succeeded."
+      ],
+      "trap": "Equate patch upgrades with automatic safety and broaden a single approved update to the whole dependency graph.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "GDEP-TOOLCHAIN-02",
+      "name": "tool-pinning-preserves-supported-go-version",
+      "prompt": "A repository must remain buildable with Go 1.23. Its maintainer wants a reproducibly pinned code-generation CLI for CI, but has not authorized a Go version upgrade or application dependency changes. A suggested recipe uses a `tool` directive and bumps the module to Go 1.26. Recommend a compatible bounded approach. You may describe a version-pinned installation or isolated tooling arrangement; no current package version needs to be selected.",
+      "expectations": [
+        "Preserves the explicit Go 1.23 compatibility requirement.",
+        "Recognizes that module tool directives require a newer Go version and selects an appropriate legacy or separately isolated pinned-tool approach.",
+        "Pins the tool version in a reproducible repository/CI location and keeps tool installation distinct from runtime application dependencies."
+      ],
+      "negative_expectations": [
+        "Must not upgrade the application go directive or use an unsupported tool directive as the default fix.",
+        "Must not use an unpinned latest tool installation while calling it reproducible."
+      ],
+      "trap": "Follow a modern tool-directive recipe by silently upgrading a compatibility-constrained module.",
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}
