@@ -1,19 +1,27 @@
 ---
 name: test-driven-development
-description: "Test-Driven Development workflow for any language — use tests to drive behavior and design through a tight red-green-refactor loop. Use when implementing a feature test-first, choosing the next example, turning a bug into a regression test, evolving an API from tests, deciding when to Fake It or Triangulate, judging whether TDD evidence really proves the claimed behavior, or using targeted mutation testing to challenge a green suite. Covers the Test List, Red-Green-Refactor, Obvious Implementation / Fake It / Triangulation, design feedback, refactoring discipline, boundary tests, test doubles, and honest-green test integrity. Pair with the language testing skill for mechanics."
+description: "Test-Driven Development and test-suite maintenance for any language. Use when implementing a feature test-first, choosing the next example, turning a bug into regression protection, evolving an API from tests, deciding when to Fake It or Triangulate, judging honest-green evidence, consolidating redundant tests, investigating slow suites, or using targeted mutation testing. Covers the Test List, Red-Green-Refactor, design feedback, test lifecycle and cost, boundary tests, and test doubles. Pair with the language testing skill for mechanics."
 license: MIT
 metadata:
   author: Bateau
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 > Language-agnostic TDD methodology with explicit guidance about test integrity and test doubles. Language mechanics live in skills such as `golang-testing` and `python-testing`. Follow the project's testing conventions and the host's execution permissions.
 
 **Persona:** You let tests drive the next behavior and expose design pressure. You do not write new production behavior until a failing test demands it, and you do not trust a green bar until you know why it is green.
 
+## Inspect existing protection
+
+Before adding a test, inspect the affected behavior, existing assertions, fixtures, and execution path. Check relevant regression history and repository test commands when available. Determine what already detects the failure and what remains unproved; a test name or coverage percentage is not enough. Keep this local to the change unless suite maintenance is the task.
+
+Choose examples from accepted outcomes, invariants, and credible failure modes. Where the project uses Domain-Driven Design, use its ubiquitous language and existing domain/consistency boundaries: exercise a rule through its owning interface, and retain integration evidence for contracts across boundaries. Do not derive a test inventory from every class or impose a new domain model for testing.
+
+Prefer extending a suitable existing test or case table when it preserves clear intent and failure diagnosis. Add a separate test when it supplies a distinct example, regression guard, or boundary proof. A pure behavior-preserving refactor can use existing protection; it does not require inventing new behavior to obtain a Red.
+
 ## Start with a Test List
 
-Before non-trivial coding, make a small working list of behaviors or examples implied by the accepted contract. For a genuinely single-behavior change, the one next test is enough; do not create list ceremony just to satisfy the method.
+Before non-trivial coding, make a small working list of behaviors or examples implied by the accepted contract, accounting for existing protection. For a genuinely single-behavior change, the one next test is enough; do not create list ceremony just to satisfy the method.
 
 The Test List is not a complete up-front test plan. It is a queue of useful next questions. Update it whenever implementation teaches you something new.
 
@@ -32,7 +40,7 @@ TDD is a tight loop over one conceptual behavior at a time.
 
 ### 1. Red — specify the next behavior
 
-Write the smallest test that expresses the next behavior, then run it.
+Write or extend the smallest test that expresses the next behavior, then run it. An existing regression test that already fails for the intended reason can supply this Red.
 
 A useful Red:
 
@@ -73,7 +81,7 @@ Refactoring includes production code **and test code**:
 - extract helpers that clarify intent;
 - delete obsolete scaffolding from Fake It steps.
 
-Run the focused test after each meaningful change, then the affected package/module suite. If behavior changes, you left Refactor and need a new Red.
+Run focused checks after meaningful changes and the affected suite at the appropriate integration boundary, as described under Inner-loop execution. Apply the test lifecycle decisions below when redundant or costly protection is exposed. If behavior changes, you left Refactor and need a new Red.
 
 ### 4. Update the Test List
 
@@ -114,7 +122,7 @@ A useful heuristic: if a focused test requires understanding roughly five or mor
 ## Behavior, examples, and invariants
 
 - **Test behavior, not implementation.** Prefer externally meaningful results: returned values, persisted state, emitted events, protocol messages, operator-visible signals, or other accepted outputs.
-- **Every bug becomes a regression test.** Reproduce the bug with Red before fixing it when practical, then keep that test.
+- **Preserve regression protection.** Reproduce a bug with a new or existing discriminating test before fixing it when practical. Keep protection against the defect while the contract applies; the original test file or shape need not remain forever.
 - **Use examples to discover the rule.** When one example permits a trivial implementation, add the smallest second example that forces the actual rule.
 - **Test invariants directly.** For state machines, parsers, encoders, stores, or security rules, identify properties that must remain true across examples.
 
@@ -125,6 +133,27 @@ Round-trip tests are valuable for pairs such as encode/decode, add/remove, or se
 `decode(encode(x)) == x`
 
 But a round trip can pass when **both sides are wrong in the same way**. When the representation or behavior has independent meaning, also use known-answer tests for each side.
+
+## Maintain the test lifecycle
+
+Treat tests as maintained code. During relevant refactoring or a suite review, choose deliberately:
+
+| Decision | Evidence and constraint |
+| --- | --- |
+| Keep or improve | The test protects a distinct accepted behavior or failure mechanism. Improve reliability, setup, or diagnostics where useful. |
+| Extend | An existing test can cover the missing case clearly without mixing unrelated behaviors. |
+| Consolidate or replace | Surviving tests preserve the same required assertions, meaningful inputs, and boundary semantics with less execution or maintenance cost. |
+| Retire | The accepted behavior has been removed, or identified remaining coverage provides equivalent protection. Check compatibility and historical regression obligations first. |
+
+For consolidation, start from a passing relevant baseline, identify the surviving protection, and verify it after the edit. For a historical defect or consequential invariant, replay the known counterexample or use a bounded deliberate defect when needed to establish that the replacement still detects it. A green suite alone, matching coverage numbers, or similar test names do not establish equivalence. Never delete the only guard for a still-required behavior to meet a time or count target.
+
+Prefer the least costly test that faithfully exercises the claim. Put a rule's example matrix near its owning interface; retain representative higher-level tests for real wiring and materially different failure modes. Similar assertions across layers can be justified by persistence, serialization, authorization, scheduling, recovery, or platform semantics. Inspect those mechanisms before calling coverage redundant.
+
+Consolidation should preserve readable scenarios and useful failure isolation. Do not turn independent tests into a large shared-state script or hide the oracle in complicated helpers just to reduce lines. Some repeated setup is clearer than an abstraction.
+
+Separate temporary diagnostic probes from durable regression protection. Retain a probe as a permanent test when it guards an ongoing contract or credible regression; otherwise remove temporary instrumentation after the diagnosis. Tests of shared fixtures or acceptance oracles can be valuable when those components could falsely certify the product.
+
+Use the existing Test List, diff, review, or verification note for consequential choices: what protection survives, what cost changes, and what remains uncertain. No per-test form, deletion quota, or whole-suite audit is required for routine work. See [framework basis and examples](references/test-lifecycle.md) for rationale.
 
 ## Honest green — test integrity
 
@@ -169,7 +198,7 @@ A fixture is **input to** the behavior: sample payloads, files, database startin
 
 ## Unit TDD does not prove every boundary
 
-When accepted behavior crosses process, storage, protocol, filesystem, database, CLI, browser, or service boundaries, add the smallest higher-level test that proves the boundary actually composes.
+When accepted behavior crosses process, storage, protocol, filesystem, database, CLI, browser, or service boundaries, inspect existing higher-level evidence and add or adapt the smallest test needed to prove the changed composition.
 
 Use the testing pyramid pragmatically:
 
@@ -195,14 +224,15 @@ A characterization test is not proof that the current behavior is correct. Once 
 
 ## Inner-loop execution
 
-After each Red and Green:
+Use the focused test for each Red and Green. Broaden to the affected package/module and relevant integration checks as changes interact, and satisfy the repository's required verification at its defined handoff, merge, or release boundary. A slow package suite need not run after every small edit unless policy or the changed risk requires it. Never advance while a relevant failure is unresolved or green is unexplained.
 
-1. run the single focused test;
-2. run the affected package/module suite before moving to the next behavior;
-3. periodically run the broader relevant suite as the change grows;
-4. keep blocking or long-running commands bounded according to the active execution policy.
+When cost matters, inspect available timings, dependencies, flakes/retries, and fixture maintenance. Consider cumulative cost: duration multiplied by run frequency, matrix size, and repeated agent work. Test scope and resource cost are different dimensions; a test called "unit" can be costly and an integration test can be cheap. Use observed data or label estimates and unknowns; do not claim savings without a comparable measurement.
 
-Never advance to the next behavior on a red bar or an unexplained green bar.
+Reuse prior execution evidence only after checking its tested revision/artifact, selected tests, relevant configuration/platform, and whether later changes invalidate the claim. Independent review still examines the code and evidence; it need not repeat an identical expensive run solely because the reviewer changed. Rerun for relevant changes, suspect evidence, missing coverage, or required policy.
+
+Keep rapid feedback and broader qualification explicit. Moving a required slow check to an existing later stage must preserve its ownership and execution before the claim depends on it. Do not silently skip, quarantine, weaken, or redefine a required check to save time. Bound commands according to the active execution policy and report unexecuted obligations honestly.
+
+Stop expanding verification once accepted behavior, material risks, and applicable required checks have sufficient evidence. Test count, code coverage, a fixed pyramid ratio, and a universal runtime threshold are not substitutes for this judgment.
 
 ## Anti-patterns
 
@@ -219,6 +249,8 @@ Never advance to the next behavior on a red bar or an unexplained green bar.
 - **Refactor plus behavior change** — silently adding requirements while supposedly cleaning up.
 - **Round-trip only** — letting two mutually wrong implementations validate each other.
 - **Mutation-score theater** — widening exclusions, weakening behavior, or adding brittle tests merely to reach a number; calling a manual sample a whole-suite score.
+- **Additive-only maintenance** — adding another test before inspecting existing protection, preserving obsolete tests indefinitely, or repeating the same scenario matrix at every layer without a distinct failure mechanism.
+- **Cost-only deletion** — removing slow tests or moving them out of the required path without preserving the behavior and boundary they prove.
 
 ## Cross-references
 

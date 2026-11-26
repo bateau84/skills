@@ -12,6 +12,7 @@ Reviewer verifies that TDD generated discriminating behavioral and design eviden
 - the defining behavior was driven before exotic cases unless risk justified another order;
 - each cycle handled one conceptual behavior so failures remained diagnostic;
 - additional examples were chosen to force useful generalization, not merely increase test count.
+- affected existing assertions and paths were inspected before adding cases; reuse or extension was considered without treating similar coverage as proof of redundancy.
 
 ### RED evidence
 
@@ -35,6 +36,15 @@ Reviewer verifies that TDD generated discriminating behavioral and design eviden
 - refactoring did not silently expand product behavior, API, or architecture;
 - test cleanup preserved or improved discriminating strength rather than weakening assertions;
 - obsolete Fake It scaffolding and accidental duplication were removed.
+
+### Test lifecycle and cost
+
+- new permanent tests protect a distinct accepted behavior, regression, invariant, or integration failure mechanism;
+- consolidation or retirement names equivalent surviving protection or the accepted removal of the behavior, preserves important inputs/assertions/boundaries, and has relevant verification;
+- high-consequence or historical regression protection remains discriminating, using a known counterexample or targeted defect probe where needed;
+- runtime, run frequency, dependencies, reliability, and maintenance informed material choices; measurements are distinguished from estimates and no numeric quota replaces judgment;
+- focused feedback and broader required verification are separated without dropping required execution; reused evidence remains applicable to the current artifact/configuration and independent judgment remains independent;
+- temporary probes are not automatically retained, and helpers or combined scenarios do not obscure intent and diagnosis.
 
 ### Design feedback
 
@@ -66,4 +76,4 @@ Use the procedure and result distinctions in [targeted mutation testing](./refer
 
 - bugs are reproduced by regression tests before the fix when practical;
 - characterization tests are not confused with proof that legacy behavior is correct;
-- the affected package/module suite still passes after each completed cycle.
+- the relevant affected suite passes at the appropriate verification boundary; no unresolved relevant failure or unexecuted assigned obligation is hidden by a focused pass.

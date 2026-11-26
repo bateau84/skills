@@ -4,14 +4,14 @@ description: "TypeScript/JavaScript testing mechanics across Bun test, Vitest, J
 license: MIT
 metadata:
   author: Bateau
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
-> **House skill.** test-driven-development owns test-first process and honest behavioral intent. This skill owns TypeScript/JavaScript test mechanics and common false-green modes. Use the repository's existing runner rather than introducing another by default.
+> **House skill.** test-driven-development owns test selection, red-green-refactor, test lifecycle management, and honest behavioral intent. This skill owns TypeScript/JavaScript test mechanics and common false-green modes. Use the repository's existing runner rather than introducing another by default.
 
 ## Start from the runner and environment
 
-Inspect package scripts and test configuration before writing tests.
+Inspect package scripts, test configuration, and existing coverage of the affected behavior before writing tests. Extend a suitable test or parameterized case before creating another suite. Consolidate equivalent scenarios while retaining distinct runtime, type, browser, or integration protection.
 
 Know:
 
@@ -124,7 +124,7 @@ Coverage percentage is a locator, not a correctness verdict.
 Prioritize:
 
 - defining behavior;
-- a regression case for each fixed bug;
+- durable regression protection for fixed bugs, extending existing cases when suitable;
 - failure and rejection paths;
 - valid boundary values including falsy values;
 - cancellation and race cases for async code;
@@ -135,7 +135,7 @@ Snapshots are appropriate for stable, reviewable structures. Avoid giant snapsho
 
 ## Verification loop
 
-While developing, run the focused test first. Before completion, run the relevant containing suite and the repository's TypeScript typecheck and lint checks.
+While developing, run the focused test first. Broaden to the relevant containing suite and applicable repository typecheck, lint, and integration gates at completion. Inspect actual runtime, browser startup, transforms, and fixture cost before changing suite selection. A fast DOM-shim test cannot replace a required browser behavior check, and reused results need to match the candidate and relevant environment.
 
 If a test is expected to catch a regression, temporarily break or otherwise falsify the behavior when practical to confirm the test actually fails for the intended reason. Restore that deliberate mutation before continuing, then rerun the test and inspect the final diff so no falsification change survives into the delivered work.
 

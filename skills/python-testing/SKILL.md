@@ -4,16 +4,18 @@ description: "Production-ready Python tests with pytest — fixtures, parametriz
 license: MIT
 metadata:
   author: Bateau
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
-> Pair with `python-common-practice` for shared verification guidance.
+> Pair with `python-common-practice` for shared verification guidance and `test-driven-development` for test selection, red-green-refactor, and test lifecycle management.
 
 **Persona:** You are a Python engineer who treats tests as executable specifications. You write tests to constrain behavior, not to chase a coverage number.
 
 # Python Testing with pytest
 
 Tests pin behavior. A good test fails for exactly one reason and names that reason. Prefer plain `assert` (pytest rewrites it for rich diffs) over `unittest`'s `assertEqual` zoo.
+
+Before adding tests, inspect existing cases, fixtures, parametrization, and markers for the affected behavior. Extend or consolidate suitable cases when protection is equivalent. Keep parameters that distinguish meaningful boundaries; do not multiply combinations mechanically. Reduce expensive fixture setup without sharing mutable state or replacing a real integration boundary that the test must prove.
 
 ## Structure and naming
 
@@ -95,15 +97,17 @@ def test_skips_on_api_error(monkeypatch):
 
 ## Coverage and CI
 
+Use the focused node ID or file in the inner loop, then affected suites and applicable repository gates. Inspect collection, markers, and skips when selecting tests: an excluded integration check remains unproven until its required job runs. Use measured durations and fixture setup cost to investigate slow feedback; do not make every iteration rerun the whole suite.
+
 ```bash
 pytest                       # all tests
-pytest -k "match and not slow"   # filter by name expression
+pytest -k "match"             # filter by name expression
 pytest -x --ff               # stop at first failure, failed-first ordering
 pytest -q tests/test_match.py::test_fuzzy_match   # one test
 pytest --cov=src --cov-report=term-missing        # coverage with missing lines
 ```
 
-Coverage is a floor, not a goal: 100% coverage with no assertions tests nothing. Chase uncovered *branches* that carry risk, not the percentage.
+Coverage locates unexecuted code; it does not establish assertion quality. Inspect uncovered *branches* that carry risk rather than adding cases solely to raise the percentage.
 
 ## Targeted mutation testing
 

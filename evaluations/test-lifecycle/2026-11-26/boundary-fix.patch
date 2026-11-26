@@ -1,0 +1,37 @@
+diff --git a/README.md b/README.md
+index 85ecdbb..d5277d0 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,7 @@
+ # Order sample
+
+ Use Python 3 standard library only. `orders.qualifies` is the public minimum-order rule.
++Orders at or above the configured minimum qualify.
+ `OrderStore.create` returns `created` once per ID and `duplicate` thereafter,
+ including after process death following a successful commit. Internal helpers
+ and their call counts are not public contracts.
+diff --git a/orders.py b/orders.py
+index 8154150..4c6d65b 100644
+--- a/orders.py
++++ b/orders.py
+@@ -2,7 +2,7 @@ import sqlite3
+ import sys
+
+ def qualifies(amount, minimum):
+-    return amount > minimum
++    return amount >= minimum
+
+ class OrderStore:
+     def __init__(self, path):
+diff --git a/tests/test_domain.py b/tests/test_domain.py
+index 2900d42..dc97561 100644
+--- a/tests/test_domain.py
++++ b/tests/test_domain.py
+@@ -3,6 +3,6 @@ from orders import qualifies
+
+ class MinimumOrderTests(unittest.TestCase):
+     def test_minimum_order_rule(self):
+-        for amount, expected in [(9, False), (11, True)]:
++        for amount, expected in [(9, False), (10, True), (11, True)]:
+             with self.subTest(amount=amount):
+                 self.assertEqual(qualifies(amount, 10), expected)

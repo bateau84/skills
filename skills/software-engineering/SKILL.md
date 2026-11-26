@@ -4,7 +4,7 @@ description: "Baseline engineering discipline for changing software. Use when au
 license: MIT
 metadata:
   author: Bateau
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # Software Engineering
@@ -71,12 +71,14 @@ For a material choice, use the existing result, PR explanation, or decision reco
 
 Tests are part of implementation when behavior changes.
 
-- Add or update tests alongside the code. Bugs should gain a regression test when the behavior can be exercised.
+- Inspect affected tests and assertions before adding cases. Add or extend protection for changed behavior and credible regressions; an existing discriminating test can already cover a bug.
 - Test the defining behavior before exotic cases.
+- Maintain tests with the code: consolidate redundant protection or retire obsolete cases while preserving accepted behavior and meaningful boundary evidence. Prefer the least costly adequate test; include execution frequency, reliability, and maintenance in material choices.
 - Prefer real inputs through the real code path. Mock external boundaries when needed; do not mock away the behavior being verified.
 - A test that passes because expected pipeline output was hand-injected, the component under test was bypassed, the hard case was skipped, or the assertion was weakened is not evidence of correctness.
 - Do not claim build, test, lint, security, runtime, or integration success without observed evidence.
-- Load `test-driven-development` when a test-first workflow materially helps implement or fix the behavior; load the applicable language testing skill when writing or changing tests. A trivial change does not need an elaborate test process.
+- Use focused checks while editing, broaden for affected risks and required gates, and reuse applicable recorded evidence instead of repeating expensive checks mechanically. Do not skip assigned verification or replace independent review with someone else's verdict.
+- Load `test-driven-development` for test-first implementation or shared test selection, consolidation, and lifecycle guidance; load the applicable language testing skill for mechanics. A trivial change does not need an elaborate test process.
 
 ## Errors and operational visibility
 

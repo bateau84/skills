@@ -5,6 +5,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 ## Review criteria
 
 - The scenario set traces to accepted criteria, including load-bearing recovery and human-experience promises, without mechanically duplicating every lower-level test.
+- Existing scenarios and evidence were inspected before adding proof. Consolidation preserves distinct composition failures and provenance; costly qualification remains owned and executed at the required boundary. Reuse checks artifact/configuration applicability and evidence quality without substituting a prior verdict for independent assessment.
 - A milestone claim identifies its contribution to the parent goal and the bounded outcome actually demonstrated. Earlier relevant behavior remains supported; unfinished later capabilities do not invalidate a valid narrower claim or become implicitly accepted by it.
 - Every full-claim PASS enters at the claimed consumer/stimulus boundary. The path identifies real implementations of all mandatory product-owned stages, including adapters, persistence, and initialization where relevant.
 - True external fakes preserve scenario-relevant semantics and have explicit evidence limits. Local mocks remain legitimate evidence for narrower claims; live providers are not required without a claim-specific reason.

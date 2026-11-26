@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-26",
+  "kind": "combined candidate agent-and-skills forward exercises",
+  "bases": {
+    "bateau84/agents": "628564aa041773f8e2f9b65ea9adbcba83cccd02",
+    "bateau84/skills": "ef1638859a3a9687e37da6cdfea30d8d943a6ee2"
+  },
+  "execution": "Two fresh-context subagents inherited the session model. No separate provider model ID or sampling seed was recorded. The tasks were executed against isolated copies of the same synthetic fixture.",
+  "source_sha256": {
+    "agents/agents/coder.md": "8118dbd5f6f965124f13febfefed52a32d61c5eb36e0eee90eb816c9e97edf27",
+    "skills/skills/test-driven-development/SKILL.md": "40fcb2cd01572d7ca93569c6d1c2eaf7ecfce1e421c40afe959ec4839341c994",
+    "skills/skills/python-testing/SKILL.md": "6ca43d888b9dd148064d510c9c8638d484b43feb4d78c5f4072ccfe4504a3587",
+    "skills/skills/software-engineering/SKILL.md": "36a9bee677661f929ebd9adbaba406df9955748b230b26dc983be76c70038a0c",
+    "skills/skills/python-how-to/SKILL.md": "8754a12775c5446e521031c0ef7856410aa9e732f5bddab667fefd94d587fb01",
+    "skills/skills/python-common-practice/SKILL.md": "d397d88c400ee7cbb163aa671c326a2559243fe5dc10d94238674955333adec1",
+    "skills/skills/test-driven-development/references/test-lifecycle.md": "e3dfa3bc0db0f5b5628a3b1e5406b2d2d2f452766bc2c79759d1a1f2d491885b"
+  },
+  "cases": [
+    {
+      "id": "boundary-fix",
+      "task": "Orders exactly at the configured minimum must qualify; currently equality is rejected. Implement that correction using TDD and follow the repository README verification obligations.",
+      "observed": "Existing domain table extended; meaningful Red reported before > to >= fix; full six-test suite passed including real process recovery.",
+      "artifacts": [
+        "boundary-fix.patch",
+        "boundary-fix-result.md"
+      ]
+    },
+    {
+      "id": "suite-maintenance",
+      "task": "Review and simplify the existing order persistence tests to reduce unnecessary maintenance while preserving the accepted public behavior in README.md. Domain quantity behavior is outside this task. Make justified test changes and satisfy repository verification obligations.",
+      "observed": "Exact duplicate and private-call assertion removed; distinct-ID assertion added; real process-recovery test unchanged; full four-test suite and three isolated defect probes reported.",
+      "artifacts": [
+        "suite-maintenance.patch",
+        "suite-maintenance-result.md"
+      ]
+    }
+  ],
+  "limitations": [
+    "Candidate-only samples; no old-instruction or no-skill comparison, and no causal effectiveness claim.",
+    "The fast synthetic fixture exercises real SQLite/process recovery but does not reproduce a fifteen-minute product suite.",
+    "Reported millisecond timings are observations, not a controlled speed comparison or production savings.",
+    "The staged evidence-reuse and whole-objective evaluation cases were not executed.",
+    "Hosted OpenCode evaluation harness, model matrix, and product repository suites were not run."
+  ]
+}

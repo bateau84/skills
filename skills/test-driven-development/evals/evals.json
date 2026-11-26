@@ -112,14 +112,14 @@
     {
       "id": 9,
       "name": "refactor-includes-test-code-without-weakening-proof",
-      "prompt": "After a Red→Green cycle, the feature behavior is correct but the test setup is duplicated and noisy. A reviewer says tests are evidence and therefore must never be changed after they first pass; only production code may be refactored. Is that correct? Describe what test refactoring may and may not do.",
-      "expected_output": "The response allows test-code refactoring under green while preserving or improving discriminating strength, and rejects moving production decision logic into helpers or changing behavior during Refactor.",
-      "trap": "The model freezes test code forever or weakens/removes the discriminating assertion in the name of cleanup.",
+      "prompt": "After a Red→Green cycle, behavior is correct but two slow tests repeat the same public input, production path, and assertion. The original case was added for a real defect. A reviewer says tests are evidence and therefore must never be changed after they first pass. Propose a bounded refactoring and verification approach. A second test with a similar assertion crosses a real database transaction while the first uses memory. There are no timing results beyond the supplied description.",
+      "expected_output": "The response permits test refactoring and consolidation with identified surviving defect protection, checks the historical counterexample when useful, and keeps the database case unless its distinct semantics are equivalently proved. It preserves readable assertions and makes no invented savings claim.",
+      "trap": "The model freezes test code indefinitely, treats a passing reduced suite as sufficient equivalence, or deletes the distinct database test because its assertion looks similar.",
       "expectations": [
-        "Allows test-code refactoring while the behavior suite stays green",
-        "Preserves or improves discriminating assertions",
-        "Avoids hiding production decision logic inside test helpers",
-        "Treats any behavior change as a new Red rather than part of Refactor"
+        "Allows consolidation under a passing relevant baseline when the remaining test preserves the original defect-detecting input, path, and assertion",
+        "Uses the known counterexample or a bounded defect probe where needed to verify that historical regression protection survives",
+        "Distinguishes the database transaction case from equivalent same-path duplicates and preserves its unique boundary proof",
+        "Preserves readable independent oracles without moving production logic into helpers or inventing measured savings"
       ]
     },
     {
@@ -146,6 +146,32 @@
         "Treats the one regression test as sufficient current Test List/next behavior",
         "Still writes and observes the regression test fail before fixing the bug when practical",
         "Adds more cases only if implementation reveals a real boundary or counterexample within accepted scope"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "inspect-and-extend-before-adding-another-layer",
+      "prompt": "A reservation service must reject quantities less than one. Existing tests include a domain quantity table for positive values and upper-limit rejection, an HTTP test for parsing and mapping a rejected domain result, and a real database test for concurrent reservations. Zero currently slips through the domain rule. A proposal adds a new file and repeats all quantity cases through every layer. Describe the next TDD change and what you need to inspect before choosing permanent tests. No public API or transaction behavior is changing.",
+      "expected_output": "Inspect existing assertions and paths, extend the domain table with the missing zero case and observe meaningful Red before fixing the rule. Keep existing distinct HTTP and concurrency protection; add higher-level cases only if inspection finds a distinct affected gap.",
+      "trap": "The model adds a scenario matrix at every layer by default, skips meaningful Red because some tests exist, or removes the real concurrency test as overlapping coverage.",
+      "expectations": [
+        "Inspects the relevant existing assertions, inputs, and execution paths before choosing the test change",
+        "Prefers a focused extension of the existing quantity cases with a meaningful failing observation before the fix",
+        "Preserves distinct parsing/mapping and real concurrency evidence without mechanically duplicating the whole matrix",
+        "Uses accepted domain rules and existing boundaries rather than creating a new architecture or test-count target"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "slow-suite-cost-is-not-proof-of-redundancy",
+      "prompt": "A suite takes 18 minutes in the supplied CI record. Local tests take 20 seconds. Two expensive groups exercise real process-kill/restart recovery and an older supported on-disk format; neither has equivalent lower-level proof. Three agents each rerun the entire unchanged suite during one handoff sequence. A teammate proposes deleting all slow groups because unit coverage is 98%, another wants to keep rerunning everything after every edit. Recommend a bounded response. The final qualification is mandatory before merge, and no per-group timings or flake history have been supplied.",
+      "expected_output": "Retain the distinct recovery/compatibility obligations, inspect timing and reliability before optimizing, use focused local feedback, and reuse applicable unchanged execution evidence while preserving mandatory final qualification and independent review.",
+      "trap": "Cost or line coverage becomes permission to remove required proof; alternatively, risk awareness becomes a mandate to repeat a full suite on each small edit or role handoff.",
+      "expectations": [
+        "Retains the process recovery and supported-format proof unless an equivalent boundary-preserving replacement is demonstrated",
+        "Accounts for repeat frequency as well as runtime and requests only the useful missing cost/reliability evidence rather than inventing measurements",
+        "Uses focused editing feedback and checks revision/artifact, test selection, configuration, platform, and invalidating changes before reusing a recorded run",
+        "Preserves mandatory merge qualification and independent judgment; does not treat 98% coverage, a fixed runtime limit, or unexecuted checks as sufficiency"
       ]
     }
   ]
