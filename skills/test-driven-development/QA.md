@@ -78,6 +78,12 @@ Check that refactoring did not:
 
 Inspect whether the sequence of tests forced useful design progress or merely accumulated examples after implementation. Where tests require excessive setup, many mocks, or broad internal knowledge, consider whether the suite hides a design/locality problem that can make future autonomous maintenance unsafe.
 
+### Challenge apparent redundancy
+
+For a proposed consolidation, seek a credible defect that only the removed test would detect: a real transaction boundary replaced by memory, serialized data replaced by a direct call, an actual process restart replaced by object reconstruction, or a distinct platform omitted. Compare the remaining inputs, oracle, and exercised path; overlapping line coverage is insufficient. Conversely, do not demand another permanent test when existing evidence already rejects the same defect at the relevant boundary.
+
+Distinguish a bounded diagnostic experiment from a durable regression obligation. Stop when the material uncertainty is resolved; additional exploration needs another credible gap, not a desire to increase test count.
+
 ## Blocking guidance
 
 Block when TDD evidence is used to claim mandatory behavior that the tests do not discriminate, when doubles bypass the product boundary under proof, when a temporary Fake It implementation is presented as complete behavior, or when load-bearing cross-boundary behavior lacks evidence at the boundary.

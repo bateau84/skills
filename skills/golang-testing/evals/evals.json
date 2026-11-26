@@ -16,16 +16,27 @@
     },
     {
       "id": 2,
-      "name": "integration-build-tag-not-testing-short",
-      "description": "Integration tests use //go:build integration tag; testing.Short() is not an acceptable alternative",
-      "prompt": "Our team disagrees on how to separate integration tests from unit tests in our Go project. A teammate proposes:\n\n```go\nfunc TestUserRepository_Create(t *testing.T) {\n    if testing.Short() {\n        t.Skip(\"skipping integration test\")\n    }\n    db := connectToPostgres(t)\n    // ... test ...\n}\n```\n\nThey argue: 'testing.Short() is the Go standard way — it's in the stdlib, you can configure it with -short, and every Go developer knows it. Build tags are extra complexity for no benefit.'\n\nHow should integration tests be separated? Is the teammate's approach correct? Write the correct implementation for a TestUserRepository_Create integration test.",
-      "trap": "Model accepts testing.Short() as a valid approach because it's a stdlib feature and the teammate's argument sounds reasonable. The skill teaches: build tags are required because testing.Short() still compiles tests into the binary, requires a flag to skip, and leaks DB connection attempts into normal test runs.",
+      "name": "integration-selection-preserves-required-execution",
+      "description": "Repository test-selection conventions are valid when the required integration path really executes.",
+      "prompt": "Our Go repository uses `go test -short ./...` for local feedback and a required CI job running `go test -race ./...` with PostgreSQL available. TestUserRepository_Create checks `testing.Short()` before connecting and registers cleanup. CI output confirms that its database assertions execute. A teammate wants to migrate every integration test behind `//go:build integration` because build tags are supposedly mandatory best practice. Assess that proposal. Explain what must change in CI if we deliberately choose opt-in tags later, and what an unqualified `go test ./...` currently does.",
+      "trap": "A blanket build-tag rule can remove required database coverage from the existing CI command, while blanket acceptance of short mode can conceal a job that only skips the hard path.",
       "expectations": [
-        "Rejects testing.Short() as the primary separation mechanism — does not accept the teammate's approach as correct",
-        "Uses `//go:build integration` build tag (at the file level, before the package declaration)",
-        "Explains why build tags are preferred: tests using testing.Short() still compile and attempt connections when running without -short, whereas build-tagged files are completely excluded from compilation",
-        "Includes the command to run integration tests: go test -tags=integration ./..."
-      ]
+        "Accepts the established short-mode convention given the supplied execution evidence; does not require a tag migration solely for style.",
+        "Explains that short mode controls execution, whereas build tags exclude source files from compilation; unqualified go test currently runs the integration test.",
+        "If tags are adopted, explicitly updates the required CI command to select them and checks actual integration execution rather than only a green command.",
+        "Preserves database assertions and cleanup; does not replace required integration coverage with a mock or a skip."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 3,
@@ -136,32 +147,53 @@
     },
     {
       "id": 11,
-      "name": "httptest-recorder-not-real-server",
-      "description": "HTTP handler tests use httptest.NewRecorder, not a real HTTP server",
-      "prompt": "Write end-to-end tests for a REST API handler `HandleCreateOrder(w http.ResponseWriter, r *http.Request)` that accepts POST with JSON body `{\"product\": \"...\", \"quantity\": N}`. It returns 201 with the order JSON on success, 400 for invalid JSON, and 422 for validation errors (empty product, quantity <= 0). Test it like a real client would call it.",
-      "trap": "Model starts a real HTTP server with httptest.NewServer or net/http ListenAndServe, adding unnecessary network overhead and port allocation to tests",
+      "name": "httptest-boundary-matches-the-claim",
+      "description": "Use a recorder for handler logic and a real client/server path for the distinct transport contract.",
+      "prompt": "A Go service already has named ResponseRecorder tests covering HandleCreateOrder status codes 201, 400, and 422 plus their JSON bodies. They pass. The real production client recently failed because its transport used HTTP instead of the required TLS endpoint; the tests never called that client. Propose the smallest useful regression coverage and verification scope. A teammate suggests repeating the same handler table with a recorder because starting a test server costs more.",
+      "trap": "Optimizing away the actual transport boundary leaves the client regression undetected; duplicating the full handler table through every layer adds cost without distinct protection.",
       "expectations": [
-        "Uses httptest.NewRecorder (not httptest.NewServer or a real HTTP server)",
-        "Table-driven with named test cases covering multiple scenarios",
-        "Tests at least 3 status codes (201, 400, 422)",
-        "Verifies response body content (not just status code)",
-        "Sets proper Content-Type header on requests"
-      ]
+        "Keeps the existing recorder tests as handler-level evidence rather than duplicating their table.",
+        "Exercises the actual production client against a controlled TLS test server or equivalent real transport boundary, including its TLS configuration.",
+        "Checks the client result and relevant transport failure rather than supplying the final result through a mock.",
+        "Includes deterministic server/client cleanup and focused verification; does not claim the recorder tests already prove the TLS behavior."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "regression",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 12,
-      "name": "testify-suite-for-integration",
-      "description": "Integration tests use testify/suite with SetupSuite/TearDownTest for organized setup/teardown",
-      "prompt": "Write integration tests for an `OrderRepository` that interacts with PostgreSQL. It has `Create(order *Order) error`, `GetByID(id string) (*Order, error)`, and `ListByUserID(userID string) ([]*Order, error)`. Tests need database setup (create tables), per-test data cleanup, and graceful teardown. Organize them cleanly so setup/teardown happens automatically. These must not run during normal unit tests.",
-      "trap": "Model uses TestMain or plain setup functions with defer for teardown, mixing setup concerns into each test instead of a suite",
+      "name": "integration-fixture-cleanup-with-existing-tools",
+      "description": "Integration fixture reuse preserves per-test isolation without imposing a new test framework.",
+      "prompt": "Draft integration tests for a Go OrderRepository backed by PostgreSQL, with Create, GetByID, and ListByUserID methods. This repository uses standard testing, t.Cleanup helpers, an opt-in integration build tag, and a required CI job that selects that tag. No testify dependency is present. A disposable database service can be shared, but each test must own isolated data and cleanup, including when setup or assertions fail. A teammate proposes adding testify/suite because integration testing supposedly requires it. Choose an approach and outline the fixture lifecycle.",
+      "trap": "Treating a preferred framework as mandatory adds dependencies and setup machinery; sharing mutable database contents to reduce startup cost makes tests order-dependent.",
       "expectations": [
-        "Uses testify/suite.Suite struct embedding for test organization",
-        "Has SetupSuite (or similar) for one-time database connection and schema setup",
-        "Has SetupTest or TearDownTest for per-test data cleanup (e.g., TRUNCATE)",
-        "Has TearDownSuite for graceful shutdown (close DB, docker-compose down)",
-        "Uses `//go:build integration` build tag",
-        "Has a runner function `func TestXxx(t *testing.T) { suite.Run(t, ...) }`"
-      ]
+        "Uses the existing standard-testing helpers and does not add testify/suite merely to satisfy a supposed integration-test rule.",
+        "Shares only safe service setup while isolating each test data through a suitable database/schema/transaction strategy.",
+        "Registers cleanup as resources are acquired so failure during setup or assertions cannot leave state or connections behind.",
+        "Preserves the repository integration tag and required CI selection, and tests real repository operations against PostgreSQL.",
+        "Explains how tests remain independently runnable; does not trade isolation for cheaper setup."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "E5": "outcome",
+          "T1": "outcome"
+        }
+      }
     },
     {
       "id": 13,
@@ -191,6 +223,32 @@
         "Uses sync.WaitGroup or similar synchronization to coordinate concurrent test goroutines",
         "Tests are independently runnable (any single test can pass when run in isolation with -run)"
       ]
+    },
+    {
+      "id": 15,
+      "name": "cost-aware-consolidation-keeps-distinct-regressions",
+      "description": "Choose suite-maintenance actions from existing behavior and execution costs, not per-test quotas or function counts.",
+      "prompt": "Review this proposed Go test cleanup. A behavior-preserving helper extraction leaves TestPricePolicy passing; its named table covers the accepted minimum, maximum, equality, and rejection boundaries and takes 70ms with a local fixture. The author adds 30 generated tests repeating those same inputs against private helpers. To get a 16-minute suite down, they propose deleting TestPricePolicy because unit tests must take under 1ms and removing a six-minute process-restart test. The restart test is the only check that detected a previous wrong-write-order recovery bug; in-memory tests cannot reproduce that mechanism. Required CI runs both package and recovery jobs. Given this inventory, what changes and verification would you recommend? No code or command execution is available in this exercise.",
+      "trap": "Function-by-function generation and arbitrary speed thresholds can grow duplicate coverage while deleting the only protection for an expensive real boundary.",
+      "expectations": [
+        "Uses the supplied coverage inventory to retain or extend the existing behavioral table and remove or decline equivalent private-helper tests rather than automatically keeping all additions.",
+        "Rejects a universal 1ms threshold; investigates measured fixture/setup cost without treating duration alone as evidence that the test is unnecessary.",
+        "Retains the distinct process-restart regression and required recovery job unless equivalent protection is actually demonstrated.",
+        "Keeps behavior-preserving test consolidation green, verifies retained boundary assertions and independent execution, and does not demand new product behavior or a fabricated red failure.",
+        "Separates focused package feedback from required final recovery verification and does not claim execution or runtime savings from this response-only exercise."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "contrast",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "E4": "outcome",
+          "E5": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

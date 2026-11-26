@@ -1,29 +1,27 @@
 ---
 name: golang-testing
-description: "Production-ready Golang tests — table-driven tests, testify suites and mocks, parallel tests, fuzzing, fixtures, goroutine leak detection with goleak, snapshot testing, code coverage, targeted mutation testing, integration tests, idiomatic test naming. Use when writing or reviewing Go tests, choosing a testing approach, setting up Go test CI, or debugging flaky/slow tests. For testify-specific APIs, consult the testify documentation (→ See `golang-pkg-go-dev` skill); for measurement methodology see `golang-benchmark`."
+description: "Production-ready Golang tests — table-driven tests, testify suites and mocks, parallel tests, fuzzing, fixtures, goroutine leak detection with goleak, snapshot testing, code coverage, targeted mutation testing, integration tests, idiomatic test naming. Use when writing or reviewing Go tests, choosing test scope, maintaining a slow or redundant suite, setting up Go test CI, or debugging flaky tests. For testify-specific APIs, consult the testify documentation (→ See `golang-pkg-go-dev` skill); for measurement methodology see `golang-benchmark`."
 license: MIT
 metadata:
   author: Bateau
-  version: "1.1.0"
+  version: "1.2.0"
   adapted-from: samber/cc-skills-golang@golang-testing
 ---
 
-> Adapted from `samber/cc-skills-golang@golang-testing`. Pair with `golang-common-practice` for shared verification guidance.
+> Adapted from `samber/cc-skills-golang@golang-testing`. Pair with `golang-common-practice` for shared verification guidance and `test-driven-development` for test selection, red-green-refactor, and test lifecycle management.
 
 **Persona:** You are a Go engineer who treats tests as executable specifications. You write tests to constrain behavior, not to hit coverage targets.
 
 **Modes:**
 
-- **Write mode** — generating new tests for existing or new code. Work sequentially through the code under test; use `gotests` to scaffold table-driven tests, then enrich with edge cases and error paths.
-- **Review mode** — reviewing a PR's test changes. Focus on the diff: check coverage of new behaviour, assertion quality, table-driven structure, and absence of flakiness patterns. Sequential.
-- **Audit mode** — auditing an existing test suite for gaps, flakiness, or bad patterns (order-dependent tests, missing `t.Parallel()`, implementation-detail coupling). Cover three concerns: (1) unit test quality and coverage gaps, (2) integration test isolation and build tags, (3) goroutine leaks and race conditions. Organize the audit according to scope and available tools.
+- **Write mode** — inspect the accepted behavior and existing tests first. Extend a suitable test or table before adding a separate test; select cases for distinct behavior, boundaries, and credible regressions rather than generating tests for every function.
+- **Review mode** — review the changed tests alongside existing coverage: check distinct protection, assertion quality, execution and fixture cost, isolation, and resistance to behavior-preserving refactors.
+- **Audit mode** — identify meaningful gaps and recurring cost: slow setup, redundant scenarios, flakes, order dependence, implementation coupling, or unproven concurrency/integration behavior. Measure the affected packages and preserve distinct regression protection when consolidating tests.
 - **Debug mode** — a test is failing or flaky. Work sequentially: reproduce reliably, isolate the failing assertion, trace the root cause in production code or test setup.
 
 > **Community default.** A company skill that explicitly supersedes `golang-testing` skill takes precedence.
 
-**Dependencies:**
-
-- gotests: `go install github.com/cweill/gotests/gotests@latest`
+**Optional tooling:** `gotests` can scaffold a selected test when already available; generated cases still need behavior-derived inputs and assertions. It is not a prerequisite or a reason to add tests mechanically.
 
 # Go Testing Best Practices
 
@@ -32,14 +30,14 @@ This skill guides the creation of production-ready tests for Go applications. Fo
 ## Best Practices Summary
 
 1. Table-driven tests MUST use named subtests -- every test case needs a `name` field passed to `t.Run`
-2. Integration tests MUST use build tags (`//go:build integration`) to separate from unit tests
+2. Follow the repository's test-selection conventions; explicitly run any required tests excluded from the focused loop
 3. Tests MUST NOT depend on execution order -- each test MUST be independently runnable
 4. Independent tests SHOULD use `t.Parallel()` when possible
 5. NEVER test implementation details -- test observable behavior and public API contracts
 6. Packages with goroutines SHOULD use `goleak.VerifyTestMain` in `TestMain` to detect goroutine leaks
 7. Use testify as helpers, not a replacement for standard library
 8. Mock interfaces, not concrete types
-9. Keep unit tests fast (< 1ms), use build tags for integration tests
+9. Keep the feedback loop fast using measured package/test costs and appropriate scope; there is no universal per-test millisecond limit
 10. Run tests with race detection in CI
 11. Include examples as executable documentation
 
@@ -115,11 +113,19 @@ func TestCalculatePrice(t *testing.T) {
 
 ## Unit Tests
 
-Unit tests should be fast (< 1ms), isolated (no external dependencies), and deterministic.
+Keep unit tests deterministic, independent, and cheap enough for frequent feedback. Judge cost from the actual setup, resources, and run frequency; the unit/integration label alone does not establish runtime.
+
+## Selecting and maintaining Go tests
+
+Use `test-driven-development` for the shared lifecycle method. Inspect existing package tests, subtests, fixtures, build tags, and relevant CI jobs before adding coverage. Consolidate equivalent cases without losing boundary values, failure diagnostics, cleanup, or regression assertions. Similar inputs at two layers may protect different mechanisms: a pure decision test cannot replace a real transport, persistence, or process-recovery test.
+
+Start the inner loop with the affected package and named test/subtest. Broaden to affected packages and applicable repository gates at the appropriate completion boundary. Use race detection, repeated runs, and shuffle to answer a concurrency or isolation question, or to satisfy repository policy; a new review step alone does not require repeating an unchanged full matrix.
+
+For slow suites, inspect elapsed time and setup cost with existing CI output or `go test -json`. Use `-count=1` when fresh execution is needed for diagnosis or measurement, and distinguish cached results from new runs. If tests move behind tags, `-short`, or separate jobs, verify that required tests and subtests actually execute in their intended job; a passing parent with all relevant children skipped is insufficient. Do not change required gates merely to make local feedback faster.
 
 ## Testing HTTP Handlers
 
-Use `httptest` for handler tests with table-driven patterns. See [HTTP Testing](./references/http-testing.md) for examples with request/response bodies, query parameters, headers, and status code assertions.
+Use `httptest.ResponseRecorder` for handler behavior that can be proved in-process. Use an actual test server/client when transport, TLS, client behavior, or assembled routing is part of the claim; do not replace that boundary with a recorder to save time. See [HTTP Testing](./references/http-testing.md) for request/response examples and the [standard library documentation](https://pkg.go.dev/net/http/httptest) for the available test boundaries.
 
 ## Goroutine Leak Detection with goleak
 
@@ -365,7 +371,9 @@ Record tool/version, candidate, baseline, scope, raw outcomes, survivor reasons,
 
 ## Integration Tests
 
-Use build tags to separate integration tests from unit tests:
+Choose separation according to repository conventions and the resources needed. Build tags exclude files from compilation; `testing.Short()` allows an explicitly shorter execution path; separate packages/jobs can make scope clear. None is universally required. Preserve the commands and CI coverage for required integration behavior. See [Go test flags](https://pkg.go.dev/cmd/go#hdr-Testing_flags).
+
+For a repository that uses opt-in integration tags:
 
 ```go
 //go:build integration
@@ -383,7 +391,7 @@ func TestDatabaseIntegration(t *testing.T) {
 }
 ```
 
-Run integration tests separately:
+Run the tagged integration tests explicitly in the required verification job:
 
 ```bash
 go test -tags=integration ./...
@@ -412,10 +420,12 @@ Many test best practices are enforced automatically by linters: `thelper`, `para
 
 ## Quick Reference
 
+Select commands for the task; this is not a checklist to run after every edit. `-run` uses regular expressions, and matching a parent does not prove its intended subtests ran.
+
 ```bash
-go test ./...                          # all tests
-go test -run TestName ./...            # specific test by exact name
-go test -run TestName/subtest ./...    # subtests within a test
+go test ./...                          # default-selected tests across packages
+go test -run '^TestName$' ./path/to/pkg # focused test in one package
+go test -run '^TestName$/^subtest$' ./path/to/pkg # focused named subtest
 go test -run 'Test(Add|Sub)' ./...     # multiple tests (regexp OR)
 go test -run 'Test[A-Z]' ./...         # tests starting with capital letter
 go test -run 'TestUser.*' ./...        # tests matching prefix
