@@ -17,12 +17,12 @@ For material capability or control changes, use `technology-impact` when availab
 2. **Recover the user's actual request.** Preserve the intended benefit, affected users or actors, relevant context, and meaningful wording. Distinguish the user's explicit decisions from agent recommendations and inferred consequences. Do not paste a conversation transcript.
 3. **Separate outcomes from solutions.** State what must be possible or observable, what is excluded, and which constraints are already accepted. Keep ordinary technology, component, or task choices open to later specialists.
 4. **Resolve consequential ambiguity.** First consult existing sources. Ask the user only about unresolved choices they own and that materially change success, scope, guarantees, or risk acceptance. Explain the trade-off and recommend an option when useful; do not demand an interview when the request is already clear.
-5. **Make the outcome falsifiable.** Define a small set of observable success/acceptance conditions and important negative boundaries. Do not invent numeric targets or guarantees where the user supplied none.
+5. **Define the done state.** For the accepted product goal or bounded change, state a small set of observable completion conditions and what evidence would distinguish fulfillment from activity. Keep the intended benefit, outcome-specific acceptance, and applicable shared quality Definition of Done distinct. Reference an existing quality baseline when relevant; do not invent numeric targets or guarantees. Exclusions bound the work but cannot substitute for positive conditions of success.
 6. **Preserve decision lineage.** Record material choices, their reason, rejected alternatives when relevant, and outstanding questions. Mark proposals as proposals; do not silently convert exploratory language into commitments.
 7. **Check for parallel-use ambiguity.** Ask whether independent agents could implement mutually incompatible meanings while still claiming they followed this Anchor. Resolve important semantic differences before relying on the Anchor for delegation; defer implementation detail.
 8. **Present the interpreted intent.** Give the user a concise opportunity to correct material misunderstandings. Record acceptance only when it actually occurred. Do not claim acceptance from silence or a tool result. Small, already clear changes may use previously accepted authority without an extra ceremony.
 9. **Publish to the repository's chosen location.** Follow its `AGENTS.md` (or equivalent), artifact naming rules, and `okf-authoring` if available. Make provenance and relevant relationships discoverable. No global folder structure, ID format, or harness command is imposed by this skill.
-10. **Run the fresh-session test.** Another agent should understand the expected outcome, constraints, accepted decisions, and genuinely unresolved questions without the originating chat.
+10. **Run the fresh-session test.** Another agent should understand the parent purpose, bounded outcome, completion conditions, constraints, accepted decisions, and genuinely unresolved questions without the originating chat. They should know what evidence would justify stopping, without assuming every possible future improvement is part of this change.
 
 ## Proportional artifact
 
@@ -37,8 +37,10 @@ Use only the sections required to retain meaning:
 ## Intended outcome
 <What the user wants to accomplish.>
 
-## Observable success
-- <Externally meaningful, falsifiable outcome>
+## Completion conditions (done when)
+- <Externally meaningful, falsifiable outcome and evidence that would establish it>
+<Reference the applicable shared Definition of Done when one exists; keep detailed
+requirements and verification mechanics in their owning artifacts.>
 
 ## Scope and exclusions
 <Relevant in-scope / out-of-scope boundaries.>
@@ -58,6 +60,8 @@ with acceptance evidence when applicable.>
 ```
 
 Do not copy placeholders or create empty sections. The repository's document-format skill owns frontmatter, index/log updates, and graph representation; this skill owns **substantive Anchor quality**.
+
+The Anchor-writing assignment is complete when this intent can be understood and checked without inventing material meaning, with acceptance and unresolved decisions represented truthfully. That does not establish that the product has achieved its completion conditions. Preserve the accepted goal as work is refined; reopen affected conditions for an authorized change or material new evidence, not because another enhancement can be imagined.
 
 ## First principles emerge later
 

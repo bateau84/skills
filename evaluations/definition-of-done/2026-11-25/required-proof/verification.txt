@@ -1,0 +1,12 @@
+$ python3 -B -m unittest -v
+test_download_contains_real_query_result (test_deployment.DeploymentAcceptance.test_download_contains_real_query_result) ... skipped 'Required controlled deployment is unavailable in this workspace; no live export evidence captured'
+test_header_and_empty (test_report.ReportTests.test_header_and_empty) ... ok
+test_order_and_plain_values (test_report.ReportTests.test_order_and_plain_values) ... ok
+test_roundtrip_special_characters (test_report.ReportTests.test_roundtrip_special_characters) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK (skipped=1)
+
+exit_code=0

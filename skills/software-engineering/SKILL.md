@@ -109,7 +109,11 @@ Commits and PRs are engineering artifacts, not afterthoughts.
 
 The detailed commit and PR formats live in those skills; do not duplicate them here.
 
-## Completion check
+## Definition of Done and completion
+
+Use the project's applicable **Definition of Done** as the shared quality baseline, alongside the assignment's outcome-specific acceptance criteria. The rules above supply engineering discipline; they do not create unaccepted features or universal numeric targets. Understand the parent outcome, bounded responsibility, and evidence needed to finish before expanding implementation. The existing request and repository rules can provide this contract without a named DoD document. Match the delivery boundary to the assignment; PR completion does not imply merge or deployment authority.
+
+Use the accepted request, plan or responsible caller's allocation of quality and proof obligations. Independent review may belong to a later reviewer even though it is mandatory in the shared Definition of Done. Complete the implementation assignment when its own allocated criteria, tests, documentation and other quality obligations are evidenced; report the pending review and its owner without treating it as either satisfied or a blocker to that local handoff. The parent remains incomplete until every obligation required at its acceptance boundary is satisfied. Do not unilaterally move an assigned failing or unavailable check downstream to claim DONE; clarify material allocation gaps with the responsible owner while continuing independent work.
 
 Before returning implementation work, ask:
 
@@ -122,7 +126,9 @@ Before returning implementation work, ask:
 7. Is the resulting diff focused and understandable?
 8. If committing or opening a PR is in scope, were the dedicated Git/PR skills loaded?
 
-If any answer exposes a real implementation gap, fix it within scope or report the blocker with evidence to the user or responsible collaborator. Do not manufacture completion.
+Report completion only when the outcome and quality obligations allocated to this assignment have current, sufficient evidence. Name the evidence and its limits; a passing local test cannot stand in for required integration proof at either the local or parent boundary. If work or proof allocated to this assignment remains, preserve completed work and report a partial or blocked result with the exact unmet condition and next useful step. Mandatory downstream work stays open at the parent boundary; local DONE neither satisfies nor waives it. Use the host's existing result format. A session ending or a recorded deferral is not completion.
+
+Once the contract is satisfied, stop. A concrete in-scope defect or credible material risk to accepted behavior warrants correction or the smallest decisive check; optional refactoring, speculative hardening, and unrelated baseline failures do not automatically extend the task. Report useful follow-up separately without implying authorization. Reopen completed work for a relevant change or new counterevidence, not repeated preferences or an imagined stronger guarantee.
 
 ## Evaluation
 

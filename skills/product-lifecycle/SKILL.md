@@ -15,7 +15,7 @@ This method identifies applicable work within existing authority. It does not cr
 
 ## Method
 
-1. **Establish the delivery boundary.** Identify who installs, uses, and operates the product; where it runs; what data or credentials it owns; and which first-use, continuing-use, or release outcomes were actually accepted. Separate known context from assumptions.
+1. **Establish the delivery and completion boundary.** Identify the bounded version or change, who installs, uses, and operates it; where it runs; what data or credentials it owns; and which first-use, continuing-use, or release outcomes were actually accepted. Preserve their acceptance criteria and applicable shared quality Definition of Done. Ongoing product operation does not make this assignment responsible for every future lifecycle improvement. Separate known context from assumptions.
 2. **Follow applicable lifecycle paths.** Use only the paths material to that boundary:
    - Start: installation/distribution, prerequisites, configuration, permissions/credentials, initial data, and the first useful action in a fresh environment.
    - Continue: ordinary use, dependency failures, meaningful failure detection, diagnostics, resource/cost limits, and who can take action.
@@ -30,9 +30,9 @@ This method identifies applicable work within existing authority. It does not cr
 
 Reuse the current permitted artifact or handoff. For each material path, preserve its accepted basis, starting condition, owning contribution, observable result/proof need, and any genuine unresolved gap. State important exclusions and their basis when misunderstanding would matter; do not create a blank matrix for every imaginable lifecycle concern.
 
-## Sufficient result
+## Completion of lifecycle planning
 
-The relevant owners can explain how an intended user starts, obtains value, continues, and handles the material failures/changes inside the agreed delivery boundary. Necessary work has an owner and proof path; optional work is not silently promoted into scope. This is a proposed coverage result, not a claim of completed deployment or product readiness.
+The relevant owners can explain how an intended user starts, obtains value, continues, and handles the material failures/changes inside the agreed delivery boundary. Necessary work has an owner and proof path; consequential unresolved meaning prevents claiming that dependent planning is complete. Stop when that coverage is sufficient for the assignment, preserving optional improvements as advisory. This is a coverage result, not proof of completed deployment or product readiness; those claims require observed evidence of the accepted paths. Reopen affected coverage for new evidence or changed commitments, without expanding into every possible operating concern.
 
 Example: an application works on a populated development database, but a fresh supported installation cannot initialize its required data. Surface the first-use gap and its owner before decomposing delivery; later prove the real setup-to-first-result path. Do not accept a seeded fixture as that proof or require an unrelated cloud deployment.
 

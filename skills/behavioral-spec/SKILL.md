@@ -21,6 +21,8 @@ An agent writing specifications may resolve ordinary semantic detail within the 
 
 For substantial requirements, start the bundle index or existing overview with a brief explanation in everyday language: what the user wants to accomplish, what success looks like, one useful example (including an important failure when relevant), and what is deliberately outside scope. This lets the user check the interpretation before technical wording spreads into design and architecture. It is an explanation of the accepted requirements, **not a second source of requirements**. If the explanation and precise clauses disagree, resolve the mismatch; don't bury it in jargon or silently invent a stronger promise. Ordinary specification choices remain with the author, not a new user sign-off.
 
+Make the completion boundary explicit: which product change or increment do these requirements define, and how does it advance the parent goal? Preserve the applicable **Definition of Done** as the shared quality baseline; requirement-specific acceptance criteria define the particular observable outcomes. Give each criterion a verification meaning under its actual conditions. Keep those links in the existing clauses and overview rather than copying the quality baseline into every requirement or creating a second completion checklist.
+
 ## Improve existing requirement documents
 
 When an existing requirement bundle relevant to the task is too opaque for a reader to verify the intended behavior, revise the unclear explanation **and the affected requirement wording** where needed, rather than adding a second summary that disagrees with the clauses. Preserve accepted meaning, identifiers, source links, priority, conditions, exceptions, verification criteria, and relationships. Replace unnecessary jargon with observable examples; keep exact terms where they distinguish real guarantees.
@@ -129,7 +131,7 @@ Before handoff, apply three bounded counterexample checks:
 
 These are practitioner self-checks, not an assertion of independent review or a new approval gate. Correct the affected meaning and repeat the affected checks; do not restart unrelated specification work.
 
-### 8. Stop at bounded coverage
+### 8. Define when the specification work is done
 
 A handoff is ready only for the scope whose accepted meaning is sufficiently settled for downstream realization:
 
@@ -138,6 +140,8 @@ A handoff is ready only for the scope whose accepted meaning is sufficiently set
 - No known in-scope counterexample or unresolved conflict defeats the claimed coverage. Assumptions and remaining uncertainty are visible, not presented as proof of exhaustive completeness.
 
 Continue and hand off independent, unaffected specification while an authority question is open. Do not declare the dependent portion or whole assignment complete just because its gap has been recorded. Summarize the ready scope, consequential choices, coverage limits, and blockers using the project's existing notes or handoff surface, not a new required artifact. A fresh counterexample or changed anchor reopens affected coverage, not the entire process by default.
+
+Once this bounded coverage and the document-quality conditions allocated to the specification assignment are established, finish that assignment. Required review or proof allocated to another owner by the accepted request or plan stays open at the parent acceptance boundary; local completion neither satisfies nor waives it. More imaginable requirements do not justify continued expansion. A completed requirements bundle defines how product completion will be judged; it is not evidence that the implementation satisfies those requirements. Missing required coverage remains incomplete even when a session ends or its remaining work is handed off.
 
 ## Worked example
 

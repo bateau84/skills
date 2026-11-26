@@ -75,6 +75,33 @@
         "Must not omit interruption/re-entry despite it being part of the accepted context.",
         "Must not define success as HTTP/page-load success."
       ]
+    },
+    {
+      "id": "SC-03",
+      "name": "observable-export-outcome-and-authoring-boundary",
+      "prompt": "Write one user story and one concrete design scenario for the first report-export increment. The accepted product goal is that an operator can inspect completed-job outcomes offline. For this increment, the operator chooses a time range, downloads a CSV containing matching completed-job IDs and terminal outcomes, and opens it in their existing spreadsheet application. If the query fails, the operator sees an error and does not receive a file that appears successful. Export scheduling and email are excluded. This is only the story/scenario authoring assignment; no implementation or user validation exists yet. Include the material failure branch and a concise handoff stating what this work establishes.",
+      "trap": "Clicking Download substitutes for the human outcome, or writing an end-to-end scenario is reported as proof that the real product satisfies it.",
+      "expectations": [
+        "Defines human-observable success as usable matching data in the spreadsheet, ties it to offline inspection, and covers the accepted query-failure experience.",
+        "Keeps the story and scenario implementation-independent, excludes scheduling/email and avoids inventing unrelated personas or capabilities.",
+        "Completes the authoring handoff with clear meaning and future validation intent, without presenting the written journey as an executed experience."
+      ],
+      "negative_expectations": [
+        "Must not equate a click, task count or document completion with successful offline use.",
+        "Must not claim user validation passed, prescribe new backend mechanisms or expand the accepted increment."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

@@ -45,6 +45,7 @@ After the first demonstration, inspect whether the explanation is usable and whe
 ### <candidate name>
 
 - Outcome / responsibility / exclusions:
+- Parent contribution: <larger outcome this work advances>
 - Grounded surface: <paths, interfaces, mutable resources + inspection evidence>
   Unverified targets / discovery owner:
   Authorized executable scope, if applicable:
@@ -52,7 +53,12 @@ After the first demonstration, inspect whether the explanation is usable and whe
 - Coordination: <shared state; actual host facilities; isolation/integrator/re-read choice>
 - Obligations preserved: <guarantee → outcome/constraint + proof>
 - Seam participants / integration owner:
-- Local and cross-boundary verification: <falsifiable expectations>
+- Completion:
+  - Acceptance criteria: <observable conditions allocated to this group>
+  - Applicable Definition of Done: <shared baseline reference; obligations allocated to this group>
+  - Required evidence: <what establishes those conditions at this boundary>
+  - Return boundary: <return when this group's allocated conditions are evidenced; otherwise name the unmet condition>
+  - Mandatory downstream obligations: <remaining review/proof; responsible owner; parent acceptance boundary kept open>
 - Milestone or scenario enabled: <accepted outcome; peer prerequisites; assembly/proof owner; or enabling risk and dependent outcome>
 - Execution fit: <why this fits one focused loop; context surface, material reasoning transitions, uncertainty, retry/verification boundary>
 - Boundary reason: <what goes wrong if merged, or merge candidate>

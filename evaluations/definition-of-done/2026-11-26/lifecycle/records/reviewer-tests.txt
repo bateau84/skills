@@ -1,0 +1,10 @@
+test_escaped_fields_and_lf_record_endings (test_report.ReportTests.test_escaped_fields_and_lf_record_endings) ... ok
+test_header_and_empty (test_report.ReportTests.test_header_and_empty) ... ok
+test_order_and_plain_values (test_report.ReportTests.test_order_and_plain_values) ... ok
+test_preserves_plain_value_conversion (test_report.ReportTests.test_preserves_plain_value_conversion) ... ok
+test_roundtrip_special_characters (test_report.ReportTests.test_roundtrip_special_characters) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.000s
+
+OK

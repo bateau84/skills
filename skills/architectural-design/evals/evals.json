@@ -110,6 +110,33 @@
         "No invented recovery-time target, mandatory automatic retry count, distributed cluster or technology beyond the agreed requirements.",
         "No nominal healthy-worker test presented as proof of the crash Quality Scenario, and no commitment to a specific Markdown section name or extra approval gate."
       ]
+    },
+    {
+      "id": "Design-07",
+      "name": "design-ready-is-not-runtime-conformance",
+      "prompt": "Finalize a structural design handoff for an agreed first report-export increment. Parent outcome: operators can inspect completed-job outcomes offline. The accepted design reuses the existing authenticated query boundary, CSV formatter, and HTTP download adapter. The query owns time-range filtering and stored terminal outcomes; the formatter owns escaped CSV representation; the adapter returns a file only after query and formatting succeed, and otherwise exposes the existing error outcome. Relevant source review found coherent ownership, no new store or service is needed, and a focused formatter feasibility probe confirmed the required escaping. No cross-region deployment or email feature is in scope. Implementation has not been assembled and the required real query-to-download check has not run; the delivery plan assigns it to the export integration task. The design task requires the justified structure, relevant failure paths, and a downstream proof plan, not implementation. Produce the readiness decision and remaining proof obligations. A reviewer also suggests eventually benchmarking distributed export workers.",
+      "trap": "Architecture readiness is conflated with runtime proof, or an unrelated suggestion prevents completing an otherwise justified bounded design.",
+      "expectations": [
+        "Connects the structural outcome to offline inspection and identifies the relevant owners, failure behavior and evidence supporting design readiness.",
+        "Treats the planned real query-to-download check as unexecuted evidence owned by the integration task; does not claim that the product or composed runtime already works.",
+        "Completes the design-only assignment when the supplied readiness conditions are met and keeps the distributed-worker suggestion advisory."
+      ],
+      "negative_expectations": [
+        "Must not label the integration check passed, fabricate execution, or mistake formatter-only evidence for the assembled path.",
+        "Must not require unrelated distributed architecture, new runtime implementation, or another approval ceremony merely to finalize the design."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

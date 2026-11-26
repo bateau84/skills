@@ -15,6 +15,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 - Trust/security boundaries are explicit where authority, credentials, untrusted input, sensitive state, processes, or networks cross.
 - Composition proof tests assembled behavior rather than only locally plausible components, and load-bearing verification is persisted when required.
 - Public seams remain small enough that downstream implementation does not have to rediscover architecture.
+- The readiness claim names the supported outcome and parent goal, resolves blocking design uncertainty, and distinguishes completed design checks from future implementation/conformance proof. Required downstream evidence has an owner without making a design-only assignment responsible for building the system. Optional refinements do not reopen an otherwise sufficient design; known material gaps still limit readiness.
 - Structural preparation addresses an inspected difficulty or accepted upcoming change, with a direct baseline, bounded stopping point, whole-change cost, and preservation evidence. The claimed improvement names knowledge or coordination callers no longer need; conditional future value is not presented as an observed result.
 
 ## Review depth

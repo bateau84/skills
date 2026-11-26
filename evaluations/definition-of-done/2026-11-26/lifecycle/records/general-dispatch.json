@@ -1,0 +1,11 @@
+{
+  "call": "collaboration.spawn_agent",
+  "arguments": {
+    "task_name": "completion_lifecycle",
+    "fork_turns": "none",
+    "message": "Read /tmp/dod-ownership-14991c66/REQUEST.md and act under /tmp/dod-ownership-14991c66/instructions/general.md to complete the accepted task. Work in /tmp/dod-ownership-14991c66/project using the supplied sources and actual fresh specialist delegations. Keep the requested observation records and final result in /tmp/dod-ownership-14991c66/records. Do not inspect unrelated workspace directories or publish. Report progress to /root after each specialist returns as requested."
+  },
+  "result": {
+    "task_name": "/root/completion_lifecycle"
+  }
+}

@@ -13,6 +13,7 @@ Domain-specific review guidance for any agent performing assessment. It does not
 - Known failed reviews/findings affecting the planned boundary are explicitly closed, carried as risk, or represented in acceptance criteria before dependent execution.
 - Superseded or stale evidence is not silently used to close a current planning risk.
 - Research and decisions remain with their proper authorities.
+- Investigations define the decision, discriminating evidence, and return boundary. A negative finding can finish the question; a timebox or access failure cannot silently close an unresolved guarantee or authorize replacement implementation.
 
 ## Review depth
 

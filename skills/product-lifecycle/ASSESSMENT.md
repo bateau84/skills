@@ -10,5 +10,6 @@ For Reviewer when lifecycle coverage is material to the assigned product outcome
 - Necessary work and proof expectations reach the existing decomposition/verification surfaces; missing setup, migration, or recovery work is not lost between component tasks.
 - Evidence can distinguish the claimed lifecycle property from a weaker one: restoration versus backup creation, upgrade versus fresh install, actionable recovery versus an error message, and real initialization versus seeded state.
 - Reports separate proposed coverage, executed checks, accepted limitations, and readiness claims. No extra operations gate or enterprise process is imposed on a bounded prototype.
+- Planning completion is tied to the bounded version/change and preserves applicable quality obligations. A complete owner/proof map does not establish lifecycle readiness, while optional future operations work does not keep this assignment open.
 
 Identify the exact accepted path, missing contribution/proof, and correction owner. Preserve valid feature evidence while naming what it cannot establish about lifecycle use.

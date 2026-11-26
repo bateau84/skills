@@ -10,5 +10,6 @@ For Reviewer when discovery findings are within the assigned review surface. Thi
 - Decisive assumptions have an appropriate evidence or explicitly carried-uncertainty disposition. Proposed probes are not reported as executed, and mutation authority is not inferred from their research label.
 - Delivery criteria and expected benefit remain distinct. Proposed measures have not become new mandatory acceptance criteria without authority, and an authorized experiment is not blocked solely because value is unproven.
 - The receiving owner can use the result without repeating settled questions or maintaining a competing product specification. Any follow-up measurement is bounded and authorized rather than implied ongoing monitoring.
+- Discovery has a bounded decision and evidence-based return condition. A supported negative recommendation can complete it; unavailable mandatory evidence remains visible, and completing discovery does not establish product delivery or benefit.
 
 Identify the exact unsupported claim, scope change, or missing decision/evidence in the assigned surface. Preserve useful observations and existing accepted work; do not demand a market study or a particular document shape.

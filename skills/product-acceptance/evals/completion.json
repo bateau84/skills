@@ -1,0 +1,60 @@
+{
+  "skill": "product-acceptance",
+  "version": 1,
+  "shape": 1,
+  "common_instruction": "Work from the supplied task and evidence packet within its stated scope. Produce the requested practical artifact and rationale. Treat supplied facts as evidence for this decision exercise, not as actions you performed. State missing evidence and unresolved decisions precisely; continue independent work where possible. Use available reference material when useful. Do not invent requirements, tool execution, or results.",
+  "cases": [
+    {
+      "id": "PA12",
+      "name": "close-a-proven-bounded-claim",
+      "prompt": "Give an acceptance decision for a bounded CSV export milestone. Accepted criteria: select records in the real CLI, atomically publish a CSV, print its path, and inspect it afterward; preserve source records. Shared quality obligations require relevant regression evidence, current command help, and review. Supplied current-revision records identify the shipping-equivalent build, real selection/export/storage/read path, independent expected content, failure-path preservation checks, command transcript, updated help, and completed review with no open required finding. All expected results match. JSON export is a later milestone; a reviewer proposes dashboard metrics as optional polish. No new counterevidence is supplied.",
+      "trap": "Acceptance expands indefinitely to future capability or optional polish despite sufficient current evidence for the accepted bounded claim.",
+      "expectations": [
+        "Accepts the supplied evidence for the bounded CSV claim and explains its contribution and limits.",
+        "Keeps JSON and optional metrics outside this completion decision without inferring full product delivery.",
+        "Does not repeat broad proof solely because another enhancement is possible."
+      ],
+      "negative_expectations": [
+        "Does not block CSV acceptance on future JSON or metrics.",
+        "Does not claim to have executed the supplied run or treat the whole evolving product as finished."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "PA13",
+      "name": "assessment-complete-product-unproven",
+      "prompt": "Your assignment is to assess the supplied release evidence and report the exact next proof needed. No execution is authorized. The accepted release requires a browser-created export to be downloadable after restarting the service. Current records prove only the running-service path; no restart check occurred. Produce the assessment handback. A task tracker has one status field and the team asks whether your review task and the release claim are both DONE.",
+      "trap": "Completing a review report is confused with establishing the assessed product outcome.",
+      "expectations": [
+        "Completes the evidence-assessment artifact with a scoped UNPROVEN restart claim and a concrete real restart-to-download proof need.",
+        "Separates completion of the assessment assignment from the still-incomplete release acceptance claim, preserving the useful running-service evidence."
+      ],
+      "negative_expectations": [
+        "Does not label the release complete, infer restart failure, or claim an unexecuted check passed.",
+        "Does not implement an unapproved fix or demand unrelated lifecycle checks."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

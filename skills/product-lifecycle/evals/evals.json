@@ -18,6 +18,33 @@
         "Treats Kubernetes, multi-region deployment, centralized telemetry or a zero-downtime release process as required for this 1.0",
         "Presents upgrade or backup/restore as a blocker for tagging 1.0"
       ]
+    },
+    {
+      "id": "pl-done-01",
+      "name": "planning-completion-is-not-release-proof",
+      "prompt": "Produce a lifecycle planning handoff for an accepted v1 local inventory tool. Its required paths are fresh setup to first item, restart preserving items, and export before uninstall. No upgrade path is promised for this first version. Current planning identifies the real startup command, storage owner, export command, and observable evidence for each required path; implementation and execution have not started. The shared quality baseline requires usage documentation and relevant verification. A suggestion adds fleet telemetry, unattended upgrades, and a restoration service. State what completes your planning assignment and what still prevents claiming v1 ready.",
+      "trap": "A plan with owners is mistaken for executed readiness, or the open-ended lifecycle turns every operational enhancement into current scope.",
+      "expectations": [
+        "Produces bounded coverage, ownership, applicable quality obligations, and proof expectations for the three accepted paths.",
+        "Distinguishes a complete usable planning handoff from the unimplemented/unproven product and keeps necessary proof visible downstream.",
+        "Keeps the proposed operational additions advisory and outside v1 rather than blocking the plan on them."
+      ],
+      "negative_expectations": [
+        "Does not claim the paths have run or v1 is release-ready.",
+        "Does not require a universal operations checklist or erase an accepted lifecycle guarantee."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
     }
   ]
 }

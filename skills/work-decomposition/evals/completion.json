@@ -1,0 +1,89 @@
+{
+  "skill": "work-decomposition",
+  "version": 1,
+  "shape": 1,
+  "common_instruction": "Work from the supplied assignment and evidence. Produce the requested artifact or decision within its stated authority. Treat supplied observations as evidence, not actions you performed. Do not invent execution results.",
+  "cases": [
+    {
+      "id": "WD-DONE-01",
+      "name": "task-contracts-preserve-parent-and-quality",
+      "prompt": "Prepare bounded work groups for this accepted milestone: a user creates an export in the browser and can later download the exact stored file. The backend export endpoint and browser integration are independently implementable by different owners. The project Definition of Done requires relevant regression tests, current usage documentation, and review of changed behavior. Acceptance requires the real browser-to-service-to-storage-to-later-download path; a fake external object-store endpoint is allowed, but the real product adapter must run. Backend and browser local tests alone cannot establish the journey. A future export scheduler is out of scope. Give each group its completion conditions and state who proves the milestone. This is planning only.",
+      "trap": "Local task criteria omit the shared quality bar or parent proof, leaving every owner able to claim done while no one owns the usable result.",
+      "expectations": [
+        "Each work group preserves its bounded outcome, contribution to the user journey, applicable shared quality obligations, and observable evidence needed to return.",
+        "Assigns real assembled-path verification and its prerequisites to a coherent owner without automatically creating a task per seam.",
+        "Keeps local task completion, planning completion, and milestone acceptance distinct; the future scheduler stays outside the work."
+      ],
+      "negative_expectations": [
+        "Does not treat a test plan or green local tests as executed journey proof.",
+        "Does not add a new workflow engine, mandatory schema, approval stage, or global quality targets."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "WD-DONE-02",
+      "name": "reslice-does-not-redefine-completion",
+      "prompt": "Update an existing task plan. The accepted task must migrate stored records and verify old and new readers preserve their content. The migration is implemented and new-reader evidence passes. During work, the old reader is found to require a separate compatibility fix; that fix is authorized but exceeds this focused task context. Preserve the valid work and arrange the remaining work. An engineer suggests closing the original task as DONE because a follow-up issue can own the old reader. What should the plan and handoff say?",
+      "trap": "Splitting unfinished work silently weakens the original completion contract and converts a recorded follow-up into acceptance.",
+      "expectations": [
+        "Preserves the migration and new-reader evidence with their limits and gives the compatibility fix and remaining proof a coherent owner.",
+        "Leaves the original accepted outcome incomplete or transparently represents the parent remainder; a completed subtask does not imply the old task or milestone is fulfilled.",
+        "Keeps the accepted reader-preservation promise intact while allowing independent valid work to continue."
+      ],
+      "negative_expectations": [
+        "Does not mark the original outcome done solely because a follow-up exists.",
+        "Does not restart the verified migration or invent a new migration guarantee."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    },
+    {
+      "id": "WD-DONE-03",
+      "name": "allocate-shared-quality-across-implementation-and-review",
+      "prompt": "Prepare the completion portion of a delivery plan for a bounded CSV export fix. The shared Definition of Done requires correct escaping, passing regression tests, updated usage documentation and independent review of the changed behavior. The responsible caller assigns implementation, tests and documentation to one implementer, followed by an independent reviewer; the caller owns acceptance of the overall change. Keep this allocation and explain the local and parent states at two points: first, the implementation/tests/docs have current evidence but review has not started; second, independent review has completed with a supported approval and no remaining required finding. No deployment or new feature is authorized. Produce the bounded work-group handoff and the next action at each point.",
+      "trap": "The shared DoD either blocks the implementer from handing off until its downstream review exists, or is weakened into separate personal standards that allow the parent change to finish without review.",
+      "expectations": [
+        "Allocates every shared-quality obligation to its responsible owner and acceptance boundary without changing the baseline; the implementer owns implementation/tests/docs and a different reviewer owns independent assessment.",
+        "At the first point, allows the evidenced implementation assignment to finish and hand off to the reviewer while keeping the parent change incomplete for the pending review.",
+        "At the second point, allows the caller to complete the bounded parent change only after considering the review evidence and all remaining parent conditions; no deployment authority is inferred."
+      ],
+      "negative_expectations": [
+        "Must not make the implementer self-review to satisfy the independent-review condition, wait indefinitely for review before returning its local result, or invent a circular dependency.",
+        "Must not count local DONE or scheduling the reviewer as satisfying or waiving the parent independent-review obligation."
+      ],
+      "evaluation": {
+        "mode": "response",
+        "purpose": "boundary",
+        "criterion_types": {
+          "E1": "outcome",
+          "E2": "outcome",
+          "E3": "outcome",
+          "N1": "outcome",
+          "N2": "outcome",
+          "T1": "outcome"
+        }
+      }
+    }
+  ]
+}

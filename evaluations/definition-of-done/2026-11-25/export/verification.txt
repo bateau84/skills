@@ -1,0 +1,11 @@
+$ python3 -B -m unittest -v
+test_header_and_empty (test_report.ReportTests.test_header_and_empty) ... ok
+test_order_and_plain_values (test_report.ReportTests.test_order_and_plain_values) ... ok
+test_roundtrip_special_characters (test_report.ReportTests.test_roundtrip_special_characters) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK
+
+exit_code=0

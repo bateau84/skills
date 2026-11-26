@@ -12,6 +12,8 @@ This is methodology, not permission or a new approval stage. Use agreed requirem
 
 ## 1. Select claim-appropriate scenarios
 
+State the bounded product or milestone claim, its contribution to the parent goal, its acceptance criteria, and the applicable shared quality **Definition of Done** before selecting proof. Preserve their existing authority and scope. Identify who owns each required obligation and the acceptance boundary where it must be satisfied. An implementation assignment may already be DONE for its allocated work while independent review or composed proof remains mandatory here. A complete task, accepted architecture document, or finished test plan does not establish the product claim.
+
 Group accepted criteria into externally meaningful outcomes. Choose the smallest scenario set whose failures would expose materially different composition defects—not one test per requirement or only paths known to work. Use accepted human scenarios and setup-to-first-result, supported-change, and recovery coverage when relevant; optional lifecycle suggestions do not become requirements.
 
 Useful discriminators include UI → API, command → durable state → later read, scheduler → worker → side effect, policy/auth boundaries, upgrade/migration, and interruption/retry. One scenario may prove several related criteria. A happy path cannot alone prove an agreed no-loss or recovery promise. Keep internal invariants in narrower tests when those are sufficient. A pure local change with unchanged public behavior and adequate contract/regression evidence need not manufacture a new expensive E2E test.
@@ -50,6 +52,8 @@ Record at least: **claim; entry/path; real stages; external substitutions and ev
 
 Use PASS only for an executed claim supported by this evidence. An observed violated outcome is FAIL; an unavailable, skipped, uncertain, or inconclusive proof is UNPROVEN. Scope statuses to the claim: narrower routing PASS does not imply full-journey PASS. Plans and fixtures are not execution evidence. Keep logs/assertions/screenshots or transcripts with the run identity and reproduction steps; redact secrets and user data.
 
+Declare the bounded product outcome done only when all accepted criteria and shared quality obligations required at that acceptance boundary are supported, including obligations allocated across different owners. Required FAIL or UNPROVEN conditions prevent that parent completion claim even when every implementation task is closed; local completion neither satisfies nor waives downstream obligations. An acceptance-assessment assignment may still finish with an honest FAIL or UNPROVEN report when it satisfies its allocated assessment conditions; state which assignment is complete and which product claim is not. When sufficient evidence supports the outcome, stop broadening the proof. Reopen affected claims for relevant changes or material counterevidence, and keep optional improvement suggestions separate from acceptance blockers.
+
 ## 5. Review the milestone against the product goal
 
 For a milestone review, explain what now works, what its evidence establishes, what remains unavailable or unproven, and how the result advances the parent goal. Completed tasks and passing local suites do not establish the assembled outcome. A technical experiment alone does not establish a usable increment.
@@ -61,6 +65,7 @@ Use the real scenario to identify learning relevant to the next commitment: misu
 - [ASSESSMENT.md](ASSESSMENT.md): conformance of claims and proof records to accepted obligations.
 - [QA.md](QA.md): residual false confidence after competent execution and review.
 - [Portable evaluation cases](evals/cases.md): bundled prompts, evaluator observations, and standalone execution instructions. Fixtures alone are not evidence that evaluations have run.
+- [Completion cases](evals/completion.json): closing a proven bounded claim and distinguishing assessment completion from product acceptance; fixtures are not executed results.
 
 **Standalone package:** copy this complete directory, including `references/` and `evals/`. All necessary guidance and case instructions travel with it. Optional collection-only maintenance resources, when using the full library checkout, are `evaluations/selective-enrichment/README.md` (matched comparison protocol) and `evaluations/selective-enrichment/PROVENANCE.md` (baseline identities/adaptation mapping), relative to the collection root. They are not standalone dependencies; without the preserved comparison materials, run the bundled cases as decision exercises rather than claiming a four-variant comparison.
 
